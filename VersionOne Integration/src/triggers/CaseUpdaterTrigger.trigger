@@ -16,9 +16,9 @@ trigger CaseUpdaterTrigger on Case (after update) {
         	//System.debug('Case owner:' + owner.Name);
         	cases.add(updatedCase);
         }
-
-		V1Publisher publisher = new V1Publisher(cases);
-		publisher.publish();
     }
+
+	V1Publisher publisher = new V1Publisher(cases);
+	publisher.publish();
 
 }
