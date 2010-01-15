@@ -1,0 +1,19 @@
+<apex:page controller="SettingsController" action="{!initSettings}"> <!-- action="{!initPageAction}" -->
+<apex:sectionHeader title="new Test settings" />
+
+    {!greeting} <p/>
+    <apex:form >
+        <apex:pageBlock title="Settings">
+
+    Path: <apex:inputText id="V1Path" value="{!mycs.Path__c}"/> <br/>
+    <!--
+ User Name: <apex:inputField value="{!userName}"/> <br/>
+    Password: <apex:inputField value="{!password}"/> <br/>
+    <apex:commandButton value="Save" action="{!save}"/>
+
+Queue: <apex:inputfield value="{!group.UserData}" /> <br/>
+ -->
+<!--  Product: <apex:inputfield value="{!product.name}" />-->
+         </apex:pageBlock>
+    </apex:form>
+</apex:page>

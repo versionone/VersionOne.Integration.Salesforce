@@ -1,0 +1,11 @@
+[15.01.2010]
+Create Custom Settings(Setup>Develop>Custom Settings) with "V1Settings" name.
+add the following fileds:
+Path - URL
+UserName - Text
+Password - Text
+----------------------
+Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
+----------------------
+Create queue with "Assigned to VersionOne" name.
+
