@@ -5,7 +5,7 @@
     <apex:form >
         <apex:pageBlock title="Settings">
 
-    Path: <apex:inputText id="V1Path" value="{!mycs.Path__c}"/> <br/>
+    Path: <apex:inputText id="V1Path" value="{!settings.path}"/> <br/>
     <!--
  User Name: <apex:inputField value="{!userName}"/> <br/>
     Password: <apex:inputField value="{!password}"/> <br/>

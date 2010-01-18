@@ -26,6 +26,10 @@ public with sharing class Settings {
 		return mycs.Path__c;
 	}
 
+	public void setPath(String path) {
+		mycs.Path__c = path;
+	}
+
 	public String getUserName() {
 		return mycs.UserName__c;
 	}

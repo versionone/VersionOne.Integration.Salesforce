@@ -11,4 +11,8 @@ public with sharing class V1Publisher {
 			System.debug('Case product name:' + caseData.Product__c);
 		}
 	}
+
+	private integer findProjectId(String productName) {
+		return 1;
+	}
 }
