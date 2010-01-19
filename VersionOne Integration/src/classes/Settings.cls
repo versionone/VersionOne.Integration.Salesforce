@@ -9,11 +9,13 @@ public with sharing class Settings {
 
 		if(mycs == null) {
 			mycs = new V1Settings__c(Name= 'V1Settings');
-			mycs.Path__c = 'http://localhost';
+			mycs.Path__c = 'http://localhost/VersionOne/';
 			mycs.UserName__c = 'admin';
 			mycs.Password__c = 'admin';
 			insert mycs;
 		}
+
+		mycs.Path__c = 'http://195.62.49.62:7001/VersionOne/';
 
 
 		String queueName = 'Escalate to VersionOne';
@@ -40,5 +42,9 @@ public with sharing class Settings {
 
 	public String getEscalateQueueId() {
 		return escalateQueueId;
+	}
+
+	public String getSource() {
+		return 'SalesForce';
 	}
 }

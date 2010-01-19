@@ -18,7 +18,8 @@ trigger CaseUpdaterTrigger on Case (after update) {
         }
     }
 
-	V1Publisher publisher = new V1Publisher(cases);
-	publisher.publish();
+	//V1Publisher publisher = new V1Publisher(cases);
+	//publisher.publish();
+	V1Publisher.test();
 
 }
