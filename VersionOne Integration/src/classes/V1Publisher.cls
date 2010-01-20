@@ -3,19 +3,16 @@ public with sharing class V1Publisher {
 	private Settings settings;
 
 	private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
-	private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?where=Name="%1"';
-	private static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=&where=(Scope.AssetState!="Closed";Scope.Name="%1")';
+	private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="%1"';
+	private static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=&where=(Scope.AssetState!=\'Closed\';Scope.Name=\'%1\')';
+	private static final String LINK_URL = 'rest-1.v1/Data/Link';
 
-	public V1Publisher(List<Case> cases) {
-		this.cases = cases;
-		this.settings = new Settings();
-	}
-
-
-	public void publish(List<Case> cases) {
+	@future (callout=true)
+	public static void publish() {
+		Settings settings = new Settings();
+		List<Case> cases = V1CaseCollector.getCasesForV1();
 		for (Case caseData : cases) {
-			System.debug('Case name:' + caseData.Subject);
-			System.debug('Case product name:' + caseData.Product__c);
+			createDefectInVersionOne(caseData, settings);
 		}
 	}
 
@@ -31,16 +28,22 @@ public with sharing class V1Publisher {
 			'</Relation>'+
 		'</Asset>';
 		*/
+		Settings settings = new Settings();
+		String source = getSourceId(settings.getSource(), settings);
+		if (source == null) {
+			System.debug('Source \'SalesForce\' not found in VersionOne. Cases can\'t be ported to VersionOne.');
+			return;
+		}
 
 		String firstBody = '<Asset>' +
 							'<Relation act="set" name="Scope">' +
-								'<Asset idref="Scope:0"/>' +
+								'<Asset idref="Scope:' + findProjectId('SalesForce test', settings) + '"/>' +
 							'</Relation>' +
-							'<Attribute act="set" name="Name">Defect new #321 created from SalesForce </Attribute>' +
+							'<Attribute act="set" name="Name">Defect new #'+ system.now()+' created from SalesForce </Attribute>' +
 							'<Attribute act="set" name="Reference">IDOPJbvjdofjs9</Attribute>' +
 							'<Attribute act="set" name="Description">Description lala</Attribute>' +
 							'<Relation act="set" name="Source">' +
-								'<Asset href="rest-1.v1/Data/StorySource/' + getSourceId('asd') + '" idref="StorySource:' + getSourceId('asd') + '" />' +
+								'<Asset href="rest-1.v1/Data/StorySource/' + source + '" idref="StorySource:' + source + '" />' +
 							'</Relation>' +
 						  '</Asset>';
 
@@ -49,7 +52,7 @@ public with sharing class V1Publisher {
 		    Http h=new Http();
 
 		    //Send the request, andreturn a response
-		    HttpResponse res = h.send(createRequest(firstBody, new Settings(), DEFECT_URL, 'POST'));
+		    HttpResponse res = h.send(createRequest(firstBody, settings, DEFECT_URL, 'POST'));
 		    //System.debug('responce code' + res.getStatusCode());
 		    //System.debug('responce body' + res.getBody());
 		    if (res.getStatusCode() == 200) {
@@ -70,7 +73,7 @@ public with sharing class V1Publisher {
 		    String id = xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1];
 		    System.debug('respond = ' + xmlParser.toXmlString());
 		    System.debug('found id=' + id);
-
+			createLinkV1ToSF(id, '12345', settings);
 
 			/* request
 			<Asset id="Defect:5133">
@@ -90,51 +93,152 @@ public with sharing class V1Publisher {
 	}
 
 	/**
-	* Creates defect in the VersionOne and returns id of created defect
+	* Creates defect in the VersionOne and assign link to it
 	*
 	**/
-	private String createDefectInVersionOne(Case caseData, Settings settings) {
-		String sourceId = getSourceId(settings.getSource());
-		String firstBody = '<Asset>' +
+	private static void createDefectInVersionOne(Case caseData, Settings settings) {
+		String sourceId = getSourceId(settings.getSource(), settings);
+
+		if (sourceId == null) {
+			System.debug('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
+			//return null;
+			return;
+		}
+		String createDefectBody = '<Asset>' +
 							'<Relation act="set" name="Scope">' +
-								'<Asset idref="' + findProjectId(caseData.Product__c) + '"/>' +
+								'<Asset idref="Scope:' + findProjectId(caseData.Product__c, settings) + '"/>' +
 							'</Relation>' +
 							'<Attribute act="set" name="Name">' + caseData.Subject +'</Attribute>' +
 							'<Attribute act="set" name="Reference">' + caseData.CaseNumber +'</Attribute>' +
-							'<Attribute act="set" name="Description">' + caseData.Description +'</Attribute>' +
+							'<Attribute act="set" name="Description">' + (caseData.Description != null ? caseData.Description : '') +'</Attribute>' +
 							'<Relation act="set" name="Source">' +
 								'<Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceId + '" idref="StorySource:' + sourceId + '" />' +
 							'</Relation>' +
-						  '</Asset>';
+						'</Asset>';
+		System.debug('XML for create defect:' + createDefectBody);
 
-		return '0';
-	}
-
-	private String findProjectId(String productName) {
+		XMLDom xmlParser = new XMLDom();
 		try {
-			XMLDom xmlParser = new XMLDom();
-		    Http h = new Http();
-		    Settings settings = new Settings();
+		    Http h=new Http();
+		    HttpResponse res = h.send(createRequest(createDefectBody, settings, DEFECT_URL, 'POST'));
 
-		    //Send the request, andreturn a response
-		    HttpResponse res = h.send(createRequest('', settings, SCOPE_URL.replace('%1', productName), 'GET'));
 		    if (res.getStatusCode() == 200) {
 				xmlParser.parseFromString(res.getBody());
 		    } else {
 		    	System.debug('Problem with creating new defect in the VersionOne' + res.getBody());
-		    	return null;
+		    	//return '0';
 		    }
+
+		    String id = xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1];
+		    //System.debug('respond = ' + xmlParser.toXmlString());
+		    //System.debug('found id=' + id);
+			createLinkV1ToSF(id, caseData.Id, settings);
+
 		} catch (Exception e) {
-			System.debug('Find Project Id failed: ' + e);
+			System.debug('publishCase(): Http.send() failed: ' + e);
 			//return -1;
 		}
 
-
-		return 'scope:0';
+		//return '0';
 	}
 
-	private static String getSourceId(String sourceName) {
-		return '1010';
+	private static String findProjectId(String productName, Settings settings) {
+		if (productName == null) {
+			return '0';
+		}
+		try {
+			XMLDom xmlParser = new XMLDom();
+		    Http h = new Http();
+		    String escapedProductName = EncodingUtil.urlEncode(productName, 'UTF-8');
+
+		    //Send the request, andreturn a response
+		    HttpResponse res = h.send(createRequest('', settings, SCOPE_URL.replace('%1', escapedProductName), 'GET'));
+		    if (res.getStatusCode() == 200) {
+				xmlParser.parseFromString(res.getBody());
+		    } else {
+		    	System.debug('Problem with getting project from the VersionOne' + res.getBody());
+		    	return '0';
+		    }
+
+		    //Element assetTag = xmlParser.getElementByTagName('Asset');
+		    System.debug('findProjectId respond = ' + xmlParser.toXmlString());
+		    if (xmlParser.getElementByTagName('Asset') != null) {
+		    	return xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1];
+		    }
+		} catch (Exception e) {
+			System.debug('Finding Project Id  failed: ' + e);
+			//return -1;
+		}
+
+		return '0';
+	}
+
+
+	private static void createLinkV1ToSF(String defectId, String caseId, Settings settings) {
+//		<Asset>
+//			<Attribute act="set" name="OnMenu">false</Attribute>
+//			<Attribute act="set" name="URL">http://www.google.com?q=Y</Attribute>
+//			<Attribute act="set" name="Name">Link Y</Attribute>
+//			<Relation act="set" name="Asset">
+//				<Asset idref="Scope:0"/>
+//			</Relation>
+//		</Asset>
+		String body = '<Asset>' +
+						'<Attribute act="set" name="OnMenu">true</Attribute>' +
+						'<Attribute act="set" name="URL">https://na1.salesforce.com/' + caseId + '</Attribute>' +
+						'<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
+						'<Relation act="set" name="Asset">' +
+							'<Asset idref="Defect:' + defectId + '"/>' +
+					   '</Relation></Asset>';
+
+
+		try {
+			XMLDom xmlParser = new XMLDom();
+		    Http h = new Http();
+
+		    //Send the request, andreturn a response
+		    HttpResponse res = h.send(createRequest(body, settings, LINK_URL, 'POST'));
+		    if (res.getStatusCode() != 200) {
+		    	System.debug('Problem to create link to case' + res.getBody());
+		    }
+
+		} catch (Exception e) {
+			System.debug('Creating link to case failed: ' + e);
+			//return -1;
+		}
+
+	}
+
+
+
+	private static String getSourceId(String sourceName, Settings settings) {
+		try {
+			XMLDom xmlParser = new XMLDom();
+		    Http h = new Http();
+		    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
+
+		    //Send the request, andreturn a response
+		    HttpResponse res = h.send(createRequest('', settings, SOURCE_URL.replace('%1', escapedSourceName), 'GET'));
+		    if (res.getStatusCode() == 200) {
+				xmlParser.parseFromString(res.getBody());
+		    } else {
+		    	System.debug('Problem with getting source from the VersionOne' + res.getBody());
+		    	return null;
+		    }
+
+		    XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
+		    System.debug('getSourceId respond = ' + xmlParser.toXmlString());
+		    if (assetTag != null) {
+		    	return assetTag.getAttribute('id').split(':')[1];
+		    }
+		} catch (Exception e) {
+			System.debug('Getting source Id  failed: ' + e);
+			//return -1;
+		}
+
+		return null;
+
+		//return '1010';
 	}
 
 
@@ -142,9 +246,14 @@ public with sharing class V1Publisher {
 	    //Instantiate a new HTTP request,specify the method (GET) as well as the endpoint
 		HttpRequest req = new HttpRequest();
 		req.setMethod(requestType);
+		if (requestType.equals('POST')) {
+			req.setHeader('Content-Length', String.valueOf(body.length()));
+		}
 		req.setEndpoint(settings.getPath() + additionUrl);
 		addAuthorization(req, settings);
-		req.setBody(body);
+		if (body != null && body != '') {
+			req.setBody(body);
+		}
 		System.debug('body=' + body);
 		System.debug('Url=' + settings.getPath() + additionUrl);
 		//req.setHeader('Content-Type', 'text/xml');

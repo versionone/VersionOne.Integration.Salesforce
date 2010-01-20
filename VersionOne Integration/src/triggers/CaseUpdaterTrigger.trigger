@@ -1,6 +1,7 @@
 trigger CaseUpdaterTrigger on Case (after update) {
-	List<Case> cases = new List<Case>();
-	Settings settings = new Settings();
+	//List<Case> cases = new List<Case>();
+	//Settings settings = new Settings();
+	/*
     for (Case updatedCase : Trigger.new) {
         System.debug('Case name:' + updatedCase.Subject);
         System.debug('Case owner id:' + updatedCase.OwnerId);
@@ -17,9 +18,9 @@ trigger CaseUpdaterTrigger on Case (after update) {
         	cases.add(updatedCase);
         }
     }
-
+	*/
 	//V1Publisher publisher = new V1Publisher(cases);
-	//publisher.publish();
-	V1Publisher.test();
+	V1Publisher.publish();
+	//V1Publisher.test();
 
 }

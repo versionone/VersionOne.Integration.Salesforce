@@ -5,11 +5,12 @@ public class V1CaseCollector {
     if (srcQueue == null){
       return null;
     }
-    List<Case> cases = [select id, OwnerId from Case where OwnerId = :srcQueue.Id ];
+    List<Case> cases = [select id, OwnerId, Product__c, Subject, Description, CaseNumber
+    						from Case where OwnerId = :srcQueue.Id ];
     System.debug('  Found Cases: ' + cases.size());
     return cases;
   }
-  
+
   public static Group getQueueByName(String name) {
     List<Group> queues = [select Id, Name, Type from Group where Type='Queue' and name = :name];
     if (queues.isEmpty()){
