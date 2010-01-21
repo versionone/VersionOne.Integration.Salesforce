@@ -20,9 +20,9 @@ trigger CaseUpdaterTrigger on Case (after update) {
     }
 	*/
 	//V1Publisher publisher = new V1Publisher(cases);
-	if (!V1CaseCollector.getCasesForV1().isEmpty()){
+
+	String srcQueue = V1CaseCollector.getQueueIdByName('Escalate to VersionOne');
+	if (V1CaseCollector.countCasesWithOwnerId(srcQueue) > 0){
 		V1Publisher.publish();
 	}
-	//V1Publisher.test();
-
 }

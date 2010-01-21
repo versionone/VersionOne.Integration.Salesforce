@@ -1,27 +1,31 @@
 public class V1CaseCollector {
 
-	public static List<Case> getCasesForV1() {
-		Group srcQueue = getQueueByName('Escalate to VersionOne');
-		if (srcQueue == null){
-			return null;
-		}
-		List<Case> cases = [select id, OwnerId from Case where OwnerId = :srcQueue.Id ];
-		System.debug('	Found Cases: ' + cases.size());
+
+	public static Integer countCasesWithOwnerId(String ownerId) {
+		Integer count = [SELECT count() FROM Case WHERE OwnerId = :ownerId ];
+		System.debug('==> countCasesWithOwnerId() found: ' + count);
+		return count;
+	}
+
+	public static Case[] getCasesByOwnerId(String ownerId) {
+		Case[] cases = [SELECT id, OwnerId FROM Case WHERE OwnerId = :ownerId ];
+		System.debug('==> getCasesByOwnerId() found: ' + cases.size());
 		return cases;
 	}
 
-	public static void setCasesOwner(List<Case> cases, Group owner) {
+	public static void setCasesOwner(List<Case> cases, String ownerId) {
 		for (Case c : cases) {
 			System.debug('BEFORE UPDATE: ' + c);
-			c.OwnerId = owner.Id;
+			c.OwnerId = ownerId;
 			System.debug('AFTER CHANGE: ' + c);
 		}
 		//update cases;
+		Database.update(cases);
 	}
 
-	public static Group getQueueByName(String name) {
-		Group queues = [select Id, Name, Type from Group where Type='Queue' and name = :name];
-		System.debug('	Found Queue: ' + queues);
-		return queues;
+	public static String getQueueIdByName(String name) {
+		Group queue = [SELECT Id, Name, Type FROM Group WHERE Type='Queue' AND name = :name];
+		System.debug('==> getQueueIdByName() ' + queue);
+		return queue.Id;
 	}
 }

@@ -10,11 +10,12 @@ public with sharing class V1Publisher {
 	@future (callout=true)
 	public static void publish() {
 		Settings settings = new Settings();
-		List<Case> cases = V1CaseCollector.getCasesForV1();
+		String srcQueue = V1CaseCollector.getQueueIdByName('Escalate to VersionOne');
+		List<Case> cases = V1CaseCollector.getCasesByOwnerId(srcQueue);
 		for (Case caseData : cases) {
 			createDefectInVersionOne(caseData, settings);
 		}
-		Group dstQueue = V1CaseCollector.getQueueByName('Assigned to VersionOne');
+		String dstQueue = V1CaseCollector.getQueueIdByName('Assigned to VersionOne');
 		V1CaseCollector.setCasesOwner(cases, dstQueue);
 	}
 
