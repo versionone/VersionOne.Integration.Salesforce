@@ -14,6 +14,8 @@ public with sharing class V1Publisher {
 		for (Case caseData : cases) {
 			createDefectInVersionOne(caseData, settings);
 		}
+		Group dstQueue = V1CaseCollector.getQueueByName('Assigned to VersionOne');
+		V1CaseCollector.setCasesOwner(cases, dstQueue);
 	}
 
 	@future (callout=true)
