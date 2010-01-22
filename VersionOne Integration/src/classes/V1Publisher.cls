@@ -2,7 +2,7 @@ public with sharing class V1Publisher {
 
 	private static Map<String, String> projects = new Map<String, String>();
 	private static String defaultProjectId = '0';
-	private static Requestor requestor;
+	private static IRequestor requestor;
 	private static String sourceId;
 
 	private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
@@ -14,7 +14,7 @@ public with sharing class V1Publisher {
 	private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
 
 
-	public static void setRequestor(Requestor requestorClass) {
+	public static void setRequestor(IRequestor requestorClass) {
 		requestor = requestorClass;
 	}
 
@@ -25,7 +25,6 @@ public with sharing class V1Publisher {
 			requestor = new Requestor(settings);
 		}
 		sourceId = findSourceId(settings);
-
 		if (sourceId == null) {
 			errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
 			return;
@@ -53,17 +52,19 @@ public with sharing class V1Publisher {
 	* returns 	defect id  	- all ok
 	*			-1 			- defect was not created
 	**/
-	private static Integer createDefectInVersionOne(Case caseData, Settings settings) {
+	public static Integer createDefectInVersionOne(Case caseData, Settings settings) {
 		String createDefectBody = '<Asset>' +
-							'<Relation act="set" name="Scope">' +
-								'<Asset idref="Scope:' + findProjectId(caseData.Product__c) + '"/>' +
-							'</Relation>' +
-							'<Attribute act="set" name="Name">' + (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME) +'</Attribute>' +
-							'<Attribute act="set" name="Reference">' + caseData.CaseNumber +'</Attribute>' +
-							'<Attribute act="set" name="Description">' + (caseData.Description != null ? caseData.Description : '') +'</Attribute>' +
-							'<Relation act="set" name="Source">' +
-								'<Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceId + '" idref="StorySource:' + sourceId + '" />' +
-							'</Relation>' +
+							relationNode('Scope', 'Scope:' + findProjectId(caseData.Product__c)) +
+							//'<Attribute act="set" name="Name">' + (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME) +'</Attribute>' +
+							attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME)) +
+							//'<Attribute act="set" name="Reference">' + caseData.CaseNumber +'</Attribute>' +
+							attributeNode('Reference', caseData.CaseNumber) +
+							//'<Attribute act="set" name="Description">' + (caseData.Description != null ? caseData.Description : '') +'</Attribute>' +
+							attributeNode('Description', (caseData.Description != null ? caseData.Description : '')) +
+							relationNode('Source', 'StorySource:' + sourceId) +
+							//'<Relation act="set" name="Source">' +
+							//	'<Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceId + '" idref="StorySource:' + sourceId + '" />' +
+							//'</Relation>' +
 						'</Asset>';
 		System.debug('XML for create defect:' + createDefectBody);
 
@@ -72,12 +73,12 @@ public with sharing class V1Publisher {
 		Integer defectId = -1;
 		try {
 		    //HttpResponse res = h.send(createRequest(createDefectBody, settings, DEFECT_URL, 'POST'));
-		    HttpResponse res = requestor.post(createDefectBody, DEFECT_URL);
+		    requestor.doPost(createDefectBody, DEFECT_URL);
 
-		    if (res.getStatusCode() == 200) {
-				xmlParser.parseFromString(res.getBody());
+		    if (requestor.getStatusCode() == 200) {
+				xmlParser.parseFromString(requestor.getBody());
 		    } else {
-		    	errorMessage('Problem with creating new defect in the VersionOne' + res.getBody());
+		    	errorMessage('Problem with creating new defect in the VersionOne' + requestor.getBody());
 		    }
 
 		    defectId = Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
@@ -103,11 +104,11 @@ public with sharing class V1Publisher {
 		try {
 		    //Send the request, and get a response
 		    //HttpResponse res = h.send(createRequest('', settings, SCOPE_URL, 'GET'));
-		    HttpResponse res = requestor.get('', SCOPE_URL);
-		    if (res.getStatusCode() == 200) {
-				xmlParser.parseFromString(res.getBody());
+		    requestor.doGet('', SCOPE_URL);
+		    if (requestor.getStatusCode() == 200) {
+				xmlParser.parseFromString(requestor.getBody());
 		    } else {
-		    	errorMessage('Problem with getting projects from the VersionOne' + res.getBody());
+		    	errorMessage('Problem with getting projects from the VersionOne' + requestor.getBody());
 		    	return;
 		    }
 
@@ -144,21 +145,26 @@ public with sharing class V1Publisher {
 	**/
 	private static void createLinkV1ToSF(Integer defectId, String caseId, Settings settings) {
 		String body = '<Asset>' +
-						'<Attribute act="set" name="OnMenu">true</Attribute>' +
-						'<Attribute act="set" name="URL">https://na7.salesforce.com/' + caseId + '</Attribute>' +
-						'<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
-						'<Relation act="set" name="Asset">' +
-							'<Asset idref="Defect:' + defectId + '"/>' +
-					   '</Relation></Asset>';
+						//'<Attribute act="set" name="OnMenu">true</Attribute>' +
+						attributeNode('OnMenu', 'true') +
+						//'<Attribute act="set" name="URL">https://na7.salesforce.com/' + caseId + '</Attribute>' +
+						attributeNode('URL', 'https://na7.salesforce.com/' + caseId) +
+						//'<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
+						attributeNode('Name', 'SalesForce Case') +
+						relationNode('Asset', 'Defect:' + String.valueOf(defectId)) +
+						//'<Relation act="set" name="Asset">' +
+						//	'<Asset idref="Defect:' + defectId + '"/>' +
+					    //'</Relation>' +
+					   '</Asset>';
 		XMLDom xmlParser = new XMLDom();
 	    //Http h = new Http();
 
 		try {
 		    //Send the request, and get a response
 		    //HttpResponse res = h.send(createRequest(body, settings, LINK_URL, 'POST'));
-		    HttpResponse res = requestor.post(body, LINK_URL);
-		    if (res.getStatusCode() != 200) {
-		    	errorMessage('Problem to create link to case' + res.getBody());
+		    requestor.doPost(body, LINK_URL);
+		    if (requestor.getStatusCode() != 200) {
+		    	errorMessage('Problem to create link to case' + requestor.getBody());
 		    }
 
 		} catch (Exception e) {
@@ -181,11 +187,11 @@ public with sharing class V1Publisher {
 		try {
 		    //Send the request, and get a response
 		    //HttpResponse res = h.send(createRequest('', settings, String.format(CHECK_DEFECT_URL, new String[]{caseNumber, escapedSourceName}), 'GET'));
-		    HttpResponse res = requestor.get('', String.format(CHECK_DEFECT_URL, new String[]{caseNumber, escapedSourceName}));
-		    if (res.getStatusCode() == 200) {
-				xmlParser.parseFromString(res.getBody());
+		    requestor.doGet('', String.format(CHECK_DEFECT_URL, new String[]{caseNumber, escapedSourceName}));
+		    if (requestor.getStatusCode() == 200) {
+				xmlParser.parseFromString(requestor.getBody());
 		    } else {
-		    	errorMessage('Problem with getting data from the VersionOne' + res.getBody());
+		    	errorMessage('Problem with getting data from the VersionOne' + requestor.getBody());
 		    	return true;
 		    }
 
@@ -215,11 +221,11 @@ public with sharing class V1Publisher {
 		try {
 		    //Send the request, and get a response
 		    //HttpResponse res = h.send(createRequest('', settings, String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
-		    HttpResponse res = requestor.get('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
-		    if (res.getStatusCode() == 200) {
-				xmlParser.parseFromString(res.getBody());
+		    requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
+		    if (requestor.getStatusCode() == 200) {
+				xmlParser.parseFromString(requestor.getBody());
 		    } else {
-		    	errorMessage('Problem with getting source from the VersionOne' + res.getBody());
+		    	errorMessage('Problem with getting source from the VersionOne' + requestor.getBody());
 		    	return null;
 		    }
 
@@ -233,6 +239,24 @@ public with sharing class V1Publisher {
 		}
 
 		return null;
+	}
+
+	/**
+	* Creates Relation node for request
+	*
+	**/
+	public static String relationNode(String name, String value) {
+		return '<Relation act="set" name="' + name + '">' +
+				'<Asset idref="' + value + '"/>' +
+			   '</Relation>';
+	}
+
+	/**
+	* Creates Attribute node for request
+	*
+	**/
+	public static String attributeNode(String name, String value) {
+		return '<Attribute act="set" name="' + name + '">' + value + '</Attribute>';
 	}
 
 

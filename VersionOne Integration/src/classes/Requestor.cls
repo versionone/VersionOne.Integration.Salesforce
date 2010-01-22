@@ -1,5 +1,6 @@
-public with sharing class Requestor {
+public class Requestor implements IRequestor {
 	private final Settings settings;
+	private HttpResponse responce;
 
 	public Requestor(Settings settings) {
 		this.settings = settings;
@@ -8,15 +9,23 @@ public with sharing class Requestor {
 	/**
 	* Makes GET request
 	**/
-	public HttpResponse get(String body, String url) {
-		return request(body, url, 'GET');
+	public void doGet(String body, String url) {
+		responce = request(body, url, 'GET');
 	}
 
 	/**
 	* Makes POST request
 	**/
-	public HttpResponse post(String body, String url) {
-		return request(body, url, 'POST');
+	public void doPost(String body, String url) {
+		responce = request(body, url, 'POST');
+	}
+
+	public String getBody() {
+		return responce.getBody();
+	}
+
+	public Integer getStatusCode() {
+		return responce.getStatusCode();
 	}
 
 	/**
