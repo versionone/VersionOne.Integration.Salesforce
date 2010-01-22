@@ -18,16 +18,14 @@ private class V1CaseCollectorTestSuite {
     	insert sobj;
 
 		System.debug('==> OwnerId=' + case1.OwnerId);
-		System.assert(case1.OwnerId == null, 'Case already owned by queue.');
-		System.assert(case2.OwnerId == null, 'Case already owned by queue.');
-		System.assert(case3.OwnerId == null, 'Case already owned by queue.');
+		System.assert(case1.OwnerId == null, 'Case1 already owned by queue.');
+		System.assert(case2.OwnerId == null, 'Case2 already owned by queue.');
+		System.assert(case3.OwnerId == null, 'Case3 already owned by queue.');
     	V1CaseCollector.setCasesOwner(new Case[] {case1, case2}, queue.Id);
-    	//case1.OwnerId = queue.Id;
-    	//update case1;
 
-		System.assert(case1.OwnerId == queue.Id, 'Case Owner doesn\'t changed.');
-		System.assert(case2.OwnerId == queue.Id, 'Case Owner doesn\'t changed.');
-		System.assert(case3.OwnerId == null, 'Case Owner set by mistake.');
+		System.assert(case1.OwnerId == queue.Id, 'Case1 Owner doesn\'t changed.');
+		System.assert(case2.OwnerId == queue.Id, 'Case2 Owner doesn\'t changed.');
+		System.assert(case3.OwnerId == null, 'Case3 Owner set by mistake.');
     }
 
     static testMethod void getQueueIdByNameTest() {
