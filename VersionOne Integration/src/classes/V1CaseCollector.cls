@@ -8,7 +8,8 @@ public class V1CaseCollector {
 	}
 
 	public static Case[] getCasesByOwnerId(String ownerId) {
-		Case[] cases = [SELECT id, OwnerId FROM Case WHERE OwnerId = :ownerId ];
+		Case[] cases = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject
+						  FROM Case WHERE OwnerId = :ownerId ];
 		System.debug('==> getCasesByOwnerId() found: ' + cases.size());
 		return cases;
 	}

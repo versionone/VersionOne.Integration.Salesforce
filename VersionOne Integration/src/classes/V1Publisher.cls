@@ -2,6 +2,8 @@ public with sharing class V1Publisher {
 
 	private static Map<String, String> projects = new Map<String, String>();
 	private static String defaultProjectId = '0';
+	private static Requestor requestor;
+	private static String sourceId;
 
 	private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
 	private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
@@ -11,15 +13,32 @@ public with sharing class V1Publisher {
 
 	private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
 
+
+	public static void setRequestor(Requestor requestorClass) {
+		requestor = requestorClass;
+	}
+
 	@future (callout=true)
 	public static void publish() {
 		Settings settings = new Settings();
+		if (requestor == null) {
+			requestor = new Requestor(settings);
+		}
+		sourceId = findSourceId(settings);
+
+		if (sourceId == null) {
+			errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
+			return;
+		}
 		String srcQueue = V1CaseCollector.getQueueIdByName('Escalate to VersionOne');
 		List<Case> cases = V1CaseCollector.getCasesByOwnerId(srcQueue);
 		findAllProjects(settings);
 		for (Case caseData : cases) {
 			if (!isDefectAlreadyExist(settings, caseData.CaseNumber)) {
-				createDefectInVersionOne(caseData, settings);
+				Integer id = createDefectInVersionOne(caseData, settings);
+				if (id > 0) {
+					//defect was created
+				}
 			} else {
 				errorMessage('Case "' + caseData.Subject + '" (' + caseData.CaseNumber +') was already ported.' );
 			}
@@ -35,12 +54,6 @@ public with sharing class V1Publisher {
 	*			-1 			- defect was not created
 	**/
 	private static Integer createDefectInVersionOne(Case caseData, Settings settings) {
-		String sourceId = findSourceId(settings);
-
-		if (sourceId == null) {
-			errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
-			return -1;
-		}
 		String createDefectBody = '<Asset>' +
 							'<Relation act="set" name="Scope">' +
 								'<Asset idref="Scope:' + findProjectId(caseData.Product__c) + '"/>' +
@@ -55,10 +68,11 @@ public with sharing class V1Publisher {
 		System.debug('XML for create defect:' + createDefectBody);
 
 		XMLDom xmlParser = new XMLDom();
-		Http h=new Http();
+		//Http h=new Http();
 		Integer defectId = -1;
 		try {
-		    HttpResponse res = h.send(createRequest(createDefectBody, settings, DEFECT_URL, 'POST'));
+		    //HttpResponse res = h.send(createRequest(createDefectBody, settings, DEFECT_URL, 'POST'));
+		    HttpResponse res = requestor.post(createDefectBody, DEFECT_URL);
 
 		    if (res.getStatusCode() == 200) {
 				xmlParser.parseFromString(res.getBody());
@@ -84,11 +98,12 @@ public with sharing class V1Publisher {
 	**/
 	private static void findAllProjects(Settings settings) {
 		XMLDom xmlParser = new XMLDom();
-	    Http h = new Http();
+	    //Http h = new Http();
 
 		try {
 		    //Send the request, and get a response
-		    HttpResponse res = h.send(createRequest('', settings, SCOPE_URL, 'GET'));
+		    //HttpResponse res = h.send(createRequest('', settings, SCOPE_URL, 'GET'));
+		    HttpResponse res = requestor.get('', SCOPE_URL);
 		    if (res.getStatusCode() == 200) {
 				xmlParser.parseFromString(res.getBody());
 		    } else {
@@ -136,11 +151,12 @@ public with sharing class V1Publisher {
 							'<Asset idref="Defect:' + defectId + '"/>' +
 					   '</Relation></Asset>';
 		XMLDom xmlParser = new XMLDom();
-	    Http h = new Http();
+	    //Http h = new Http();
 
 		try {
 		    //Send the request, and get a response
-		    HttpResponse res = h.send(createRequest(body, settings, LINK_URL, 'POST'));
+		    //HttpResponse res = h.send(createRequest(body, settings, LINK_URL, 'POST'));
+		    HttpResponse res = requestor.post(body, LINK_URL);
 		    if (res.getStatusCode() != 200) {
 		    	errorMessage('Problem to create link to case' + res.getBody());
 		    }
@@ -160,11 +176,12 @@ public with sharing class V1Publisher {
 	private static Boolean isDefectAlreadyExist(Settings settings, String caseNumber) {
 		String sourceName = settings.getSource();
 		XMLDom xmlParser = new XMLDom();
-	    Http h = new Http();
+	    //Http h = new Http();
 	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
 		try {
 		    //Send the request, and get a response
-		    HttpResponse res = h.send(createRequest('', settings, String.format(CHECK_DEFECT_URL, new String[]{caseNumber, escapedSourceName}), 'GET'));
+		    //HttpResponse res = h.send(createRequest('', settings, String.format(CHECK_DEFECT_URL, new String[]{caseNumber, escapedSourceName}), 'GET'));
+		    HttpResponse res = requestor.get('', String.format(CHECK_DEFECT_URL, new String[]{caseNumber, escapedSourceName}));
 		    if (res.getStatusCode() == 200) {
 				xmlParser.parseFromString(res.getBody());
 		    } else {
@@ -193,11 +210,12 @@ public with sharing class V1Publisher {
 	private static String findSourceId(Settings settings) {
 		String sourceName = settings.getSource();
 		XMLDom xmlParser = new XMLDom();
-	    Http h = new Http();
+	    //Http h = new Http();
 	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
 		try {
 		    //Send the request, and get a response
-		    HttpResponse res = h.send(createRequest('', settings, String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
+		    //HttpResponse res = h.send(createRequest('', settings, String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
+		    HttpResponse res = requestor.get('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
 		    if (res.getStatusCode() == 200) {
 				xmlParser.parseFromString(res.getBody());
 		    } else {
@@ -217,37 +235,6 @@ public with sharing class V1Publisher {
 		return null;
 	}
 
-
-	/**
-	* Creates request
-	*
-	**/
-	public static HttpRequest createRequest(String body, Settings settings, String additionUrl, String requestType) {
-		HttpRequest req = new HttpRequest();
-		req.setMethod(requestType);
-		if (requestType.equals('POST')) {
-			req.setHeader('Content-Length', String.valueOf(body.length()));
-		}
-		req.setEndpoint(settings.getPath() + additionUrl);
-		addAuthorization(req, settings);
-		if (body != null && body != '') {
-			req.setBody(body);
-		}
-		System.debug('body=' + body);
-		System.debug('Url=' + settings.getPath() + additionUrl);
-		//req.setHeader('Content-Type', 'text/xml');
-		return req;
-	}
-
-	/**
-	* Adds basic authorization to the request
-	*
-	**/
-	private static void addAuthorization(HttpRequest req, Settings settings) {
-		Blob headerValue = Blob.valueOf(settings.getUserName() + ':' + settings.getPassword());
-		String authorizationHeader = 'BASIC ' +EncodingUtil.base64Encode(headerValue);
-		req.setHeader('Authorization', authorizationHeader);
-	}
 
 	/**
 	* Outputs error message
