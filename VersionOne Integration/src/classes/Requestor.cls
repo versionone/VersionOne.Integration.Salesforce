@@ -1,8 +1,8 @@
 public class Requestor implements IRequestor {
-	private final Settings settings;
+	private final ISettings settings;
 	private HttpResponse responce;
 
-	public Requestor(Settings settings) {
+	public Requestor(ISettings settings) {
 		this.settings = settings;
 	}
 
@@ -63,7 +63,7 @@ public class Requestor implements IRequestor {
 	* Adds basic authorization to the request
 	*
 	**/
-	private void addAuthorization(HttpRequest req, Settings settings) {
+	private void addAuthorization(HttpRequest req, ISettings settings) {
 		Blob headerValue = Blob.valueOf(settings.getUserName() + ':' + settings.getPassword());
 		String authorizationHeader = 'BASIC ' +EncodingUtil.base64Encode(headerValue);
 		req.setHeader('Authorization', authorizationHeader);
