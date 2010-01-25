@@ -45,11 +45,11 @@ private class V1PublisherTester {
         V1Publisher.findAllProjects(settings);
 
         System.assert(V1Publisher.getProjects().size() == 0, 'Incorrect amount of projects ' + V1Publisher.getProjects().size() + ' instead of 0');
-        System.assert(V1Publisher.getDefaultProjectId().equals(String.valueof(0)), 'Default project has to has id equals 0 but found ' + V1Publisher.getDefaultProjectId());
-        System.assert(V1Publisher.findProjectId('Integrational tests project').equals('0'), 'Incorrect id for \'Integrational tests project\'. Has to be 0 but found ' + V1Publisher.findProjectId('Integrational tests project'));
+        System.assertEquals(V1Publisher.getDefaultProjectId(), String.valueof(0), 'Default project has to has id equals 0 but found ' + V1Publisher.getDefaultProjectId());
+        System.assertEquals(V1Publisher.findProjectId('Integrational tests project'), '0', 'Incorrect id for \'Integrational tests project\'. Has to be 0 but found ' + V1Publisher.findProjectId('Integrational tests project'));
     }
 
-    static testMethod void correctCreatingLinkToSalesForceCase() {
+    static testMethod void correctCreatingLinkToSalesForceCaseTest() {
     	V1Publisher.resetAllData();
 
     	IRequestor requestor = new TestRequestor('', 200);
@@ -68,7 +68,40 @@ private class V1PublisherTester {
 					    '</Relation>' +
 					   '</Asset>';
 
-		System.assert(((TestRequestor)requestor).getSentBody().equals(body), 'Incorrect created body for POST.');
+		System.assertEquals(((TestRequestor)requestor).getSentBody(), body, 'Incorrect created body for POST.');
+    }
+
+    static testMethod void incorrectCreatingLinkToSalesForceCaseTest() {
+    	//test has to complete without any errors
+    	V1Publisher.resetAllData();
+
+    	IRequestor requestor = new TestRequestor('', 400);
+    	Settings settings = new Settings();
+    	Integer defectId = 123;
+    	String caseId = 'CaseId';
+    	V1Publisher.setRequestor(requestor);
+    	V1Publisher.createLinkV1ToSF(defectId, 'CaseId', settings);
+
+    	String body = '<Asset>' +
+						'<Attribute act="set" name="OnMenu">true</Attribute>' +
+						'<Attribute act="set" name="URL">https://na7.salesforce.com/' + caseId + '</Attribute>' +
+						'<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
+						'<Relation act="set" name="Asset">' +
+							'<Asset idref="Defect:' + defectId + '"/>' +
+					    '</Relation>' +
+					   '</Asset>';
+
+		System.assertEquals(((TestRequestor)requestor).getSentBody(), body, 'Incorrect created body for POST.');
+    }
+
+    static testMethod void correctIsDefectAlreadyExistTest() {
+    	V1Publisher.resetAllData();
+
+		String caseNumber = '00012304';
+		Settings settings = new Settings();
+		IRequestor requestor = new TestRequestor('', 400);
+		V1Publisher.setRequestor(requestor);
+		V1Publisher.isDefectAlreadyExist(settings, caseNumber);
     }
 
     public class TestRequestor implements IRequestor {

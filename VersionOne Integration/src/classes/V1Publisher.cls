@@ -13,7 +13,6 @@ public with sharing class V1Publisher {
 
 	private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
 
-
 	public static void setRequestor(IRequestor requestorClass) {
 		requestor = requestorClass;
 	}
@@ -26,7 +25,7 @@ public with sharing class V1Publisher {
 	@future (callout=true)
 	public static void publish() {
 		resetAllData();
-		Settings settings = new Settings();
+		ISettings settings = new Settings();
 		sourceId = findSourceId(settings);
 		if (requestor == null) {
 			requestor = new Requestor(settings);
@@ -58,7 +57,7 @@ public with sharing class V1Publisher {
 	* returns 	defect id  	- all ok
 	*			-1 			- defect was not created
 	**/
-	public static Integer createDefectInVersionOne(Case caseData, Settings settings) {
+	public static Integer createDefectInVersionOne(Case caseData, ISettings settings) {
 		String createDefectBody = '<Asset>' +
 							relationNode('Scope', 'Scope:' + findProjectId(caseData.Product__c)) +
 							//'<Attribute act="set" name="Name">' + (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME) +'</Attribute>' +
@@ -101,7 +100,7 @@ public with sharing class V1Publisher {
 	* Gathers all project from the VersionOne, and assign default project
 	*
 	**/
-	public static void findAllProjects(Settings settings) {
+	public static void findAllProjects(ISettings settings) {
 		XMLDom xmlParser = new XMLDom();
 
 		try {
@@ -152,7 +151,7 @@ public with sharing class V1Publisher {
 	* Creates link to the corresponding case in the SalesForce
 	*
 	**/
-	public static void createLinkV1ToSF(Integer defectId, String caseId, Settings settings) {
+	public static void createLinkV1ToSF(Integer defectId, String caseId, ISettings settings) {
 		String body = '<Asset>' +
 						attributeNode('OnMenu', 'true') +
 						attributeNode('URL', 'https://na7.salesforce.com/' + caseId) +
@@ -180,7 +179,7 @@ public with sharing class V1Publisher {
 	* Returns  	true 	- already was created
 	*			false 	- was not created.
 	**/
-	private static Boolean isDefectAlreadyExist(Settings settings, String caseNumber) {
+	public static Boolean isDefectAlreadyExist(ISettings settings, String caseNumber) {
 		String sourceName = settings.getSource();
 		XMLDom xmlParser = new XMLDom();
 	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
@@ -212,7 +211,7 @@ public with sharing class V1Publisher {
 	* Returns	id 		- if source was found
 	*			null	- if source was not found
 	**/
-	private static String findSourceId(Settings settings) {
+	private static String findSourceId(ISettings settings) {
 		String sourceName = settings.getSource();
 		XMLDom xmlParser = new XMLDom();
 	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');

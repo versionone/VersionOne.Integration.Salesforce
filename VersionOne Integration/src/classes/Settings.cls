@@ -1,4 +1,4 @@
-public with sharing class Settings {
+public with sharing class Settings implements ISettings {
 	private final V1Settings__c mycs;
 	private final String escalateQueueId;
 
