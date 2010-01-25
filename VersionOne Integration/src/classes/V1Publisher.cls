@@ -18,13 +18,19 @@ public with sharing class V1Publisher {
 		requestor = requestorClass;
 	}
 
+	public static void resetAllData() {
+		projects = new Map<String, String>();
+		defaultProjectId = '0';
+	}
+
 	@future (callout=true)
 	public static void publish() {
+		resetAllData();
 		Settings settings = new Settings();
+		sourceId = findSourceId(settings);
 		if (requestor == null) {
 			requestor = new Requestor(settings);
 		}
-		sourceId = findSourceId(settings);
 		if (sourceId == null) {
 			errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
 			return;
@@ -69,10 +75,8 @@ public with sharing class V1Publisher {
 		System.debug('XML for create defect:' + createDefectBody);
 
 		XMLDom xmlParser = new XMLDom();
-		//Http h=new Http();
 		Integer defectId = -1;
 		try {
-		    //HttpResponse res = h.send(createRequest(createDefectBody, settings, DEFECT_URL, 'POST'));
 		    requestor.doPost(createDefectBody, DEFECT_URL);
 
 		    if (requestor.getStatusCode() == 200) {
@@ -97,13 +101,11 @@ public with sharing class V1Publisher {
 	* Gathers all project from the VersionOne, and assign default project
 	*
 	**/
-	private static void findAllProjects(Settings settings) {
+	public static void findAllProjects(Settings settings) {
 		XMLDom xmlParser = new XMLDom();
-	    //Http h = new Http();
 
 		try {
 		    //Send the request, and get a response
-		    //HttpResponse res = h.send(createRequest('', settings, SCOPE_URL, 'GET'));
 		    requestor.doGet('', SCOPE_URL);
 		    if (requestor.getStatusCode() == 200) {
 				xmlParser.parseFromString(requestor.getBody());
@@ -111,16 +113,23 @@ public with sharing class V1Publisher {
 		    	errorMessage('Problem with getting projects from the VersionOne' + requestor.getBody());
 		    	return;
 		    }
-
 			List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
-			if (assetTags.size() > 0) {
-				defaultProjectId = assetTags.get(0).getElementByTagName('Asset').getAttribute('id').split(':')[1];
-			}
+
+			Integer testId = 99999999;
 			for (XMLDom.Element assetTag : assetTags) {
-				projects.put(assetTag.getValue('Attribute'), assetTag.getAttribute('id').split(':')[1]);
+				String id = assetTag.getAttribute('id').split(':')[1];
+				if (testId > Integer.valueOf(id)) {
+					testId = Integer.valueOf(id);
+				}
+				String projectName = assetTag.getValue('Attribute');
+				if (!projects.containsKey(projectName)) {
+					projects.put(projectName, id);
+				}
 			}
+			defaultProjectId = String.valueof(testId);
 
 		    System.debug('findProjectId respond = ' + xmlParser.toXmlString());
+		    System.debug('findProjectId size = ' + assetTags.size());
 
 		} catch (Exception e) {
 			errorMessage('Finding Projects failed: ' + e);
@@ -131,7 +140,7 @@ public with sharing class V1Publisher {
 	* Returns project id by product name
 	*
 	**/
-	private static String findProjectId(String productName) {
+	public static String findProjectId(String productName) {
 		if (productName != null && projects.containsKey(productName)) {
 			return projects.get(productName);
 		}
@@ -143,25 +152,17 @@ public with sharing class V1Publisher {
 	* Creates link to the corresponding case in the SalesForce
 	*
 	**/
-	private static void createLinkV1ToSF(Integer defectId, String caseId, Settings settings) {
+	public static void createLinkV1ToSF(Integer defectId, String caseId, Settings settings) {
 		String body = '<Asset>' +
-						//'<Attribute act="set" name="OnMenu">true</Attribute>' +
 						attributeNode('OnMenu', 'true') +
-						//'<Attribute act="set" name="URL">https://na7.salesforce.com/' + caseId + '</Attribute>' +
 						attributeNode('URL', 'https://na7.salesforce.com/' + caseId) +
-						//'<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
 						attributeNode('Name', 'SalesForce Case') +
 						relationNode('Asset', 'Defect:' + String.valueOf(defectId)) +
-						//'<Relation act="set" name="Asset">' +
-						//	'<Asset idref="Defect:' + defectId + '"/>' +
-					    //'</Relation>' +
 					   '</Asset>';
 		XMLDom xmlParser = new XMLDom();
-	    //Http h = new Http();
 
 		try {
 		    //Send the request, and get a response
-		    //HttpResponse res = h.send(createRequest(body, settings, LINK_URL, 'POST'));
 		    requestor.doPost(body, LINK_URL);
 		    if (requestor.getStatusCode() != 200) {
 		    	errorMessage('Problem to create link to case' + requestor.getBody());
@@ -182,11 +183,9 @@ public with sharing class V1Publisher {
 	private static Boolean isDefectAlreadyExist(Settings settings, String caseNumber) {
 		String sourceName = settings.getSource();
 		XMLDom xmlParser = new XMLDom();
-	    //Http h = new Http();
 	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
 		try {
 		    //Send the request, and get a response
-		    //HttpResponse res = h.send(createRequest('', settings, String.format(CHECK_DEFECT_URL, new String[]{caseNumber, escapedSourceName}), 'GET'));
 		    requestor.doGet('', String.format(CHECK_DEFECT_URL, new String[]{caseNumber, escapedSourceName}));
 		    if (requestor.getStatusCode() == 200) {
 				xmlParser.parseFromString(requestor.getBody());
@@ -216,11 +215,9 @@ public with sharing class V1Publisher {
 	private static String findSourceId(Settings settings) {
 		String sourceName = settings.getSource();
 		XMLDom xmlParser = new XMLDom();
-	    //Http h = new Http();
 	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
 		try {
 		    //Send the request, and get a response
-		    //HttpResponse res = h.send(createRequest('', settings, String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
 		    requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
 		    if (requestor.getStatusCode() == 200) {
 				xmlParser.parseFromString(requestor.getBody());
@@ -240,6 +237,15 @@ public with sharing class V1Publisher {
 
 		return null;
 	}
+
+	public static Map<String, String> getProjects() {
+		return projects;
+	}
+
+	public static String getDefaultProjectId() {
+		return defaultProjectId;
+	}
+
 
 	/**
 	* Creates Relation node for request
