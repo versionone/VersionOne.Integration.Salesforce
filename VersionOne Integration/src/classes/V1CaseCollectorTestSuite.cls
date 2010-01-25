@@ -1,6 +1,10 @@
 @isTest
 private class V1CaseCollectorTestSuite {
 
+    static testMethod void countAndGetCasesByOwnerIdTest() {
+
+    }
+
     static testMethod void setCasesOwnerTest() {
     	String queueName = 'TestQueue1';
     	Group queue = new Group(Type='Queue', Name=queueName);
@@ -18,14 +22,19 @@ private class V1CaseCollectorTestSuite {
     	insert sobj;
 
 		System.debug('==> OwnerId=' + case1.OwnerId);
-		System.assert(case1.OwnerId == null, 'Case1 already owned by queue.');
-		System.assert(case2.OwnerId == null, 'Case2 already owned by queue.');
-		System.assert(case3.OwnerId == null, 'Case3 already owned by queue.');
-    	V1CaseCollector.setCasesOwner(new Case[] {case1, case2}, queue.Id);
+		System.assertEquals(case1.OwnerId, null, 'Case1 already owned by queue.');
+		System.assertEquals(case2.OwnerId, null, 'Case2 already owned by queue.');
+		System.assertEquals(case3.OwnerId, null, 'Case3 already owned by queue.');
 
-		System.assert(case1.OwnerId == queue.Id, 'Case1 Owner doesn\'t changed.');
-		System.assert(case2.OwnerId == queue.Id, 'Case2 Owner doesn\'t changed.');
-		System.assert(case3.OwnerId == null, 'Case3 Owner set by mistake.');
+    	V1CaseCollector.setCasesOwner(new Case[] {case1, case2}, queue.Id);
+		System.assertEquals(case1.OwnerId, queue.Id, 'Case1 Owner doesn\'t changed.');
+		System.assertEquals(case2.OwnerId, queue.Id, 'Case2 Owner doesn\'t changed.');
+		System.assertEquals(case3.OwnerId, null, 'Case3 Owner set by mistake.');
+
+		Case[] newCases = V1CaseCollector.getCasesByOwnerId(queue.Id);
+		System.assertEquals(newCases.size(), 2, 'Wrong count of owned cases.');
+		System.assertEquals(newCases[0].Id, case1.Id, 'Wrong owned case1.');
+		System.assertEquals(newCases[1].Id, case2.Id, 'Wrong owned case2.');
     }
 
     static testMethod void getQueueIdByNameTest() {
