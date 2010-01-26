@@ -50,20 +50,20 @@ public with sharing class V1Publisher {
 			errorMessage('Internal problems: ' + ex);
 		}
 		List<Case> processedCases = new List<Case>();
-		Integer i = 0;
+		Integer maxPublishCases = 3; // we have restriction on 10 request by http.send
 		for (Case caseData : cases) {
-			if (!alreadyPortedCases.containsKey(caseData.CaseNumber)) {
-				Integer id = createDefectInVersionOne(caseData, settings, findProjectId(caseData.Product__c), sourceId);
-				if (id > 0) {
-					processedCases.add(caseData);
-				}
-			} else {
+			if (alreadyPortedCases.containsKey(caseData.CaseNumber)) {
 				errorMessage('Case "' + caseData.Subject + '" (' + caseData.CaseNumber +') was already ported.' );
 				processedCases.add(caseData);
-			}
-			i++;// we have restriction on 10 request by http.send
-			if (i == 2) {
-				break;
+			} else {
+				if (maxPublishCases > 0) {
+					maxPublishCases--;
+					String projectId = findProjectId(caseData.Product__c);
+					Integer id = createDefectInVersionOne(caseData, settings, projectId, sourceId);
+					if (id > 0) {
+						processedCases.add(caseData);
+					}
+				}
 			}
 		}
 		String dstQueue = V1CaseCollector.getQueueIdByName('Assigned to VersionOne');

@@ -21,8 +21,7 @@ trigger CaseUpdaterTrigger on Case (after update) {
 	*/
 	//V1Publisher publisher = new V1Publisher(cases);
 
-	String srcQueue = V1CaseCollector.getQueueIdByName('Escalate to VersionOne');
-	if (V1CaseCollector.getCasesByOwnerId(srcQueue).size() > 0){
+	try {
 		V1Publisher.publish();
-	}
+	} catch (System.AsyncException e) {}
 }
