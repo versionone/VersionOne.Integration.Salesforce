@@ -1,4 +1,6 @@
-//TODO create parser for exceptions from the VersionOne, atm we just put xml to log
+//TODO
+// create parser for exceptions from the VersionOne, atm we just put xml to log
+// add handling exceptions to the errorMessage
 
 public with sharing class V1Publisher {
 

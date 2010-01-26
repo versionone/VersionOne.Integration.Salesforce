@@ -31,9 +31,9 @@ private class V1PublisherTester {
         V1Publisher.setRequestor(requestor);
         V1Publisher.findAllProjects(settings);
 
-        System.assert(V1Publisher.getProjects().size() == 12, 'Incorrect amount of projects ' + V1Publisher.getProjects().size() + ' instead of 12');
-        System.assert(V1Publisher.getDefaultProjectId().equals(String.valueof(1)), 'Default project has to has id equals 1 but found ' + V1Publisher.getDefaultProjectId());
-        System.assert(V1Publisher.findProjectId('Integrational tests project').equals('1457'), 'Incorrect id for \'Integrational tests project\'. Has to be 1457 but found ' + V1Publisher.findProjectId('Integrational tests project'));
+        System.assertEquals(V1Publisher.getProjects().size(), 12, 'Error! Incorrect amount of projects.');
+        System.assertEquals(V1Publisher.getDefaultProjectId(), '1', 'Errro! Incorect default project.');
+        System.assertEquals(V1Publisher.findProjectId('Integrational tests project'), '1457', 'Incorrect id for \'Integrational tests project.');
     }
 
     static testMethod void incorrectProjectsListTest() {
@@ -48,9 +48,9 @@ private class V1PublisherTester {
 		}catch(VersionOneException e){
 			//Catch code
 		}
-        System.assert(V1Publisher.getProjects().size() == 0, 'Incorrect amount of projects ' + V1Publisher.getProjects().size() + ' instead of 0');
-        System.assertEquals(V1Publisher.getDefaultProjectId(), String.valueof(0), 'Default project has to has id equals 0 but found ' + V1Publisher.getDefaultProjectId());
-        System.assertEquals(V1Publisher.findProjectId('Integrational tests project'), '0', 'Incorrect id for \'Integrational tests project\'. Has to be 0 but found ' + V1Publisher.findProjectId('Integrational tests project'));
+        System.assertEquals(V1Publisher.getProjects().size(), 0, 'Error! Incorrect amount of projects.');
+        System.assertEquals(V1Publisher.getDefaultProjectId(), String.valueof(0), 'Error! Incorrect default project');
+        System.assertEquals(V1Publisher.findProjectId('Integrational tests project'), '0', 'Incorrect id for \'Integrational tests project\'.');
     }
 
     static testMethod void correctCreatingLinkToSalesForceCaseTest() {
@@ -72,7 +72,7 @@ private class V1PublisherTester {
 					    '</Relation>' +
 					   '</Asset>';
 
-		System.assertEquals(((TestRequestor)requestor).getSentBody(), body, 'Incorrect created body for POST.');
+		System.assertEquals(((TestRequestor)requestor).getSentBody(0), body, 'Incorrect created body for POST.');
     }
 
     static testMethod void incorrectCreatingLinkToSalesForceCaseTest() {
@@ -99,7 +99,7 @@ private class V1PublisherTester {
 					    '</Relation>' +
 					   '</Asset>';
 
-		System.assertEquals(((TestRequestor)requestor).getSentBody(), body, 'Incorrect created body for POST.');
+		System.assertEquals(((TestRequestor)requestor).getSentBody(0), body, 'Incorrect created body for POST.');
     }
 
     static testMethod void correctGetAlreadyExistedDefectsTest() {
@@ -127,7 +127,7 @@ private class V1PublisherTester {
 		System.assertEquals(alredyPorted.size(), 2, 'Error! Incorrect numbers of found defects.');
 		System.assert(alredyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
 		System.assert(!alredyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
-		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference&where=((Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\');Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
+		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference&where=((Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\');Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(0), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
 
 
 		delete new Case[]{case1, case2, case3};
@@ -149,19 +149,39 @@ private class V1PublisherTester {
     static testMethod void correctCreateDefectInVersionOne() {
     	V1Publisher.resetAllData();
     	//data preparation
-    	Case caseData = new Case(Subject = 'Test case', Description = 'Case for testing');
+    	String caseName = 'Test case';
+    	String caseDescription = 'Case for testing';
+    	Case caseData = new Case(Subject = caseName, Description = caseDescription);
+    	Test.startTest();
+		insert caseData;
+		Test.stopTest();
+		caseData = [SELECT CaseNumber, Subject, Description FROM Case WHERE Id = :caseData.Id];
 
-		String body = '';
+		String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/1699/4596" id="Defect:1699:4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
 		String sourceName = 'TestSource';
 		String sourceId = '1010';
-		String productName = 'Product Name';
+		String productId = '123';
+		String expectedSendBody = '<Asset>' +
+							'<Relation act="set" name="Scope">' +
+								'<Asset idref="Scope:' + productId + '"/>' +
+							'</Relation>' +
+							'<Attribute act="set" name="Name">' + caseName +'</Attribute>' +
+							'<Attribute act="set" name="Reference">' + caseData.CaseNumber +'</Attribute>' +
+							'<Attribute act="set" name="Description">' + caseDescription + '</Attribute>' +
+							'<Relation act="set" name="Source">' +
+								'<Asset idref="StorySource:' + sourceId + '"/>' +
+							'</Relation>' +
+						'</Asset>';
     	ISettings settings = new TestSettings(sourceName);
     	IRequestor requestor = new TestRequestor(body, 200);
     	V1Publisher.setRequestor(requestor);
 
-    	V1Publisher.createDefectInVersionOne(caseData, settings, productName, sourceId);
+    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, settings, productId, sourceId);
 
-    	//System.assertEquals(requestor, pANY)
+    	System.assertEquals(expectedSendBody, ((TestRequestor)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
+    	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
+
+    	delete caseData;
     }
 /*
     static testMethod void correctIsDefectAlreadyExistTest() {
@@ -200,8 +220,8 @@ private class V1PublisherTester {
     public class TestRequestor implements IRequestor {
     	private String responceBody;
     	private Integer statusCode;
-    	private String bodyForSend;
-    	private String urlForSend;
+    	private List<String> bodyForSend = new List<String>();
+    	private List<String> urlForSend = new List<String>();
 
 		public TestRequestor(String body, Integer statusCode) {
 			this.responceBody = body;
@@ -209,12 +229,12 @@ private class V1PublisherTester {
 		}
 
 		public void doGet(String body, String url) {
-			this.urlForSend = url;
+			this.urlForSend.add(url);
 		}
 
 		public void doPost(String body, String url) {
-			this.bodyForSend = body;
-			this.urlForSend = url;
+			this.bodyForSend.add(body);
+			this.urlForSend.add(url);
 		}
 
 		public String getBody() {
@@ -225,40 +245,21 @@ private class V1PublisherTester {
 			return statusCode;
     	}
 
-    	public String getSentBody() {
-    		return bodyForSend;
+    	public String getSentBody(Integer i) {
+    		return bodyForSend.get(i);
     	}
 
-    	public String getSentUrl() {
-    		return urlForSend;
+    	public String getSentUrl(Integer i) {
+    		return urlForSend.get(i);
     	}
     }
 
-    public class TestSettings implements ISettings {
+    public abstract class TestSettings implements ISettings {
     	private String sourceName;
 
     	public TestSettings(String sourceName) {
     		this.sourceName = sourceName;
     	}
-
-		public String getPath() {
-			return '';
-		}
-
-		public void setPath(String path) {
-		}
-
-		public String getUserName() {
-			return '';
-		}
-
-		public String getPassword() {
-			return '';
-		}
-
-		public String getEscalateQueueId() {
-			return '';
-		}
 
 		public String getSource() {
 			return sourceName;
