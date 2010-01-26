@@ -119,31 +119,33 @@ private class V1PublisherTester {
 		String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="2" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/Defect/1047" id="Defect:1047"><Attribute name="Reference">' + case1.CaseNumber + '</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Defect/1051" id="Defect:1051"><Attribute name="Reference">' + case2.CaseNumber + '</Attribute></Asset></Assets>';
 		String path = 'http://localhost/VersionOne';
 		String sourceName = 'TestSource';
-		ISettings settings = new TestSettings(sourceName);
+		Settings testSettings = Settings.getTestSettings();
 		IRequestor requestor = new TestRequestor(body, 200);
 		V1Publisher.setRequestor(requestor);
 
-		Map<String, Boolean> alredyPorted =  V1Publisher.getAlreadyExistedDefects(settings, new Case[]{case1, case2, case3});
+		Map<String, Boolean> alredyPorted =  V1Publisher.getAlreadyExistedDefects(testSettings, new Case[]{case1, case2, case3});
 		System.assertEquals(alredyPorted.size(), 2, 'Error! Incorrect numbers of found defects.');
 		System.assert(alredyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
 		System.assert(!alredyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
 		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference&where=((Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\');Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(0), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
-
-
 		delete new Case[]{case1, case2, case3};
+		Settings.deleteTestSettings();
     }
 
     static testMethod void correctFindSourceId() {
     	V1Publisher.resetAllData();
     	String sourceName = 'TestSource';
     	String sourceIdExpected = '1010';
-    	ISettings settings = new TestSettings(sourceName);
+    	//ISettings settings = new TestSettings(sourceName);
+    	Settings testSettings = Settings.getTestSettings();
     	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
 		IRequestor requestor = new TestRequestor(body, 200);
 		V1Publisher.setRequestor(requestor);
 
-    	String sourceId = V1Publisher.findSourceId(settings);
+    	String sourceId = V1Publisher.findSourceId(testSettings);
     	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
+
+    	Settings.deleteTestSettings();
     }
 
     static testMethod void correctCreateDefectInVersionOne() {
@@ -172,16 +174,18 @@ private class V1PublisherTester {
 								'<Asset idref="StorySource:' + sourceId + '"/>' +
 							'</Relation>' +
 						'</Asset>';
-    	ISettings settings = new TestSettings(sourceName);
+    	//ISettings settings = new TestSettings(sourceName);
+    	Settings testSettings = Settings.getTestSettings();
     	IRequestor requestor = new TestRequestor(body, 200);
     	V1Publisher.setRequestor(requestor);
 
-    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, settings, productId, sourceId);
+    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
 
     	System.assertEquals(expectedSendBody, ((TestRequestor)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
     	delete caseData;
+    	Settings.deleteTestSettings();
     }
 /*
     static testMethod void correctIsDefectAlreadyExistTest() {
@@ -252,17 +256,5 @@ private class V1PublisherTester {
     	public String getSentUrl(Integer i) {
     		return urlForSend.get(i);
     	}
-    }
-
-    public abstract class TestSettings implements ISettings {
-    	private String sourceName;
-
-    	public TestSettings(String sourceName) {
-    		this.sourceName = sourceName;
-    	}
-
-		public String getSource() {
-			return sourceName;
-		}
     }
 }
