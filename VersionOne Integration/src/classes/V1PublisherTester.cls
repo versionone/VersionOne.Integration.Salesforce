@@ -42,8 +42,12 @@ private class V1PublisherTester {
         Settings settings = new Settings();
         IRequestor requestor = new TestRequestor('', 400);
         V1Publisher.setRequestor(requestor);
-        V1Publisher.findAllProjects(settings);
-
+		try{
+			V1Publisher.findAllProjects(settings);
+			System.assert(false, 'This place cannot be reached.');
+		}catch(VersionOneException e){
+			//Catch code
+		}
         System.assert(V1Publisher.getProjects().size() == 0, 'Incorrect amount of projects ' + V1Publisher.getProjects().size() + ' instead of 0');
         System.assertEquals(V1Publisher.getDefaultProjectId(), String.valueof(0), 'Default project has to has id equals 0 but found ' + V1Publisher.getDefaultProjectId());
         System.assertEquals(V1Publisher.findProjectId('Integrational tests project'), '0', 'Incorrect id for \'Integrational tests project\'. Has to be 0 but found ' + V1Publisher.findProjectId('Integrational tests project'));
@@ -80,8 +84,12 @@ private class V1PublisherTester {
     	Integer defectId = 123;
     	String caseId = 'CaseId';
     	V1Publisher.setRequestor(requestor);
-    	V1Publisher.createLinkV1ToSF(defectId, 'CaseId', settings);
-
+    	try {
+    		V1Publisher.createLinkV1ToSF(defectId, 'CaseId', settings);
+    		System.assert(false, 'This place cannot be reached.');
+		}catch(VersionOneException e){
+			//Catch code
+		}
     	String body = '<Asset>' +
 						'<Attribute act="set" name="OnMenu">true</Attribute>' +
 						'<Attribute act="set" name="URL">https://na7.salesforce.com/' + caseId + '</Attribute>' +
@@ -94,20 +102,87 @@ private class V1PublisherTester {
 		System.assertEquals(((TestRequestor)requestor).getSentBody(), body, 'Incorrect created body for POST.');
     }
 
+    static testMethod void correctGetAlreadyExistedDefectsTest() {
+    	V1Publisher.resetAllData();
+
+		//prepare data
+		Case case1 = new Case(Subject = 'case1');
+		Case case2 = new Case(Subject = 'case2');
+		Case case3 = new Case(Subject = 'case3');
+		Test.startTest();
+		insert new Case[]{case1, case2, case3};
+		Test.stopTest();
+		case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
+		case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
+		case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
+
+		String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="2" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/Defect/1047" id="Defect:1047"><Attribute name="Reference">' + case1.CaseNumber + '</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Defect/1051" id="Defect:1051"><Attribute name="Reference">' + case2.CaseNumber + '</Attribute></Asset></Assets>';
+		String path = 'http://localhost/VersionOne';
+		String sourceName = 'TestSource';
+		ISettings settings = new TestSettings(sourceName);
+		IRequestor requestor = new TestRequestor(body, 200);
+		V1Publisher.setRequestor(requestor);
+
+		Map<String, Boolean> alredyPorted =  V1Publisher.getAlreadyExistedDefects(settings, new Case[]{case1, case2, case3});
+		System.assertEquals(alredyPorted.size(), 2, 'Error! Incorrect numbers of found defects.');
+		System.assert(alredyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
+		System.assert(!alredyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
+		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference&where=((Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\');Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
+
+
+		delete new Case[]{case1, case2, case3};
+    }
+
+    static testMethod void correctFindSourceId() {
+    	V1Publisher.resetAllData();
+    	String sourceName = 'TestSource';
+    	ISettings settings = new TestSettings(sourceName);
+    	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" id="StorySource:1010" /></Assets>';
+		IRequestor requestor = new TestRequestor(body, 200);
+		V1Publisher.setRequestor(requestor);
+
+    	String sourceId = V1Publisher.findSourceId(settings);
+    	System.assertEquals(sourceId, '1010', 'Incorrect id of source');
+    }
+/*
     static testMethod void correctIsDefectAlreadyExistTest() {
     	V1Publisher.resetAllData();
 
 		String caseNumber = '00012304';
-		Settings settings = new Settings();
-		IRequestor requestor = new TestRequestor('', 400);
+		String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/Defect/1051" id="Defect:1051"><Attribute name="Source.Name">SalesForce</Attribute><Attribute name="Reference">' + caseNumber + '</Attribute></Asset></Assets>';
+		String path = 'http://localhost/VersionOne';
+		String sourceName = 'TestSource';
+		ISettings settings = new TestSettings(sourceName);
+		IRequestor requestor = new TestRequestor(body, 200);
 		V1Publisher.setRequestor(requestor);
-		V1Publisher.isDefectAlreadyExist(settings, caseNumber);
+		Boolean result = V1Publisher.isDefectAlreadyExist(settings, caseNumber);
+
+		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference,Source.Name&where=(Reference="' + caseNumber + '";Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(), 'Incorrect created URL for defect request.');
+		System.assert(result, 'Error! Defect has to be found.');
     }
+
+    static testMethod void correctIsDefectNotAlreadyExistTest() {
+    	V1Publisher.resetAllData();
+
+		String caseNumber = '00012304';
+		String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"></Assets>';
+		String path = 'http://localhost/VersionOne';
+		String sourceName = 'TestSource';
+		ISettings settings = new TestSettings(sourceName);
+		IRequestor requestor = new TestRequestor(body, 200);
+		V1Publisher.setRequestor(requestor);
+		Boolean result = V1Publisher.isDefectAlreadyExist(settings, caseNumber);
+
+		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference,Source.Name&where=(Reference="' + caseNumber + '";Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(), 'Incorrect created URL for defect request.');
+		System.assert(!result, 'Error! Defect has to be not found.');
+    }
+    */
 
     public class TestRequestor implements IRequestor {
     	private String responceBody;
     	private Integer statusCode;
     	private String bodyForSend;
+    	private String urlForSend;
 
 		public TestRequestor(String body, Integer statusCode) {
 			this.responceBody = body;
@@ -115,9 +190,12 @@ private class V1PublisherTester {
 		}
 
 		public void doGet(String body, String url) {
+			this.urlForSend = url;
 		}
+
 		public void doPost(String body, String url) {
 			this.bodyForSend = body;
+			this.urlForSend = url;
 		}
 
 		public String getBody() {
@@ -131,5 +209,40 @@ private class V1PublisherTester {
     	public String getSentBody() {
     		return bodyForSend;
     	}
+
+    	public String getSentUrl() {
+    		return urlForSend;
+    	}
+    }
+
+    public class TestSettings implements ISettings {
+    	private String sourceName;
+
+    	public TestSettings(String sourceName) {
+    		this.sourceName = sourceName;
+    	}
+
+		public String getPath() {
+			return '';
+		}
+
+		public void setPath(String path) {
+		}
+
+		public String getUserName() {
+			return '';
+		}
+
+		public String getPassword() {
+			return '';
+		}
+
+		public String getEscalateQueueId() {
+			return '';
+		}
+
+		public String getSource() {
+			return sourceName;
+		}
     }
 }
