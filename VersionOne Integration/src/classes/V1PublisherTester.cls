@@ -136,13 +136,32 @@ private class V1PublisherTester {
     static testMethod void correctFindSourceId() {
     	V1Publisher.resetAllData();
     	String sourceName = 'TestSource';
+    	String sourceIdExpected = '1010';
     	ISettings settings = new TestSettings(sourceName);
-    	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" id="StorySource:1010" /></Assets>';
+    	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
 		IRequestor requestor = new TestRequestor(body, 200);
 		V1Publisher.setRequestor(requestor);
 
     	String sourceId = V1Publisher.findSourceId(settings);
-    	System.assertEquals(sourceId, '1010', 'Incorrect id of source');
+    	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
+    }
+
+    static testMethod void correctCreateDefectInVersionOne() {
+    	V1Publisher.resetAllData();
+    	//data preparation
+    	Case caseData = new Case(Subject = 'Test case', Description = 'Case for testing');
+
+		String body = '';
+		String sourceName = 'TestSource';
+		String sourceId = '1010';
+		String productName = 'Product Name';
+    	ISettings settings = new TestSettings(sourceName);
+    	IRequestor requestor = new TestRequestor(body, 200);
+    	V1Publisher.setRequestor(requestor);
+
+    	V1Publisher.createDefectInVersionOne(caseData, settings, productName, sourceId);
+
+    	//System.assertEquals(requestor, pANY)
     }
 /*
     static testMethod void correctIsDefectAlreadyExistTest() {

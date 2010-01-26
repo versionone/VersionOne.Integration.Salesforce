@@ -5,7 +5,6 @@ public with sharing class V1Publisher {
 	private static Map<String, String> projects = new Map<String, String>();
 	private static String defaultProjectId = '0';
 	private static IRequestor requestor;
-	private static String sourceId;
 
 	private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
 	private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
@@ -29,10 +28,10 @@ public with sharing class V1Publisher {
 	public static void publish() {
 		resetAllData();
 		ISettings settings = new Settings();
-		sourceId = findSourceId(settings);
 		if (requestor == null) {
-			requestor = new Requestor(settings);
+			setRequestor(new Requestor(settings));
 		}
+		String sourceId = findSourceId(settings);
 		if (sourceId == null) {
 			errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
 			return;
@@ -53,8 +52,8 @@ public with sharing class V1Publisher {
 		List<Case> processedCases = new List<Case>();
 		Integer i = 0;
 		for (Case caseData : cases) {
-			if (alreadyPortedCases.containsKey(caseData.CaseNumber)) {
-				Integer id = createDefectInVersionOne(caseData, settings);
+			if (!alreadyPortedCases.containsKey(caseData.CaseNumber)) {
+				Integer id = createDefectInVersionOne(caseData, settings, findProjectId(caseData.Product__c), sourceId);
 				if (id > 0) {
 					processedCases.add(caseData);
 				}
@@ -77,12 +76,12 @@ public with sharing class V1Publisher {
 	* returns 	defect id  	- all ok
 	*			-1 			- defect was not created
 	**/
-	public static Integer createDefectInVersionOne(Case caseData, ISettings settings) {
+	public static Integer createDefectInVersionOne(Case caseData, ISettings settings, String productId, String sourceId) {
 		Integer defectId = -1;
 		XMLDom xmlParser = new XMLDom();
 		try {
 			String createDefectBody = '<Asset>' +
-								relationNode('Scope', 'Scope:' + findProjectId(caseData.Product__c)) +
+								relationNode('Scope', 'Scope:' + productId) +
 								attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME)) +
 								attributeNode('Reference', caseData.CaseNumber) +
 								attributeNode('Description', (caseData.Description != null ? caseData.Description : '')) +
