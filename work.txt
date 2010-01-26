@@ -9,3 +9,6 @@ Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
 ----------------------
 Create queue with "Assigned to VersionOne" name.
 
+Create products with names of V1 Projects (Setup>Cases>Fields>Case Custom Fields & Relationships>Product>Edit)
+
+Allow access to V1 Server (Setup>Administration Setup>Security Controls>Remote Site Settings)
