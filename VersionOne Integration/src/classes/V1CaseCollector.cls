@@ -1,8 +1,12 @@
 public class V1CaseCollector {
 
+	/* Query cases with specified owner.
+	 * ownerId - ID of an owner.
+	 * Return: Array of cases.
+	 */
 	public static Case[] getCasesByOwnerId(String ownerId) {
 		Case[] cases = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject
-						  FROM Case WHERE OwnerId = :ownerId ];
+						  FROM Case WHERE OwnerId = :ownerId];
 		System.debug('==> getCasesByOwnerId() found: ' + cases.size());
 		return cases;
 	}

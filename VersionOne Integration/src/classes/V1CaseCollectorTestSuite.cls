@@ -1,10 +1,6 @@
 @isTest
 private class V1CaseCollectorTestSuite {
 
-    static testMethod void countAndGetCasesByOwnerIdTest() {
-
-    }
-
     static testMethod void setCasesOwnerTest() {
     	String queueName = 'TestQueue1';
     	Group queue = new Group(Type='Queue', Name=queueName);
