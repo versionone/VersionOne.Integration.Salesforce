@@ -123,12 +123,41 @@ private class V1PublisherTester {
 		IRequestor requestor = new TestRequestor(body, 200);
 		V1Publisher.setRequestor(requestor);
 
-		Map<String, Boolean> alredyPorted =  V1Publisher.getAlreadyExistedDefects(testSettings, new Case[]{case1, case2, case3});
-		System.assertEquals(alredyPorted.size(), 2, 'Error! Incorrect numbers of found defects.');
-		System.assert(alredyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
-		System.assert(!alredyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
+		Map<String, Boolean> alreadyPorted = V1Publisher.getAlreadyExistedDefects(testSettings, new Case[]{case1, case2, case3});
+		System.assertEquals(alreadyPorted.size(), 2, 'Error! Incorrect numbers of found defects.');
+		System.assert(alreadyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
+		System.assert(!alreadyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
 		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference&where=((Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\');Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(0), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
 		delete new Case[]{case1, case2, case3};
+    }
+
+    static testMethod void incorrectGetAlreadyExistedDefectsTest() {
+    	V1Publisher.resetAllData();
+
+		//prepare data
+		Case case1 = new Case(Subject = 'case1');
+		Case case2 = new Case(Subject = 'case2');
+		Case case3 = new Case(Subject = 'case3');
+		Test.startTest();
+		insert new Case[]{case1, case2, case3};
+		Test.stopTest();
+		case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
+		case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
+		case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
+
+		String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="2" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/Defect/1047" id="Defect:1047"><Attribute name="Reference">' + case1.CaseNumber + '</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Defect/1051" id="Defect:1051"><Attribute name="Reference">' + case2.CaseNumber + '</Attribute></Asset></Assets>';
+		String path = 'http://localhost/VersionOne';
+		String sourceName = 'TestSource';
+		Settings testSettings = Settings.getTestSettings();
+		IRequestor requestor = new TestRequestor(body, 400);
+		V1Publisher.setRequestor(requestor);
+
+    	try {
+    		Map<String, Boolean> alreadyPorted =  V1Publisher.getAlreadyExistedDefects(testSettings, new Case[]{case1, case2, case3});
+    		System.assert(false, 'This place cannot be reached.');
+		}catch(VersionOneException e){
+			//Catch code
+		}
     }
 
     static testMethod void correctFindSourceId() {
@@ -156,6 +185,7 @@ private class V1PublisherTester {
 		Test.stopTest();
 		caseData = [SELECT CaseNumber, Subject, Description FROM Case WHERE Id = :caseData.Id];
 
+		// case 1
 		String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/1699/4596" id="Defect:1699:4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
 		String sourceName = 'TestSource';
 		String sourceId = '1010';
@@ -181,8 +211,91 @@ private class V1PublisherTester {
     	System.assertEquals(expectedSendBody, ((TestRequestor)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
+    	//case 2
+		sourceName = 'TestSource';
+		sourceId = '1010';
+		productId = '123';
+		expectedSendBody = '<Asset>' +
+							'<Relation act="set" name="Scope">' +
+								'<Asset idref="Scope:' + productId + '"/>' +
+							'</Relation>' +
+							'<Attribute act="set" name="Name">Case from SalesForce</Attribute>' +
+							'<Attribute act="set" name="Reference">' + caseData.CaseNumber +'</Attribute>' +
+							'<Attribute act="set" name="Description"></Attribute>' +
+							'<Relation act="set" name="Source">' +
+								'<Asset idref="StorySource:' + sourceId + '"/>' +
+							'</Relation>' +
+						'</Asset>';
+    	requestor = new TestRequestor(body, 200);
+    	V1Publisher.setRequestor(requestor);
+    	caseData.Subject = '';
+    	caseData.Description = '';
+
+    	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	System.assertEquals(expectedSendBody, ((TestRequestor)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
+    	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
+
     	delete caseData;
     }
+
+    static testMethod void incorrectCreateDefectInVersionOne() {
+    	String caseName = 'Test case';
+		String sourceId = '1010';
+		String productId = '123';
+    	String caseDescription = 'Case for testing';
+    	Case caseData = new Case(Subject = caseName, Description = caseDescription);
+    	Test.startTest();
+		insert caseData;
+		Test.stopTest();
+    	Settings testSettings = Settings.getTestSettings();
+    	IRequestor requestor = new TestRequestor('', 400);
+    	V1Publisher.setRequestor(requestor);
+
+    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
+    	delete caseData;
+    }
+
+	static testMethod void exceptionsCreateDefectInVersionOne() {
+		// incorrect responce from the VersionOne on any request during creation defect
+    	String caseName = 'Test case';
+		String sourceId = '1010';
+		String productId = '123';
+		String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/1699/4596" id="Defect:1699:4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
+    	String caseDescription = 'Case for testing';
+		Case caseData = new Case(Subject = caseName, Description = caseDescription);
+    	Settings testSettings = Settings.getTestSettings();
+    	Exception[] exceptions = new Exception[]{new VersionOneException('test error', '<html>error</html>')};
+    	IRequestor requestor = new TestRequestor(body, 200, exceptions);
+    	V1Publisher.setRequestor(requestor);
+
+    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
+
+    	// ecxeption during creating defect in the VersionOne
+    	exceptions = new Exception[]{new NullPointerException()};
+    	requestor = new TestRequestor(body, 200, exceptions);
+    	V1Publisher.setRequestor(requestor);
+
+    	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
+
+    	// incorrect responce from the VersionOne during creating link to case in the VersionOne
+    	exceptions = new Exception[]{null, new VersionOneException('test error', '<html>error</html>')};
+    	requestor = new TestRequestor(body, 200, exceptions);
+    	V1Publisher.setRequestor(requestor);
+
+    	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
+
+    	// ecxeption during creating link to case in the VersionOne
+    	exceptions = new Exception[]{null, new NullPointerException()};
+    	requestor = new TestRequestor(body, 200, exceptions);
+    	V1Publisher.setRequestor(requestor);
+
+    	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
+	}
 /*
     static testMethod void correctIsDefectAlreadyExistTest() {
     	V1Publisher.resetAllData();
@@ -222,10 +335,17 @@ private class V1PublisherTester {
     	private Integer statusCode;
     	private List<String> bodyForSend = new List<String>();
     	private List<String> urlForSend = new List<String>();
+    	private Integer numberRequest = 0;
+    	private List<Exception> exceptions;
 
 		public TestRequestor(String body, Integer statusCode) {
+			this(body, statusCode, null);
+		}
+
+		public TestRequestor(String body, Integer statusCode, List<Exception> exceptions) {
 			this.responceBody = body;
 			this.statusCode = statusCode;
+			this.exceptions = exceptions;
 		}
 
 
@@ -246,7 +366,12 @@ private class V1PublisherTester {
     	}
 
 		public void request(HttpRequest request) {
-
+			System.debug('Call number:' + numberRequest);
+			if (exceptions != null && exceptions.get(numberRequest) != null) {
+				System.debug('Going to throw exception:' + exceptions.get(numberRequest));
+				throw exceptions.get(numberRequest);
+			}
+			numberRequest++;
 		}
 
 		public HttpRequest createRequest(String body, String additionUrl, String requestType) {
