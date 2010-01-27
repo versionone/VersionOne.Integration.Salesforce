@@ -324,7 +324,9 @@ public with sharing class V1Publisher {
 	*
 	**/
 	public static String attributeNode(String name, String value) {
-		value = value.replace('<', '&lt;').replace('>', '&gt;');
+		if (value != null) {
+			value = value.replace('<', '&lt;').replace('>', '&gt;');
+		}
 		return '<Attribute act="set" name="' + name + '">' + value + '</Attribute>';
 	}
 

@@ -257,6 +257,7 @@ private class V1PublisherTester {
     }
 
 	static testMethod void exceptionsCreateDefectInVersionOne() {
+		System.debug('exceptionsCreateDefectInVersionOne: 1');
 		// incorrect responce from the VersionOne on any request during creation defect
     	String caseName = 'Test case';
 		String sourceId = '1010';
@@ -272,6 +273,7 @@ private class V1PublisherTester {
     	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
     	System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
 
+		System.debug('exceptionsCreateDefectInVersionOne: 2');
     	// ecxeption during creating defect in the VersionOne
     	exceptions = new Exception[]{new NullPointerException()};
     	requestor = new TestRequestor(body, 200, exceptions);
@@ -280,6 +282,7 @@ private class V1PublisherTester {
     	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
     	System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
 
+		System.debug('exceptionsCreateDefectInVersionOne: 3');
     	// incorrect responce from the VersionOne during creating link to case in the VersionOne
     	exceptions = new Exception[]{null, new VersionOneException('test error', '<html>error</html>')};
     	requestor = new TestRequestor(body, 200, exceptions);
@@ -288,6 +291,7 @@ private class V1PublisherTester {
     	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
+		System.debug('exceptionsCreateDefectInVersionOne: 4');
     	// ecxeption during creating link to case in the VersionOne
     	exceptions = new Exception[]{null, new NullPointerException()};
     	requestor = new TestRequestor(body, 200, exceptions);

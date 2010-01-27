@@ -13,4 +13,4 @@ Create products with names of V1 Projects (Setup>Cases>Fields>Case Custom Fields
 
 Allow access to V1 Server (Setup>Administration Setup>Security Controls>Remote Site Settings)
 ----------------------
-Add new field to case Setup>Customize>Cases>Fields with field name VersionOneUrl
+Add new field(type is URL) to case Setup>Customize>Cases>Fields with field name VersionOneUrl
