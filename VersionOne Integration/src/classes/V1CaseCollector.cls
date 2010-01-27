@@ -18,6 +18,7 @@ public class V1CaseCollector {
 	 * ownerId - ID of the owner to set.
 	 */
 	public static void setCasesOwnerAndUrls(List<Case> cases, String ownerId, List<Integer> ids) {
+		List<CaseComment> comments = new List<CaseComment>();
 		//for (Case c : cases) {
 		for (Integer i = 0; i<cases.size(); i++){
 			Case c = cases[i];
@@ -27,9 +28,12 @@ public class V1CaseCollector {
 			if (id != null) {
 				c.put('VersionOneUrl__c', DEFECT_URL + id);
 			}
+			CaseComment comment = new CaseComment(CommentBody = 'Escalated to VersionOne', ParentId = c.Id);
+			comments.add(comment);
 			System.debug('AFTER CHANGE: ' + c);
 		}
 		Database.update(cases);
+		insert comments;
 	}
 
 	public static void setCasesField(List<Case> cases, String field, List<Object> value) {
