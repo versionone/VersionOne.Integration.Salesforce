@@ -6,6 +6,7 @@ public with sharing class Settings implements ISettings {
 	private String password;
 	private String source;
 	private String escalateQueueId;
+	private String urlV1Field;
 
 	public Settings () {
 		this('V1Settings');
@@ -27,6 +28,7 @@ public with sharing class Settings implements ISettings {
 			path = mycs.Path__c;
 			userName = mycs.UserName__c;
 			password = mycs.Password__c;
+			urlV1Field = 'VersionOneUrl__c';
 			source = 'SalesForce';
 		}
 
@@ -69,5 +71,9 @@ public with sharing class Settings implements ISettings {
 
 	public void setSource(String source) {
 		this.source = source;
+	}
+
+	public String getV1Url() {
+		return urlV1Field;
 	}
 }
