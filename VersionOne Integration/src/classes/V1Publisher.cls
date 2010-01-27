@@ -52,11 +52,13 @@ public with sharing class V1Publisher {
 			errorMessage('Internal problems: ' + ex);
 		}
 		List<Case> processedCases = new List<Case>();
+		List<Integer> defectsIds = new List<Integer>();
 		Integer maxPublishCases = 3; // we have restriction on 10 request by http.send
 		for (Case caseData : cases) {
 			if (alreadyPortedCases.containsKey(caseData.CaseNumber)) {
 				errorMessage('Case "' + caseData.Subject + '" (' + caseData.CaseNumber +') was already ported.' );
 				processedCases.add(caseData);
+				defectsIds.add(null);
 			} else {
 				if (maxPublishCases > 0) {
 					maxPublishCases--;
@@ -64,6 +66,7 @@ public with sharing class V1Publisher {
 					Integer id = createDefectInVersionOne(caseData, settings, projectId, sourceId);
 					if (id > 0) {
 						processedCases.add(caseData);
+						defectsIds.add(id);
 					}
 				}
 			}
@@ -321,6 +324,7 @@ public with sharing class V1Publisher {
 	*
 	**/
 	public static String attributeNode(String name, String value) {
+		value = value.replace('<', '&lt;').replace('>', '&gt;');
 		return '<Attribute act="set" name="' + name + '">' + value + '</Attribute>';
 	}
 
