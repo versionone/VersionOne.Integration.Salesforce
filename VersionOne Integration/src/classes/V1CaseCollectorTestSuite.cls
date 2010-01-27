@@ -5,6 +5,7 @@ private class V1CaseCollectorTestSuite {
     	String queueName = 'TestQueue1';
     	Group queue = new Group(Type='Queue', Name=queueName);
     	insert queue;
+    	Test.startTest();
     	String case1Name = 'TestCase1';
     	Case case1 = new Case(Subject=case1Name);
     	insert case1;
@@ -17,12 +18,14 @@ private class V1CaseCollectorTestSuite {
     	QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
     	insert sobj;
 
+		Test.stopTest();
+
 		System.debug('==> OwnerId=' + case1.OwnerId);
 		System.assertEquals(case1.OwnerId, null, 'Case1 already owned by queue.');
 		System.assertEquals(case2.OwnerId, null, 'Case2 already owned by queue.');
 		System.assertEquals(case3.OwnerId, null, 'Case3 already owned by queue.');
 
-    	V1CaseCollector.setCasesOwner(new Case[] {case1, case2}, queue.Id);
+    	V1CaseCollector.setCasesOwnerAndUrls(new Case[] {case1, case2}, queue.Id, new Integer[]{null,null});
 		System.assertEquals(case1.OwnerId, queue.Id, 'Case1 Owner doesn\'t changed.');
 		System.assertEquals(case2.OwnerId, queue.Id, 'Case2 Owner doesn\'t changed.');
 		System.assertEquals(case3.OwnerId, null, 'Case3 Owner set by mistake.');

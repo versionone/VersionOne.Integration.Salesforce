@@ -72,7 +72,7 @@ public with sharing class V1Publisher {
 			}
 		}
 		String dstQueue = V1CaseCollector.getQueueIdByName('Assigned to VersionOne');
-		V1CaseCollector.setCasesOwner(processedCases, dstQueue);
+		V1CaseCollector.setCasesOwnerAndUrls(processedCases, dstQueue, defectsIds);
 	}
 
 	/**

@@ -1,5 +1,7 @@
 public class V1CaseCollector {
 
+	private static final String DEFECT_URL = 'http://integdmz01/VersionOne/assetdetail.v1?oid=Defect%3a';
+
 	/* Query cases with specified owner.
 	 * ownerId - ID of an owner.
 	 * Return: Array of cases.
@@ -15,10 +17,24 @@ public class V1CaseCollector {
 	 * cases - list of cases to process.
 	 * ownerId - ID of the owner to set.
 	 */
-	public static void setCasesOwner(List<Case> cases, String ownerId) {
-		for (Case c : cases) {
+	public static void setCasesOwnerAndUrls(List<Case> cases, String ownerId, List<Integer> ids) {
+		//for (Case c : cases) {
+		for (Integer i = 0; i<cases.size(); i++){
+			Case c = cases[i];
+			Integer id = ids[i];
 			System.debug('BEFORE UPDATE: ' + c);
 			c.OwnerId = ownerId;
+			if (id != null) {
+				c.put('VersionOneUrl__c', DEFECT_URL + id);
+			}
+			System.debug('AFTER CHANGE: ' + c);
+		}
+		Database.update(cases);
+	}
+
+	public static void setCasesField(List<Case> cases, String field, List<Object> value) {
+		for (Case c : cases) {
+			System.debug('BEFORE UPDATE: ' + c);
 			System.debug('AFTER CHANGE: ' + c);
 		}
 		Database.update(cases);
