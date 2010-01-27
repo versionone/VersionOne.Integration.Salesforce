@@ -1,15 +1,5 @@
 public interface IRequestor {
 	/**
-	* Makes GET request
-	**/
-	void doGet(String body, String url);
-
-	/**
-	* Makes POST request
-	**/
-	void doPost(String body, String url);
-
-	/**
 	* Returns body from responce
 	*
 	**/
@@ -20,4 +10,8 @@ public interface IRequestor {
 	*
 	**/
 	Integer getStatusCode();
+
+	void request(HttpRequest request);
+
+	HttpRequest createRequest(String body, String additionUrl, String requestType);
 }

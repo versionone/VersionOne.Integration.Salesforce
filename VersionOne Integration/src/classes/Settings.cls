@@ -1,28 +1,34 @@
 public with sharing class Settings implements ISettings {
 	private final V1Settings__c mycs;
-	private final String escalateQueueId;
-	private static final String testSettingsName = 'TestSettings';
 
+	private String path;
+	private String userName;
+	private String password;
 	private String source;
+	private String escalateQueueId;
 
 	public Settings () {
 		this('V1Settings');
 	}
 
 	private Settings(String settingsName) {
-		mycs = V1Settings__c.getValues(settingsName);
+		if (settingsName != null) {
+			mycs = V1Settings__c.getValues(settingsName);
 
-		if(mycs == null) {
-			mycs = new V1Settings__c(Name = settingsName);
-			mycs.Path__c = 'http://localhost/VersionOne/';
-			mycs.UserName__c = 'admin';
-			mycs.Password__c = 'admin';
-			insert mycs;
+			if(mycs == null) {
+				mycs = new V1Settings__c(Name = settingsName);
+				mycs.Path__c = 'http://localhost/VersionOne/';
+				mycs.UserName__c = 'admin';
+				mycs.Password__c = 'admin';
+				insert mycs;
+			}
+			mycs.Path__c = 'http://195.62.49.62:7001/VersionOne/';
+
+			path = mycs.Path__c;
+			userName = mycs.UserName__c;
+			password = mycs.Password__c;
+			source = 'SalesForce';
 		}
-
-		mycs.Path__c = 'http://195.62.49.62:7001/VersionOne/';
-		source = 'SalesForce';
-
 
 		String queueName = 'Escalate to VersionOne';
 		String queueString = 'SELECT ID, Name FROM Group WHERE Name=\''+queueName+'\'' ;
@@ -31,30 +37,26 @@ public with sharing class Settings implements ISettings {
 	}
 
 	public static Settings getTestSettings() {
-		 Settings settings = new Settings(testSettingsName);
+		 Settings settings = new Settings(null);
 		 settings.setSource('TestSource');
+		 settings.setPath('http://195.62.49.62:7001/VersionOne/');
 		 return settings;
 	}
 
-	public static void deleteTestSettings() {
-		V1Settings__c forDel = V1Settings__c.getValues(testSettingsName);
-		delete forDel;
-	}
-
 	public String getPath() {
-		return mycs.Path__c;
+		return path;
 	}
 
 	public void setPath(String path) {
-		mycs.Path__c = path;
+		this.path = path;
 	}
 
 	public String getUserName() {
-		return mycs.UserName__c;
+		return userName;
 	}
 
 	public String getPassword() {
-		return mycs.Password__c;
+		return password;
 	}
 
 	public String getEscalateQueueId() {

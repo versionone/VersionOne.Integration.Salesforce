@@ -91,7 +91,8 @@ public with sharing class V1Publisher {
 									  '</Asset>';
 			System.debug('XML for create defect:' + createDefectBody);
 
-		    requestor.doPost(createDefectBody, DEFECT_URL);
+		    //requestor.doPost(createDefectBody, DEFECT_URL);
+		    requestor.request(requestor.createRequest(createDefectBody, DEFECT_URL, 'POST'));
 		} catch (VersionOneException ex) {
 			errorMessage(ex.getMessage() + ':' + ex.getResponceBody());
 			return -1;
@@ -128,7 +129,8 @@ public with sharing class V1Publisher {
 		XMLDom xmlParser = new XMLDom();
 
 	    //Send the request, and get a response
-	    requestor.doGet('', SCOPE_URL);
+	    //requestor.doGet('', SCOPE_URL);
+	    requestor.request(requestor.createRequest('', SCOPE_URL, 'GET'));
 	    if (requestor.getStatusCode() == 200) {
 			xmlParser.parseFromString(requestor.getBody());
 	    } else {
@@ -181,7 +183,8 @@ public with sharing class V1Publisher {
 		XMLDom xmlParser = new XMLDom();
 
 		//Send the request, and get a response
-	    requestor.doPost(body, LINK_URL);
+	    //requestor.doPost(body, LINK_URL);
+	    requestor.request(requestor.createRequest(body, LINK_URL, 'POST'));
 	    if (requestor.getStatusCode() != 200) {
 	    	//errorMessage('Problem to create link to case' + requestor.getBody());
 	    	throw new VersionOneException('Problem to create link to case', requestor.getBody());
@@ -208,7 +211,8 @@ public with sharing class V1Publisher {
 	    reference = reference + ')';
 
 	    //Send the request, and get a response
-	    requestor.doGet('', String.format(MULTI_DEFECT_CHECK_URL, new String[]{reference, escapedSourceName}));
+	    //requestor.doGet('', String.format(MULTI_DEFECT_CHECK_URL, new String[]{reference, escapedSourceName}));
+	    requestor.request(requestor.createRequest('', String.format(MULTI_DEFECT_CHECK_URL, new String[]{reference, escapedSourceName}), 'GET'));
 	    if (requestor.getStatusCode() == 200) {
 			xmlParser.parseFromString(requestor.getBody());
 	    } else {
@@ -272,7 +276,8 @@ public with sharing class V1Publisher {
 	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
 		try {
 		    //Send the request, and get a response
-		    requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
+		    //requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
+		    requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
 		    if (requestor.getStatusCode() == 200) {
 				xmlParser.parseFromString(requestor.getBody());
 		    } else {

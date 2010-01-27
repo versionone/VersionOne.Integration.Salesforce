@@ -129,7 +129,6 @@ private class V1PublisherTester {
 		System.assert(!alredyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
 		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference&where=((Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\');Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(0), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
 		delete new Case[]{case1, case2, case3};
-		Settings.deleteTestSettings();
     }
 
     static testMethod void correctFindSourceId() {
@@ -144,8 +143,6 @@ private class V1PublisherTester {
 
     	String sourceId = V1Publisher.findSourceId(testSettings);
     	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
-
-    	Settings.deleteTestSettings();
     }
 
     static testMethod void correctCreateDefectInVersionOne() {
@@ -185,7 +182,6 @@ private class V1PublisherTester {
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
     	delete caseData;
-    	Settings.deleteTestSettings();
     }
 /*
     static testMethod void correctIsDefectAlreadyExistTest() {
@@ -232,14 +228,6 @@ private class V1PublisherTester {
 			this.statusCode = statusCode;
 		}
 
-		public void doGet(String body, String url) {
-			this.urlForSend.add(url);
-		}
-
-		public void doPost(String body, String url) {
-			this.bodyForSend.add(body);
-			this.urlForSend.add(url);
-		}
 
 		public String getBody() {
 			return responceBody;
@@ -256,5 +244,16 @@ private class V1PublisherTester {
     	public String getSentUrl(Integer i) {
     		return urlForSend.get(i);
     	}
+
+		public void request(HttpRequest request) {
+
+		}
+
+		public HttpRequest createRequest(String body, String additionUrl, String requestType) {
+			this.bodyForSend.add(body);
+			this.urlForSend.add(additionUrl);
+
+			return new HttpRequest();
+		}
     }
 }

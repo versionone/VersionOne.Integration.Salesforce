@@ -6,35 +6,21 @@ public class Requestor implements IRequestor {
 		this.settings = settings;
 	}
 
-	/**
-	* Makes GET request
-	**/
-	public void doGet(String body, String url) {
-		responce = request(body, url, 'GET');
-	}
-
-	/**
-	* Makes POST request
-	**/
-	public void doPost(String body, String url) {
-		responce = request(body, url, 'POST');
-	}
-
 	public String getBody() {
-		return responce.getBody();
+		return responce != null ? responce.getBody() : null;
 	}
 
 	public Integer getStatusCode() {
-		return responce.getStatusCode();
+		return responce != null ? responce.getStatusCode() : null;
 	}
 
 	/**
 	* Makes request
 	**/
-	private HttpResponse request(String body, String url, String requestType) {
+	public void request(HttpRequest request) {
 		Http h = new Http();
-		HttpResponse res = h.send(createRequest(body, url, requestType));
-		return res;
+		HttpResponse res = h.send(request);//createRequest(body, url, requestType)
+		responce = res;
 	}
 
 
@@ -42,7 +28,7 @@ public class Requestor implements IRequestor {
 	* Creates request
 	*
 	**/
-	private HttpRequest createRequest(String body, String additionUrl, String requestType) {
+	public HttpRequest createRequest(String body, String additionUrl, String requestType) {
 		HttpRequest req = new HttpRequest();
 		req.setMethod(requestType);
 		if (requestType.equals('POST')) {
