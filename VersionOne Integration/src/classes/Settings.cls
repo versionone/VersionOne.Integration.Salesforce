@@ -1,11 +1,12 @@
-public with sharing class Settings implements ISettings {
+public with sharing class Settings {
 	private final V1Settings__c mycs;
 
 	private String path;
 	private String userName;
 	private String password;
 	private String source;
-	private String escalateQueueId;
+	private String sourceQueueId;
+	private String destQueueId;
 	private String urlV1Field;
 
 	public Settings () {
@@ -32,6 +33,8 @@ public with sharing class Settings implements ISettings {
 			String queueString = 'SELECT ID, Name FROM Group WHERE Name=\''+queueName+'\'' ;
 			Group owner = (Group) Database.query(queueString);
 			mycs.EscalateQueueId__c = owner.Id;
+			mycs.AssignedQueueId__c = V1CaseCollector.getQueueIdByName('Assigned to VersionOne');
+			mycs.Source__c = 'SalesForce';
 			//\\
 
 			path = mycs.Path__c;
@@ -39,7 +42,8 @@ public with sharing class Settings implements ISettings {
 			password = mycs.Password__c;
 			urlV1Field = mycs.UrlV1Field__c;
 			source = mycs.Source__c;
-			escalateQueueId = mycs.EscalateQueueId__c;
+			sourceQueueId = mycs.EscalateQueueId__c;
+			destQueueId = mycs.AssignedQueueId__c;
 		}
 	}
 
@@ -66,8 +70,13 @@ public with sharing class Settings implements ISettings {
 		return password;
 	}
 
-	public String getEscalateQueueId() {
-		return escalateQueueId;
+
+	public String getSourceQueueId() {
+		return sourceQueueId;
+	}
+
+	public String getDestQueueId() {
+		return destQueueId;
 	}
 
 	public String getSource() {

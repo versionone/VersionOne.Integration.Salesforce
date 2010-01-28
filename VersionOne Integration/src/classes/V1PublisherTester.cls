@@ -29,7 +29,8 @@ private class V1PublisherTester {
         IRequestor requestor = new TestRequestor(body, 200);
         Settings settings = new Settings();
         V1Publisher.setRequestor(requestor);
-        V1Publisher.findAllProjects(settings);
+        V1Publisher.setSettings(settings);
+        V1Publisher.findAllProjects();
 
         System.assertEquals(V1Publisher.getProjects().size(), 12, 'Error! Incorrect amount of projects.');
         System.assertEquals(V1Publisher.getDefaultProjectId(), '1', 'Errro! Incorect default project.');
@@ -42,8 +43,9 @@ private class V1PublisherTester {
         Settings settings = new Settings();
         IRequestor requestor = new TestRequestor('', 400);
         V1Publisher.setRequestor(requestor);
+        V1Publisher.setSettings(settings);
 		try{
-			V1Publisher.findAllProjects(settings);
+			V1Publisher.findAllProjects();
 			System.assert(false, 'This place cannot be reached.');
 		}catch(VersionOneException e){
 			//Catch code
@@ -61,7 +63,8 @@ private class V1PublisherTester {
     	Integer defectId = 123;
     	String caseId = 'CaseId';
     	V1Publisher.setRequestor(requestor);
-    	V1Publisher.createLinkV1ToSF(defectId, 'CaseId', settings);
+    	V1Publisher.setSettings(settings);
+    	V1Publisher.createLinkV1ToSF(defectId, 'CaseId');
 
     	String body = '<Asset>' +
 						'<Attribute act="set" name="OnMenu">true</Attribute>' +
@@ -84,8 +87,9 @@ private class V1PublisherTester {
     	Integer defectId = 123;
     	String caseId = 'CaseId';
     	V1Publisher.setRequestor(requestor);
+    	V1Publisher.setSettings(settings);
     	try {
-    		V1Publisher.createLinkV1ToSF(defectId, 'CaseId', settings);
+    		V1Publisher.createLinkV1ToSF(defectId, 'CaseId');
     		System.assert(false, 'This place cannot be reached.');
 		}catch(VersionOneException e){
 			//Catch code
@@ -122,8 +126,9 @@ private class V1PublisherTester {
 		Settings testSettings = Settings.getTestSettings();
 		IRequestor requestor = new TestRequestor(body, 200);
 		V1Publisher.setRequestor(requestor);
+    	V1Publisher.setSettings(testSettings);
 
-		Map<String, Boolean> alreadyPorted = V1Publisher.getAlreadyExistedDefects(testSettings, new Case[]{case1, case2, case3});
+		Map<String, Boolean> alreadyPorted = V1Publisher.getAlreadyExistedDefects(new Case[]{case1, case2, case3});
 		System.assertEquals(alreadyPorted.size(), 2, 'Error! Incorrect numbers of found defects.');
 		System.assert(alreadyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
 		System.assert(!alreadyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
@@ -151,9 +156,10 @@ private class V1PublisherTester {
 		Settings testSettings = Settings.getTestSettings();
 		IRequestor requestor = new TestRequestor(body, 400);
 		V1Publisher.setRequestor(requestor);
+    	V1Publisher.setSettings(testSettings);
 
     	try {
-    		Map<String, Boolean> alreadyPorted =  V1Publisher.getAlreadyExistedDefects(testSettings, new Case[]{case1, case2, case3});
+    		Map<String, Boolean> alreadyPorted =  V1Publisher.getAlreadyExistedDefects(new Case[]{case1, case2, case3});
     		System.assert(false, 'This place cannot be reached.');
 		}catch(VersionOneException e){
 			//Catch code
@@ -169,8 +175,9 @@ private class V1PublisherTester {
     	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
 		IRequestor requestor = new TestRequestor(body, 200);
 		V1Publisher.setRequestor(requestor);
+    	V1Publisher.setSettings(testSettings);
 
-    	String sourceId = V1Publisher.findSourceId(testSettings);
+    	String sourceId = V1Publisher.findSourceId();
     	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
@@ -183,8 +190,9 @@ private class V1PublisherTester {
     	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
 		IRequestor requestor = new TestRequestor(body, 400);
 		V1Publisher.setRequestor(requestor);
+    	V1Publisher.setSettings(testSettings);
 
-    	String sourceId = V1Publisher.findSourceId(testSettings);
+    	String sourceId = V1Publisher.findSourceId();
     	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
@@ -197,8 +205,9 @@ private class V1PublisherTester {
     	String body = '';
 		IRequestor requestor = new TestRequestor(body, 200, new Exception[]{new NullPointerException()});
 		V1Publisher.setRequestor(requestor);
+    	V1Publisher.setSettings(testSettings);
 
-    	String sourceId = V1Publisher.findSourceId(testSettings);
+    	String sourceId = V1Publisher.findSourceId();
     	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
@@ -233,8 +242,9 @@ private class V1PublisherTester {
     	Settings testSettings = Settings.getTestSettings();
     	IRequestor requestor = new TestRequestor(body, 200);
     	V1Publisher.setRequestor(requestor);
+    	V1Publisher.setSettings(testSettings);
 
-    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
 
     	System.assertEquals(expectedSendBody, ((TestRequestor)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
@@ -256,10 +266,11 @@ private class V1PublisherTester {
 						'</Asset>';
     	requestor = new TestRequestor(body, 200);
     	V1Publisher.setRequestor(requestor);
+    	V1Publisher.setSettings(testSettings);
     	caseData.Subject = '';
     	caseData.Description = '';
 
-    	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
     	System.assertEquals(expectedSendBody, ((TestRequestor)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
@@ -275,11 +286,10 @@ private class V1PublisherTester {
     	Test.startTest();
 		insert caseData;
 		Test.stopTest();
-    	Settings testSettings = Settings.getTestSettings();
     	IRequestor requestor = new TestRequestor('', 400);
     	V1Publisher.setRequestor(requestor);
 
-    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
     	System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
     	delete caseData;
     }
@@ -297,8 +307,9 @@ private class V1PublisherTester {
     	Exception[] exceptions = new Exception[]{new VersionOneException('test error', '<html>error</html>')};
     	IRequestor requestor = new TestRequestor(body, 200, exceptions);
     	V1Publisher.setRequestor(requestor);
+    	V1Publisher.setSettings(testSettings);
 
-    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
     	System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
 
 		System.debug('exceptionsCreateDefectInVersionOne: 2');
@@ -307,7 +318,7 @@ private class V1PublisherTester {
     	requestor = new TestRequestor(body, 200, exceptions);
     	V1Publisher.setRequestor(requestor);
 
-    	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
     	System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
 
 		System.debug('exceptionsCreateDefectInVersionOne: 3');
@@ -316,7 +327,7 @@ private class V1PublisherTester {
     	requestor = new TestRequestor(body, 200, exceptions);
     	V1Publisher.setRequestor(requestor);
 
-    	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
 		System.debug('exceptionsCreateDefectInVersionOne: 4');
@@ -325,7 +336,7 @@ private class V1PublisherTester {
     	requestor = new TestRequestor(body, 200, exceptions);
     	V1Publisher.setRequestor(requestor);
 
-    	defectId = V1Publisher.createDefectInVersionOne(caseData, testSettings, productId, sourceId);
+    	defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 	}
 /*

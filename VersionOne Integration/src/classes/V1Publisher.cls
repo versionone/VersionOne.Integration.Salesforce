@@ -7,7 +7,7 @@ public with sharing class V1Publisher {
 	private static Map<String, String> projects = new Map<String, String>();
 	private static String defaultProjectId = '0';
 	private static IRequestor requestor;
-	private static ISettings settingsData;
+	private static Settings settings;
 
 	private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
 	private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
@@ -18,12 +18,12 @@ public with sharing class V1Publisher {
 
 	private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
 
-	public static void setRequestor(IRequestor requestorClass) {
-		requestor = requestorClass;
+	public static void setRequestor(IRequestor requestorData) {
+		requestor = requestorData;
 	}
 
-	public static void setSettings(ISettings settingsClass) {
-		settingsData = settingsClass;
+	public static void setSettings(Settings settingsData) {
+		settings = settingsData;
 	}
 
 	public static void resetAllData() {
@@ -36,24 +36,23 @@ public with sharing class V1Publisher {
 	@future (callout=true)
 	public static void publish() {
 		resetAllData();
-		if (settingsData == null) {
-			settingsData = new Settings();
+		if (settings == null) {
+			settings = new Settings();
 		}
 		if (requestor == null) {
-			setRequestor(new Requestor(settingsData));
+			setRequestor(new Requestor(settings));
 		}
-		String sourceId = findSourceId(settingsData);
+		String sourceId = findSourceId();
 		if (sourceId == null) {
-			errorMessage('Source ' + settingsData.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
+			errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
 			return;
 		}
-		String srcQueue = V1CaseCollector.getQueueIdByName('Escalate to VersionOne');
-		List<Case> cases = V1CaseCollector.getCasesByOwnerId(srcQueue);
+		List<Case> cases = V1CaseCollector.getCasesByOwnerId(settings.getSourceQueueId());
 
 		Map<String, Boolean> alreadyPortedCases;
 		try {
-			alreadyPortedCases = getAlreadyExistedDefects(settingsData, cases);
-			findAllProjects(settingsData);
+			alreadyPortedCases = getAlreadyExistedDefects(cases);
+			findAllProjects();
 		} catch (VersionOneException ex) {
 			errorMessage(ex.getMessage() + ':' + ex.getResponceBody());
 			return;
@@ -72,7 +71,7 @@ public with sharing class V1Publisher {
 				if (maxPublishCases > 0) {
 					maxPublishCases--;
 					String projectId = findProjectId(caseData.Product__c);
-					Integer id = createDefectInVersionOne(caseData, settingsData, projectId, sourceId);
+					Integer id = createDefectInVersionOne(caseData, projectId, sourceId);
 					if (id > 0) {
 						processedCases.add(caseData);
 						defectsIds.add(id);
@@ -80,7 +79,7 @@ public with sharing class V1Publisher {
 				}
 			}
 		}
-		String dstQueue = V1CaseCollector.getQueueIdByName('Assigned to VersionOne');
+		String dstQueue = settings.getDestQueueId();
 		V1CaseCollector.setCasesOwnerAndUrls(processedCases, dstQueue, defectsIds);
 	}
 
@@ -90,7 +89,7 @@ public with sharing class V1Publisher {
 	* returns 	defect id  	- all ok
 	*			-1 			- defect was not created
 	**/
-	public static Integer createDefectInVersionOne(Case caseData, ISettings settings, String productId, String sourceId) {
+	public static Integer createDefectInVersionOne(Case caseData, String productId, String sourceId) {
 		Integer defectId = -1;
 		XMLDom xmlParser = new XMLDom();
 		try {
@@ -123,7 +122,7 @@ public with sharing class V1Publisher {
 
 		try {
 		    defectId = Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
-			createLinkV1ToSF(defectId, caseData.Id, settings);
+			createLinkV1ToSF(defectId, caseData.Id);
 		} catch (VersionOneException ex) {
 			errorMessage(ex.getMessage() + ':' + ex.getResponceBody());
 		} catch (Exception ex) {
@@ -135,9 +134,8 @@ public with sharing class V1Publisher {
 
 	/**
 	* Gathers all project from the VersionOne, and assign default project
-	*
 	**/
-	public static void findAllProjects(ISettings settings) {
+	public static void findAllProjects() {
 		XMLDom xmlParser = new XMLDom();
 
 	    //Send the request, and get a response
@@ -171,7 +169,6 @@ public with sharing class V1Publisher {
 
 	/**
 	* Returns project id by product name
-	*
 	**/
 	public static String findProjectId(String productName) {
 		if (productName != null && projects.containsKey(productName)) {
@@ -183,9 +180,8 @@ public with sharing class V1Publisher {
 
 	/**
 	* Creates link to the corresponding case in the SalesForce
-	*
 	**/
-	public static void createLinkV1ToSF(Integer defectId, String caseId, ISettings settings) {
+	public static void createLinkV1ToSF(Integer defectId, String caseId) {
 		String body = '<Asset>' +
 						attributeNode('OnMenu', 'true') +
 						attributeNode('URL', 'https://na7.salesforce.com/' + caseId) +
@@ -209,7 +205,7 @@ public with sharing class V1Publisher {
 	*
 	* Returns - List<Integer> Already ported cases
 	**/
-	public static Map<String, Boolean> getAlreadyExistedDefects(ISettings settings, List<Case> cases) {
+	public static Map<String, Boolean> getAlreadyExistedDefects(List<Case> cases) {
 		String sourceName = settings.getSource();
 		XMLDom xmlParser = new XMLDom();
 	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
@@ -282,10 +278,9 @@ public with sharing class V1Publisher {
 	* Returns	id 		- if source was found
 	*			null	- if source was not found
 	**/
-	public static String findSourceId(ISettings settings) {
-		String sourceName = settings.getSource();
+	public static String findSourceId() {
 		XMLDom xmlParser = new XMLDom();
-	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
+	    String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
 		try {
 		    //Send the request, and get a response
 		    //requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
@@ -305,7 +300,6 @@ public with sharing class V1Publisher {
 		} catch (Exception ex) {
 			errorMessage('Getting source Id  failed: ' + ex);
 		}
-
 		return null;
 	}
 
@@ -317,10 +311,8 @@ public with sharing class V1Publisher {
 		return defaultProjectId;
 	}
 
-
 	/**
 	* Creates Relation node for request
-	*
 	**/
 	public static String relationNode(String name, String value) {
 		return '<Relation act="set" name="' + name + '">' +
@@ -330,7 +322,6 @@ public with sharing class V1Publisher {
 
 	/**
 	* Creates Attribute node for request
-	*
 	**/
 	public static String attributeNode(String name, String value) {
 		if (value != null) {
@@ -339,9 +330,8 @@ public with sharing class V1Publisher {
 		return '<Attribute act="set" name="' + name + '">' + value + '</Attribute>';
 	}
 
-
 	/**
-	* Outputs error message
+	* Handle error message
 	**/
 	public static void errorMessage(String message) {
 		System.debug(message);
