@@ -7,6 +7,7 @@ public with sharing class V1Publisher {
 	private static Map<String, String> projects = new Map<String, String>();
 	private static String defaultProjectId = '0';
 	private static IRequestor requestor;
+	private static ISettings settingsData;
 
 	private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
 	private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
@@ -21,21 +22,29 @@ public with sharing class V1Publisher {
 		requestor = requestorClass;
 	}
 
+	public static void setSettings(ISettings settingsClass) {
+		settingsData = settingsClass;
+	}
+
 	public static void resetAllData() {
 		projects = new Map<String, String>();
 		defaultProjectId = '0';
+		//settingsData = null;
+		//requestor = null;
 	}
 
 	@future (callout=true)
 	public static void publish() {
 		resetAllData();
-		ISettings settings = new Settings();
-		if (requestor == null) {
-			setRequestor(new Requestor(settings));
+		if (settingsData == null) {
+			settingsData = new Settings();
 		}
-		String sourceId = findSourceId(settings);
+		if (requestor == null) {
+			setRequestor(new Requestor(settingsData));
+		}
+		String sourceId = findSourceId(settingsData);
 		if (sourceId == null) {
-			errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
+			errorMessage('Source ' + settingsData.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
 			return;
 		}
 		String srcQueue = V1CaseCollector.getQueueIdByName('Escalate to VersionOne');
@@ -43,8 +52,8 @@ public with sharing class V1Publisher {
 
 		Map<String, Boolean> alreadyPortedCases;
 		try {
-			alreadyPortedCases = getAlreadyExistedDefects(settings, cases);
-			findAllProjects(settings);
+			alreadyPortedCases = getAlreadyExistedDefects(settingsData, cases);
+			findAllProjects(settingsData);
 		} catch (VersionOneException ex) {
 			errorMessage(ex.getMessage() + ':' + ex.getResponceBody());
 			return;
@@ -63,7 +72,7 @@ public with sharing class V1Publisher {
 				if (maxPublishCases > 0) {
 					maxPublishCases--;
 					String projectId = findProjectId(caseData.Product__c);
-					Integer id = createDefectInVersionOne(caseData, settings, projectId, sourceId);
+					Integer id = createDefectInVersionOne(caseData, settingsData, projectId, sourceId);
 					if (id > 0) {
 						processedCases.add(caseData);
 						defectsIds.add(id);
