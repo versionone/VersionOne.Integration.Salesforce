@@ -4,6 +4,10 @@ add the following fileds:
 Path - URL
 UserName - Text
 Password - Text
+Added [28.01.2010]
+Source - Text
+EscalateQueueId - String
+UrlV1Field - Text
 ----------------------
 Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
 ----------------------

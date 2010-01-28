@@ -174,10 +174,38 @@ private class V1PublisherTester {
     	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
+    static testMethod void incorrectFindSourceId() {
+    	V1Publisher.resetAllData();
+    	String sourceName = 'TestSource';
+    	String sourceIdExpected = null;
+    	//ISettings settings = new TestSettings(sourceName);
+    	Settings testSettings = Settings.getTestSettings();
+    	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
+		IRequestor requestor = new TestRequestor(body, 400);
+		V1Publisher.setRequestor(requestor);
+
+    	String sourceId = V1Publisher.findSourceId(testSettings);
+    	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
+    }
+
+    static testMethod void exceptionFindSourceId() {
+    	V1Publisher.resetAllData();
+    	String sourceName = 'TestSource';
+    	String sourceIdExpected = null;
+    	//ISettings settings = new TestSettings(sourceName);
+    	Settings testSettings = Settings.getTestSettings();
+    	String body = '';
+		IRequestor requestor = new TestRequestor(body, 200, new Exception[]{new NullPointerException()});
+		V1Publisher.setRequestor(requestor);
+
+    	String sourceId = V1Publisher.findSourceId(testSettings);
+    	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
+    }
+
     static testMethod void correctCreateDefectInVersionOne() {
     	V1Publisher.resetAllData();
     	//data preparation
-    	String caseName = 'Test case';
+    	String caseName = '<Test case>';
     	String caseDescription = 'Case for testing';
     	Case caseData = new Case(Subject = caseName, Description = caseDescription);
     	Test.startTest();
@@ -194,7 +222,7 @@ private class V1PublisherTester {
 							'<Relation act="set" name="Scope">' +
 								'<Asset idref="Scope:' + productId + '"/>' +
 							'</Relation>' +
-							'<Attribute act="set" name="Name">' + caseName +'</Attribute>' +
+							'<Attribute act="set" name="Name">&lt;Test case&gt;</Attribute>' +
 							'<Attribute act="set" name="Reference">' + caseData.CaseNumber +'</Attribute>' +
 							'<Attribute act="set" name="Description">' + caseDescription + '</Attribute>' +
 							'<Relation act="set" name="Source">' +

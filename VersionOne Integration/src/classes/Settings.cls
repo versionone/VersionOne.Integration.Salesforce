@@ -21,21 +21,26 @@ public with sharing class Settings implements ISettings {
 				mycs.Path__c = 'http://localhost/VersionOne/';
 				mycs.UserName__c = 'admin';
 				mycs.Password__c = 'admin';
+				mycs.EscalateQueueId__c = '0';
+				mycs.UrlV1Field__c = 'VersionOneUrl__c';
+				mycs.Source__c = 'SalesForce';
 				insert mycs;
 			}
+			// just some hardcode till we don't have UI for settings
 			mycs.Path__c = 'http://195.62.49.62:7001/VersionOne/';
+			String queueName = 'Escalate to VersionOne';
+			String queueString = 'SELECT ID, Name FROM Group WHERE Name=\''+queueName+'\'' ;
+			Group owner = (Group) Database.query(queueString);
+			mycs.EscalateQueueId__c = owner.Id;
+			//\\
 
 			path = mycs.Path__c;
 			userName = mycs.UserName__c;
 			password = mycs.Password__c;
-			urlV1Field = 'VersionOneUrl__c';
-			source = 'SalesForce';
+			urlV1Field = mycs.UrlV1Field__c;
+			source = mycs.Source__c;
+			escalateQueueId = mycs.EscalateQueueId__c;
 		}
-
-		String queueName = 'Escalate to VersionOne';
-		String queueString = 'SELECT ID, Name FROM Group WHERE Name=\''+queueName+'\'' ;
-		Group owner = (Group) Database.query(queueString);
-		escalateQueueId = owner.Id;
 	}
 
 	public static Settings getTestSettings() {
