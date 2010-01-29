@@ -23,7 +23,7 @@ public with sharing class Settings {
 				mycs.UserName__c = 'admin';
 				mycs.Password__c = 'admin';
 				mycs.EscalateQueueId__c = '0';
-				mycs.UrlV1Field__c = 'VersionOneUrl__c';
+				//mycs.UrlV1Field__c = 'VersionOneUrl__c';
 				mycs.Source__c = 'SalesForce';
 				insert mycs;
 			}
@@ -40,7 +40,7 @@ public with sharing class Settings {
 			path = mycs.Path__c;
 			userName = mycs.UserName__c;
 			password = mycs.Password__c;
-			urlV1Field = mycs.UrlV1Field__c;
+			urlV1Field = 'VersionOneUrl__c';
 			source = mycs.Source__c;
 			sourceQueueId = mycs.EscalateQueueId__c;
 			destQueueId = mycs.AssignedQueueId__c;
@@ -66,10 +66,17 @@ public with sharing class Settings {
 		return userName;
 	}
 
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
 	public String getPassword() {
 		return password;
 	}
 
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
 	public String getSourceQueueId() {
 		return sourceQueueId;

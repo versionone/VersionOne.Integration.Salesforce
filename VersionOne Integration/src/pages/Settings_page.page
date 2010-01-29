@@ -1,11 +1,26 @@
+<!-- Page -->
 <apex:page controller="SettingsController" action="{!initSettings}"> <!-- action="{!initPageAction}" -->
 <apex:sectionHeader title="new Test settings" />
 
     {!greeting} <p/>
     <apex:form >
         <apex:pageBlock title="Settings">
-
-    Path: <apex:inputText id="V1Path" value="{!settings.path}"/> <br/>
+        <apex:pageBlockButtons >
+        </apex:pageBlockButtons>
+        <apex:pageBlockSection title="VersionOne settings" columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="URL to VersionOne" for="V1Path"/>
+                    <c:inputRequiredText value="{!settings.path}" size="75" id="V1Path" required="true" tabindex="1"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="User name" for="UserName"/>
+                    <c:inputRequiredText value="{!settings.UserName}" size="40" id="UserName" required="true" tabindex="2"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Password" for="Password"/>
+                    <apex:inputSecret value="{!settings.Password}" size="40" id="Password" tabindex="3"/>
+                </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
     <!--
  User Name: <apex:inputField value="{!userName}"/> <br/>
     Password: <apex:inputField value="{!password}"/> <br/>

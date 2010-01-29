@@ -1,3 +1,4 @@
+[Settings]----------------------------------------------------------------------------
 [15.01.2010]
 Create Custom Settings(Setup>Develop>Custom Settings) with "V1Settings" name.
 add the following fileds:
@@ -8,7 +9,7 @@ Added [28.01.2010]
 Source - Text
 EscalateQueueId - String
 AssignedQueueId - Text
-UrlV1Field - Text
+UrlV1Field - Text -                NEED TO REMOVE
 ----------------------
 Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
 ----------------------
@@ -19,5 +20,10 @@ Create products with names of V1 Projects (Setup>Cases>Fields>Case Custom Fields
 Allow access to V1 Server (Setup>Administration Setup>Security Controls>Remote Site Settings)
 ----------------------
 Add new field(type is URL) to case Setup>Customize>Cases>Fields with field name VersionOneUrl
+----------------------
+Add new tab(Setup>Create>Tabs) and assign Settings page
 
+
+
+[Notes]----------------------------------------------------------------------------
 ***Integrated auth in V1 wasn't tested and likly don't works.

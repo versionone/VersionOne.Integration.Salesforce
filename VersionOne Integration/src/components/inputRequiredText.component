@@ -1,0 +1,15 @@
+<apex:component >
+    <apex:attribute name="Value"
+        description="This is the text expression to pass into inputText" type="String"
+        required="true" />
+    <apex:attribute name="Size"
+        description="This is the text expression to pass into inputText" type="Integer" />
+    <apex:attribute name="Required"
+        description="This is the text expression to pass into inputText" type="Boolean" />
+    <apex:attribute name="tabindex"
+        description="This is the text expression to pass into inputText" type="integer" />
+
+    <div class="requiredInput">
+    <div class="requiredBlock" /><apex:inputText value="{!Value}" size="{!Size}" required="{!Required}" tabindex="{!tabindex}"/>
+    </div>
+</apex:component>
