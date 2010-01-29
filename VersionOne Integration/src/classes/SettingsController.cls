@@ -1,14 +1,27 @@
 public class SettingsController {
 
+    public String severity { get; set; }
+    public String errorMessage { get; set; }
+
+
+    public PageReference TestSettings() {
+        System.debug('Path:' + Settings.getPath() + ', UserName:' + Settings.getUserName() + ', Password:' + Settings.getPassword());
+        errorMessage = 'testing error message';
+        severity = 'error'; //info
+        return null;
+    }
+
+
     public String getGreeting() {
         return 'Hello tester!';
     }
 
     public Settings settings {get; set;}
 
-	public void initSettings() {
-		settings = new Settings();
-	}
+    public void initSettings() {
+        errorMessage = '';
+        settings = new Settings();
+    }
 /*
     public PageReference initPageAction() {
         PageReference homePage= new PageReference('/home/test.jsp');
