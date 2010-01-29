@@ -1,7 +1,5 @@
 public class V1CaseCollector {
 
-	private static final String DEFECT_URL = 'http://integdmz01/VersionOne/assetdetail.v1?oid=Defect%3a';
-
 	/* Query cases with specified owner.
 	 * ownerId - ID of an owner.
 	 * Return: Array of cases.
@@ -13,35 +11,29 @@ public class V1CaseCollector {
 		return cases;
 	}
 
-	/* Set cases Owner to the specified value.
+	/* Update cases: set Owner and custom field to the specified values. Create Comment with specified body.
 	 * cases - list of cases to process.
-	 * ownerId - ID of the owner to set.
+	 * ownerId - ID of the owner to set to all cases.
+	 * commentBody - text of comment body to attach to all cases.
+	 * fieldName - name of custom field.
+	 * fieldValues - list values to set to custom field. Must be same size as list of cases.
+	 * 				 Each value set to apropriate case: case[i].<fieldName> = fieldValues[i].
 	 */
-	public static void setCasesOwnerAndUrls(List<Case> cases, String ownerId, List<Integer> ids) {
+	public static void updateCases(List<Case> cases, String ownerId, String commentBody,
+								   String fieldName, List<Object> fieldValues) {
 		List<CaseComment> comments = new List<CaseComment>();
-		//for (Case c : cases) {
-		for (Integer i = 0; i<cases.size(); i++){
+		for (Integer i = 0; i < cases.size(); i++){
 			Case c = cases[i];
-			Integer id = ids[i];
 			System.debug('BEFORE UPDATE: ' + c);
 			c.OwnerId = ownerId;
-			if (id != null) {
-				c.put('VersionOneUrl__c', DEFECT_URL + id);
+			if (fieldValues[i] != null) {
+				c.put(fieldName, fieldValues[i]);
 			}
-			CaseComment comment = new CaseComment(CommentBody = 'Escalated to VersionOne', ParentId = c.Id);
-			comments.add(comment);
+			comments.add(new CaseComment(CommentBody = commentBody, ParentId = c.Id));
 			System.debug('AFTER CHANGE: ' + c);
 		}
 		Database.update(cases);
 		insert comments;
-	}
-
-	public static void setCasesField(List<Case> cases, String field, List<Object> value) {
-		for (Case c : cases) {
-			System.debug('BEFORE UPDATE: ' + c);
-			System.debug('AFTER CHANGE: ' + c);
-		}
-		Database.update(cases);
 	}
 
 	/* Get Queue with specified Name.

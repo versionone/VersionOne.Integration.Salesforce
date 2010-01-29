@@ -17,6 +17,7 @@ public with sharing class V1Publisher {
 	private static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Defect?sel=Reference&where=({0};Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
 
 	private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
+	private static final String URL_TO_V1_TEMPLATE = 'http://integdmz01/VersionOne/assetdetail.v1?oid=Defect%3a';
 
 	public static void setRequestor(IRequestor requestorData) {
 		requestor = requestorData;
@@ -60,13 +61,13 @@ public with sharing class V1Publisher {
 			errorMessage('Internal problems: ' + ex);
 		}
 		List<Case> processedCases = new List<Case>();
-		List<Integer> defectsIds = new List<Integer>();
+		List<String> urls = new List<String>();
 		Integer maxPublishCases = 3; // we have restriction on 10 request by http.send
 		for (Case caseData : cases) {
 			if (alreadyPortedCases.containsKey(caseData.CaseNumber)) {
 				errorMessage('Case "' + caseData.Subject + '" (' + caseData.CaseNumber +') was already ported.' );
 				processedCases.add(caseData);
-				defectsIds.add(null);
+				urls.add(null);
 			} else {
 				if (maxPublishCases > 0) {
 					maxPublishCases--;
@@ -74,13 +75,13 @@ public with sharing class V1Publisher {
 					Integer id = createDefectInVersionOne(caseData, projectId, sourceId);
 					if (id > 0) {
 						processedCases.add(caseData);
-						defectsIds.add(id);
+						urls.add(URL_TO_V1_TEMPLATE + id);
 					}
 				}
 			}
 		}
 		String dstQueue = settings.getDestQueueId();
-		V1CaseCollector.setCasesOwnerAndUrls(processedCases, dstQueue, defectsIds);
+		V1CaseCollector.updateCases(processedCases, dstQueue, 'Escalated to VersionOne', 'VersionOneUrl__c' ,urls);
 	}
 
 	/**
