@@ -8,6 +8,7 @@ public with sharing class Settings {
 	private String sourceQueueId;
 	private String destQueueId;
 	private String urlV1Field;
+	private String commentBody;
 
 	public Settings () {
 		this('V1Settings');
@@ -41,6 +42,7 @@ public with sharing class Settings {
 			userName = mycs.UserName__c;
 			password = mycs.Password__c;
 			urlV1Field = 'VersionOneUrl__c';
+			commentBody = 'Escalated to VersionOne';
 			source = mycs.Source__c;
 			sourceQueueId = mycs.EscalateQueueId__c;
 			destQueueId = mycs.AssignedQueueId__c;
@@ -96,5 +98,9 @@ public with sharing class Settings {
 
 	public String getV1Url() {
 		return urlV1Field;
+	}
+
+	public String getCommentBody() {
+		return commentBody;
 	}
 }

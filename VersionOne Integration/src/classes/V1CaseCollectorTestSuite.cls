@@ -61,6 +61,6 @@ private class V1CaseCollectorTestSuite {
     	Group group2 = new Group(Name=queueName);
     	insert group2;
         String queueId = V1CaseCollector.getQueueIdByName(queueName);
-        System.assertEquals(queueId, queue.Id, '"Queue ID doesn\'t set');
+        System.assertEquals(queue.Id, queueId, 'Queue ID doesn\'t set');
     }
 }
