@@ -8,8 +8,10 @@
         description="This is the text expression to pass into inputText" type="Boolean" />
     <apex:attribute name="tabindex"
         description="This is the text expression to pass into inputText" type="integer" />
+    <apex:attribute name="onkeydown"
+        description="This is the text expression to pass into inputText" type="String" />
 
     <div class="requiredInput">
-    <div class="requiredBlock" /><apex:inputText value="{!Value}" size="{!Size}" required="{!Required}" tabindex="{!tabindex}"/>
+    <div class="requiredBlock" /><apex:inputText value="{!Value}" size="{!Size}" required="{!Required}" tabindex="{!tabindex}" onkeydown="{!onkeydown}"/>
     </div>
 </apex:component>

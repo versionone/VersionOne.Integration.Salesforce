@@ -1,28 +1,69 @@
 <!-- Page -->
 <apex:page controller="SettingsController" action="{!initSettings}">
+<script>
+function disableSaveButtons() {
+    disableSaveButton1();
+    disableSaveButton2();
+}
+</script>
 <apex:sectionHeader title="Settings for VersionOne integration." />
 
-    {!greeting} <p/>
+    <apex:actionStatus startText="Testing settings..." id="test_status"/>
+    <apex:actionStatus startText="Saving settings..." id="save_status"/>
+    
     <apex:form >
         <apex:pageBlock title="Settings">
-        <apex:pageBlockButtons >
-            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out, error, error2" status="status"/>
-            <apex:actionStatus startText="testing..." id="status"/>
-        </apex:pageBlockButtons>
         <apex:pageBlockSection title="VersionOne settings" columns="1">
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="URL to VersionOne" for="V1Path"/>
-                    <c:inputRequiredText value="{!settings.path}" size="75" id="V1Path" required="true" tabindex="1"/>
+                    <c:inputRequiredText value="{!settings.path}" size="75" id="V1Path" required="true" tabindex="1" onkeydown="disableSaveButtons()">
+                    </c:inputRequiredText>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="User name" for="UserName"/>
-                    <c:inputRequiredText value="{!settings.UserName}" size="40" id="UserName" required="true" tabindex="2"/>
+                    <c:inputRequiredText value="{!settings.UserName}" size="40" id="UserName" required="true" tabindex="2" onkeydown="disableSaveButtons()"/>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="Password" for="Password"/>
                     <apex:inputSecret value="{!settings.Password}" size="40" id="Password" tabindex="3"/>
                 </apex:pageBlockSectionItem>
         </apex:pageBlockSection>
+        <apex:pageBlockButtons location="top">
+            <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button1" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, message_test, save_button1, save_button2">
+                <script type="text/javascript">
+                function disableSaveButton1() {
+                    var ele = document.getElementById('{!$Component.save_button1}');
+                    ele .disabled = true;
+                    ele .className = 'btnDisabled';
+                }
+                </script>
+            </apex:commandButton>
+            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, message_test, save_button1, save_button2" status="test_status"/>
+        </apex:pageBlockButtons>
+        <apex:pageBlockButtons location="bottom">
+            <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button2" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, message_test, save_button1, save_button2"> 
+                <script type="text/javascript">
+                function disableSaveButton2() {
+                    var ele = document.getElementById('{!$Component.save_button2}');
+                    ele .disabled = true;
+                    ele .className = 'btnDisabled';
+                }
+                </script>
+            </apex:commandButton>
+            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, message_test, save_button1, save_button2" status="test_status"/>            
+        </apex:pageBlockButtons>
+        </apex:pageBlock>
+    </apex:form>
+
+    <apex:outputPanel id="out_testing">
+        <apex:pageMessage severity="{!testSeverity}" id="message_test" title="Testing result" summary="{!testMessage}" rendered="{!isSettingsValidated}" strength="1"/>
+    </apex:outputPanel>
+    
+    <apex:outputPanel id="out_saving">
+        <apex:pageMessage severity="{!saveSeverity}" id="message_save" title="Saving result" summary="{!saveMessage}" rendered="{!isSaved}" strength="1"/>
+    </apex:outputPanel>
+
+</apex:page>
     <!--
  User Name: <apex:inputField value="{!userName}"/> <br/>
     Password: <apex:inputField value="{!password}"/> <br/>
@@ -31,23 +72,3 @@
 Queue: <apex:inputfield value="{!group.UserData}" /> <br/>
  -->
 <!--  Product: <apex:inputfield value="{!product.name}" />-->
-         </apex:pageBlock>
-    </apex:form>
-
-    <apex:outputPanel id="out">
-        <apex:pageMessage severity="{!severity}" id="error" title="Testing result" summary="{!errorMessage}" rendered="{!errorMessage != ''}" strength="1"/>
-    </apex:outputPanel>
-
-    <!--
-     <apex:pageBlock id="out" title="Testing Result" >
-        <apex:outputPanel rendered="{!errorMessage = ''}">
-            Settings is valide
-        </apex:outputPanel>
-
-        <apex:outputPanel rendered="{!errorMessage != ''}">
-            {!errorMessage}
-        </apex:outputPanel>
-    </apex:pageBlock>
-    -->
-
-</apex:page>

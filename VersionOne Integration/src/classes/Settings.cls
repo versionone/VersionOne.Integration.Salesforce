@@ -29,6 +29,7 @@ public with sharing class Settings {
 				insert mycs;
 			}
 			// just some hardcode till we don't have UI for settings
+			/*
 			mycs.Path__c = 'http://195.62.49.62:7001/VersionOne/';
 			String queueName = 'Escalate to VersionOne';
 			String queueString = 'SELECT ID, Name FROM Group WHERE Name=\''+queueName+'\'' ;
@@ -36,6 +37,7 @@ public with sharing class Settings {
 			mycs.EscalateQueueId__c = owner.Id;
 			mycs.AssignedQueueId__c = V1CaseCollector.getQueueIdByName('Assigned to VersionOne');
 			mycs.Source__c = 'SalesForce';
+			*/
 			//\\
 
 			path = mycs.Path__c;
@@ -100,7 +102,21 @@ public with sharing class Settings {
 		return urlV1Field;
 	}
 
+	public void updateSettings() {
+		System.debug('update Settings');
+		mycs.Path__c = path;
+		System.debug('Path=' + mycs.Path__c);
+		mycs.UserName__c = userName;
+		mycs.Password__c = password;
+		//urlV1Field = 'VersionOneUrl__c';
+		mycs.Source__c = source;
+		mycs.EscalateQueueId__c = sourceQueueId;
+		mycs.AssignedQueueId__c = destQueueId;
+		update mycs;
+	}
+
 	public String getCommentBody() {
 		return commentBody;
 	}
+
 }

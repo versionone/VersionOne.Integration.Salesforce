@@ -1,13 +1,37 @@
 public class SettingsController {
 
-    public String severity { get; set; }
-    public String errorMessage { get; set; }
+    public PageReference SaveSettings() {
+        System.debug('Save Settings');
+        testMessage = '';
+        testMessage = '';
+        saveSeverity = 'info';
+        saveMessage = 'Settings has been saved.';
+        isSettingsValidated = false;
+        isSaved = true;
+        try {
+        	settings.updateSettings();
+        } catch (Exception ex) {
+        	saveSeverity = 'error';
+        	saveMessage = 'Settings has not been saved. Reason:' + ex.getMessage();
+        }
+        return null;
+    }
+
+
+    public String testSeverity{ get; set; }
+    public String saveSeverity{ get; set; }
+    public String testMessage{ get; set; }
+    public String saveMessage{ get; set; }
+    public Boolean isSettingsValidated { get; set; }
+    public Boolean isSaved { get; set; }
 
 
     public PageReference TestSettings() {
         System.debug('Path:' + Settings.getPath() + ', UserName:' + Settings.getUserName() + ', Password:' + Settings.getPassword());
-        errorMessage = 'testing error message';
-        severity = 'error'; //info
+        testMessage = 'testing error message';
+        testSeverity = 'error'; //info
+        isSettingsValidated = true;
+        isSaved = false;
         return null;
     }
 
@@ -19,7 +43,10 @@ public class SettingsController {
     public Settings settings {get; set;}
 
     public void initSettings() {
-        errorMessage = '';
+        testMessage = '';
+        saveMessage = '';
+        isSettingsValidated = false;
+        isSaved = false;
         settings = new Settings();
     }
 /*
