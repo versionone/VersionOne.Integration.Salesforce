@@ -12,8 +12,8 @@ function disableSaveButtons() {
     <apex:actionStatus startText="Saving settings..." id="save_status"/>
 
     <apex:form >
-        <apex:pageBlock title="Settings">
-			<apex:pageBlockSection title="VersionOne settings" columns="1">
+        <apex:pageBlock title="Settings" mode="edit">
+			<apex:pageBlockSection title="VersionOne settings" columns="1">  <!-- title="Connection" -->
 			        <apex:pageBlockSectionItem >
 			            <apex:outputLabel value="URL to VersionOne" for="V1Path"/>
 			            <c:inputRequiredText value="{!settings.path}" size="75" id="V1Path" required="true" tabindex="1" onkeydown="disableSaveButtons()">
@@ -32,24 +32,44 @@ function disableSaveButtons() {
 			            <c:inputRequiredText value="{!settings.Source}" size="40" id="Source" required="true" tabindex="4" onkeydown="disableSaveButtons()"/>
 			        </apex:pageBlockSectionItem>
 			</apex:pageBlockSection>
-			<apex:pageBlockSection title="SalesForce Configuration">
+
+			<apex:pageBlockSection title="Case publishing">
 				<apex:pageBlockSectionItem >
-					<apex:outputLabel value="Source Queue" for="SourceQueue" />
-					<apex:selectList value="{!settings.SourceQueueId}" size="4" required="true" id="SourceQueue">
-						<apex:selectOptions value="{!QueueList}" />
-					</apex:selectList>
+					<apex:outputLabel value="Source Queue" for="SourceQueue"/>
+					<apex:outputPanel styleClass="requiredInput" layout="block">
+						<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+						<apex:selectList value="{!settings.SourceQueueId}" size="1" required="true" id="SourceQueue">
+							<apex:selectOptions value="{!QueueList}"/>
+						</apex:selectList>
+					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
+
 				<apex:pageBlockSectionItem >
-					<apex:outputLabel value="Destination Queue" for="DestQueue" />
-					<apex:selectList value="{!settings.DestQueueId}" size="4" required="true" id="DestQueue">
-						<apex:selectOptions value="{!QueueList}" />
-					</apex:selectList>
+					<apex:outputLabel value="Destination Queue" for="DestQueue"/>
+					<apex:outputPanel styleClass="requiredInput" layout="block">
+						<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+						<apex:selectList value="{!settings.DestQueueId}" size="1" required="true" id="DestQueue">
+							<apex:selectOptions value="{!QueueList}"/>
+						</apex:selectList>
+					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
+
 				<apex:pageBlockSectionItem >
-					<apex:outputLabel value="Comment for publishing" for="Comment" />
-					<apex:inputTextarea value="{!settings.CommentBody}" id="Comment" />
+					<apex:outputLabel value="Source" for="Source"/>
+					<apex:outputPanel styleClass="requiredInput" layout="block">
+						<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+						<apex:inputText value="{!settings.Source}" required="true" id="Source"/>
+					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
 			</apex:pageBlockSection>
+
+			<apex:pageBlockSection columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Comment on publishing" for="Comment"/>
+					<apex:inputTextarea value="{!settings.CommentBody}" id="Comment" cols="75" rows="6"/>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+
         <apex:pageBlockButtons location="top">
             <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsCorrect == false}" id="save_button1" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2">
                 <script type="text/javascript">
