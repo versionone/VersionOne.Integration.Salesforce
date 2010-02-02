@@ -60,7 +60,7 @@ function disableSaveButtons() {
                 }
                 </script>
             </apex:commandButton>
-            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, out_saving, message_test, messge_save, save_button1, save_button2" status="test_status"/>
+            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, out_saving, message_test, messge_save, save_button1, save_button2, requiredfields" status="test_status"/>
         </apex:pageBlockButtons>
         <apex:pageBlockButtons location="bottom">
             <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsCorrect == false}" id="save_button2" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2">
@@ -72,7 +72,7 @@ function disableSaveButtons() {
                 }
                 </script>
             </apex:commandButton>
-            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2" status="test_status"/>
+            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, requiredfields" status="test_status"/>
         </apex:pageBlockButtons>
         </apex:pageBlock>
     </apex:form>
@@ -84,6 +84,10 @@ function disableSaveButtons() {
     <apex:outputPanel id="out_saving">
         <apex:pageMessage severity="{!saveSeverity}" id="message_save" title="Saving result" summary="{!saveMessage}" rendered="{!isSaved}" strength="1"/>
     </apex:outputPanel>
+
+        <apex:outputPanel >
+	    	<apex:pageMessages id="requiredfields" />
+	    </apex:outputPanel>
 
 </apex:page>
     <!--

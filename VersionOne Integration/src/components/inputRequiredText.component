@@ -11,7 +11,9 @@
     <apex:attribute name="onkeydown"
         description="This is the text expression to pass into inputText" type="String" />
 
-    <div class="requiredInput">
-    <div class="requiredBlock" /><apex:inputText value="{!Value}" size="{!Size}" required="{!Required}" tabindex="{!tabindex}" onkeydown="{!onkeydown}"/>
-    </div>
+    <apex:outputPanel layout="block" styleClass="requiredInput">
+    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+    <apex:inputText value="{!Value}" size="{!Size}" required="{!Required}" tabindex="{!tabindex}" onkeydown="{!onkeydown}"/>
+    </apex:outputPanel>
+
 </apex:component>
