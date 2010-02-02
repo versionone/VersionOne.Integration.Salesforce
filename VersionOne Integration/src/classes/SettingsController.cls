@@ -72,17 +72,17 @@ public class SettingsController {
     */
 
     public List<SelectOption> getQueueList() {
-		List<SelectOption> options = new List<SelectOption>();
-		options.add(new SelectOption('00GA0000000iNOGMA2','Escalate to VersionOne'));
-		options.add(new SelectOption('00GA0000000iNOLMA2','Assigned to VersionOne'));
-		options.add(new SelectOption('CANADA','Canada'));
-		options.add(new SelectOption('MEXICO1','Mexico1'));
-		options.add(new SelectOption('MEXICO3','Mexico2'));
-		options.add(new SelectOption('MEXICO4','Mexico3'));
-		options.add(new SelectOption('MEXICO5','Mexico4'));
-		options.add(new SelectOption('MEXICO6','Mexico5'));
-		options.add(new SelectOption('MEXICO7','Mexico6'));
-		options.add(new SelectOption('MEXICO8','Mexico7'));
-		return options;
-	}
+        List<SelectOption> options = new List<SelectOption>();
+        options.add(new SelectOption('00GA0000000iNOGMA2','Escalate to VersionOne'));
+        options.add(new SelectOption('00GA0000000iNOLMA2','Assigned to VersionOne'));
+        options.add(new SelectOption('CANADA','Canada'));
+        options.add(new SelectOption('MEXICO1','Mexico1'));
+        options.add(new SelectOption('MEXICO3','Mexico2'));
+        options.add(new SelectOption('MEXICO4','Mexico3'));
+        options.add(new SelectOption('MEXICO5','Mexico4'));
+        options.add(new SelectOption('MEXICO6','Mexico5'));
+        options.add(new SelectOption('MEXICO7','Mexico6'));
+        options.add(new SelectOption('MEXICO8','Mexico7'));
+        return options;
+    }
 }

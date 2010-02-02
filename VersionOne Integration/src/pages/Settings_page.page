@@ -33,31 +33,31 @@ function disableSaveButtons() {
                 </apex:pageBlockSectionItem>
         </apex:pageBlockSection>
 
-		<apex:pageBlockSection title="SalesForce Configuration">
-   	        <apex:pageBlockSectionItem >
-       	        <apex:outputLabel value="Source Queue" for="SourceQueue"/>
-				<apex:selectList value="{!settings.SourceQueueId}" size="4" required="true" id="SourceQueue">
-					<apex:selectOptions value="{!QueueList}"/>
-				</apex:selectList>
-            </apex:pageBlockSectionItem>
+			<apex:pageBlockSection title="SalesForce Configuration">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Source Queue" for="SourceQueue" />
+					<apex:selectList value="{!settings.SourceQueueId}" size="4" required="true" id="SourceQueue">
+						<apex:selectOptions value="{!QueueList}" />
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
 
-   	        <apex:pageBlockSectionItem >
-       	        <apex:outputLabel value="Destination Queue" for="DestQueue"/>
-				<apex:selectList value="{!settings.DestQueueId}" size="4" required="true" id="DestQueue">
-					<apex:selectOptions value="{!QueueList}"/>
-				</apex:selectList>
-            </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Destination Queue" for="DestQueue" />
+					<apex:selectList value="{!settings.DestQueueId}" size="4" required="true" id="DestQueue">
+						<apex:selectOptions value="{!QueueList}" />
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
 
-   	        <apex:pageBlockSectionItem >
-       	        <apex:outputLabel value="Source" for="Source"/>
-				<apex:inputText value="{!settings.Source}" required="true" id="Source"/>
-            </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Source" for="Source" />
+					<apex:inputText value="{!settings.Source}" required="true" id="Source" />
+				</apex:pageBlockSectionItem>
 
-            <apex:pageBlockSectionItem >
-   	            <apex:outputLabel value="Comment for publishing" for="Comment"/>
-				<apex:inputTextarea value="{!settings.CommentBody}" id="Comment"/>
-           	</apex:pageBlockSectionItem>
-		</apex:pageBlockSection>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Comment for publishing" for="Comment" />
+					<apex:inputTextarea value="{!settings.CommentBody}" id="Comment" />
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
 
         <apex:pageBlockButtons location="top">
             <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button1" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2">
