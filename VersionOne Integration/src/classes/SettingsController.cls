@@ -9,10 +9,10 @@ public class SettingsController {
         isSettingsValidated = false;
         isSaved = true;
         try {
-        	settings.updateSettings();
+            settings.updateSettings();
         } catch (Exception ex) {
-        	saveSeverity = 'error';
-        	saveMessage = 'Settings has not been saved. Reason:' + ex.getMessage();
+            saveSeverity = 'error';
+            saveMessage = 'Settings has not been saved. Reason:' + ex.getMessage();
         }
         return null;
     }

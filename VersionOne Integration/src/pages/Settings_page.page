@@ -27,9 +27,13 @@ function disableSaveButtons() {
                     <apex:outputLabel value="Password" for="Password"/>
                     <apex:inputSecret value="{!settings.Password}" size="40" id="Password" tabindex="3"/>
                 </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Source" for="Source"/>
+                    <c:inputRequiredText value="{!settings.Source}" size="40" id="Source" required="true" tabindex="4"/>
+                </apex:pageBlockSectionItem>
         </apex:pageBlockSection>
         <apex:pageBlockButtons location="top">
-            <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button1" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, message_test, save_button1, save_button2">
+            <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button1" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2">
                 <script type="text/javascript">
                 function disableSaveButton1() {
                     var ele = document.getElementById('{!$Component.save_button1}');
@@ -38,10 +42,10 @@ function disableSaveButtons() {
                 }
                 </script>
             </apex:commandButton>
-            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, message_test, save_button1, save_button2" status="test_status"/>
+            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, out_saving, message_test, messge_save, save_button1, save_button2" status="test_status"/>
         </apex:pageBlockButtons>
         <apex:pageBlockButtons location="bottom">
-            <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button2" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, message_test, save_button1, save_button2"> 
+            <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button2" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2"> 
                 <script type="text/javascript">
                 function disableSaveButton2() {
                     var ele = document.getElementById('{!$Component.save_button2}');
@@ -50,7 +54,7 @@ function disableSaveButtons() {
                 }
                 </script>
             </apex:commandButton>
-            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, message_test, save_button1, save_button2" status="test_status"/>            
+            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2" status="test_status"/>            
         </apex:pageBlockButtons>
         </apex:pageBlock>
     </apex:form>
