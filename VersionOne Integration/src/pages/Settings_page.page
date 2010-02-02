@@ -10,7 +10,7 @@ function disableSaveButtons() {
 
     <apex:actionStatus startText="Testing settings..." id="test_status"/>
     <apex:actionStatus startText="Saving settings..." id="save_status"/>
-    
+
     <apex:form >
         <apex:pageBlock title="Settings">
         <apex:pageBlockSection title="VersionOne settings" columns="1">
@@ -32,6 +32,33 @@ function disableSaveButtons() {
                     <c:inputRequiredText value="{!settings.Source}" size="40" id="Source" required="true" tabindex="4"/>
                 </apex:pageBlockSectionItem>
         </apex:pageBlockSection>
+
+		<apex:pageBlockSection title="SalesForce Configuration">
+   	        <apex:pageBlockSectionItem >
+       	        <apex:outputLabel value="Source Queue" for="SourceQueue"/>
+				<apex:selectList value="{!settings.SourceQueueId}" size="4" required="true" id="SourceQueue">
+					<apex:selectOptions value="{!QueueList}"/>
+				</apex:selectList>
+            </apex:pageBlockSectionItem>
+
+   	        <apex:pageBlockSectionItem >
+       	        <apex:outputLabel value="Destination Queue" for="DestQueue"/>
+				<apex:selectList value="{!settings.DestQueueId}" size="4" required="true" id="DestQueue">
+					<apex:selectOptions value="{!QueueList}"/>
+				</apex:selectList>
+            </apex:pageBlockSectionItem>
+
+   	        <apex:pageBlockSectionItem >
+       	        <apex:outputLabel value="Source" for="Source"/>
+				<apex:inputText value="{!settings.Source}" required="true" id="Source"/>
+            </apex:pageBlockSectionItem>
+
+            <apex:pageBlockSectionItem >
+   	            <apex:outputLabel value="Comment for publishing" for="Comment"/>
+				<apex:inputTextarea value="{!settings.CommentBody}" id="Comment"/>
+           	</apex:pageBlockSectionItem>
+		</apex:pageBlockSection>
+
         <apex:pageBlockButtons location="top">
             <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button1" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2">
                 <script type="text/javascript">
@@ -45,7 +72,7 @@ function disableSaveButtons() {
             <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, out_saving, message_test, messge_save, save_button1, save_button2" status="test_status"/>
         </apex:pageBlockButtons>
         <apex:pageBlockButtons location="bottom">
-            <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button2" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2"> 
+            <apex:commandButton value="Save settings" action="{!SaveSettings}" disabled="{!isSettingsValidated == false}" id="save_button2" onclick="disableSaveButtons()" status="save_status" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2">
                 <script type="text/javascript">
                 function disableSaveButton2() {
                     var ele = document.getElementById('{!$Component.save_button2}');
@@ -54,7 +81,7 @@ function disableSaveButtons() {
                 }
                 </script>
             </apex:commandButton>
-            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2" status="test_status"/>            
+            <apex:commandButton value="Test settings" action="{!TestSettings}" rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2" status="test_status"/>
         </apex:pageBlockButtons>
         </apex:pageBlock>
     </apex:form>
@@ -62,7 +89,7 @@ function disableSaveButtons() {
     <apex:outputPanel id="out_testing">
         <apex:pageMessage severity="{!testSeverity}" id="message_test" title="Testing result" summary="{!testMessage}" rendered="{!isSettingsValidated}" strength="1"/>
     </apex:outputPanel>
-    
+
     <apex:outputPanel id="out_saving">
         <apex:pageMessage severity="{!saveSeverity}" id="message_save" title="Saving result" summary="{!saveMessage}" rendered="{!isSaved}" strength="1"/>
     </apex:outputPanel>

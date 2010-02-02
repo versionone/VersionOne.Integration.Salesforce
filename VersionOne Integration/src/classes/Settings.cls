@@ -86,8 +86,16 @@ public with sharing class Settings {
 		return sourceQueueId;
 	}
 
+	public void setSourceQueueId(String id) {
+		sourceQueueId = id;
+	}
+
 	public String getDestQueueId() {
 		return destQueueId;
+	}
+
+	public void setDestQueueId(String id) {
+		destQueueId = id;
 	}
 
 	public String getSource() {
@@ -119,4 +127,7 @@ public with sharing class Settings {
 		return commentBody;
 	}
 
+	public void setCommentBody(String text) {
+		commentBody = text;
+	}
 }
