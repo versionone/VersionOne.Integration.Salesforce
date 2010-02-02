@@ -14,7 +14,7 @@ public with sharing class V1Publisher {
 	private static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
 	private static final String LINK_URL = 'rest-1.v1/Data/Link';
 	private static final String CHECK_DEFECT_URL = 'rest-1.v1/Data/Defect?sel=Reference,Source.Name&where=(Reference="{0}";Source.Name="{1}")';
-	private static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Defect?sel=Reference&where=({0};Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
+	private static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Defect?sel=Reference&where=({0}Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
 
 	private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
 	private static final String URL_TO_V1_TEMPLATE = 'assetdetail.v1?oid=Defect%3a';
@@ -55,7 +55,7 @@ public with sharing class V1Publisher {
 			alreadyPortedCases = getAlreadyExistedDefects(cases);
 			findAllProjects();
 		} catch (VersionOneException ex) {
-			errorMessage(ex.getMessage() + ':' + ex.getResponceBody());
+			errorMessage(ex.getErrorMessage() + ':' + ex.getResponceBody());
 			return;
 		} catch (Exception ex) {
 			errorMessage('Internal problems: ' + ex);
@@ -106,7 +106,7 @@ public with sharing class V1Publisher {
 		    //requestor.doPost(createDefectBody, DEFECT_URL);
 		    requestor.request(requestor.createRequest(createDefectBody, DEFECT_URL, 'POST'));
 		} catch (VersionOneException ex) {
-			errorMessage(ex.getMessage() + ':' + ex.getResponceBody());
+			errorMessage(ex.getErrorMessage() + ':' + ex.getResponceBody());
 			return -1;
 		}  catch (Exception ex) {
 			errorMessage('Internal problems during creating defect: ' + ex);
@@ -125,7 +125,7 @@ public with sharing class V1Publisher {
 		    defectId = Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
 			createLinkV1ToSF(defectId, caseData.Id);
 		} catch (VersionOneException ex) {
-			errorMessage(ex.getMessage() + ':' + ex.getResponceBody());
+			errorMessage(ex.getErrorMessage() + ':' + ex.getResponceBody());
 		} catch (Exception ex) {
 			errorMessage('Internal problems during creating link to case: ' + ex);
 		}
@@ -210,14 +210,17 @@ public with sharing class V1Publisher {
 		String sourceName = settings.getSource();
 		XMLDom xmlParser = new XMLDom();
 	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
-	    String reference = '(';
 	    Map<String, Boolean> defectsInfo = new Map<String, Boolean>();
 
-	    for (Case caseData : cases) {
-			reference = reference + 'Reference=\''+ caseData.CaseNumber + '\'|';
+	    String reference = '';
+	    if (cases.size() > 0) {
+		    reference = '(';
+		    for (Case caseData : cases) {
+				reference = reference + 'Reference=\''+ caseData.CaseNumber + '\'|';
+		    }
+		    reference = reference.substring(0, reference.length() - 1);
+		    reference = reference + ');';
 	    }
-	    reference = reference.substring(0, reference.length() - 1);
-	    reference = reference + ')';
 
 	    //Send the request, and get a response
 	    //requestor.doGet('', String.format(MULTI_DEFECT_CHECK_URL, new String[]{reference, escapedSourceName}));

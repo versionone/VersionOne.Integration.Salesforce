@@ -1,5 +1,7 @@
 public class SettingsController {
 
+	private transient IRequestor requestor;
+
     public PageReference SaveSettings() {
         System.debug('Save Settings');
         testMessage = '';
@@ -23,15 +25,37 @@ public class SettingsController {
     public String testMessage{ get; set; }
     public String saveMessage{ get; set; }
     public Boolean isSettingsValidated { get; set; }
+    public Boolean isSettingsCorrect { get; set; }
     public Boolean isSaved { get; set; }
+	public Settings settings {get; set;}
 
 
     public PageReference TestSettings() {
+    	if (requestor == null) {
+    		requestor = new Requestor(settings);
+    	}
+    	try {
+    		validateConnectionAndSource();
+    		testSeverity = 'info';
+    		testMessage = 'Settings correct.';
+    		isSettingsCorrect = true;
+    	} catch (VersionOneException ex) {
+    		testSeverity = 'error';
+    		testMessage = ex.getErrorMessage();
+    		isSettingsCorrect = false;
+    	} catch (Exception ex) {
+    		testSeverity = 'error';
+    		testMessage = 'Internal error:' + ex.getMessage();
+    		isSettingsCorrect = false;
+    	}
+
         System.debug('Path:' + Settings.getPath() + ', UserName:' + Settings.getUserName() + ', Password:' + Settings.getPassword());
-        testMessage = 'testing error message';
-        testSeverity = 'error'; //info
-        isSettingsValidated = true;
+        System.debug('testMessage=' + testMessage);
+
+
+		isSettingsValidated = true;
         isSaved = false;
+
         return null;
     }
 
@@ -40,14 +64,42 @@ public class SettingsController {
         return 'Hello tester!';
     }
 
-    public Settings settings {get; set;}
-
     public void initSettings() {
         testMessage = '';
         saveMessage = '';
         isSettingsValidated = false;
+        isSettingsCorrect = false;
         isSaved = false;
         settings = new Settings();
+    }
+
+    private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
+    private boolean validateConnectionAndSource() {
+    	XMLDom xmlParser = new XMLDom();
+	    String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
+
+	    //Send the request, and get a response
+	    //requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
+	    requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
+	    System.debug('Responce code = ' + requestor.getStatusCode());
+	    System.debug('Responce body = ' + requestor.getBody());
+	    if (requestor.getStatusCode() == 200) {
+			xmlParser.parseFromString(requestor.getBody());
+	    }else if (requestor.getStatusCode() == 401){
+			throw new VersionOneException('Credentions is not correct.', '');
+	    }else if (requestor.getStatusCode() == 500){
+			throw new VersionOneException('URL is not correct or VersionOne server has some problems at the moment.', '');
+	    }else {
+	    	throw new VersionOneException('Problem with getting source from the VersionOne.', requestor.getBody());
+	    }
+
+	    XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
+	    System.debug('findSourceId respond = ' + xmlParser.toXmlString());
+	    if (assetTag != null) {
+	    	return true;
+	    }
+
+	    throw new VersionOneException('Source setting is not correct.', '');
     }
 /*
     public PageReference initPageAction() {
@@ -70,6 +122,10 @@ public class SettingsController {
         return new PageReference();
     }
     */
+
+    public void setRequestor(IRequestor requestor) {
+    	this.requestor = requestor;
+    }
 
     public List<SelectOption> getQueueList() {
         List<SelectOption> options = new List<SelectOption>();
