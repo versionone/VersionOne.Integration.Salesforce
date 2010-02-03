@@ -49,42 +49,30 @@
 
 			<apex:pageBlockSection title="Case publishing">
 				<apex:pageBlockSectionItem >
-					<apex:outputLabel value="Source Queue" for="SourceQueue" />
+					<apex:outputLabel value="Source Queue" for="SourceQueue"/>
 					<apex:outputPanel styleClass="requiredInput" layout="block">
-						<apex:outputPanel styleClass="requiredBlock" layout="block" />
-						<apex:selectList value="{!settings.SourceQueueId}" size="1"
-							required="true" id="SourceQueue">
-							<apex:selectOptions value="{!QueueList}" />
+						<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+						<apex:selectList value="{!settings.SourceQueueId}" size="1"	required="true" id="SourceQueue">
+							<apex:selectOptions value="{!QueueList}"/>
 						</apex:selectList>
 					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
 
 				<apex:pageBlockSectionItem >
-					<apex:outputLabel value="Destination Queue" for="DestQueue" />
+					<apex:outputLabel value="Destination Queue" for="DestQueue"/>
 					<apex:outputPanel styleClass="requiredInput" layout="block">
-						<apex:outputPanel styleClass="requiredBlock" layout="block" />
-						<apex:selectList value="{!settings.DestQueueId}" size="1"
-							required="true" id="DestQueue">
-							<apex:selectOptions value="{!QueueList}" />
+						<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+						<apex:selectList value="{!settings.DestQueueId}" size="1" required="true" id="DestQueue">
+							<apex:selectOptions value="{!QueueList}"/>
 						</apex:selectList>
-					</apex:outputPanel>
-				</apex:pageBlockSectionItem>
-
-				<apex:pageBlockSectionItem >
-					<apex:outputLabel value="Source" for="Source" />
-					<apex:outputPanel styleClass="requiredInput" layout="block">
-						<apex:outputPanel styleClass="requiredBlock" layout="block" />
-						<apex:inputText value="{!settings.Source}" required="true"
-							id="Source" />
 					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
 			</apex:pageBlockSection>
 
 			<apex:pageBlockSection columns="1">
 				<apex:pageBlockSectionItem >
-					<apex:outputLabel value="Comment on publishing" for="Comment" />
-					<apex:inputTextarea value="{!settings.CommentBody}" id="Comment"
-						cols="75" rows="6" />
+					<apex:outputLabel value="Comment on publishing" for="Comment"/>
+					<apex:inputTextarea value="{!settings.CommentBody}" id="Comment" cols="75" rows="6"/>
 				</apex:pageBlockSectionItem>
 			</apex:pageBlockSection>
 
