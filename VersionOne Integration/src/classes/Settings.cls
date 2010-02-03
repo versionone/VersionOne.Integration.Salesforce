@@ -25,7 +25,7 @@ public with sharing class Settings {
                 mycs.EscalateQueueId__c = '0';
                 mycs.AssignedQueueId__c = '0';
                 mycs.Source__c = 'SalesForce';
-                mycs.commentBody__c = 'Escalated to VersionOne';
+                mycs.CommentBody__c = 'Escalated to VersionOne';
                 insert mycs;
             }
             // just some hardcode till we don't have UI for settings

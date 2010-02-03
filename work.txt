@@ -10,6 +10,8 @@ Source - Text
 EscalateQueueId - String
 AssignedQueueId - Text
 UrlV1Field - Text -                NEED TO REMOVE
+added [03.02.2010]
+commentBody - Text Area
 ----------------------
 Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
 ----------------------
