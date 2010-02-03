@@ -2,11 +2,11 @@
 [15.01.2010]
 Create Custom Settings(Setup>Develop>Custom Settings) with "V1Settings" name.
 add the following fileds:
-Path - URL
-UserName - Text
-Password - Text
+Path - URL maxlength 255
+UserName - Text maxlength=20
+Password - Text maxlength=20
 Added [28.01.2010]
-Source - Text
+Source - Text maxlength=30
 EscalateQueueId - String
 AssignedQueueId - Text
 UrlV1Field - Text -                NEED TO REMOVE

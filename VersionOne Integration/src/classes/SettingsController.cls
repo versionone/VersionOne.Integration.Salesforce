@@ -3,6 +3,16 @@ public class SettingsController {
 	private transient IRequestor requestor;
 
     public PageReference SaveSettings() {
+    	if (!validateRequiredFields()) {
+			isSettingsCorrect = false;
+			isSettingsValidated = false;
+			testMessage = '';
+    		return null;
+    	}
+    	if (!isSettingsCorrect) {
+    		ApexPages.addMessage(getErrorMessage('Settings is not correct or was not validated.'));
+    		return null;
+    	}
         System.debug('Save Settings');
         testMessage = '';
         testMessage = '';
@@ -31,6 +41,12 @@ public class SettingsController {
 
 
     public PageReference TestSettings() {
+    	if (!validateRequiredFields()) {
+			isSettingsCorrect = false;
+			isSettingsValidated = false;
+			testMessage = '';
+    		return null;
+    	}
     	if (requestor == null) {
     		requestor = new Requestor(settings);
     	}
@@ -58,6 +74,36 @@ public class SettingsController {
 
         return null;
     }
+
+    /**
+    * Validates required fields. Adds errors messages on page.
+    *
+    * Returns 	true  - if all requred fields are filled
+    *			false - if any of requred fields are not filled
+    **/
+    private Boolean validateRequiredFields() {
+    	Boolean result = true;
+    	if (settings.getPath() == null || settings.getPath() == '') {
+    		ApexPages.addMessage(getErrorMessage('URL is required field.'));
+    		result = false;
+    	}
+    	System.debug('UserName:' + settings.getUserName());
+    	if (settings.getSource() == null || settings.getSource() == '') {
+    		ApexPages.addMessage(getErrorMessage('Source is required field.'));
+    		result = false;
+    	}
+    	if (settings.getUserName() == null || settings.getUserName() == '') {
+    		ApexPages.addMessage(getErrorMessage('User name is required field.'));
+    		result = false;
+    	}
+
+    	return result;
+    }
+
+    private ApexPages.Message getErrorMessage(String text) {
+		return new ApexPages.Message(ApexPages.Severity.ERROR, text);
+    }
+
 
 
     public String getGreeting() {

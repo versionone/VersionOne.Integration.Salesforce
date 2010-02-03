@@ -7,13 +7,17 @@
     <apex:attribute name="Required"
         description="This is the text expression to pass into inputText" type="Boolean" />
     <apex:attribute name="tabindex"
-        description="This is the text expression to pass into inputText" type="integer" />
+        description="This is the text expression to pass into inputText" type="Integer" />
     <apex:attribute name="onkeydown"
         description="This is the text expression to pass into inputText" type="String" />
+    <apex:attribute name="onchange"
+        description="This is the text expression to pass into inputText" type="String" />
+    <apex:attribute name="maxlength"
+        description="This is the text expression to pass into inputText" type="Integer" />
 
     <apex:outputPanel layout="block" styleClass="requiredInput">
     <apex:outputPanel layout="block" styleClass="requiredBlock"/>
-    <apex:inputText value="{!Value}" size="{!Size}" required="{!Required}" tabindex="{!tabindex}" onkeydown="{!onkeydown}"/>
+    <apex:inputText value="{!Value}" size="{!Size}" required="{!Required}" tabindex="{!tabindex}" onkeydown="{!onkeydown}" onchange="{!onchange}" maxlength="{!maxlength}"/>
     </apex:outputPanel>
 
 </apex:component>
