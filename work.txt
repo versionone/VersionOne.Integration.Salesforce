@@ -7,7 +7,7 @@ UserName - Text maxlength=20
 Password - Text maxlength=20
 Added [28.01.2010]
 Source - Text maxlength=30
-EscalateQueueId - String
+EscalateQueueId - Text
 AssignedQueueId - Text
 UrlV1Field - Text -                NEED TO REMOVE
 added [03.02.2010]
