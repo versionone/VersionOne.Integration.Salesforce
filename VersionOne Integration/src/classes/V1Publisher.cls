@@ -55,10 +55,10 @@ public with sharing class V1Publisher {
 			alreadyPortedCases = getAlreadyExistedDefects(cases);
 			findAllProjects();
 		} catch (VersionOneException ex) {
-			errorMessage(ex.getErrorMessage() + ':' + ex.getResponceBody());
+			errorMessage(ex.getErrorMessage(), ex);
 			return;
 		} catch (Exception ex) {
-			errorMessage('Internal problems: ' + ex);
+			errorMessage('Internal problems during getting existed defects from the VersionOne: ', ex);
 		}
 		List<Case> processedCases = new List<Case>();
 		List<String> urls = new List<String>();
@@ -106,10 +106,10 @@ public with sharing class V1Publisher {
 		    //requestor.doPost(createDefectBody, DEFECT_URL);
 		    requestor.request(requestor.createRequest(createDefectBody, DEFECT_URL, 'POST'));
 		} catch (VersionOneException ex) {
-			errorMessage(ex.getErrorMessage() + ':' + ex.getResponceBody());
+			errorMessage(ex.getErrorMessage(), ex);
 			return -1;
 		}  catch (Exception ex) {
-			errorMessage('Internal problems during creating defect: ' + ex);
+			errorMessage('Internal problems during creating defect: ', ex);
 			return -1;
 		}
 
@@ -125,7 +125,7 @@ public with sharing class V1Publisher {
 		    defectId = Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
 			createLinkV1ToSF(defectId, caseData.Id);
 		} catch (VersionOneException ex) {
-			errorMessage(ex.getErrorMessage() + ':' + ex.getResponceBody());
+			errorMessage(ex.getErrorMessage(), ex);
 		} catch (Exception ex) {
 			errorMessage('Internal problems during creating link to case: ' + ex);
 		}
@@ -339,5 +339,16 @@ public with sharing class V1Publisher {
 	**/
 	public static void errorMessage(String message) {
 		System.debug(message);
+	}
+
+	/**
+	* Handle error message with exception
+	**/
+	public static void errorMessage(String message, Exception ex) {
+		if (ex instanceof VersionOneException ) {
+			System.debug(message + ':' + ((VersionOneException)ex).getResponceBody());
+		} else {
+			System.debug('Internal error:' + ex.getMessage());
+		}
 	}
 }

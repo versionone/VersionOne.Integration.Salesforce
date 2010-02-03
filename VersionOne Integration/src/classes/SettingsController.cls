@@ -132,7 +132,7 @@ public class SettingsController {
 	    if (requestor.getStatusCode() == 200) {
 			xmlParser.parseFromString(requestor.getBody());
 	    }else if (requestor.getStatusCode() == 401){
-			throw new VersionOneException('Credentions is not correct.', '');
+			throw new VersionOneException('Credentials is not correct.', '');
 	    }else if (requestor.getStatusCode() == 500){
 			throw new VersionOneException('URL is not correct or VersionOne server has some problems at the moment.', '');
 	    }else {
