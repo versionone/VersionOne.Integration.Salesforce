@@ -174,33 +174,11 @@ public class SettingsController {
     }
 
     public List<SelectOption> getQueueList() {
+        Group[] queues = V1CaseCollector.getQueuesList();
         List<SelectOption> options = new List<SelectOption>();
-        options.add(new SelectOption('00GA0000000iNOGMA2','Escalate to VersionOne'));
-        options.add(new SelectOption('00GA0000000iNOLMA2','Assigned to VersionOne'));
-        options.add(new SelectOption('CANADA','Canada'));
-        options.add(new SelectOption('MEXICO11','Mexico11'));
-        options.add(new SelectOption('MEXICO31','Mexico21'));
-        options.add(new SelectOption('MEXICO41','Mexico31'));
-        options.add(new SelectOption('MEXICO51','Mexico41'));
-        options.add(new SelectOption('MEXICO61','Mexico51'));
-        options.add(new SelectOption('MEXICO71','Mexico61'));
-        options.add(new SelectOption('MEXICO81','Mexico71'));
-
-        options.add(new SelectOption('MEXICO12','Mexico12'));
-        options.add(new SelectOption('MEXICO32','Mexico22'));
-        options.add(new SelectOption('MEXICO42','Mexico32'));
-        options.add(new SelectOption('MEXICO52','Mexico42'));
-        options.add(new SelectOption('MEXICO62','Mexico52'));
-        options.add(new SelectOption('MEXICO72','Mexico62'));
-        options.add(new SelectOption('MEXICO82','Mexico72'));
-
-        options.add(new SelectOption('MEXICO13','Mexico13'));
-        options.add(new SelectOption('MEXICO33','Mexico23'));
-        options.add(new SelectOption('MEXICO43','Mexico33'));
-        options.add(new SelectOption('MEXICO53','Mexico43'));
-        options.add(new SelectOption('MEXICO63','Mexico53'));
-        options.add(new SelectOption('MEXICO73','Mexico63'));
-        options.add(new SelectOption('MEXICO83','Mexico73'));
+        for(Group queue : queues) {
+            options.add(new SelectOption(queue.Id, queue.Name));
+        }
         return options;
     }
 }

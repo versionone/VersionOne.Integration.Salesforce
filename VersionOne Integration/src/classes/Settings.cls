@@ -31,8 +31,6 @@ public with sharing class Settings {
             // just some hardcode till we don't have UI for settings
 			//mycs.Path__c = 'http://195.62.49.62:7001/VersionOne/';
 			//mycs.Source__c = 'SalesForce';
-            mycs.EscalateQueueId__c = V1CaseCollector.getQueueIdByName('Escalate to VersionOne');
-            mycs.AssignedQueueId__c = V1CaseCollector.getQueueIdByName('Assigned to VersionOne');
             //\\
 
             path = mycs.Path__c;

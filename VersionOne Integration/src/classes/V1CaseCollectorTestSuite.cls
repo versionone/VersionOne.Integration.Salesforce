@@ -1,6 +1,30 @@
 @isTest
 private class V1CaseCollectorTestSuite {
 
+    static testMethod void getQueuesListTest() {
+    	String queueName = 'TestQueue';
+    	Group queue1 = new Group(Type='Queue', Name=queueName+'1');
+    	insert queue1;
+    	Group queue2 = new Group(Type='Queue', Name=queueName+'2');
+    	insert queue2;
+    	Group queue3 = new Group(Name=queueName+'3');
+    	insert queue3;
+    	Group[] newQueues = V1CaseCollector.getQueuesList();
+    	assertContains(queue1, newQueues, 'Wrong queue1');
+    	assertContains(queue2, newQueues, 'Wrong queue2');
+    }
+
+	static void assertContains (SObject expect, SObject[] actuals, String msg) {
+		Boolean contains = false;
+		for (SObject o : actuals) {
+			if (o.Id == expect.Id) {
+				contains = true;
+				break;
+			}
+		}
+		System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
+	}
+
     static testMethod void setCasesOwnerTest() {
     	V1Publisher.resetAllData();
     	V1Publisher.setSettings(Settings.getTestSettings());

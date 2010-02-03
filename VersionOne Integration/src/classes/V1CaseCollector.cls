@@ -44,4 +44,13 @@ public class V1CaseCollector {
 		System.debug('==> getQueueIdByName() ' + queue);
 		return queue.Id;
 	}
+
+	/* Get all Queues in a system.
+	 * Return: array of queues.
+	 */
+	public static Group[] getQueuesList() {
+		Group[] queues = [SELECT Id, Name, Type FROM Group WHERE Type='Queue'];
+		System.debug('==> getQueuesList() ' + queues);
+		return queues;
+	}
 }
