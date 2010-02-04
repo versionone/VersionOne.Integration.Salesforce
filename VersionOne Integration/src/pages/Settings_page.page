@@ -77,7 +77,7 @@
 			</apex:pageBlockSection>
 
 			<apex:pageBlockButtons location="top">
-				<apex:commandButton value="Save settings" action="{!SaveSettings}"
+				<apex:commandButton value="Save settings" action="{!saveSettings}"
 					disabled="{!isSettingsCorrect == false}" id="save_button1"
 					onclick="disableAllButtons()" status="save_status"
 					rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, requiredfields">
@@ -89,7 +89,7 @@
 	                }
                 </script>
 				</apex:commandButton>
-				<apex:commandButton value="Test settings" action="{!TestSettings}"
+				<apex:commandButton value="Test settings" action="{!testSettings}"
 					rerender="out_testing, out_saving, message_test, messge_save, save_button1, save_button2, test_button1, test_button2, requiredfields"
 					onclick="disableAllButtons()"
 					status="test_status" id="test_button1">
@@ -103,7 +103,7 @@
                 </apex:commandButton>
 			</apex:pageBlockButtons>
 			<apex:pageBlockButtons location="bottom">
-				<apex:commandButton value="Save settings" action="{!SaveSettings}"
+				<apex:commandButton value="Save settings" action="{!saveSettings}"
 					disabled="{!isSettingsCorrect == false}" id="save_button2"
 					onclick="disableAllButtons()" status="save_status"
 					rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, requiredfields">
@@ -115,7 +115,7 @@
 					}
 				</script>
 				</apex:commandButton>
-				<apex:commandButton value="Test settings" action="{!TestSettings}"
+				<apex:commandButton value="Test settings" action="{!testSettings}"
 					rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, requiredfields"
 					onclick="disableAllButtons()"
 					status="test_status" id="test_button2">

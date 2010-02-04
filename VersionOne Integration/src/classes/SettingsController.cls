@@ -1,9 +1,18 @@
 public class SettingsController {
 
+    public String testSeverity{ get; set; }
+    public String saveSeverity{ get; set; }
+    public String testMessage{ get; set; }
+    public String saveMessage{ get; set; }
+    public Boolean isSettingsValidated { get; set; }
+    public Boolean isSettingsCorrect { get; set; }
+    public Boolean isSaved { get; set; }
+    public Settings settings {get; set;}
+
     private transient IRequestor requestor;
 
-    public PageReference SaveSettings() {
-        if (!validateRequiredFields()) {
+    public PageReference saveSettings() {
+        if (!validateRequiredFields(settings)) {
             isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
@@ -29,19 +38,8 @@ public class SettingsController {
         return null;
     }
 
-
-    public String testSeverity{ get; set; }
-    public String saveSeverity{ get; set; }
-    public String testMessage{ get; set; }
-    public String saveMessage{ get; set; }
-    public Boolean isSettingsValidated { get; set; }
-    public Boolean isSettingsCorrect { get; set; }
-    public Boolean isSaved { get; set; }
-    public Settings settings {get; set;}
-
-
-    public PageReference TestSettings() {
-        if (!validateRequiredFields()) {
+    public PageReference testSettings() {
+        if (!validateRequiredFields(settings)) {
             isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
@@ -78,10 +76,11 @@ public class SettingsController {
     /**
     * Validates required fields. Adds errors messages on page.
     *
-    * Returns 	true  - if all requred fields are filled
-    *			false - if any of requred fields are not filled
+    * settings - settings to validate.
+    * Returns 	true  - if all requred fields are filled.
+    *			false - if any of requred fields are not filled.
     **/
-    public Boolean validateRequiredFields() {
+    public static Boolean validateRequiredFields(Settings settings) {
         Boolean result = true;
         if (settings.getPath() == null || settings.getPath() == '') {
             ApexPages.addMessage(getErrorMessage('URL is required field.'));
@@ -108,11 +107,9 @@ public class SettingsController {
         return result;
     }
 
-    private ApexPages.Message getErrorMessage(String text) {
+    private static ApexPages.Message getErrorMessage(String text) {
         return new ApexPages.Message(ApexPages.Severity.ERROR, text);
     }
-
-
 
     public String getGreeting() {
         return 'Hello tester!';

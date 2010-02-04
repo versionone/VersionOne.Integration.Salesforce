@@ -2,10 +2,7 @@
 private class SettingsControllerTester {
 
     static testMethod void validateRequiredFieldsTest() {
-        SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
-
-        controller.setSettings(settingsData);
 
         //all fields is filled
         settingsData.setPath('http://localhost');
@@ -14,36 +11,36 @@ private class SettingsControllerTester {
         settingsData.setSourceQueueId('78234612347614298476');
         settingsData.setDestQueueId('78234612347614298476');
         settingsData.setCommentBody('test comment');
-        System.assert(controller.validateRequiredFields(), 'Incorrect reuslt when all required parameters is filled.');
+        System.assert(SettingsController.validateRequiredFields(settingsData), 'Incorrect reuslt when all required parameters is filled.');
 
         //empty SourceQueueId
         settingsData.setSourceQueueId('');
-        System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when SourceQueueId is empty.');
+        System.assert(!SettingsController.validateRequiredFields(settingsData), 'Incorrect reuslt when SourceQueueId is empty.');
         settingsData.setSourceQueueId('78234612347614298476');
 
         //empty DestQueueId
         settingsData.setDestQueueId(null);
-        System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when DestQueueId is empty.');
+        System.assert(!SettingsController.validateRequiredFields(settingsData), 'Incorrect reuslt when DestQueueId is empty.');
         settingsData.setDestQueueId('78234612347614298476');
 
         //empty Comment
         settingsData.setCommentBody(null);
-        System.assert(controller.validateRequiredFields(), 'Incorrect reuslt when CommentBody is empty.');
+        System.assert(SettingsController.validateRequiredFields(settingsData), 'Incorrect reuslt when CommentBody is empty.');
         settingsData.setCommentBody('test comment');
 
         //empty source
         settingsData.setSource('');
-        System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when source is empty.');
+        System.assert(!SettingsController.validateRequiredFields(settingsData), 'Incorrect reuslt when source is empty.');
         settingsData.setSource('source');
 
         //empty user name
         settingsData.setUserName('');
-        System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when user name is empty.');
+        System.assert(!SettingsController.validateRequiredFields(settingsData), 'Incorrect reuslt when user name is empty.');
         settingsData.setUserName('user');
 
         //empty path
         settingsData.setPath('');
-        System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when path is empty.');
+        System.assert(!SettingsController.validateRequiredFields(settingsData), 'Incorrect reuslt when path is empty.');
         settingsData.setPath('http://localhost');
     }
 
