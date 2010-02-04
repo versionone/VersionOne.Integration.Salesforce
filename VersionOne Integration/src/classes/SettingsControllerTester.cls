@@ -3,10 +3,8 @@ private class SettingsControllerTester {
 
     static testMethod void validateRequiredFieldsTest() {
         SettingsController controller = new SettingsController();
-        //IRequestor requestor = new RequestorMock('', 200);
         Settings settingsData = Settings.getTestSettings();
 
-        //controller.setRequestor(requestor);
         controller.setSettings(settingsData);
 
         //all fields is filled
