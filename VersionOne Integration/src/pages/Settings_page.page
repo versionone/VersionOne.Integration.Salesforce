@@ -52,7 +52,7 @@
 					<apex:outputLabel value="Source Queue" for="SourceQueue"/>
 					<apex:outputPanel styleClass="requiredInput" layout="block">
 						<apex:outputPanel styleClass="requiredBlock" layout="block"/>
-						<apex:selectList value="{!settings.SourceQueueId}" size="1"	required="true" id="SourceQueue">
+						<apex:selectList value="{!settings.SourceQueueId}" size="1"	required="false" id="SourceQueue">
 							<apex:selectOptions value="{!QueueList}"/>
 						</apex:selectList>
 					</apex:outputPanel>
@@ -62,7 +62,7 @@
 					<apex:outputLabel value="Destination Queue" for="DestQueue"/>
 					<apex:outputPanel styleClass="requiredInput" layout="block">
 						<apex:outputPanel styleClass="requiredBlock" layout="block"/>
-						<apex:selectList value="{!settings.DestQueueId}" size="1" required="true" id="DestQueue">
+						<apex:selectList value="{!settings.DestQueueId}" size="1" required="false" id="DestQueue">
 							<apex:selectOptions value="{!QueueList}"/>
 						</apex:selectList>
 					</apex:outputPanel>

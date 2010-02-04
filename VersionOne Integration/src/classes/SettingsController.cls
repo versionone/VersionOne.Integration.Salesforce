@@ -1,18 +1,18 @@
 public class SettingsController {
 
-	private transient IRequestor requestor;
+    private transient IRequestor requestor;
 
     public PageReference SaveSettings() {
-    	if (!validateRequiredFields()) {
-			isSettingsCorrect = false;
-			isSettingsValidated = false;
-			testMessage = '';
-    		return null;
-    	}
-    	if (!isSettingsCorrect) {
-    		ApexPages.addMessage(getErrorMessage('Settings is not correct or was not validated.'));
-    		return null;
-    	}
+        if (!validateRequiredFields()) {
+            isSettingsCorrect = false;
+            isSettingsValidated = false;
+            testMessage = '';
+            return null;
+        }
+        if (!isSettingsCorrect) {
+            ApexPages.addMessage(getErrorMessage('Settings is not correct or was not validated.'));
+            return null;
+        }
         System.debug('Save Settings');
         testMessage = '';
         testMessage = '';
@@ -37,39 +37,39 @@ public class SettingsController {
     public Boolean isSettingsValidated { get; set; }
     public Boolean isSettingsCorrect { get; set; }
     public Boolean isSaved { get; set; }
-	public Settings settings {get; set;}
+    public Settings settings {get; set;}
 
 
     public PageReference TestSettings() {
-    	if (!validateRequiredFields()) {
-			isSettingsCorrect = false;
-			isSettingsValidated = false;
-			testMessage = '';
-    		return null;
-    	}
-    	if (requestor == null) {
-    		requestor = new Requestor(settings);
-    	}
-    	try {
-    		validateConnectionAndSource();
-    		testSeverity = 'info';
-    		testMessage = 'Settings correct.';
-    		isSettingsCorrect = true;
-    	} catch (VersionOneException ex) {
-    		testSeverity = 'error';
-    		testMessage = ex.getErrorMessage();
-    		isSettingsCorrect = false;
-    	} catch (Exception ex) {
-    		testSeverity = 'error';
-    		testMessage = 'Internal error:' + ex.getMessage();
-    		isSettingsCorrect = false;
-    	}
+        if (!validateRequiredFields()) {
+            isSettingsCorrect = false;
+            isSettingsValidated = false;
+            testMessage = '';
+            return null;
+        }
+        if (requestor == null) {
+            requestor = new Requestor(settings);
+        }
+        try {
+            validateConnectionAndSource();
+            testSeverity = 'info';
+            testMessage = 'Settings correct.';
+            isSettingsCorrect = true;
+        } catch (VersionOneException ex) {
+            testSeverity = 'error';
+            testMessage = ex.getErrorMessage();
+            isSettingsCorrect = false;
+        } catch (Exception ex) {
+            testSeverity = 'error';
+            testMessage = 'Internal error:' + ex.getMessage();
+            isSettingsCorrect = false;
+        }
 
         System.debug('Path:' + Settings.getPath() + ', UserName:' + Settings.getUserName() + ', Password:' + Settings.getPassword());
         System.debug('testMessage=' + testMessage);
 
 
-		isSettingsValidated = true;
+        isSettingsValidated = true;
         isSaved = false;
 
         return null;
@@ -82,26 +82,34 @@ public class SettingsController {
     *			false - if any of requred fields are not filled
     **/
     public Boolean validateRequiredFields() {
-    	Boolean result = true;
-    	if (settings.getPath() == null || settings.getPath() == '') {
-    		ApexPages.addMessage(getErrorMessage('URL is required field.'));
-    		result = false;
-    	}
-    	System.debug('UserName:' + settings.getUserName());
-    	if (settings.getSource() == null || settings.getSource() == '') {
-    		ApexPages.addMessage(getErrorMessage('Source is required field.'));
-    		result = false;
-    	}
-    	if (settings.getUserName() == null || settings.getUserName() == '') {
-    		ApexPages.addMessage(getErrorMessage('User name is required field.'));
-    		result = false;
-    	}
+        Boolean result = true;
+        if (settings.getPath() == null || settings.getPath() == '') {
+            ApexPages.addMessage(getErrorMessage('URL is required field.'));
+            result = false;
+        }
+        System.debug('UserName:' + settings.getUserName());
+        if (settings.getSource() == null || settings.getSource() == '') {
+            ApexPages.addMessage(getErrorMessage('Source is required field.'));
+            result = false;
+        }
+        if (settings.getUserName() == null || settings.getUserName() == '') {
+            ApexPages.addMessage(getErrorMessage('User name is required field.'));
+            result = false;
+        }
+        if (settings.getSourceQueueId() == null) {
+            ApexPages.addMessage(getErrorMessage('You must choose a Source Queue.'));
+            result = false;
+        }
+        if (settings.getDestQueueId() == null) {
+            ApexPages.addMessage(getErrorMessage('You must choose a Destination Queue.'));
+            result = false;
+        }
 
-    	return result;
+        return result;
     }
 
     private ApexPages.Message getErrorMessage(String text) {
-		return new ApexPages.Message(ApexPages.Severity.ERROR, text);
+        return new ApexPages.Message(ApexPages.Severity.ERROR, text);
     }
 
 
@@ -116,38 +124,38 @@ public class SettingsController {
         isSettingsValidated = false;
         isSettingsCorrect = false;
         isSaved = false;
-    	if (settings == null) {
-    		settings = new Settings();
-    	}
+        if (settings == null) {
+            settings = new Settings();
+        }
     }
 
     private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
     public boolean validateConnectionAndSource() {
-    	XMLDom xmlParser = new XMLDom();
-	    String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
+        XMLDom xmlParser = new XMLDom();
+        String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
 
-	    //Send the request, and get a response
-	    //requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
-	    requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
-	    System.debug('Responce code = ' + requestor.getStatusCode());
-	    System.debug('Responce body = ' + requestor.getBody());
-	    if (requestor.getStatusCode() == 200) {
-			xmlParser.parseFromString(requestor.getBody());
-	    }else if (requestor.getStatusCode() == 401){
-			throw new VersionOneException('Credentials is not correct.', '');
-	    }else if (requestor.getStatusCode() == 500){
-			throw new VersionOneException('URL is not correct or VersionOne server has some problems at the moment.', '');
-	    }else {
-	    	throw new VersionOneException('Problem with getting source from the VersionOne.', requestor.getBody());
-	    }
+        //Send the request, and get a response
+        //requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
+        requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
+        System.debug('Responce code = ' + requestor.getStatusCode());
+        System.debug('Responce body = ' + requestor.getBody());
+        if (requestor.getStatusCode() == 200) {
+            xmlParser.parseFromString(requestor.getBody());
+        }else if (requestor.getStatusCode() == 401){
+            throw new VersionOneException('Credentials is not correct.', '');
+        }else if (requestor.getStatusCode() == 500){
+            throw new VersionOneException('URL is not correct or VersionOne server has some problems at the moment.', '');
+        }else {
+            throw new VersionOneException('Problem with getting source from the VersionOne.', requestor.getBody());
+        }
 
-	    XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
-	    System.debug('findSourceId respond = ' + xmlParser.toXmlString());
-	    if (assetTag != null) {
-	    	return true;
-	    }
+        XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
+        System.debug('findSourceId respond = ' + xmlParser.toXmlString());
+        if (assetTag != null) {
+            return true;
+        }
 
-	    throw new VersionOneException('Source setting is not correct.', '');
+        throw new VersionOneException('Source setting is not correct.', '');
     }
 /*
     public PageReference initPageAction() {
@@ -172,11 +180,11 @@ public class SettingsController {
     */
 
     public void setRequestor(IRequestor requestor) {
-    	this.requestor = requestor;
+        this.requestor = requestor;
     }
 
     public void setSettings(Settings settings) {
-    	this.settings = settings;
+        this.settings = settings;
     }
 
     public List<SelectOption> getQueueList() {

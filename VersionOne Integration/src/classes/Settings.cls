@@ -29,8 +29,8 @@ public with sharing class Settings {
                 insert mycs;
             }
             // just some hardcode till we don't have UI for settings
-			//mycs.Path__c = 'http://195.62.49.62:7001/VersionOne/';
-			//mycs.Source__c = 'SalesForce';
+            //mycs.Path__c = 'http://195.62.49.62:7001/VersionOne/';
+            //mycs.Source__c = 'SalesForce';
             //\\
 
             path = mycs.Path__c;
@@ -79,7 +79,10 @@ public with sharing class Settings {
     }
 
     public void setSourceQueueId(String id) {
-        sourceQueueId = id;
+        if (id == '')
+            sourceQueueId = null;
+        else
+            sourceQueueId = id;
     }
 
     public String getDestQueueId() {
@@ -87,7 +90,10 @@ public with sharing class Settings {
     }
 
     public void setDestQueueId(String id) {
-        destQueueId = id;
+        if (id == '')
+            destQueueId = null;
+        else
+            destQueueId = id;
     }
 
     public String getSource() {
@@ -120,6 +126,9 @@ public with sharing class Settings {
     }
 
     public void setCommentBody(String text) {
-        commentBody = text;
+        if (text == '')
+            commentBody = null;
+        else
+            commentBody = text;
     }
 }
