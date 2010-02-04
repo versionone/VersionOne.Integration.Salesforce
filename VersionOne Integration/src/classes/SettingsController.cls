@@ -81,7 +81,7 @@ public class SettingsController {
     * Returns 	true  - if all requred fields are filled
     *			false - if any of requred fields are not filled
     **/
-    private Boolean validateRequiredFields() {
+    public Boolean validateRequiredFields() {
     	Boolean result = true;
     	if (settings.getPath() == null || settings.getPath() == '') {
     		ApexPages.addMessage(getErrorMessage('URL is required field.'));
@@ -116,11 +116,13 @@ public class SettingsController {
         isSettingsValidated = false;
         isSettingsCorrect = false;
         isSaved = false;
-        settings = new Settings();
+    	if (settings == null) {
+    		settings = new Settings();
+    	}
     }
 
     private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
-    private boolean validateConnectionAndSource() {
+    public boolean validateConnectionAndSource() {
     	XMLDom xmlParser = new XMLDom();
 	    String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
 
@@ -171,6 +173,10 @@ public class SettingsController {
 
     public void setRequestor(IRequestor requestor) {
     	this.requestor = requestor;
+    }
+
+    public void setSettings(Settings settings) {
+    	this.settings = settings;
     }
 
     public List<SelectOption> getQueueList() {

@@ -26,7 +26,7 @@ private class V1PublisherTester {
     	V1Publisher.resetAllData();
     	// correct responce
     	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="21" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/Scope/1081" id="Scope:1081"><Attribute name="Name">CI</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1367" id="Scope:1367"><Attribute name="Name">Misha\'s project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1099" id="Scope:1099"><Attribute name="Name">Manual Hudson testing</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/0" id="Scope:1"><Attribute name="Name">System (All Projects)</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1675" id="Scope:1675"><Attribute name="Name">DefectTester</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1676" id="Scope:1676"><Attribute name="Name">DefectTester</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1082" id="Scope:1082"><Attribute name="Name">HudsonPlugin</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1202" id="Scope:1202"><Attribute name="Name">StoryTester</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1204" id="Scope:1204"><Attribute name="Name">StoryTester</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1443" id="Scope:1443"><Attribute name="Name">testAlina</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1349" id="Scope:1349"><Attribute name="Name">stanf</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1002" id="Scope:1002"><Attribute name="Name">DIR project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1457" id="Scope:1457"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1462" id="Scope:1462"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1467" id="Scope:1467"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1472" id="Scope:1472"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1477" id="Scope:1477"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1492" id="Scope:1492"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1542" id="Scope:1542"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1562" id="Scope:1562"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1008" id="Scope:1008"><Attribute name="Name">_Bugzilla test</Attribute></Asset></Assets>';
-        IRequestor requestor = new TestRequestor(body, 200);
+        IRequestor requestor = new RequestorMock(body, 200);
         Settings settings = new Settings();
         V1Publisher.setRequestor(requestor);
         V1Publisher.setSettings(settings);
@@ -41,7 +41,7 @@ private class V1PublisherTester {
     	V1Publisher.resetAllData();
         //incorrect responce
         Settings settings = new Settings();
-        IRequestor requestor = new TestRequestor('', 400);
+        IRequestor requestor = new RequestorMock('', 400);
         V1Publisher.setRequestor(requestor);
         V1Publisher.setSettings(settings);
 		try{
@@ -58,7 +58,7 @@ private class V1PublisherTester {
     static testMethod void correctCreatingLinkToSalesForceCaseTest() {
     	V1Publisher.resetAllData();
 
-    	IRequestor requestor = new TestRequestor('', 200);
+    	IRequestor requestor = new RequestorMock('', 200);
     	Settings settings = new Settings();
     	Integer defectId = 123;
     	String caseId = 'CaseId';
@@ -75,14 +75,14 @@ private class V1PublisherTester {
 					    '</Relation>' +
 					   '</Asset>';
 
-		System.assertEquals(((TestRequestor)requestor).getSentBody(0), body, 'Incorrect created body for POST.');
+		System.assertEquals(((RequestorMock)requestor).getSentBody(0), body, 'Incorrect created body for POST.');
     }
 
     static testMethod void incorrectCreatingLinkToSalesForceCaseTest() {
     	//test has to complete without any errors
     	V1Publisher.resetAllData();
 
-    	IRequestor requestor = new TestRequestor('', 400);
+    	IRequestor requestor = new RequestorMock('', 400);
     	Settings settings = new Settings();
     	Integer defectId = 123;
     	String caseId = 'CaseId';
@@ -103,7 +103,7 @@ private class V1PublisherTester {
 					    '</Relation>' +
 					   '</Asset>';
 
-		System.assertEquals(((TestRequestor)requestor).getSentBody(0), body, 'Incorrect created body for POST.');
+		System.assertEquals(((RequestorMock)requestor).getSentBody(0), body, 'Incorrect created body for POST.');
     }
 
     static testMethod void correctGetAlreadyExistedDefectsTest() {
@@ -124,7 +124,7 @@ private class V1PublisherTester {
 		String path = 'http://localhost/VersionOne';
 		String sourceName = 'TestSource';
 		Settings testSettings = Settings.getTestSettings();
-		IRequestor requestor = new TestRequestor(body, 200);
+		IRequestor requestor = new RequestorMock(body, 200);
 		V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
 
@@ -132,7 +132,7 @@ private class V1PublisherTester {
 		System.assertEquals(alreadyPorted.size(), 2, 'Error! Incorrect numbers of found defects.');
 		System.assert(alreadyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
 		System.assert(!alreadyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
-		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference&where=((Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\');Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(0), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
+		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference&where=((Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\');Source.Name="' + sourceName + '")', ((RequestorMock)requestor).getSentUrl(0), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
 		delete new Case[]{case1, case2, case3};
     }
 
@@ -154,7 +154,7 @@ private class V1PublisherTester {
 		String path = 'http://localhost/VersionOne';
 		String sourceName = 'TestSource';
 		Settings testSettings = Settings.getTestSettings();
-		IRequestor requestor = new TestRequestor(body, 400);
+		IRequestor requestor = new RequestorMock(body, 400);
 		V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
 
@@ -173,7 +173,7 @@ private class V1PublisherTester {
     	//ISettings settings = new TestSettings(sourceName);
     	Settings testSettings = Settings.getTestSettings();
     	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
-		IRequestor requestor = new TestRequestor(body, 200);
+		IRequestor requestor = new RequestorMock(body, 200);
 		V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
 
@@ -188,7 +188,7 @@ private class V1PublisherTester {
     	//ISettings settings = new TestSettings(sourceName);
     	Settings testSettings = Settings.getTestSettings();
     	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
-		IRequestor requestor = new TestRequestor(body, 400);
+		IRequestor requestor = new RequestorMock(body, 400);
 		V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
 
@@ -203,7 +203,7 @@ private class V1PublisherTester {
     	//ISettings settings = new TestSettings(sourceName);
     	Settings testSettings = Settings.getTestSettings();
     	String body = '';
-		IRequestor requestor = new TestRequestor(body, 200, new Exception[]{new NullPointerException()});
+		IRequestor requestor = new RequestorMock(body, 200, new Exception[]{new NullPointerException()});
 		V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
 
@@ -240,13 +240,13 @@ private class V1PublisherTester {
 						'</Asset>';
     	//ISettings settings = new TestSettings(sourceName);
     	Settings testSettings = Settings.getTestSettings();
-    	IRequestor requestor = new TestRequestor(body, 200);
+    	IRequestor requestor = new RequestorMock(body, 200);
     	V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
 
     	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
 
-    	System.assertEquals(expectedSendBody, ((TestRequestor)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
+    	System.assertEquals(expectedSendBody, ((RequestorMock)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
     	//case 2
@@ -264,14 +264,14 @@ private class V1PublisherTester {
 								'<Asset idref="StorySource:' + sourceId + '"/>' +
 							'</Relation>' +
 						'</Asset>';
-    	requestor = new TestRequestor(body, 200);
+    	requestor = new RequestorMock(body, 200);
     	V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
     	caseData.Subject = '';
     	caseData.Description = '';
 
     	defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
-    	System.assertEquals(expectedSendBody, ((TestRequestor)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
+    	System.assertEquals(expectedSendBody, ((RequestorMock)requestor).getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
     	delete caseData;
@@ -286,7 +286,7 @@ private class V1PublisherTester {
     	Test.startTest();
 		insert caseData;
 		Test.stopTest();
-    	IRequestor requestor = new TestRequestor('', 400);
+    	IRequestor requestor = new RequestorMock('', 400);
     	V1Publisher.setRequestor(requestor);
 
     	Integer defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
@@ -305,7 +305,7 @@ private class V1PublisherTester {
 		Case caseData = new Case(Subject = caseName, Description = caseDescription);
     	Settings testSettings = Settings.getTestSettings();
     	Exception[] exceptions = new Exception[]{new VersionOneException('test error', '<html>error</html>')};
-    	IRequestor requestor = new TestRequestor(body, 200, exceptions);
+    	IRequestor requestor = new RequestorMock(body, 200, exceptions);
     	V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
 
@@ -315,7 +315,7 @@ private class V1PublisherTester {
 		System.debug('exceptionsCreateDefectInVersionOne: 2');
     	// ecxeption during creating defect in the VersionOne
     	exceptions = new Exception[]{new NullPointerException()};
-    	requestor = new TestRequestor(body, 200, exceptions);
+    	requestor = new RequestorMock(body, 200, exceptions);
     	V1Publisher.setRequestor(requestor);
 
     	defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
@@ -324,7 +324,7 @@ private class V1PublisherTester {
 		System.debug('exceptionsCreateDefectInVersionOne: 3');
     	// incorrect responce from the VersionOne during creating link to case in the VersionOne
     	exceptions = new Exception[]{null, new VersionOneException('test error', '<html>error</html>')};
-    	requestor = new TestRequestor(body, 200, exceptions);
+    	requestor = new RequestorMock(body, 200, exceptions);
     	V1Publisher.setRequestor(requestor);
 
     	defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
@@ -333,7 +333,7 @@ private class V1PublisherTester {
 		System.debug('exceptionsCreateDefectInVersionOne: 4');
     	// ecxeption during creating link to case in the VersionOne
     	exceptions = new Exception[]{null, new NullPointerException()};
-    	requestor = new TestRequestor(body, 200, exceptions);
+    	requestor = new RequestorMock(body, 200, exceptions);
     	V1Publisher.setRequestor(requestor);
 
     	defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
@@ -372,56 +372,4 @@ private class V1PublisherTester {
 		System.assert(!result, 'Error! Defect has to be not found.');
     }
     */
-
-    public class TestRequestor implements IRequestor {
-    	private String responceBody;
-    	private Integer statusCode;
-    	private List<String> bodyForSend = new List<String>();
-    	private List<String> urlForSend = new List<String>();
-    	private Integer numberRequest = 0;
-    	private List<Exception> exceptions;
-
-		public TestRequestor(String body, Integer statusCode) {
-			this(body, statusCode, null);
-		}
-
-		public TestRequestor(String body, Integer statusCode, List<Exception> exceptions) {
-			this.responceBody = body;
-			this.statusCode = statusCode;
-			this.exceptions = exceptions;
-		}
-
-
-		public String getBody() {
-			return responceBody;
-		}
-
-		public Integer getStatusCode() {
-			return statusCode;
-    	}
-
-    	public String getSentBody(Integer i) {
-    		return bodyForSend.get(i);
-    	}
-
-    	public String getSentUrl(Integer i) {
-    		return urlForSend.get(i);
-    	}
-
-		public void request(HttpRequest request) {
-			System.debug('Call number:' + numberRequest);
-			if (exceptions != null && exceptions.get(numberRequest) != null) {
-				System.debug('Going to throw exception:' + exceptions.get(numberRequest));
-				throw exceptions.get(numberRequest);
-			}
-			numberRequest++;
-		}
-
-		public HttpRequest createRequest(String body, String additionUrl, String requestType) {
-			this.bodyForSend.add(body);
-			this.urlForSend.add(additionUrl);
-
-			return new HttpRequest();
-		}
-    }
 }
