@@ -66,7 +66,6 @@ public class SettingsController {
         System.debug('Path:' + Settings.getPath() + ', UserName:' + Settings.getUserName() + ', Password:' + Settings.getPassword());
         System.debug('testMessage=' + testMessage);
 
-
         isSettingsValidated = true;
         isSaved = false;
 
@@ -102,8 +101,10 @@ public class SettingsController {
         if (settings.getDestQueueId() == null) {
             ApexPages.addMessage(getErrorMessage('You must choose a Destination Queue.'));
             result = false;
+        } else if (settings.getDestQueueId() == settings.getSourceQueueId()) {
+            ApexPages.addMessage(getErrorMessage('Source and Destination Queue must be different.'));
+            result = false;
         }
-
         return result;
     }
 

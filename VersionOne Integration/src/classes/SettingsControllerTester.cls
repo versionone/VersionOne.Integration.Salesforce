@@ -15,7 +15,7 @@ private class SettingsControllerTester {
         settingsData.setUserName('user');
         settingsData.setSource('source');
         settingsData.setSourceQueueId('78234612347614298476');
-        settingsData.setDestQueueId('78234612347614298476');
+        settingsData.setDestQueueId('235453764567567455345');
         settingsData.setCommentBody('test comment');
         controller.setSettings(settingsData);
         System.assert(controller.validateRequiredFields(), 'Incorrect reuslt when all required parameters is filled.');
@@ -37,7 +37,7 @@ private class SettingsControllerTester {
         //empty DestQueueId
         settingsData.setDestQueueId(null);
         System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when DestQueueId is empty.');
-        settingsData.setDestQueueId('78234612347614298476');
+        settingsData.setDestQueueId('43564657586587456745');
 
         //empty Comment
         settingsData.setCommentBody(null);
