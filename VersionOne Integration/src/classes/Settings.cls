@@ -55,6 +55,9 @@ public with sharing class Settings {
     }
 
     public void setPath(String path) {
+    	if (path != null && path != '' && !path.endsWith('/')) {
+    		path = path + '/';
+    	}
         this.path = path;
     }
 

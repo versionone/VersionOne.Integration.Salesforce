@@ -12,7 +12,7 @@ public class SettingsController {
     private transient IRequestor requestor;
 
     public PageReference saveSettings() {
-        if (!validateRequiredFields(settings)) {
+        if (!validateRequiredFields()) {
             isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
@@ -24,7 +24,7 @@ public class SettingsController {
         }
         System.debug('Save Settings');
         testMessage = '';
-        testMessage = '';
+        testSeverity = '';
         saveSeverity = 'info';
         saveMessage = 'Settings has been saved.';
         isSettingsValidated = false;
@@ -39,7 +39,7 @@ public class SettingsController {
     }
 
     public PageReference testSettings() {
-        if (!validateRequiredFields(settings)) {
+        if (!validateRequiredFields()) {
             isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
@@ -80,7 +80,7 @@ public class SettingsController {
     * Returns 	true  - if all requred fields are filled.
     *			false - if any of requred fields are not filled.
     **/
-    public static Boolean validateRequiredFields(Settings settings) {
+    public Boolean validateRequiredFields() {
         Boolean result = true;
         if (settings.getPath() == null || settings.getPath() == '') {
             ApexPages.addMessage(getErrorMessage('URL is required field.'));
@@ -109,10 +109,6 @@ public class SettingsController {
 
     private static ApexPages.Message getErrorMessage(String text) {
         return new ApexPages.Message(ApexPages.Severity.ERROR, text);
-    }
-
-    public String getGreeting() {
-        return 'Hello tester!';
     }
 
     public void initSettings() {
