@@ -113,15 +113,16 @@ public with sharing class Settings {
 
     public void updateSettings() {
         System.debug('update Settings');
-        mycs.Path__c = path;
-        System.debug('Path=' + mycs.Path__c);
-        mycs.UserName__c = userName;
-        mycs.Password__c = password;
-        mycs.Source__c = source;
-        mycs.EscalateQueueId__c = sourceQueueId;
-        mycs.AssignedQueueId__c = destQueueId;
-        mycs.CommentBody__c = commentBody;
-        update mycs;
+        if (mycs != null) {
+	        mycs.Path__c = path;
+	        mycs.UserName__c = userName;
+	        mycs.Password__c = password;
+	        mycs.Source__c = source;
+	        mycs.EscalateQueueId__c = sourceQueueId;
+	        mycs.AssignedQueueId__c = destQueueId;
+	        mycs.CommentBody__c = commentBody;
+	        update mycs;
+    	}
     }
 
     public String getCommentBody() {

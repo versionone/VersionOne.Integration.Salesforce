@@ -17,12 +17,12 @@ private class SettingsControllerTester {
         settingsData.setSourceQueueId('78234612347614298476');
         settingsData.setDestQueueId('235453764567567455345');
         settingsData.setCommentBody('test comment');
-        controller.setSettings(settingsData);
+        controller.settings = settingsData;
         System.assert(controller.validateRequiredFields(), 'Incorrect reuslt when all required parameters is filled.');
 
         //empty path
         settingsData.setPath('');
-        controller.setSettings(settingsData);
+        controller.settings = settingsData;
         result = controller.validateRequiredFields();
         System.assert(!result, 'Incorrect result when path is empty.');
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when path is empty.');
@@ -54,7 +54,7 @@ private class SettingsControllerTester {
 
         //empty source
         settingsData.setSource('');
-        controller.setSettings(settingsData);
+        controller.settings = settingsData;
         result = controller.validateRequiredFields();
         System.assertEquals(5, ApexPages.getMessages().size(), 'Incorrect number of errors when source is empty.');
         System.assert(!result, 'Incorrect result when source is empty.');
@@ -64,7 +64,7 @@ private class SettingsControllerTester {
 
         //empty path
         settingsData.setPath('');
-        controller.setSettings(settingsData);
+        controller.settings = settingsData;
         System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when path is empty.');
         settingsData.setPath('http://localhost');
     }
@@ -78,7 +78,7 @@ private class SettingsControllerTester {
         IRequestor requestor = new RequestorMock(body, 200);
 
         controller.setRequestor(requestor);
-        controller.setSettings(settingsData);
+        controller.settings = settingsData;
 
         controller.initSettings();
         System.assert(controller.validateConnectionAndSource(), 'Incorrect result of test.');
@@ -131,7 +131,7 @@ private class SettingsControllerTester {
         Settings settingsData = Settings.getTestSettings();
 
         controller.setRequestor(requestor);
-        controller.setSettings(settingsData);
+        controller.settings = settingsData;
 
         controller.testSettings();
         System.assert(!controller.isSettingsCorrect, 'Settings have to be not correct.');
@@ -171,5 +171,53 @@ private class SettingsControllerTester {
         System.assertEquals('Internal error:Script-thrown exception', controller.testMessage, 'Test message has to be not empty.');
         System.assertEquals('error', controller.testSeverity, 'Incorrect severity.');
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
+    }
+
+    static testMethod void saveSettingsTester() {
+    	// normal way
+        String userName = 'UserName';
+        String source = 'Source';
+        String path = 'http://localhost';
+        String destQueueId = 'destQueueId';
+        String sourceQueueId = 'sourceQueueId';
+        String body = '';
+        IRequestor requestor = new RequestorMock(body, 200);
+        SettingsController controller = new SettingsController();
+        Settings settingsData = Settings.getTestSettings();
+        settingsData.setPath(path);
+        settingsData.setUserName(userName);
+        settingsData.setSource(source);
+        settingsData.setDestQueueId(destQueueId);
+        settingsData.setSourceQueueId(sourceQueueId);
+
+        controller.setRequestor(requestor);
+        controller.settings = settingsData;
+        controller.isSettingsCorrect = true;
+
+        controller.saveSettings();
+
+        System.assert(controller.isSaved, 'Settings have to be saved.');
+        System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
+        System.assertEquals('Settings has been saved.', controller.saveMessage, 'Incorrect save message.');
+        System.assertEquals('info', controller.saveSeverity, 'Incorrect save severity.');
+        System.assertEquals('', controller.testMessage, 'Incorrect test message.');
+        System.assertEquals('', controller.testSeverity, 'Incorrect test severity.');
+
+        //settings was incorrect, and person submited data but hack or using mouse
+        controller.isSettingsCorrect = false;
+		controller.saveSettings();
+        System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when path is empty.');
+        System.assertEquals('Settings is not correct or was not validated.', ApexPages.getMessages()[0].getSummary(), 'Incorrect message when settings is not validated.');
+
+        // not all required fields filled
+        settingsData.setPath('');
+        controller.settings = settingsData;
+
+        controller.saveSettings();
+
+        System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
+        System.assert(!controller.isSettingsCorrect, 'Settings have to not be correct.');
+        System.assertEquals('', controller.testMessage, 'Incorrect test message.');
+
     }
 }

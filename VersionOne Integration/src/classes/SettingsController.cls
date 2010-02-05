@@ -177,10 +177,6 @@ public class SettingsController {
         this.requestor = requestor;
     }
 
-    public void setSettings(Settings settings) {
-        this.settings = settings;
-    }
-
     public List<SelectOption> getQueueList() {
         Group[] queues = V1CaseCollector.getQueuesList();
         List<SelectOption> options = new List<SelectOption>();
