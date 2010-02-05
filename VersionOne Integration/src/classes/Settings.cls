@@ -22,8 +22,8 @@ public with sharing class Settings {
                 mycs.Path__c = 'http://localhost/VersionOne/';
                 mycs.UserName__c = 'admin';
                 mycs.Password__c = 'admin';
-                mycs.EscalateQueueId__c = '0';
-                mycs.AssignedQueueId__c = '0';
+                mycs.EscalateQueueId__c = null;
+                mycs.AssignedQueueId__c = null;
                 mycs.Source__c = 'SalesForce';
                 mycs.CommentBody__c = 'Escalated to VersionOne';
                 insert mycs;
