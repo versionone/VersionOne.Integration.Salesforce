@@ -102,7 +102,7 @@ public class SettingsController {
             ApexPages.addMessage(getErrorMessage('You must choose a Destination Queue.'));
             result = false;
         } else if (settings.getDestQueueId() == settings.getSourceQueueId()) {
-            ApexPages.addMessage(getErrorMessage('Source and Destination Queue must be different.'));
+            ApexPages.addMessage(getErrorMessage('Source Queue and Destination Queue must be different.'));
             result = false;
         }
         return result;
@@ -177,7 +177,7 @@ public class SettingsController {
         this.requestor = requestor;
     }
 
-    public List<SelectOption> getQueueList() {
+    public static List<SelectOption> getQueueList() {
         Group[] queues = V1CaseCollector.getQueuesList();
         List<SelectOption> options = new List<SelectOption>();
         for(Group queue : queues) {

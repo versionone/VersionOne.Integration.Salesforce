@@ -1,6 +1,30 @@
 @isTest
 private class SettingsControllerTester {
 
+    static testMethod void getQueueListTest() {
+        String queueName = 'TestQueue';
+        Group queue1 = new Group(Type='Queue', Name=queueName+'1');
+        insert queue1;
+        Group queue2 = new Group(Type='Queue', Name=queueName+'2');
+        insert queue2;
+        Group queue3 = new Group(Name=queueName+'3');
+        insert queue3;
+        List<SelectOption> options = SettingsController.getQueueList();
+        assertContainsOption(queueName+'1', options, 'Wrong option 1');
+        assertContainsOption(queueName+'1', options, 'Wrong option 2');
+    }
+    
+    static void assertContainsOption(String name, List<SelectOption> actuals, String msg) {
+        Boolean contains = false;
+        for (SelectOption o : actuals) {
+            if (o.getLabel() == name) {
+                contains = true;
+                break;
+            }
+        }
+        System.assert(contains, msg + '\n  ' + name + ' not found in ' + actuals);
+    }
+    
     static testMethod void validateRequiredFieldsTest() {
         SettingsController controller = new SettingsController();
         Test.setCurrentPage(new PageReference('apex/Settings_page'));
