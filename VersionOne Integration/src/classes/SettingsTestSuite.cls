@@ -37,7 +37,7 @@ private class SettingsTestSuite {
     static testMethod void pathTest() {
         Settings s = new Settings();
         s.setPath('');
-        System.assertEquals('', s.getPath(), 'Wrong Path.');
+        System.assertEquals(null, s.getPath(), 'Wrong Path.');
         s.setPath('http://localhost');
         System.assertEquals('http://localhost/', s.getPath(), 'Wrong Path.');
         s.setPath('http://localhost/');

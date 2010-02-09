@@ -40,6 +40,12 @@ public with sharing class V1Publisher {
 		if (requestor == null) {
 			setRequestor(new Requestor(settings));
 		}
+		if (settings.getSource() == null || settings.getDestQueueId() == null ||
+			settings.getSourceQueueId() == null || settings.getPath() == null ||
+			settings.getUserName() == null || settings.getPath() == null) {
+			errorMessage('Incorrect settings.');
+			return;
+		}
 		String sourceId = findSourceId();
 		if (sourceId == null) {
 			errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');

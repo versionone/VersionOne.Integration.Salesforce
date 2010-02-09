@@ -125,6 +125,9 @@ public class SettingsController {
 
     private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
     public boolean validateConnectionAndSource() {
+    	if (settings.getSource() == null) {
+    		throw new VersionOneException('Incorrect source.', '');
+    	}
         XMLDom xmlParser = new XMLDom();
         String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
 
