@@ -80,20 +80,20 @@ public class SettingsController {
     *			false - if any of requred fields are not filled.
     **/
     public Boolean validateRequiredFields() {
-    	Map<String, String> requredData = new Map<String, String>();
-    	// key - value for verify on null, value - error, if value is null
-    	requredData.put(settings.getPath(), 'URL is required field.');
-    	requredData.put(settings.getUserName(), 'User name is required field.');
-    	requredData.put(settings.getSource(), 'Source is required field.');
-    	requredData.put(settings.getDestQueueId(), 'You must choose a Destination Queue.');
-    	requredData.put(settings.getSourceQueueId(), 'You must choose a Source Queue.');
+        Map<String, String> requredData = new Map<String, String>();
+        // key - value for verify on null, value - error, if value is null
+        requredData.put(settings.getPath(), 'URL is required field.');
+        requredData.put(settings.getUserName(), 'User name is required field.');
+        requredData.put(settings.getSource(), 'Source is required field.');
+        requredData.put(settings.getDestQueueId(), 'You must choose a Destination Queue.');
+        requredData.put(settings.getSourceQueueId(), 'You must choose a Source Queue.');
 
         Boolean result = true;
         for (String key : requredData.keySet()) {
-        	if (key == null) {
-        		ApexPages.addMessage(getErrorMessage(requredData.get(key)));
-        		result = false;
-        	}
+            if (key == null) {
+                ApexPages.addMessage(getErrorMessage(requredData.get(key)));
+                result = false;
+            }
         }
 
         /*
@@ -143,7 +143,7 @@ public class SettingsController {
     private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
     public boolean validateConnectionAndSource() {
         if (settings.getSource() == null) {
-          throw new VersionOneException('Incorrect source.', '');
+            throw new VersionOneException('Incorrect source.', '');
         }
         XMLDom xmlParser = new XMLDom();
         String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
