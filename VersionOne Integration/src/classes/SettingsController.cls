@@ -80,12 +80,27 @@ public class SettingsController {
     *			false - if any of requred fields are not filled.
     **/
     public Boolean validateRequiredFields() {
+    	Map<String, String> requredData = new Map<String, String>();
+    	// key - value for verify on null, value - error, if value is null
+    	requredData.put(settings.getPath(), 'URL is required field.');
+    	requredData.put(settings.getUserName(), 'User name is required field.');
+    	requredData.put(settings.getSource(), 'Source is required field.');
+    	requredData.put(settings.getDestQueueId(), 'You must choose a Destination Queue.');
+    	requredData.put(settings.getSourceQueueId(), 'You must choose a Source Queue.');
+
         Boolean result = true;
+        for (String key : requredData.keySet()) {
+        	if (key == null) {
+        		ApexPages.addMessage(getErrorMessage(requredData.get(key)));
+        		result = false;
+        	}
+        }
+
+        /*
         if (settings.getPath() == null || settings.getPath() == '') {
             ApexPages.addMessage(getErrorMessage('URL is required field.'));
             result = false;
         }
-        System.debug('UserName:' + settings.getUserName());
         if (settings.getSource() == null || settings.getSource() == '') {
             ApexPages.addMessage(getErrorMessage('Source is required field.'));
             result = false;
@@ -101,7 +116,9 @@ public class SettingsController {
         if (settings.getDestQueueId() == null) {
             ApexPages.addMessage(getErrorMessage('You must choose a Destination Queue.'));
             result = false;
-        } else if (settings.getDestQueueId() == settings.getSourceQueueId()) {
+        }
+        */
+        if (settings.getDestQueueId() == settings.getSourceQueueId()) {
             ApexPages.addMessage(getErrorMessage('Source Queue and Destination Queue must be different.'));
             result = false;
         }
@@ -132,7 +149,6 @@ public class SettingsController {
         String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
 
         //Send the request, and get a response
-        //requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
         requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
         System.debug('Responce code = ' + requestor.getStatusCode());
         System.debug('Responce body = ' + requestor.getBody());
@@ -140,7 +156,7 @@ public class SettingsController {
             xmlParser.parseFromString(requestor.getBody());
         }else if (requestor.getStatusCode() == 401){
             throw new VersionOneException('Credentials is not correct.', '');
-        }else if (requestor.getStatusCode() == 500){
+        }else if (requestor.getStatusCode() == 500 || requestor.getStatusCode() == 404){
             throw new VersionOneException('URL is not correct or VersionOne server has some problems at the moment.', '');
         }else {
             throw new VersionOneException('Problem with getting source from the VersionOne.', requestor.getBody());
@@ -154,27 +170,6 @@ public class SettingsController {
 
         throw new VersionOneException('Source setting is not correct.', '');
     }
-/*
-    public PageReference initPageAction() {
-        PageReference homePage= new PageReference('/home/test.jsp');
-        homePage.setRedirect(true);
-        return homePage;
-    }
-    */
-
-
-/*
-    public PageReference save() {
-        // Add the account to the database.
-        //insert settings;
-
-        // Send the user to the detail page for the new account.
-        //PageReference acctPage = new ApexPages.StandardController(settings).view();
-        //acctPage.setRedirect(true);
-
-        return new PageReference();
-    }
-    */
 
     public void setRequestor(IRequestor requestor) {
         this.requestor = requestor;

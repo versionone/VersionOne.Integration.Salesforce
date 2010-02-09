@@ -19,8 +19,7 @@ public class Requestor implements IRequestor {
 	**/
 	public void request(HttpRequest request) {
 		Http h = new Http();
-		HttpResponse res = h.send(request);//createRequest(body, url, requestType)
-		responce = res;
+		responce = h.send(request);
 	}
 
 
@@ -41,7 +40,6 @@ public class Requestor implements IRequestor {
 		}
 		System.debug('body=' + body);
 		System.debug('Url=' + settings.getPath() + additionUrl);
-		//req.setHeader('Content-Type', 'text/xml');
 		return req;
 	}
 
