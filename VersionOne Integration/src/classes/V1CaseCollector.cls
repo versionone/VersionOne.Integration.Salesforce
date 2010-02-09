@@ -27,6 +27,7 @@ public class V1CaseCollector {
             c.OwnerId = ownerId;
             if (fieldValues[i] != null) {
                 c.put(fieldName, fieldValues[i]);
+                System.debug('update ' + fieldName + ' field to '  + fieldValues[i]);
             }
             System.debug('AFTER CHANGE: ' + c);
         }

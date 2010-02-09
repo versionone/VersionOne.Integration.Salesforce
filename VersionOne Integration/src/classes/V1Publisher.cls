@@ -1,6 +1,5 @@
 //TODO
 // create parser for exceptions from the VersionOne, atm we just put xml to log
-// add handling exceptions to the errorMessage
 
 public with sharing class V1Publisher {
 
@@ -30,8 +29,6 @@ public with sharing class V1Publisher {
 	public static void resetAllData() {
 		projects = new Map<String, String>();
 		defaultProjectId = '0';
-		//settingsData = null;
-		//requestor = null;
 	}
 
 	@future (callout=true)
@@ -59,7 +56,18 @@ public with sharing class V1Publisher {
 			return;
 		} catch (Exception ex) {
 			errorMessage('Internal problems during getting existed defects from the VersionOne: ', ex);
+			return;
 		}
+		processCases(alreadyPortedCases, cases, sourceId);
+	}
+
+
+	/**
+	* Processes cases assigned to settings.getSourceQueueId() queue and update that cases
+	*
+	*
+	**/
+	public static void processCases(Map<String, Boolean> alreadyPortedCases, List<Case> cases, String sourceId) {
 		List<Case> processedCases = new List<Case>();
 		List<String> urls = new List<String>();
 		Integer maxPublishCases = 3; // we have restriction on 10 request by http.send
@@ -80,9 +88,10 @@ public with sharing class V1Publisher {
 				}
 			}
 		}
-		String dstQueue = settings.getDestQueueId();
-		V1CaseCollector.updateCases(processedCases, dstQueue, settings.getCommentBody(), settings.getV1Url(), urls);
+
+		V1CaseCollector.updateCases(processedCases, settings.getDestQueueId(), settings.getCommentBody(), settings.getV1Url(), urls);
 	}
+
 
 	/**
 	* Creates defect in the VersionOne and assign link to it
@@ -103,7 +112,6 @@ public with sharing class V1Publisher {
 									  '</Asset>';
 			System.debug('XML for create defect:' + createDefectBody);
 
-		    //requestor.doPost(createDefectBody, DEFECT_URL);
 		    requestor.request(requestor.createRequest(createDefectBody, DEFECT_URL, 'POST'));
 		} catch (VersionOneException ex) {
 			errorMessage(ex.getErrorMessage(), ex);
@@ -118,7 +126,6 @@ public with sharing class V1Publisher {
 	    } else {
 	    	errorMessage('Problem with creating new defect in the VersionOne' + requestor.getBody());
 	    	return -1;
-	    	//throw new VersionOneException('Problem with creating new defect in the VersionOne.', requestor.getBody());
 	    }
 
 		try {
@@ -140,13 +147,10 @@ public with sharing class V1Publisher {
 		XMLDom xmlParser = new XMLDom();
 
 	    //Send the request, and get a response
-	    //requestor.doGet('', SCOPE_URL);
 	    requestor.request(requestor.createRequest('', SCOPE_URL, 'GET'));
 	    if (requestor.getStatusCode() == 200) {
 			xmlParser.parseFromString(requestor.getBody());
 	    } else {
-	    	//errorMessage('Problem with getting projects from the VersionOne' + requestor.getBody());
-	    	//return;
 	    	throw new VersionOneException('Problem with getting projects from the VersionOne.', requestor.getBody());
 	    }
 		List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
@@ -192,10 +196,8 @@ public with sharing class V1Publisher {
 		XMLDom xmlParser = new XMLDom();
 
 		//Send the request, and get a response
-	    //requestor.doPost(body, LINK_URL);
 	    requestor.request(requestor.createRequest(body, LINK_URL, 'POST'));
 	    if (requestor.getStatusCode() != 200) {
-	    	//errorMessage('Problem to create link to case' + requestor.getBody());
 	    	throw new VersionOneException('Problem to create link to case', requestor.getBody());
 	    }
 
@@ -223,14 +225,11 @@ public with sharing class V1Publisher {
 	    }
 
 	    //Send the request, and get a response
-	    //requestor.doGet('', String.format(MULTI_DEFECT_CHECK_URL, new String[]{reference, escapedSourceName}));
 	    requestor.request(requestor.createRequest('', String.format(MULTI_DEFECT_CHECK_URL, new String[]{reference, escapedSourceName}), 'GET'));
 	    if (requestor.getStatusCode() == 200) {
 			xmlParser.parseFromString(requestor.getBody());
 	    } else {
 	    	throw new VersionOneException('Problem with getting data from the VersionOne', requestor.getBody());
-	    	//errorMessage('Problem with getting data from the VersionOne' + requestor.getBody());
-	    	//return true;
 	    }
 
 	    List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
@@ -240,41 +239,6 @@ public with sharing class V1Publisher {
 
 		return defectsInfo;
 	}
-
-	/**
-	* Was detect already created in the VersionOne.
-	*
-	* Returns  	true 	- already was created
-	*			false 	- was not created.
-	**/
-	/*
-	public static Boolean isDefectAlreadyExist(ISettings settings, String caseNumber) {
-		String sourceName = settings.getSource();
-		XMLDom xmlParser = new XMLDom();
-	    String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
-		try {
-		    //Send the request, and get a response
-		    requestor.doGet('', String.format(CHECK_DEFECT_URL, new String[]{caseNumber, escapedSourceName}));
-		    if (requestor.getStatusCode() == 200) {
-				xmlParser.parseFromString(requestor.getBody());
-		    } else {
-		    	throw new VersionOneException('Problem with getting data from the VersionOne', requestor.getBody());
-		    	//errorMessage('Problem with getting data from the VersionOne' + requestor.getBody());
-		    	//return true;
-		    }
-
-		    List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
-		    if (assetTags.size() > 0) {
-		    	return true;
-		    }
-
-		} catch (Exception ex) {
-			errorMessage('Getting defects failed: ' + ex);
-		}
-
-		return false;
-	}
-	*/
 
 	/**
 	* Finds source id by name from the settings.
@@ -287,7 +251,6 @@ public with sharing class V1Publisher {
 	    String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
 		try {
 		    //Send the request, and get a response
-		    //requestor.doGet('', String.format(SOURCE_URL, new String[]{escapedSourceName}));
 		    requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
 		    if (requestor.getStatusCode() == 200) {
 				xmlParser.parseFromString(requestor.getBody());
