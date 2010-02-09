@@ -40,9 +40,7 @@ public with sharing class V1Publisher {
 		if (requestor == null) {
 			setRequestor(new Requestor(settings));
 		}
-		if (settings.getSource() == null || settings.getDestQueueId() == null ||
-			settings.getSourceQueueId() == null || settings.getPath() == null ||
-			settings.getUserName() == null || settings.getPath() == null) {
+		if (!settings.isCorrect()) {
 			errorMessage('Incorrect settings.');
 			return;
 		}

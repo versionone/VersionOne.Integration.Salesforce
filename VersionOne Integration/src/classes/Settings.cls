@@ -148,4 +148,14 @@ public with sharing class Settings {
             commentBody = text;
         }
     }
+
+    /**
+    * Returns true if main attributes are not null
+    *
+    **/
+    public boolean isCorrect() {
+		return getSource() != null && getDestQueueId() != null &&
+			getSourceQueueId() != null && getPath() != null &&
+			getUserName() != null && getPath() != null;
+    }
 }
