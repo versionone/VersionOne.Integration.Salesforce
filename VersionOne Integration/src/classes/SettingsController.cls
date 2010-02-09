@@ -125,9 +125,9 @@ public class SettingsController {
 
     private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
     public boolean validateConnectionAndSource() {
-    	if (settings.getSource() == null) {
-    		throw new VersionOneException('Incorrect source.', '');
-    	}
+        if (settings.getSource() == null) {
+          throw new VersionOneException('Incorrect source.', '');
+        }
         XMLDom xmlParser = new XMLDom();
         String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
 
@@ -183,6 +183,7 @@ public class SettingsController {
     public static List<SelectOption> getQueueList() {
         Group[] queues = V1CaseCollector.getQueuesList();
         List<SelectOption> options = new List<SelectOption>();
+        options.add(new SelectOption('', '--None--'));
         for(Group queue : queues) {
             options.add(new SelectOption(queue.Id, queue.Name));
         }

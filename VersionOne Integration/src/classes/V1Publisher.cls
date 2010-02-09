@@ -89,7 +89,7 @@ public with sharing class V1Publisher {
 					Integer id = createDefectInVersionOne(caseData, projectId, sourceId);
 					if (id > 0) {
 						processedCases.add(caseData);
-						urls.add(settings.getPath()+ URL_TO_V1_TEMPLATE + id);
+						urls.add(settings.getPath() + URL_TO_V1_TEMPLATE + id);
 					}
 				}
 			}
@@ -97,7 +97,6 @@ public with sharing class V1Publisher {
 
 		V1CaseCollector.updateCases(processedCases, settings.getDestQueueId(), settings.getCommentBody(), settings.getV1Url(), urls);
 	}
-
 
 	/**
 	* Creates defect in the VersionOne and assign link to it
