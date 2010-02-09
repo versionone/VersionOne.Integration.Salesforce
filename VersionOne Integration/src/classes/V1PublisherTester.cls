@@ -103,6 +103,7 @@ private class V1PublisherTester {
 		String path = 'http://localhost/VersionOne';
 		String sourceName = 'TestSource';
 		Settings testSettings = Settings.getTestSettings();
+		testSettings.setSource(sourceName);
 		IRequestor requestor = new RequestorMock(body, 200);
 		V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
@@ -133,6 +134,7 @@ private class V1PublisherTester {
 		String path = 'http://localhost/VersionOne';
 		String sourceName = 'TestSource';
 		Settings testSettings = Settings.getTestSettings();
+		testSettings.setSource(sourceName);
 		IRequestor requestor = new RequestorMock(body, 400);
 		V1Publisher.setRequestor(requestor);
     	V1Publisher.setSettings(testSettings);
@@ -149,8 +151,8 @@ private class V1PublisherTester {
     	V1Publisher.resetAllData();
     	String sourceName = 'TestSource';
     	String sourceIdExpected = '1010';
-    	//ISettings settings = new TestSettings(sourceName);
     	Settings testSettings = Settings.getTestSettings();
+    	testSettings.setSource(sourceName);
     	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
 		IRequestor requestor = new RequestorMock(body, 200);
 		V1Publisher.setRequestor(requestor);
@@ -164,8 +166,8 @@ private class V1PublisherTester {
     	V1Publisher.resetAllData();
     	String sourceName = 'TestSource';
     	String sourceIdExpected = null;
-    	//ISettings settings = new TestSettings(sourceName);
     	Settings testSettings = Settings.getTestSettings();
+    	testSettings.setSource(sourceName);
     	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
 		IRequestor requestor = new RequestorMock(body, 400);
 		V1Publisher.setRequestor(requestor);
@@ -179,8 +181,8 @@ private class V1PublisherTester {
     	V1Publisher.resetAllData();
     	String sourceName = 'TestSource';
     	String sourceIdExpected = null;
-    	//ISettings settings = new TestSettings(sourceName);
     	Settings testSettings = Settings.getTestSettings();
+    	testSettings.setSource(sourceName);
     	String body = '';
 		IRequestor requestor = new RequestorMock(body, 200, new Exception[]{new NullPointerException()});
 		V1Publisher.setRequestor(requestor);

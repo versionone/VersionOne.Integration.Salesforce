@@ -13,7 +13,7 @@ private class SettingsControllerTester {
         assertContainsOption(queueName+'1', options, 'Wrong option 1');
         assertContainsOption(queueName+'1', options, 'Wrong option 2');
     }
-    
+
     static void assertContainsOption(String name, List<SelectOption> actuals, String msg) {
         Boolean contains = false;
         for (SelectOption o : actuals) {
@@ -24,7 +24,7 @@ private class SettingsControllerTester {
         }
         System.assert(contains, msg + '\n  ' + name + ' not found in ' + actuals);
     }
-    
+
     static testMethod void validateRequiredFieldsTest() {
         SettingsController controller = new SettingsController();
         Test.setCurrentPage(new PageReference('apex/Settings_page'));
@@ -100,6 +100,7 @@ private class SettingsControllerTester {
         String sourceIdExpected = '1010';
         String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
         IRequestor requestor = new RequestorMock(body, 200);
+        settingsData.setSource(sourceName);
 
         controller.setRequestor(requestor);
         controller.settings = settingsData;

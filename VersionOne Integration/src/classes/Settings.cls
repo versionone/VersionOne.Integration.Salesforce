@@ -45,8 +45,6 @@ public with sharing class Settings {
 
     public static Settings getTestSettings() {
          Settings settings = new Settings(null);
-         settings.setSource('TestSource');
-         settings.setPath('http://195.62.49.62:7001/VersionOne/');
          return settings;
     }
 
@@ -55,7 +53,10 @@ public with sharing class Settings {
     }
 
     public void setPath(String path) {
-    	if (path != null && path != '' && !path.endsWith('/')) {
+    	if (path == '') {
+    		path = null;
+    	}
+    	if (path != null && !path.endsWith('/')) {
     		path = path + '/';
     	}
         this.path = path;
@@ -66,7 +67,11 @@ public with sharing class Settings {
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+    	if (userName == '') {
+    		this.userName = null;
+    	} else {
+        	this.userName = userName;
+    	}
     }
 
     public String getPassword() {
@@ -74,7 +79,7 @@ public with sharing class Settings {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+		this.password = password;
     }
 
     public String getSourceQueueId() {
@@ -82,10 +87,11 @@ public with sharing class Settings {
     }
 
     public void setSourceQueueId(String id) {
-        if (id == '')
+        if (id == '') {
             sourceQueueId = null;
-        else
+        } else {
             sourceQueueId = id;
+        }
     }
 
     public String getDestQueueId() {
@@ -93,10 +99,11 @@ public with sharing class Settings {
     }
 
     public void setDestQueueId(String id) {
-        if (id == '')
+        if (id == '') {
             destQueueId = null;
-        else
+        } else {
             destQueueId = id;
+        }
     }
 
     public String getSource() {
@@ -104,7 +111,11 @@ public with sharing class Settings {
     }
 
     public void setSource(String source) {
-        this.source = source;
+    	if (source == '') {
+        	this.source = null;
+    	} else {
+    		this.source = source;
+    	}
     }
 
     public String getV1Url() {
@@ -130,9 +141,10 @@ public with sharing class Settings {
     }
 
     public void setCommentBody(String text) {
-        if (text == '')
+        if (text == '') {
             commentBody = null;
-        else
+        } else {
             commentBody = text;
+        }
     }
 }
