@@ -19,12 +19,12 @@ public with sharing class Settings {
 
             if(mycs == null) {
                 mycs = new V1Settings__c(Name = settingsName);
-                mycs.Path__c = 'http://localhost/VersionOne/';
+                mycs.Path__c = 'http://example.com/VersionOne/';
                 mycs.UserName__c = 'admin';
-                mycs.Password__c = 'admin';
-                mycs.EscalateQueueId__c = null;
-                mycs.AssignedQueueId__c = null;
-                mycs.Source__c = 'SalesForce';
+                //mycs.Password__c = 'admin';
+                //mycs.EscalateQueueId__c = null;
+                //mycs.AssignedQueueId__c = null;
+                //mycs.Source__c = 'SalesForce';
                 mycs.CommentBody__c = 'Escalated to VersionOne';
                 insert mycs;
             }
@@ -53,12 +53,12 @@ public with sharing class Settings {
     }
 
     public void setPath(String path) {
-    	if (path == '') {
-    		path = null;
-    	}
-    	if (path != null && !path.endsWith('/')) {
-    		path = path + '/';
-    	}
+        if (path == '') {
+            path = null;
+        }
+        if (path != null && !path.endsWith('/')) {
+            path = path + '/';
+        }
         this.path = path;
     }
 
@@ -67,11 +67,11 @@ public with sharing class Settings {
     }
 
     public void setUserName(String userName) {
-    	if (userName == '') {
-    		this.userName = null;
-    	} else {
-        	this.userName = userName;
-    	}
+        if (userName == '') {
+            this.userName = null;
+        } else {
+            this.userName = userName;
+        }
     }
 
     public String getPassword() {
@@ -79,7 +79,7 @@ public with sharing class Settings {
     }
 
     public void setPassword(String password) {
-		this.password = password;
+        this.password = password;
     }
 
     public String getSourceQueueId() {
@@ -87,11 +87,10 @@ public with sharing class Settings {
     }
 
     public void setSourceQueueId(String id) {
-        if (id == '') {
+        if (id == '')
             sourceQueueId = null;
-        } else {
+        else
             sourceQueueId = id;
-        }
     }
 
     public String getDestQueueId() {
@@ -111,11 +110,11 @@ public with sharing class Settings {
     }
 
     public void setSource(String source) {
-    	if (source == '') {
-        	this.source = null;
-    	} else {
-    		this.source = source;
-    	}
+        if (source == '') {
+            this.source = null;
+        } else {
+            this.source = source;
+        }
     }
 
     public String getV1Url() {
@@ -125,15 +124,17 @@ public with sharing class Settings {
     public void updateSettings() {
         System.debug('update Settings');
         if (mycs != null) {
-	        mycs.Path__c = path;
-	        mycs.UserName__c = userName;
-	        mycs.Password__c = password;
-	        mycs.Source__c = source;
-	        mycs.EscalateQueueId__c = sourceQueueId;
-	        mycs.AssignedQueueId__c = destQueueId;
-	        mycs.CommentBody__c = commentBody;
-	        update mycs;
-    	}
+            mycs.Path__c = path;
+            mycs.UserName__c = userName;
+            mycs.Password__c = password;
+            mycs.Source__c = source;
+            mycs.EscalateQueueId__c = sourceQueueId;
+            mycs.AssignedQueueId__c = destQueueId;
+            mycs.CommentBody__c = commentBody;
+            update mycs;
+        } else {
+            //TODO Can be there?
+        }
     }
 
     public String getCommentBody() {

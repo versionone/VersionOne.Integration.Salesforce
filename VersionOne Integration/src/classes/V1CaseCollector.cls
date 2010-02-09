@@ -23,11 +23,11 @@ public class V1CaseCollector {
                                    String fieldName, List<Object> fieldValues) {
         for (Integer i = 0; i < cases.size(); i++){
             Case c = cases[i];
-            System.debug('BEFORE UPDATE: ' + c);
+            System.debug('BEFORE CHANGE: ' + c);
             c.OwnerId = ownerId;
             if (fieldValues[i] != null) {
                 c.put(fieldName, fieldValues[i]);
-                System.debug('update ' + fieldName + ' field to '  + fieldValues[i]);
+                System.debug('update ' + fieldName + ' field to ' + fieldValues[i]);
             }
             System.debug('AFTER CHANGE: ' + c);
         }
