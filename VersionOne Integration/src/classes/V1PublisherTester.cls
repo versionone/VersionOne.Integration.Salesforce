@@ -1,24 +1,3 @@
-/**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
- *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
- *
- * All test methods in an organization are executed whenever Apex code is deployed
- * to a production organization to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production organization. In addition, all triggers must have some code coverage.
- *
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the organization size limit for all Apex scripts.
- *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
- */
 @isTest
 private class V1PublisherTester {
 
@@ -238,7 +217,6 @@ private class V1PublisherTester {
 								'<Asset idref="StorySource:' + sourceId + '"/>' +
 							'</Relation>' +
 						'</Asset>';
-    	//ISettings settings = new TestSettings(sourceName);
     	Settings testSettings = Settings.getTestSettings();
     	IRequestor requestor = new RequestorMock(body, 200);
     	V1Publisher.setRequestor(requestor);
@@ -295,6 +273,7 @@ private class V1PublisherTester {
     }
 
 	static testMethod void exceptionsCreateDefectInVersionOne() {
+		V1Publisher.resetAllData();
 		System.debug('exceptionsCreateDefectInVersionOne: 1');
 		// incorrect responce from the VersionOne on any request during creation defect
     	String caseName = 'Test case';
@@ -339,37 +318,92 @@ private class V1PublisherTester {
     	defectId = V1Publisher.createDefectInVersionOne(caseData, productId, sourceId);
     	System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 	}
-/*
-    static testMethod void correctIsDefectAlreadyExistTest() {
-    	V1Publisher.resetAllData();
 
-		String caseNumber = '00012304';
-		String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/Defect/1051" id="Defect:1051"><Attribute name="Source.Name">SalesForce</Attribute><Attribute name="Reference">' + caseNumber + '</Attribute></Asset></Assets>';
-		String path = 'http://localhost/VersionOne';
-		String sourceName = 'TestSource';
-		ISettings settings = new TestSettings(sourceName);
-		IRequestor requestor = new TestRequestor(body, 200);
-		V1Publisher.setRequestor(requestor);
-		Boolean result = V1Publisher.isDefectAlreadyExist(settings, caseNumber);
+	static testMethod void processCasesTest() {
+		V1Publisher.resetAllData();
+		//prepare queue
+        String queueName = 'TestQueue1';
+        Group queue = new Group(Type='Queue', Name=queueName);
+        insert queue;
+        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+        insert sobj;
 
-		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference,Source.Name&where=(Reference="' + caseNumber + '";Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(), 'Incorrect created URL for defect request.');
-		System.assert(result, 'Error! Defect has to be found.');
+		System.runAs(createUser('test4356')){
+			//prepare cases
+			Case case1 = new Case(Subject = 'case1');
+			Case case2 = new Case(Subject = 'case2');
+			Case case3 = new Case(Subject = 'case3');
+			insert new Case[]{case1, case2, case3};
+			case1 = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case1.Id];
+			case2 = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case2.Id];
+			case3 = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case3.Id];
+
+			Map<String, Boolean> alreadyPortedCases = new Map<String, Boolean>();
+			alreadyPortedCases.put(case2.CaseNumber, true);
+			List<Case> cases = new Case[]{case1, case2, case3};
+
+			String defectId = '1699';
+			String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId +'/4596" id="Defect:' +defectId + ':4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
+			String sourceName = 'TestSource';
+			String sourceId = '1010';
+			String productId = '123';
+	    	String caseName = '<Test case>';
+	    	String caseDescription = 'Case for testing';
+	    	String path = 'http://localhost/';
+			String expectedSendBody = '<Asset>' +
+								'<Relation act="set" name="Scope">' +
+									'<Asset idref="Scope:' + productId + '"/>' +
+								'</Relation>' +
+								'<Attribute act="set" name="Name">&lt;Test case&gt;</Attribute>' +
+								'<Attribute act="set" name="Reference">' + case1.CaseNumber +'</Attribute>' +
+								'<Attribute act="set" name="Description">' + caseDescription + '</Attribute>' +
+								'<Relation act="set" name="Source">' +
+									'<Asset idref="StorySource:' + sourceId + '"/>' +
+								'</Relation>' +
+							'</Asset>';
+			String comment = 'test comment';
+			String additionPath = 'assetdetail.v1?oid=Defect%3a';
+	    	Settings testSettings = Settings.getTestSettings();
+	    	testSettings.setDestQueueId(queue.Id);
+	    	testSettings.setPath(path);
+	    	testSettings.setCommentBody(comment);
+	    	IRequestor requestor = new RequestorMock(body, 200);
+	    	V1Publisher.setRequestor(requestor);
+	    	V1Publisher.setSettings(testSettings);
+
+			V1Publisher.processCases(alreadyPortedCases, cases, sourceId);
+
+			Case newCase1 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case1.Id];
+			System.assertEquals(path + additionPath + defectId, newCase1.VersionOneUrl__c);
+			System.assertEquals(queue.Id, newCase1.OwnerId);
+			CaseComment newComment = [SELECT CommentBody FROM CaseComment where ParentId = :newCase1.Id];
+			System.assertEquals(comment, newComment.CommentBody);
+
+			Case newCase2 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case2.Id];
+			System.assertEquals(null, newCase2.VersionOneUrl__c);
+			System.assertEquals(queue.Id, newCase2.OwnerId);
+			CaseComment newComment2 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase2.Id];
+			System.assertEquals(comment, newComment2.CommentBody);
+
+			Case newCase3 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case3.Id];
+			System.assertEquals(path + additionPath + defectId, newCase3.VersionOneUrl__c);
+			System.assertEquals(queue.Id, newCase3.OwnerId);
+			CaseComment newComment3 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase3.Id];
+			System.assertEquals(comment, newComment2.CommentBody);
+		}
+	}
+
+    static User createUser(String alias) {
+        User user = new User();
+        user.Username = alias + '@not-a-mail.com';
+        user.LastName = alias;
+        user.Email = alias + '@not-a-mail.com';
+        user.alias = alias;
+        user.TimeZoneSidKey = 'America/New_York';
+        user.LocaleSidKey = 'en_US';
+        user.EmailEncodingKey = 'ISO-8859-1';
+        user.ProfileId = [select id from Profile where Name='System Administrator'].Id;
+        user.LanguageLocaleKey = 'en_US';
+        return user;
     }
-
-    static testMethod void correctIsDefectNotAlreadyExistTest() {
-    	V1Publisher.resetAllData();
-
-		String caseNumber = '00012304';
-		String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"></Assets>';
-		String path = 'http://localhost/VersionOne';
-		String sourceName = 'TestSource';
-		ISettings settings = new TestSettings(sourceName);
-		IRequestor requestor = new TestRequestor(body, 200);
-		V1Publisher.setRequestor(requestor);
-		Boolean result = V1Publisher.isDefectAlreadyExist(settings, caseNumber);
-
-		System.assertEquals('rest-1.v1/Data/Defect?sel=Reference,Source.Name&where=(Reference="' + caseNumber + '";Source.Name="' + sourceName + '")', ((TestRequestor)requestor).getSentUrl(), 'Incorrect created URL for defect request.');
-		System.assert(!result, 'Error! Defect has to be not found.');
-    }
-    */
 }
