@@ -3,7 +3,8 @@ global public class SyncSchedule implements Schedulable {
     public static final String CRON_EXP = '0 0 0 * * ?';
 
     global void execute(SchedulableContext sc) {
-        (new Syncronizer()).syncCases();
+    	Settings settings = new Settings();
+        (new Syncronizer(settings, new Requestor(settings))).syncCases();
     }
 
     public static void schedule() {
