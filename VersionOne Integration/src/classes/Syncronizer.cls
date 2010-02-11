@@ -16,7 +16,7 @@ public class Syncronizer {
     public void getClosedDefects() {
     	List<Case> closedCases = V1CaseCollector.getCasesByOwnerId(settings.getSourceQueueId(), true);
     	if (closedCases.size() == 0) {
-    		System.debug('There are no classes for close');
+    		System.debug('There are no cases for close');
     		return;
     	}
 

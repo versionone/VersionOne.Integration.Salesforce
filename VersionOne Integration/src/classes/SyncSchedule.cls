@@ -4,7 +4,7 @@ global public class SyncSchedule implements Schedulable {
     public static final String JOB_NAME = 'Sync with VersionOne Job';
 
     global void execute(SchedulableContext sc) {
-    	Settings settings = new Settings();
+        Settings settings = new Settings();
         (new Syncronizer(settings, new Requestor(settings))).syncCases();
     }
 
