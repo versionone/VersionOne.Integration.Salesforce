@@ -86,7 +86,6 @@ private class SettingsControllerTester {
         System.assertEquals('Source is required field.', ApexPages.getMessages()[4].getSummary(), 'Incorrect message when source is empty.');
         settingsData.setSource('source');
 
-
         //empty password
         settingsData.setPassword('');
         result = controller.validateRequiredFields();

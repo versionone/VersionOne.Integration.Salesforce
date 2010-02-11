@@ -158,7 +158,7 @@ public with sharing class V1Publisher {
 	    }
 		List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
 
-		Integer testId = 99999999;
+		Integer testId = 999999999;
 		for (XMLDom.Element assetTag : assetTags) {
 			String id = assetTag.getAttribute('id').split(':')[1];
 			if (testId > Integer.valueOf(id)) {

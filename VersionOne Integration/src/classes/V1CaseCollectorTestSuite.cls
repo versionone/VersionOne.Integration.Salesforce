@@ -92,4 +92,35 @@ private class V1CaseCollectorTestSuite {
         String queueId = V1CaseCollector.getQueueIdByName(queueName);
         System.assertEquals(queue.Id, queueId, 'Queue ID doesn\'t set');
     }
+
+    static testMethod void getCasesByOwnerIdTest() {
+        V1Publisher.resetAllData();
+        V1Publisher.setSettings(Settings.getTestSettings());
+        String queueName = 'TestQueue1';
+        Group queue = new Group(Type='Queue', Name=queueName);
+        insert queue;
+        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+        insert sobj;
+
+        System.runAs(createUser('test4356')){
+        	Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
+        	Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id);
+        	Case case3 = new Case(Subject='TestCase3', OwnerId = queue.Id);
+        	insert new Case[] {case1, case2, case3};
+
+        	Case[] cases = V1CaseCollector.getCasesByOwnerId(queue.Id);
+        	System.assertEquals(3, cases.size(), 'Incorrect numbers of cases.');
+
+        	case2.status = 'Closed';
+        	update case2;
+        	System.debug('case 2 status : ' + case2.status);
+        	Case[] newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, true);
+        	System.assertEquals(1, newCases.size(), 'Incorrect numbers of cases. One cases have to be closed');
+            assertContains(case2, newCases, 'Wrong owned case1.');
+        	newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, false);
+        	System.assertEquals(2, newCases.size(), 'Incorrect numbers of cases. Two classes have to be not closed');
+            assertContains(case1, newCases, 'Wrong owned case1.');
+            assertContains(case3, newCases, 'Wrong owned case1.');
+		}
+    }
 }

@@ -4,9 +4,24 @@ public class V1CaseCollector {
      * ownerId - ID of an owner.
      * Return: Array of cases.
      */
-    public static Case[] getCasesByOwnerId(String ownerId) {
-        Case[] cases = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject
-                          FROM Case WHERE OwnerId = :ownerId];
+	public static Case[] getCasesByOwnerId(String ownerId) {
+		return getCasesByOwnerId(ownerId, false);
+	}
+
+    /* Query cases with specified owner.
+     * ownerId - ID of an owner.
+     * isClosed - is case closed
+     * Return: Array of cases.
+     */
+    public static Case[] getCasesByOwnerId(String ownerId, Boolean isClosed) {
+        Case[] cases;
+        if (isClosed) {
+			cases = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject
+                          FROM Case WHERE OwnerId = :ownerId and Status = 'Closed'];
+		} else {
+			cases = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject
+                          FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed'];
+        }
         System.debug('==> getCasesByOwnerId() found: ' + cases.size());
         return cases;
     }
