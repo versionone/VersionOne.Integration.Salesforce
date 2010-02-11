@@ -122,6 +122,10 @@ public with sharing class Settings {
         return 'VersionOneUrl__c';
     }
 
+    public String getV1Project() {
+        return 'VersionOneProject__c';
+    }
+
     public void updateSettings() {
         System.debug('update Settings');
         if (mycs != null) {
@@ -155,8 +159,8 @@ public with sharing class Settings {
     *
     **/
     public boolean isCorrect() {
-		return getSource() != null && getDestQueueId() != null &&
-			getSourceQueueId() != null && getPath() != null &&
-			getUserName() != null && getPath() != null;
+        return getSource() != null && getDestQueueId() != null &&
+            getSourceQueueId() != null && getPath() != null &&
+            getUserName() != null && getPath() != null;
     }
 }

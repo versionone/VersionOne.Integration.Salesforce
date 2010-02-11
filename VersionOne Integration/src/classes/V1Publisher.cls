@@ -83,7 +83,7 @@ public with sharing class V1Publisher {
 			} else {
 				if (maxPublishCases > 0) {
 					maxPublishCases--;
-					String projectId = findProjectId(caseData.Product__c);
+					String projectId = findProjectId((String) caseData.get(settings.getV1Project()));
 					Integer id = createDefectInVersionOne(caseData, projectId, sourceId);
 					if (id > 0) {
 						processedCases.add(caseData);

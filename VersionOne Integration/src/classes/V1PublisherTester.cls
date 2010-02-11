@@ -336,9 +336,9 @@ private class V1PublisherTester {
 			Case case2 = new Case(Subject = 'case2');
 			Case case3 = new Case(Subject = 'case3');
 			insert new Case[]{case1, case2, case3};
-			case1 = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case1.Id];
-			case2 = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case2.Id];
-			case3 = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case3.Id];
+			case1 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case1.Id];
+			case2 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case2.Id];
+			case3 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case3.Id];
 
 			Map<String, Boolean> alreadyPortedCases = new Map<String, Boolean>();
 			alreadyPortedCases.put(case2.CaseNumber, true);
