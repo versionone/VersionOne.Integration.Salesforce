@@ -1,6 +1,6 @@
 public class V1CaseCollector {
 
-    /* Query cases with specified owner.
+    /* Query not closed cases with specified owner.
      * ownerId - ID of an owner.
      * Return: Array of cases.
      */
@@ -10,7 +10,9 @@ public class V1CaseCollector {
 
     /* Query cases with specified owner.
      * ownerId - ID of an owner.
-     * isClosed - is case closed
+     * isClosed - is case closed.
+     *			true  - gather only not closed cases
+     *			false - gather only closed cases
      * Return: Array of cases.
      */
     public static Case[] getCasesByOwnerId(String ownerId, Boolean isClosed) {

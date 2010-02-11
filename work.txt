@@ -5,13 +5,14 @@ add the following fileds:
 Path - URL maxlength 255
 UserName - Text maxlength=20
 Password - Text maxlength=20
-Added [28.01.2010]
+	Added [28.01.2010]
 Source - Text maxlength=30
 EscalateQueueId - Text
 AssignedQueueId - Text
-UrlV1Field - Text -                NEED TO REMOVE
-added [03.02.2010]
+	added [03.02.2010]
 commentBody - Text Area
+	added [11.02.2010]
+V1SourceId	- Text
 ----------------------
 Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
 ----------------------
