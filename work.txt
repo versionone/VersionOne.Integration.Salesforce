@@ -18,11 +18,10 @@ Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
 ----------------------
 Create queue with "Assigned to VersionOne" name.
 
-Create products with names of V1 Projects (Setup>Cases>Fields>Case Custom Fields & Relationships>Product>Edit)
-
 Allow access to V1 Server (Setup>Administration Setup>Security Controls>Remote Site Settings)
 ----------------------
 Add new field(type is URL) to case Setup>Customize>Cases>Fields with field name VersionOneUrl
+Add new custom field with name VersionOneProject (PickList) and add projects names as values.
 ----------------------
 Add new tab(Setup>Create>Tabs>Visualforce Tabs) and assign V1Settings page
 

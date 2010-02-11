@@ -18,10 +18,10 @@ public class V1CaseCollector {
     public static Case[] getCasesByOwnerId(String ownerId, Boolean isClosed) {
         Case[] cases;
         if (isClosed) {
-			cases = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject
+			cases = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject
                           FROM Case WHERE OwnerId = :ownerId and Status = 'Closed'];
 		} else {
-			cases = [SELECT id, OwnerId, CaseNumber, Description, Product__c, Subject
+			cases = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject
                           FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed'];
         }
         System.debug('==> getCasesByOwnerId() found: ' + cases.size());
