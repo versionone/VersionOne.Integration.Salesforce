@@ -36,8 +36,11 @@
 				</apex:pageBlockSectionItem>
 				<apex:pageBlockSectionItem >
 					<apex:outputLabel value="Password" for="Password" />
-					<apex:inputSecret value="{!settings.Password}" size="40"
-						id="Password" tabindex="3" onkeydown="disableSaveButtons()" onchange="disableSaveButtons()" maxlength="20"/>
+					<apex:outputPanel styleClass="requiredInput" layout="block">
+						<apex:outputPanel styleClass="requiredBlock" layout="block"/>
+						<apex:inputSecret value="{!settings.Password}" size="40"
+							id="Password" tabindex="3" onkeydown="disableSaveButtons()" onchange="disableSaveButtons()" maxlength="20"/>
+					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
 				<apex:pageBlockSectionItem >
 					<apex:outputLabel value="Source" for="Source" />

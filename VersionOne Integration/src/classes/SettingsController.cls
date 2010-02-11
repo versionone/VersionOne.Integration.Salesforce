@@ -16,6 +16,7 @@ public class SettingsController {
             isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
+            isSaved = false;
             return null;
         }
         if (!isSettingsCorrect) {
@@ -87,6 +88,7 @@ public class SettingsController {
         requredData.put(settings.getSource(), 'Source is required field.');
         requredData.put(settings.getDestQueueId(), 'You must choose a Destination Queue.');
         requredData.put(settings.getSourceQueueId(), 'You must choose a Source Queue.');
+        requredData.put(settings.getPassword(), 'Password is required field.');
 
         Boolean result = true;
         for (String key : requredData.keySet()) {

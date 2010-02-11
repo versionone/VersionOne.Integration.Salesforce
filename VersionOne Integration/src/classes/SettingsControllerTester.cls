@@ -41,6 +41,7 @@ private class SettingsControllerTester {
         settingsData.setSourceQueueId('78234612347614298476');
         settingsData.setDestQueueId('235453764567567455345');
         settingsData.setCommentBody('test comment');
+        settingsData.setPassword('password');
         controller.settings = settingsData;
         System.assert(controller.validateRequiredFields(), 'Incorrect reuslt when all required parameters is filled.');
 
@@ -85,6 +86,14 @@ private class SettingsControllerTester {
         System.assertEquals('Source is required field.', ApexPages.getMessages()[4].getSummary(), 'Incorrect message when source is empty.');
         settingsData.setSource('source');
 
+
+        //empty password
+        settingsData.setPassword('');
+        result = controller.validateRequiredFields();
+        System.assertEquals(6, ApexPages.getMessages().size(), 'Incorrect number of errors when user name is empty.');
+        System.assert(!result, 'Incorrect result when password is empty.');
+		System.assertEquals('Password is required field.', ApexPages.getMessages()[5].getSummary(), 'Incorrect message when user name is empty.');
+		settingsData.setUserName('password');
 
         //empty path
         settingsData.setPath('');
@@ -169,6 +178,7 @@ private class SettingsControllerTester {
         settingsData.setSource(source);
         settingsData.setDestQueueId(destQueueId);
         settingsData.setSourceQueueId(sourceQueueId);
+        settingsData.setPassword('password');
         controller.testSettings();
 
         System.assert(controller.isSettingsCorrect, 'Settings have to be correct.');
@@ -205,6 +215,7 @@ private class SettingsControllerTester {
         String path = 'http://localhost';
         String destQueueId = 'destQueueId';
         String sourceQueueId = 'sourceQueueId';
+        String password = 'password';
         String body = '';
         IRequestor requestor = new RequestorMock(body, 200);
         SettingsController controller = new SettingsController();
@@ -214,6 +225,7 @@ private class SettingsControllerTester {
         settingsData.setSource(source);
         settingsData.setDestQueueId(destQueueId);
         settingsData.setSourceQueueId(sourceQueueId);
+        settingsData.setPassword(password);
 
         controller.setRequestor(requestor);
         controller.settings = settingsData;

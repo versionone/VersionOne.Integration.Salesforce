@@ -28,10 +28,6 @@ public with sharing class Settings {
                 mycs.CommentBody__c = 'Escalated to VersionOne';
                 insert mycs;
             }
-            // just some hardcode till we don't have UI for settings
-            //mycs.Path__c = 'http://195.62.49.62:7001/VersionOne/';
-            //mycs.Source__c = 'SalesForce';
-            //\\
 
             path = mycs.Path__c;
             userName = mycs.UserName__c;
@@ -79,7 +75,11 @@ public with sharing class Settings {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+    	if (password == '') {
+        	this.password = null;
+    	} else {
+    		this.password = password;
+    	}
     }
 
     public String getSourceQueueId() {
@@ -87,10 +87,11 @@ public with sharing class Settings {
     }
 
     public void setSourceQueueId(String id) {
-        if (id == '')
+        if (id == '') {
             sourceQueueId = null;
-        else
+        } else {
             sourceQueueId = id;
+        }
     }
 
     public String getDestQueueId() {
