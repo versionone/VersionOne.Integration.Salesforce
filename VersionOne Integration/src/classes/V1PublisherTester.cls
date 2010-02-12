@@ -147,6 +147,7 @@ private class V1PublisherTester {
         }
     }
 
+/*
     static testMethod void correctFindSourceId() {
         V1Publisher.resetAllData();
         String sourceName = 'TestSource';
@@ -191,7 +192,7 @@ private class V1PublisherTester {
         String sourceId = V1Publisher.findSourceId();
         System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
-
+*/
     static testMethod void correctCreateDefectInVersionOne() {
         V1Publisher.resetAllData();
         //data preparation
