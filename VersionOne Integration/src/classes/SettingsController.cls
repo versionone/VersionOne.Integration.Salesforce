@@ -1,5 +1,7 @@
 public class SettingsController {
 
+	private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
+
     public String testSeverity{ get; set; }
     public String saveSeverity{ get; set; }
     public String testMessage{ get; set; }
@@ -23,6 +25,15 @@ public class SettingsController {
             ApexPages.addMessage(getErrorMessage('Settings is not correct or was not validated.'));
             return null;
         }
+        String sourceId = getSourceId();
+        if (sourceId == null) {
+            isSettingsCorrect = false;
+            isSettingsValidated = false;
+            testMessage = '';
+            isSaved = false;
+        	return null;
+        }
+        settings.setSourceId(sourceId);
         System.debug('Save Settings');
         testMessage = '';
         testSeverity = '';
@@ -46,9 +57,7 @@ public class SettingsController {
             testMessage = '';
             return null;
         }
-        if (requestor == null) {
-            requestor = new Requestor(settings);
-        }
+
         try {
             validateConnectionAndSource();
             testSeverity = 'info';
@@ -98,28 +107,6 @@ public class SettingsController {
             }
         }
 
-        /*
-        if (settings.getPath() == null || settings.getPath() == '') {
-            ApexPages.addMessage(getErrorMessage('URL is required field.'));
-            result = false;
-        }
-        if (settings.getSource() == null || settings.getSource() == '') {
-            ApexPages.addMessage(getErrorMessage('Source is required field.'));
-            result = false;
-        }
-        if (settings.getUserName() == null || settings.getUserName() == '') {
-            ApexPages.addMessage(getErrorMessage('User name is required field.'));
-            result = false;
-        }
-        if (settings.getSourceQueueId() == null) {
-            ApexPages.addMessage(getErrorMessage('You must choose a Source Queue.'));
-            result = false;
-        }
-        if (settings.getDestQueueId() == null) {
-            ApexPages.addMessage(getErrorMessage('You must choose a Destination Queue.'));
-            result = false;
-        }
-        */
         if (settings.getDestQueueId() == settings.getSourceQueueId()) {
             ApexPages.addMessage(getErrorMessage('Source Queue and Destination Queue must be different.'));
             result = false;
@@ -142,13 +129,24 @@ public class SettingsController {
         }
     }
 
-    private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
     public boolean validateConnectionAndSource() {
         if (settings.getSource() == null) {
             throw new VersionOneException('Incorrect source.', '');
         }
+
+        if (getSourceId() != null) {
+            return true;
+        }
+
+        throw new VersionOneException('Source setting is not correct.', '');
+    }
+
+    public String getSourceId() {
         XMLDom xmlParser = new XMLDom();
         String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
+		if (requestor == null) {
+            requestor = new Requestor(settings);
+        }
 
         //Send the request, and get a response
         requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
@@ -165,12 +163,11 @@ public class SettingsController {
         }
 
         XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
-        System.debug('findSourceId respond = ' + xmlParser.toXmlString());
-        if (assetTag != null) {
-            return true;
-        }
+		if (assetTag != null) {
+	    	return assetTag.getAttribute('id').split(':')[1];
+	    }
 
-        throw new VersionOneException('Source setting is not correct.', '');
+	    return null;
     }
 
     public void setRequestor(IRequestor requestor) {

@@ -44,7 +44,7 @@ public with sharing class V1Publisher {
             errorMessage('Incorrect settings.');
             return;
         }
-        String sourceId = findSourceId();
+        String sourceId = Settings.getSourceId();//findSourceId();
         if (sourceId == null) {
             errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
             return;
@@ -241,36 +241,6 @@ public with sharing class V1Publisher {
         }
 
         return defectsInfo;
-    }
-
-    /**
-    * Finds source id by name from the settings.
-    *
-    * Returns	id 		- if source was found
-    *			null	- if source was not found
-    **/
-    public static String findSourceId() {
-        XMLDom xmlParser = new XMLDom();
-        String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
-        try {
-            //Send the request, and get a response
-            requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
-            if (requestor.getStatusCode() == 200) {
-                xmlParser.parseFromString(requestor.getBody());
-            } else {
-                errorMessage('Problem with getting source from the VersionOne' + requestor.getBody());
-                return null;
-            }
-
-            XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
-            System.debug('findSourceId respond = ' + xmlParser.toXmlString());
-            if (assetTag != null) {
-                return assetTag.getAttribute('id').split(':')[1];
-            }
-        } catch (Exception ex) {
-            errorMessage('Getting source Id  failed: ' + ex);
-        }
-        return null;
     }
 
     public static Map<String, String> getProjects() {

@@ -5,6 +5,7 @@ public with sharing class Settings {
     private String userName;
     private String password;
     private String source;
+    private String sourceId;
     private String sourceQueueId;
     private String destQueueId;
     private String commentBody;
@@ -34,6 +35,7 @@ public with sharing class Settings {
             password = mycs.Password__c;
             commentBody = mycs.commentBody__c;
             source = mycs.Source__c;
+            sourceId = mycs.V1SourceId__c;
             sourceQueueId = mycs.EscalateQueueId__c;
             destQueueId = mycs.AssignedQueueId__c;
         }
@@ -118,6 +120,14 @@ public with sharing class Settings {
         }
     }
 
+    public String getSourceId() {
+    	return this.sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+		this.sourceId = sourceId;
+    }
+
     public String getV1Url() {
         return 'VersionOneUrl__c';
     }
@@ -136,6 +146,7 @@ public with sharing class Settings {
             mycs.EscalateQueueId__c = sourceQueueId;
             mycs.AssignedQueueId__c = destQueueId;
             mycs.CommentBody__c = commentBody;
+            mycs.V1SourceId__c = sourceId;
             update mycs;
         } else {
             //TODO Can be there?
@@ -161,6 +172,6 @@ public with sharing class Settings {
     public boolean isCorrect() {
         return getSource() != null && getDestQueueId() != null &&
             getSourceQueueId() != null && getPath() != null &&
-            getUserName() != null && getPath() != null;
+            getUserName() != null && getPath() != null && getSourceId() != null;
     }
 }
