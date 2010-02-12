@@ -25,7 +25,8 @@ Add new custom field with name VersionOneProject (PickList) and add projects nam
 ----------------------
 Add new tab(Setup>Create>Tabs>Visualforce Tabs) and assign V1Settings page
 
+[Scheduling]-------------------------------------------------------------------
+  To manualy create schrduled jobs one should use SyncSchedule class.
 
-
-[Notes]----------------------------------------------------------------------------
-***Integrated auth in V1 wasn't tested and likly don't works.
+[Authentication]----------------------------------------------------------------------------
+  Integrated auth in V1 wasn't tested and likly don't works.
