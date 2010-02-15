@@ -71,7 +71,7 @@ private class SyncronizerTester {
                           '</Assets>';
             Settings testSettings = Settings.getTestSettings();
             IRequestor testRequestor = new RequestorMock(xml, 200);
-            testSettings.setSourceQueueId(queueId);
+            testSettings.setDestQueueId(queueId);
             testSettings.setSourceId(sourceId);
             String expectedDate = '2009-10-20T09:57:33';
             testSettings.setLastDateChangeAsset(Datetime.newInstance(2009, 10, 20, 9, 57, 33));
