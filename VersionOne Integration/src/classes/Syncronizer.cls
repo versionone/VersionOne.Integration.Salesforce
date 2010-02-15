@@ -1,6 +1,6 @@
 public class Syncronizer {
     //StorySource%3a1009
-    private static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source=\'{0}\';Defect.AssetState=\'Closed\')';
+    private static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="{0}";Defect.AssetState="Closed"{1})';
     private final Settings settings;
     private final IRequestor requestor;
 
@@ -20,12 +20,15 @@ public class Syncronizer {
             return null;
         }
 
-        String sourceName = settings.getSource();
+        //String sourceName = settings.getSource();
         XMLDom xmlParser = new XMLDom();
         //String escapedSourceId = EncodingUtil.urlEncode('Source:' + settings.getSourceId(), 'UTF-8');// TODO change to source id
-
+        String dateRestriction = '';
+        if (settings.getLastDateChangeAsset() != null) {
+            dateRestriction = ';ChangeDateUTC>\'' +settings.getLastDateChangeAsset().format('yyyy-MM-dd\'T\'HH:mm:ss') + '\'';
+        }
         //Send the request, and get a response
-        requestor.request(requestor.createRequest('', String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId()}), 'GET'));
+        requestor.request(requestor.createRequest('', String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), dateRestriction}), 'GET'));
         if (requestor.getStatusCode() == 200) {
             xmlParser.parseFromString(requestor.getBody());
         } else {
@@ -33,10 +36,20 @@ public class Syncronizer {
         }
         List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
         List<String> references = new List<String>();
+        DateTime latestDate = settings.getLastDateChangeAsset();
         for (XMLDom.Element asset : assetTags) {
             String reference = getValue('Reference', asset.childNodes);
+            String changeDateUTC = getValue('ChangeDateUTC', asset.childNodes);
             references.add(reference);
-		}
+            DateTime testDate = convertToDateTime(changeDateUTC);
+            if (latestDate == null || testDate > latestDate) {
+                latestDate = testDate;
+			}
+        }
+        if (latestDate != settings.getLastDateChangeAsset()) {
+            settings.setLastDateChangeAsset(latestDate);
+            settings.updateSettings();
+        }
 
         return references;
     }
@@ -53,11 +66,11 @@ public class Syncronizer {
             System.debug('attibuteValue.equals(attributeValue)=' + attibuteValue.equals(attributeValue));
             if (attibuteValue != null && attibuteValue.equals(attributeValue)) {
                 return element.nodeValue;
-			}
-		}
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
     /**
     * Converts string with yyyy-MM-ddTHH:mm:ss.MMM format to DateTime object
@@ -65,7 +78,7 @@ public class Syncronizer {
     * if millisecont equals 0 - convert to yyyy-MM-ddTHH:mm:ss-1
     *
     **/
-    public DateTime convertToDateTime(String utcDate) {
+    public static DateTime convertToDateTime(String utcDate) {
         String[] dateTimeData = utcDate.split('T');
         String[] dateData = dateTimeData[0].split('-');
         String[] timeData = dateTimeData[1].split(':');
@@ -82,5 +95,5 @@ public class Syncronizer {
             second = secondAndMillisecond.intValue();
         }
         return DateTime.newInstance(year, month, day, hour, minutes, second);
-	}
+    }
 }

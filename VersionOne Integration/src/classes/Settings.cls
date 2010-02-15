@@ -9,6 +9,7 @@ public with sharing class Settings {
     private String sourceQueueId;
     private String destQueueId;
     private String commentBody;
+    private DateTime changeDateUTC;
     private String scheduleId;
 
     public Settings () {
@@ -39,6 +40,7 @@ public with sharing class Settings {
             sourceId = mycs.V1SourceId__c;
             sourceQueueId = mycs.EscalateQueueId__c;
             destQueueId = mycs.AssignedQueueId__c;
+            changeDateUTC = mycs.DateLastClosedAsset__c;
             scheduleId = mycs.scheduleId__c;
         }
     }
@@ -157,6 +159,7 @@ public with sharing class Settings {
             mycs.AssignedQueueId__c = destQueueId;
             mycs.CommentBody__c = commentBody;
             mycs.V1SourceId__c = sourceId;
+            mycs.DateLastClosedAsset__c = changeDateUTC;
             mycs.ScheduleId__c = scheduleId;
             update mycs;
         } else {
@@ -174,6 +177,14 @@ public with sharing class Settings {
         } else {
             commentBody = text;
         }
+    }
+
+    public void setLastDateChangeAsset(DateTime changeDateUTC) {
+    	this.changeDateUTC = changeDateUTC;
+    }
+
+    public DateTime getLastDateChangeAsset() {
+    	return this.changeDateUTC;
     }
 
     /**
