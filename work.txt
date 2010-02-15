@@ -2,17 +2,15 @@
 [15.01.2010]
 Create Custom Settings(Setup>Develop>Custom Settings) with "V1Settings" name.
 add the following fileds:
-Path - URL maxlength 255
-UserName - Text maxlength=20
-Password - Text maxlength=20
-	Added [28.01.2010]
-Source - Text maxlength=30
-EscalateQueueId - Text
-AssignedQueueId - Text
-	added [03.02.2010]
-commentBody - Text Area
-	added [11.02.2010]
-V1SourceId	- Text
+  Path 		- URL maxlength 255
+  UserName 	- Text maxlength=20
+  Password 	- Text maxlength=20
+  Source 		- Text maxlength=30
+  EscalateQueueId 	- Text(18)
+  AssignedQueueId 	- Text(18)
+  commentBody 	- Text Area(255)
+  V1SourceId	- Text(4?)
+  ScheduleId	- Text(18) 
 ----------------------
 Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
 ----------------------

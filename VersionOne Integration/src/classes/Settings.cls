@@ -9,6 +9,7 @@ public with sharing class Settings {
     private String sourceQueueId;
     private String destQueueId;
     private String commentBody;
+    private String scheduleId;
 
     public Settings () {
         this('V1Settings');
@@ -38,6 +39,7 @@ public with sharing class Settings {
             sourceId = mycs.V1SourceId__c;
             sourceQueueId = mycs.EscalateQueueId__c;
             destQueueId = mycs.AssignedQueueId__c;
+            scheduleId = mycs.scheduleId__c;
         }
     }
 
@@ -77,11 +79,11 @@ public with sharing class Settings {
     }
 
     public void setPassword(String password) {
-    	if (password == '') {
-        	this.password = null;
-    	} else {
-    		this.password = password;
-    	}
+        if (password == '') {
+            this.password = null;
+        } else {
+            this.password = password;
+        }
     }
 
     public String getSourceQueueId() {
@@ -121,11 +123,19 @@ public with sharing class Settings {
     }
 
     public String getSourceId() {
-    	return this.sourceId;
+        return this.sourceId;
     }
 
     public void setSourceId(String sourceId) {
-		this.sourceId = sourceId;
+        this.sourceId = sourceId;
+    }
+
+    public String getScheduleId() {
+        return this.scheduleId;
+    }
+
+    public void setScheduleId(String scheduleId) {
+        this.scheduleId = scheduleId;
     }
 
     public String getV1Url() {
@@ -147,6 +157,7 @@ public with sharing class Settings {
             mycs.AssignedQueueId__c = destQueueId;
             mycs.CommentBody__c = commentBody;
             mycs.V1SourceId__c = sourceId;
+            mycs.ScheduleId__c = scheduleId;
             update mycs;
         } else {
             //TODO Can be there?
