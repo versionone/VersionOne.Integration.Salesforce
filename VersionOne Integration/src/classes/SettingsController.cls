@@ -1,6 +1,6 @@
 public class SettingsController {
 
-	private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
+    private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
 
     public String testSeverity{ get; set; }
     public String saveSeverity{ get; set; }
@@ -31,9 +31,13 @@ public class SettingsController {
             isSettingsValidated = false;
             testMessage = '';
             isSaved = false;
-        	return null;
+            return null;
         }
         settings.setSourceId(sourceId);
+        if (settings.getScheduleId() == null) {
+            String id = SyncSchedule.addSchedule();
+            settings.setScheduleId(id);
+        }
         System.debug('Save Settings');
         testMessage = '';
         testSeverity = '';
@@ -144,7 +148,7 @@ public class SettingsController {
     public String getSourceId() {
         XMLDom xmlParser = new XMLDom();
         String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
-		if (requestor == null) {
+        if (requestor == null) {
             requestor = new Requestor(settings);
         }
 
@@ -163,11 +167,11 @@ public class SettingsController {
         }
 
         XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
-		if (assetTag != null) {
-	    	return assetTag.getAttribute('id').split(':')[1];
-	    }
+        if (assetTag != null) {
+            return assetTag.getAttribute('id').split(':')[1];
+        }
 
-	    return null;
+        return null;
     }
 
     public void setRequestor(IRequestor requestor) {
