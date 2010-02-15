@@ -74,8 +74,8 @@ private class SettingsControllerTester {
         result = controller.validateRequiredFields();
         System.assertEquals(4, ApexPages.getMessages().size(), 'Incorrect number of errors when user name is empty.');
         System.assert(!result, 'Incorrect result when user name is empty.');
-		System.assertEquals('User name is required field.', ApexPages.getMessages()[3].getSummary(), 'Incorrect message when user name is empty.');
-		settingsData.setUserName('user');
+        System.assertEquals('User name is required field.', ApexPages.getMessages()[3].getSummary(), 'Incorrect message when user name is empty.');
+        settingsData.setUserName('user');
 
         //empty source
         settingsData.setSource('');
@@ -91,8 +91,8 @@ private class SettingsControllerTester {
         result = controller.validateRequiredFields();
         System.assertEquals(6, ApexPages.getMessages().size(), 'Incorrect number of errors when user name is empty.');
         System.assert(!result, 'Incorrect result when password is empty.');
-		System.assertEquals('Password is required field.', ApexPages.getMessages()[5].getSummary(), 'Incorrect message when user name is empty.');
-		settingsData.setUserName('password');
+        System.assertEquals('Password is required field.', ApexPages.getMessages()[5].getSummary(), 'Incorrect message when user name is empty.');
+        settingsData.setUserName('password');
 
         //empty path
         settingsData.setPath('');
@@ -208,7 +208,7 @@ private class SettingsControllerTester {
     }
 
     static testMethod void saveSettingsTester() {
-    	// normal way
+        // normal way
         String userName = 'UserName';
         String source = 'Source';
         String path = 'http://localhost';
@@ -240,6 +240,12 @@ private class SettingsControllerTester {
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
         System.assertEquals('', controller.testSeverity, 'Incorrect test severity.');
 
+        String scheduleId = settingsData.getScheduleId();
+        System.assert(scheduleId != null , 'Schedule have to be created.');
+        System.assert(SyncSchedule.unschedule(scheduleId), 'Schedule don\'t exist.');
+        settingsData.setScheduleId('');
+        System.assert(settingsData.getScheduleId() == null , 'Schedule ID have to be null.');
+
         //no source id
         body = '';
         requestor = new RequestorMock(body, 200);
@@ -253,7 +259,7 @@ private class SettingsControllerTester {
 
         //settings was incorrect, and person submited data by hack
         controller.isSettingsCorrect = false;
-		controller.saveSettings();
+        controller.saveSettings();
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when path is empty.');
         System.assertEquals('Settings is not correct or was not validated.', ApexPages.getMessages()[0].getSummary(), 'Incorrect message when settings is not validated.');
 
@@ -269,88 +275,88 @@ private class SettingsControllerTester {
     }
 
     static testMethod void correctGetSourceIdTester() {
-    	V1Publisher.resetAllData();
-    	String sourceName = 'TestSource';
-    	String sourceIdExpected = '1010';
-    	Settings testSettings = Settings.getTestSettings();
-    	testSettings.setSource(sourceName);
-    	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
-		IRequestor requestor = new RequestorMock(body, 200);
+        V1Publisher.resetAllData();
+        String sourceName = 'TestSource';
+        String sourceIdExpected = '1010';
+        Settings testSettings = Settings.getTestSettings();
+        testSettings.setSource(sourceName);
+        String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
+        IRequestor requestor = new RequestorMock(body, 200);
         SettingsController controller = new SettingsController();
-		controller.setRequestor(requestor);
+        controller.setRequestor(requestor);
         controller.settings = testSettings;
 
-    	String sourceId = controller.getSourceId();
-    	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
+        String sourceId = controller.getSourceId();
+        System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
     static testMethod void incorrectGetSourceIdTester() {
-    	V1Publisher.resetAllData();
-    	String sourceName = 'TestSource';
-    	String sourceIdExpected = null;
-    	Settings testSettings = Settings.getTestSettings();
-    	testSettings.setSource(sourceName);
-    	String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="0" pageSize="0" pageStart="0"></Assets>';
-		IRequestor requestor = new RequestorMock(body, 200);
+        V1Publisher.resetAllData();
+        String sourceName = 'TestSource';
+        String sourceIdExpected = null;
+        Settings testSettings = Settings.getTestSettings();
+        testSettings.setSource(sourceName);
+        String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="0" pageSize="0" pageStart="0"></Assets>';
+        IRequestor requestor = new RequestorMock(body, 200);
         SettingsController controller = new SettingsController();
-		controller.setRequestor(requestor);
+        controller.setRequestor(requestor);
         controller.settings = testSettings;
 
-    	String sourceId = controller.getSourceId();
-    	System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
+        String sourceId = controller.getSourceId();
+        System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
     static testMethod void exceptionsGetSourceIdTester() {
-    	V1Publisher.resetAllData();
-    	String sourceName = 'TestSource';
-    	String sourceIdExpected = null;
-    	Settings testSettings = Settings.getTestSettings();
-    	testSettings.setSource(sourceName);
-    	String body = '';
-		IRequestor requestor = new RequestorMock(body, 401);
+        V1Publisher.resetAllData();
+        String sourceName = 'TestSource';
+        String sourceIdExpected = null;
+        Settings testSettings = Settings.getTestSettings();
+        testSettings.setSource(sourceName);
+        String body = '';
+        IRequestor requestor = new RequestorMock(body, 401);
         SettingsController controller = new SettingsController();
-		controller.setRequestor(requestor);
+        controller.setRequestor(requestor);
         controller.settings = testSettings;
 
-		try {
-    		String sourceId = controller.getSourceId();
-    		System.assert(false, 'This cannot be reached.');
-		} catch (VersionOneException ex) {
-			System.assertEquals('Credentials is not correct.', ex.getErrorMessage(), 'Incorrect error message.');
-		}
+        try {
+            String sourceId = controller.getSourceId();
+            System.assert(false, 'This cannot be reached.');
+        } catch (VersionOneException ex) {
+            System.assertEquals('Credentials is not correct.', ex.getErrorMessage(), 'Incorrect error message.');
+        }
 
-		//another exception
-		requestor = new RequestorMock(body, 500);
-		controller.setRequestor(requestor);
+        //another exception
+        requestor = new RequestorMock(body, 500);
+        controller.setRequestor(requestor);
 
-		try {
-    		String sourceId = controller.getSourceId();
-    		System.assert(false, 'This cannot be reached.');
-		} catch (VersionOneException ex) {
-			System.assertEquals('URL is not correct or VersionOne server has some problems at the moment.', ex.getErrorMessage(), 'Incorrect error message.');
-		}
+        try {
+            String sourceId = controller.getSourceId();
+            System.assert(false, 'This cannot be reached.');
+        } catch (VersionOneException ex) {
+            System.assertEquals('URL is not correct or VersionOne server has some problems at the moment.', ex.getErrorMessage(), 'Incorrect error message.');
+        }
 
-		//another exception
-		requestor = new RequestorMock(body, 404);
-		controller.setRequestor(requestor);
+        //another exception
+        requestor = new RequestorMock(body, 404);
+        controller.setRequestor(requestor);
 
-		try {
-    		String sourceId = controller.getSourceId();
-    		System.assert(false, 'This cannot be reached.');
-		} catch (VersionOneException ex) {
-			System.assertEquals('URL is not correct or VersionOne server has some problems at the moment.', ex.getErrorMessage(), 'Incorrect error message.');
-		}
+        try {
+            String sourceId = controller.getSourceId();
+            System.assert(false, 'This cannot be reached.');
+        } catch (VersionOneException ex) {
+            System.assertEquals('URL is not correct or VersionOne server has some problems at the moment.', ex.getErrorMessage(), 'Incorrect error message.');
+        }
 
-		//another exception
-		requestor = new RequestorMock(body, 111);
-		controller.setRequestor(requestor);
+        //another exception
+        requestor = new RequestorMock(body, 111);
+        controller.setRequestor(requestor);
 
-		try {
-    		String sourceId = controller.getSourceId();
-    		System.assert(false, 'This cannot be reached.');
-		} catch (VersionOneException ex) {
-			System.assertEquals('Problem with getting source from the VersionOne.', ex.getErrorMessage(), 'Incorrect error message.');
-		}
+        try {
+            String sourceId = controller.getSourceId();
+            System.assert(false, 'This cannot be reached.');
+        } catch (VersionOneException ex) {
+            System.assertEquals('Problem with getting source from the VersionOne.', ex.getErrorMessage(), 'Incorrect error message.');
+        }
 
     }
 }

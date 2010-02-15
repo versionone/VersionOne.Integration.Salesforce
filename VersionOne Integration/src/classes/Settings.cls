@@ -32,16 +32,16 @@ public with sharing class Settings {
                 insert mycs;
             }
 
-            path = mycs.Path__c;
-            userName = mycs.UserName__c;
-            password = mycs.Password__c;
-            commentBody = mycs.commentBody__c;
-            source = mycs.Source__c;
-            sourceId = mycs.V1SourceId__c;
-            sourceQueueId = mycs.EscalateQueueId__c;
-            destQueueId = mycs.AssignedQueueId__c;
+            setPath(mycs.Path__c);
+            setUserName(mycs.UserName__c);
+            setPassword(mycs.Password__c);
+            setCommentBody(mycs.commentBody__c);
+            setSource(mycs.Source__c);
+            setSourceId(mycs.V1SourceId__c);
+            setSourceQueueId(mycs.EscalateQueueId__c);
+            setDestQueueId(mycs.AssignedQueueId__c);
             changeDateUTC = mycs.DateLastClosedAsset__c;
-            scheduleId = mycs.scheduleId__c;
+            setScheduleId(mycs.scheduleId__c);
         }
     }
 
@@ -125,19 +125,23 @@ public with sharing class Settings {
     }
 
     public String getSourceId() {
-        return this.sourceId;
+        return sourceId;
     }
 
-    public void setSourceId(String sourceId) {
-        this.sourceId = sourceId;
+    public void setSourceId(String id) {
+        sourceId = id;
     }
 
     public String getScheduleId() {
-        return this.scheduleId;
+        return scheduleId;
     }
 
-    public void setScheduleId(String scheduleId) {
-        this.scheduleId = scheduleId;
+    public void setScheduleId(String id) {
+        if (id == '') {
+            scheduleId = null;
+        } else {
+            scheduleId = id;
+        }
     }
 
     public String getV1Url() {
@@ -180,11 +184,11 @@ public with sharing class Settings {
     }
 
     public void setLastDateChangeAsset(DateTime changeDateUTC) {
-    	this.changeDateUTC = changeDateUTC;
+        this.changeDateUTC = changeDateUTC;
     }
 
     public DateTime getLastDateChangeAsset() {
-    	return this.changeDateUTC;
+        return this.changeDateUTC;
     }
 
     /**

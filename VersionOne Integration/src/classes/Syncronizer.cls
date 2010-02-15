@@ -44,7 +44,7 @@ public class Syncronizer {
             DateTime testDate = convertToDateTime(changeDateUTC);
             if (latestDate == null || testDate > latestDate) {
                 latestDate = testDate;
-			}
+            }
         }
         if (latestDate != settings.getLastDateChangeAsset()) {
             settings.setLastDateChangeAsset(latestDate);
