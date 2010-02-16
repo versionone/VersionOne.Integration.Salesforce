@@ -2,10 +2,10 @@ public with sharing class V1Connector implements IV1Connector {
     private static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="{0}";Defect.AssetState="Closed"{1})';
     private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
     private static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
-	private static final String LINK_URL = 'rest-1.v1/Data/Link';
-	private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
-	private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
-	private static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Defect?sel=Reference&where=({0}Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
+    private static final String LINK_URL = 'rest-1.v1/Data/Link';
+    private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
+    private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
+    private static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Defect?sel=Reference&where=({0}Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
 
     private final Settings settings;
     private final IRequestor requestor;
@@ -133,7 +133,7 @@ public with sharing class V1Connector implements IV1Connector {
     **/
     public Map<String, String> findAllProjects() {
         XMLDom xmlParser = new XMLDom();
-		Map<String, String> projects = new Map<String, String>();
+        Map<String, String> projects = new Map<String, String>();
 
         //Send the request, and get a response
         requestor.request(requestor.createRequest('', SCOPE_URL, 'GET'));
@@ -166,10 +166,10 @@ public with sharing class V1Connector implements IV1Connector {
     * Returns default project. It we will use if user doesn't assign case to project
     **/
     public String getDefaultProjectId() {
-    	if (defaultProjectId == null) {
-    		findAllProjects();
-    	}
-    	return defaultProjectId;
+        if (defaultProjectId == null) {
+            findAllProjects();
+        }
+        return defaultProjectId;
     }
 
     /**
