@@ -42,4 +42,14 @@ global public class SyncSchedule implements Schedulable {
             return false;
         }
     }
+
+    /** Check if job with specified ID exists. */
+    public static Boolean isScheduled(String id) {
+        if (id == null){
+            return false;
+        }
+        Integer count = [SELECT count() FROM CronTrigger WHERE id=:id];
+        System.debug(id + ' count: ' + count);
+        return count > 0;
+    }
 }

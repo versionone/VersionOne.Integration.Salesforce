@@ -45,6 +45,14 @@ private class SettingsTestSuite {
         System.assertEquals('http://localhost/', s.getPath(), 'Wrong Path.');
     }
 
+    static testMethod void scheduleIdTest() {
+        Settings s = new Settings();
+        s.setScheduleId('');
+        System.assertEquals(null, s.getScheduleId(), 'Wrong ScheduleId.');
+        s.setScheduleId('wrong-id');
+        System.assertEquals('wrong-id', s.getScheduleId(), 'Wrong ScheduleId.');
+    }
+
     static testMethod void updateSettingsTest() {
         delete [SELECT Id FROM V1Settings__c];
         Settings s = new Settings();
