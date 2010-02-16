@@ -50,7 +50,6 @@ private class V1PublisherTester {
             testSettings.setPath(path);
             testSettings.setCommentBody(comment);
             IRequestor requestor = new RequestorMock('', 200);
-            //V1Publisher.setRequestor(requestor);
             IV1Connector connector = new V1ConnectorMock();
             ((V1ConnectorMock)connector).setCreatedDefectId(defectId);
 			V1Publisher.setConnector(connector);

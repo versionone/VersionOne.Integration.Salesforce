@@ -75,7 +75,6 @@ private class V1ConnectorTester {
     }
 
     static testMethod void correctGetSourceIdTester() {
-        V1Publisher.resetAllData();
         String sourceName = 'TestSource';
         String sourceIdExpected = '1010';
         Settings testSettings = Settings.getTestSettings();
@@ -89,7 +88,6 @@ private class V1ConnectorTester {
     }
 
     static testMethod void incorrectGetSourceIdTester() {
-        V1Publisher.resetAllData();
         String sourceName = 'TestSource';
         String sourceIdExpected = null;
         Settings testSettings = Settings.getTestSettings();
@@ -103,7 +101,6 @@ private class V1ConnectorTester {
     }
 
     static testMethod void exceptionsGetSourceIdTester() {
-        V1Publisher.resetAllData();
         String sourceName = 'TestSource';
         String sourceIdExpected = null;
         Settings testSettings = Settings.getTestSettings();
@@ -160,9 +157,6 @@ private class V1ConnectorTester {
         IRequestor requestor = new RequestorMock(body, 200);
         Settings testSettings = Settings.getTestSettings();
         V1Connector connector = new V1Connector(testSettings, requestor);
-        //V1Publisher.setRequestor(requestor);
-        //V1Publisher.setSettings(settings);
-        //V1Publisher.findAllProjects();
         Map<String, String> projects = connector.findAllProjects();
 
         System.assertEquals(projects.size(), 12, 'Error! Incorrect amount of projects.');
@@ -171,7 +165,6 @@ private class V1ConnectorTester {
     }
 
     static testMethod void incorrectProjectsListTest() {
-        V1Publisher.resetAllData();
         //incorrect responce
         Settings testSettings = Settings.getTestSettings();
         IRequestor requestor = new RequestorMock('', 400);
@@ -348,7 +341,7 @@ private class V1ConnectorTester {
                             '</Relation>' +
                         '</Asset>';
         requestor = new RequestorMock(body, 200);
-		connector = new V1Connector(testSettings, requestor);
+        connector = new V1Connector(testSettings, requestor);
         caseData.Subject = '';
         caseData.Description = '';
 
