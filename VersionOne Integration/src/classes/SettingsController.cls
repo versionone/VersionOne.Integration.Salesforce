@@ -1,7 +1,5 @@
 public class SettingsController {
 
-    private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
-
     public String testSeverity{ get; set; }
     public String saveSeverity{ get; set; }
     public String testMessage{ get; set; }
@@ -11,7 +9,7 @@ public class SettingsController {
     public Boolean isSaved { get; set; }
     public Settings settings {get; set;}
 
-    private transient IRequestor requestor;
+    private transient IV1Connector connector;
 
     public PageReference saveSettings() {
         if (!validateRequiredFields()) {
@@ -146,36 +144,16 @@ public class SettingsController {
     }
 
     public String getSourceId() {
-        XMLDom xmlParser = new XMLDom();
-        String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
-        if (requestor == null) {
-            requestor = new Requestor(settings);
+        if (connector == null) {
+            IRequestor requestor = new Requestor(settings);
+            connector = new V1Connector(settings, requestor);
         }
 
-        //Send the request, and get a response
-        requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
-        System.debug('Responce code = ' + requestor.getStatusCode());
-        System.debug('Responce body = ' + requestor.getBody());
-        if (requestor.getStatusCode() == 200) {
-            xmlParser.parseFromString(requestor.getBody());
-        }else if (requestor.getStatusCode() == 401){
-            throw new VersionOneException('Credentials is not correct.', '');
-        }else if (requestor.getStatusCode() == 500 || requestor.getStatusCode() == 404){
-            throw new VersionOneException('URL is not correct or VersionOne server has some problems at the moment.', '');
-        }else {
-            throw new VersionOneException('Problem with getting source from the VersionOne.', requestor.getBody());
-        }
-
-        XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
-        if (assetTag != null) {
-            return assetTag.getAttribute('id').split(':')[1];
-        }
-
-        return null;
+		return connector.getSourceId();
     }
 
-    public void setRequestor(IRequestor requestor) {
-        this.requestor = requestor;
+    public void setConnector(IV1Connector connector) {
+        this.connector = connector;
     }
 
     public static List<SelectOption> getQueueList() {

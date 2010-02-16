@@ -7,7 +7,8 @@ global public class SyncSchedule implements Schedulable {
     /** Periodicaly executed method. */
     global void execute(SchedulableContext sc) {
         Settings settings = new Settings();
-        (new Syncronizer(settings, new Requestor(settings))).syncCases();
+        IV1Connector connector = new V1Connector(settings, new Requestor(settings));
+        (new Syncronizer(settings, connector)).syncCases();
     }
 
     /**

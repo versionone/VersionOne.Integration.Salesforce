@@ -28,11 +28,9 @@ private class SettingsControllerTester {
     static testMethod void validateRequiredFieldsTest() {
         SettingsController controller = new SettingsController();
         Test.setCurrentPage(new PageReference('apex/Settings_page'));
-        IRequestor requestor = new RequestorMock('', 200);
         Settings settingsData = Settings.getTestSettings();
         Boolean result;
-
-        controller.setRequestor(requestor);
+        controller.setConnector(new V1ConnectorMock());
 
         //all fields is filled
         settingsData.setPath('http://localhost');
@@ -106,43 +104,25 @@ private class SettingsControllerTester {
         Settings settingsData = Settings.getTestSettings();
         String sourceName = 'TestSource';
         String sourceIdExpected = '1010';
-        String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
-        IRequestor requestor = new RequestorMock(body, 200);
         settingsData.setSource(sourceName);
-
-        controller.setRequestor(requestor);
+        IV1Connector connector = new V1ConnectorMock();
+        ((V1ConnectorMock)connector).setTestSourceId(sourceIdExpected);
+        controller.setConnector(connector);
         controller.settings = settingsData;
-
         controller.initSettings();
         System.assert(controller.validateConnectionAndSource(), 'Incorrect result of test.');
 
-        //incorrect credentials
-        requestor = new RequestorMock('', 401);
-        controller.setRequestor(requestor);
-        try {
-            controller.validateConnectionAndSource();
-            System.assert(false, 'This place cannot be reached.');
-        }catch(VersionOneException e){}
-
-        //incorrect path
-        requestor = new RequestorMock('', 500);
-        controller.setRequestor(requestor);
-        try {
-            controller.validateConnectionAndSource();
-            System.assert(false, 'This place cannot be reached.');
-        }catch(VersionOneException e){}
-
-        //unknown error
-        requestor = new RequestorMock('', 303);
-        controller.setRequestor(requestor);
+        //thorw exception
+        ((V1ConnectorMock)connector).enableException(true, 1, 'Just test exception.');
+        controller.setConnector(connector);
         try {
             controller.validateConnectionAndSource();
             System.assert(false, 'This place cannot be reached.');
         }catch(VersionOneException e){}
 
         //source was not found
-        requestor = new RequestorMock('<?xml version="1.0" encoding="UTF-8"?><Assets/>', 200);
-        controller.setRequestor(requestor);
+        ((V1ConnectorMock)connector).setTestSourceId(null);
+        controller.setConnector(connector);
         try {
             controller.validateConnectionAndSource();
             System.assert(false, 'This place cannot be reached.');
@@ -158,14 +138,12 @@ private class SettingsControllerTester {
         String path = 'http://localhost';
         String destQueueId = 'destQueueId';
         String sourceQueueId = 'sourceQueueId';
-        String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
-        IRequestor requestor = new RequestorMock(body, 200);
+        IV1Connector connector = new V1ConnectorMock();
+        ((V1ConnectorMock)connector).setTestSourceId(sourceIdExpected);
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
-
-        controller.setRequestor(requestor);
+        controller.setConnector(connector);
         controller.settings = settingsData;
-
         controller.testSettings();
         System.assert(!controller.isSettingsCorrect, 'Settings have to be not correct.');
         System.assert(!controller.isSettingsValidated, 'Settings have to be not validated.');
@@ -179,32 +157,45 @@ private class SettingsControllerTester {
         settingsData.setSourceQueueId(sourceQueueId);
         settingsData.setPassword('password');
         controller.testSettings();
-
         System.assert(controller.isSettingsCorrect, 'Settings have to be correct.');
         System.assert(controller.isSettingsValidated, 'Settings have to be validated.');
-        System.assertEquals('Settings correct.', controller.testMessage, 'Test message has to be not empty.');
+        System.assertEquals('Settings correct.', controller.testMessage, 'Incorrect message after testing.');
         System.assertEquals('info', controller.testSeverity, 'Incorrect severity.');
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
 
         //VersionOneException during test connection
-        requestor = new RequestorMock(body, 401);
-        controller.setRequestor(requestor);
+        ((V1ConnectorMock)connector).enableException(true, 1, 'Credentials is not correct.');
+        controller.setConnector(connector);
         controller.testSettings();
         System.assert(!controller.isSettingsCorrect, 'Settings have to be not correct.');
         System.assert(controller.isSettingsValidated, 'Settings have to be validated.');
-        System.assertEquals('Credentials is not correct.', controller.testMessage, 'Test message has to be not empty.');
+        System.assertEquals('Credentials is not correct.', controller.testMessage, 'Incorrect message after testing.');
         System.assertEquals('error', controller.testSeverity, 'Incorrect severity.');
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
 
         //Unknown exception during test connection
-        requestor = new RequestorMock(body, 200, new Exception[]{new NullPointerException()});
-        controller.setRequestor(requestor);
+        ((V1ConnectorMock)connector).enableException(true, 2, '');
+        controller.setConnector(connector);
         controller.testSettings();
         System.assert(!controller.isSettingsCorrect, 'Settings have to be not correct.');
         System.assert(controller.isSettingsValidated, 'Settings have to be validated.');
-        System.assertEquals('Internal error:Script-thrown exception', controller.testMessage, 'Test message has to be not empty.');
+        System.assertEquals('Internal error:Script-thrown exception', controller.testMessage, 'Incorrect message after testing.');
         System.assertEquals('error', controller.testSeverity, 'Incorrect severity.');
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
+
+        //source is null
+        System.debug('//source is null');
+        ((V1ConnectorMock)connector).enableException(false, 0, '');
+        ((V1ConnectorMock)connector).setTestSourceId(null);
+        controller.setConnector(connector);
+        controller.testSettings();
+        System.assert(!controller.isSettingsCorrect, 'Settings have to be not correct.');
+        System.assert(controller.isSettingsValidated, 'Settings have to be validated.');
+        System.assertEquals('Source setting is not correct.', controller.testMessage, 'Incorrect message after testing.');
+        System.assertEquals('error', controller.testSeverity, 'Incorrect severity.');
+        System.assert(!controller.isSaved, 'Settings has to be not saved.');
+
+        controller.testSettings();
     }
 
     static testMethod void saveSettingsTester() {
@@ -216,8 +207,6 @@ private class SettingsControllerTester {
         String sourceQueueId = 'sourceQueueId';
         String password = 'password';
         String sourceIdExpected = '1010';
-        String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
-        IRequestor requestor = new RequestorMock(body, 200);
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
         settingsData.setPath(path);
@@ -226,13 +215,14 @@ private class SettingsControllerTester {
         settingsData.setDestQueueId(destQueueId);
         settingsData.setSourceQueueId(sourceQueueId);
         settingsData.setPassword(password);
+        IV1Connector connector = new V1ConnectorMock();
+        ((V1ConnectorMock)connector).setTestSourceId(sourceIdExpected);
 
-        controller.setRequestor(requestor);
+        //controller.setRequestor(requestor);
+        controller.setConnector(connector);
         controller.settings = settingsData;
         controller.isSettingsCorrect = true;
-
         controller.saveSettings();
-
         System.assert(controller.isSaved, 'Settings have to be saved.');
         System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
         System.assertEquals('Settings has been saved.', controller.saveMessage, 'Incorrect save message.');
@@ -247,12 +237,9 @@ private class SettingsControllerTester {
         System.assert(settingsData.getScheduleId() == null , 'Schedule ID have to be null.');
 
         //no source id
-        body = '';
-        requestor = new RequestorMock(body, 200);
-        controller.setRequestor(requestor);
-
+        ((V1ConnectorMock)connector).setTestSourceId(null);
+        controller.setConnector(connector);
         controller.saveSettings();
-
         System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
         System.assert(!controller.isSettingsCorrect, 'Settings have to not be correct.');
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
@@ -266,97 +253,25 @@ private class SettingsControllerTester {
         // not all required fields filled
         settingsData.setPath('');
         controller.settings = settingsData;
-
         controller.saveSettings();
-
         System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
         System.assert(!controller.isSettingsCorrect, 'Settings have to not be correct.');
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
     }
 
+
     static testMethod void correctGetSourceIdTester() {
-        V1Publisher.resetAllData();
-        String sourceName = 'TestSource';
+        SettingsController controller = new SettingsController();
+        Settings testSettings = Settings.getTestSettings();
         String sourceIdExpected = '1010';
-        Settings testSettings = Settings.getTestSettings();
-        testSettings.setSource(sourceName);
-        String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/' + sourceIdExpected + '" id="StorySource:' + sourceIdExpected + '" /></Assets>';
-        IRequestor requestor = new RequestorMock(body, 200);
-        SettingsController controller = new SettingsController();
-        controller.setRequestor(requestor);
+        testSettings.setSource('');
+        IV1Connector connector = new V1ConnectorMock();
+        ((V1ConnectorMock)connector).setTestSourceId(sourceIdExpected);
+        controller.setConnector(connector);
         controller.settings = testSettings;
 
         String sourceId = controller.getSourceId();
         System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
-    static testMethod void incorrectGetSourceIdTester() {
-        V1Publisher.resetAllData();
-        String sourceName = 'TestSource';
-        String sourceIdExpected = null;
-        Settings testSettings = Settings.getTestSettings();
-        testSettings.setSource(sourceName);
-        String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="0" pageSize="0" pageStart="0"></Assets>';
-        IRequestor requestor = new RequestorMock(body, 200);
-        SettingsController controller = new SettingsController();
-        controller.setRequestor(requestor);
-        controller.settings = testSettings;
-
-        String sourceId = controller.getSourceId();
-        System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
-    }
-
-    static testMethod void exceptionsGetSourceIdTester() {
-        V1Publisher.resetAllData();
-        String sourceName = 'TestSource';
-        String sourceIdExpected = null;
-        Settings testSettings = Settings.getTestSettings();
-        testSettings.setSource(sourceName);
-        String body = '';
-        IRequestor requestor = new RequestorMock(body, 401);
-        SettingsController controller = new SettingsController();
-        controller.setRequestor(requestor);
-        controller.settings = testSettings;
-
-        try {
-            String sourceId = controller.getSourceId();
-            System.assert(false, 'This cannot be reached.');
-        } catch (VersionOneException ex) {
-            System.assertEquals('Credentials is not correct.', ex.getErrorMessage(), 'Incorrect error message.');
-        }
-
-        //another exception
-        requestor = new RequestorMock(body, 500);
-        controller.setRequestor(requestor);
-
-        try {
-            String sourceId = controller.getSourceId();
-            System.assert(false, 'This cannot be reached.');
-        } catch (VersionOneException ex) {
-            System.assertEquals('URL is not correct or VersionOne server has some problems at the moment.', ex.getErrorMessage(), 'Incorrect error message.');
-        }
-
-        //another exception
-        requestor = new RequestorMock(body, 404);
-        controller.setRequestor(requestor);
-
-        try {
-            String sourceId = controller.getSourceId();
-            System.assert(false, 'This cannot be reached.');
-        } catch (VersionOneException ex) {
-            System.assertEquals('URL is not correct or VersionOne server has some problems at the moment.', ex.getErrorMessage(), 'Incorrect error message.');
-        }
-
-        //another exception
-        requestor = new RequestorMock(body, 111);
-        controller.setRequestor(requestor);
-
-        try {
-            String sourceId = controller.getSourceId();
-            System.assert(false, 'This cannot be reached.');
-        } catch (VersionOneException ex) {
-            System.assertEquals('Problem with getting source from the VersionOne.', ex.getErrorMessage(), 'Incorrect error message.');
-        }
-
-    }
 }
