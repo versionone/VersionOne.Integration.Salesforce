@@ -8,6 +8,7 @@ public class SettingsController {
     public Boolean isSettingsCorrect { get; set; }
     public Boolean isSaved { get; set; }
     public Settings settings {get; set;}
+    public Boolean isSyncEnabled {get; set;}
 
     private transient IV1Connector connector;
 
@@ -32,10 +33,20 @@ public class SettingsController {
             return null;
         }
         settings.setSourceId(sourceId);
-        if (settings.getScheduleId() == null) {
-            String id = SyncSchedule.addSchedule();
-            settings.setScheduleId(id);
+
+        Boolean isScheduled = SyncSchedule.isScheduled(settings.getScheduleId());
+        if (isSyncEnabled) {
+            if (!isScheduled) {
+                String id = SyncSchedule.addSchedule();
+                settings.setScheduleId(id);
+            }
+        } else {
+            if (isScheduled) {
+                SyncSchedule.unschedule(settings.getScheduleId());
+            }
+            settings.setScheduleId(null);
         }
+
         System.debug('Save Settings');
         testMessage = '';
         testSeverity = '';
@@ -129,6 +140,7 @@ public class SettingsController {
         if (settings == null) {
             settings = new Settings();
         }
+        isSyncEnabled = SyncSchedule.isScheduled(settings.getScheduleId());
     }
 
     public boolean validateConnectionAndSource() {

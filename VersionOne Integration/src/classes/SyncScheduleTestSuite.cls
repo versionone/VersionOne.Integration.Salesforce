@@ -16,13 +16,17 @@ private class SyncScheduleTestSuite {
         System.assert(id1 != null, 'Schedule 1 wasn\'t added.');
         System.assertEquals(x + 2, countJobs(), 'Wrong triggers count');
 
+        System.assert(SyncSchedule.isScheduled(id0), 'Job 0 must be sheduled.');
         System.assert(SyncSchedule.unschedule(id0), 'Job 0 wasn\'t unsheduled.');
+        System.assert(!SyncSchedule.isScheduled(id0), 'Job 0 must be unsheduled.');
         System.assertEquals(x + 1, countJobs(), 'Wrong triggers count');
 
+        System.assert(SyncSchedule.isScheduled(id1), 'Job 1 must be sheduled.');
         System.assert(SyncSchedule.unschedule(id1), 'Job 1 wasn\'t unsheduled.');
+        System.assert(!SyncSchedule.isScheduled(id1), 'Job 1 must be unsheduled.');
         System.assertEquals(x, countJobs(), 'Wrong triggers count');
 
-        System.assert(!SyncSchedule.unschedule('Wrong ID'), 'Wrong Id was unsheduled.');
+        System.assert(!SyncSchedule.unschedule(id1), 'Job 1 cannot be unsheduled twice.');
     }
 }
 /*

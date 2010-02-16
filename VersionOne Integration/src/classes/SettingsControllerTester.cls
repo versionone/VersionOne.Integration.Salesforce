@@ -207,7 +207,6 @@ private class SettingsControllerTester {
         String sourceQueueId = 'sourceQueueId';
         String password = 'password';
         String sourceIdExpected = '1010';
-        SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
         settingsData.setPath(path);
         settingsData.setUserName(userName);
@@ -215,14 +214,18 @@ private class SettingsControllerTester {
         settingsData.setDestQueueId(destQueueId);
         settingsData.setSourceQueueId(sourceQueueId);
         settingsData.setPassword(password);
-        IV1Connector connector = new V1ConnectorMock();
-        ((V1ConnectorMock)connector).setTestSourceId(sourceIdExpected);
+        settingsData.setScheduleId('wrong-id');
 
-        //controller.setRequestor(requestor);
+        V1ConnectorMock connector = new V1ConnectorMock();
+        connector.setTestSourceId(sourceIdExpected);
+        SettingsController controller = new SettingsController();
         controller.setConnector(connector);
         controller.settings = settingsData;
+        controller.initSettings();
         controller.isSettingsCorrect = true;
+        controller.isSyncEnabled = true;
         controller.saveSettings();
+
         System.assert(controller.isSaved, 'Settings have to be saved.');
         System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
         System.assertEquals('Settings has been saved.', controller.saveMessage, 'Incorrect save message.');
@@ -232,9 +235,13 @@ private class SettingsControllerTester {
 
         String scheduleId = settingsData.getScheduleId();
         System.assert(scheduleId != null , 'Schedule have to be created.');
-        System.assert(SyncSchedule.unschedule(scheduleId), 'Schedule don\'t exist.');
-        settingsData.setScheduleId('');
-        System.assert(settingsData.getScheduleId() == null , 'Schedule ID have to be null.');
+        System.assert(SyncSchedule.isScheduled(scheduleId), 'Schedule don\'t exist.');
+
+        controller.isSyncEnabled = false;
+        controller.saveSettings();
+
+        System.assert(settingsData.getScheduleId() == null , 'Schedule ID must be empty.');
+        System.assert(!SyncSchedule.isScheduled(scheduleId), 'Schedule have to be removed.');
 
         //no source id
         ((V1ConnectorMock)connector).setTestSourceId(null);
