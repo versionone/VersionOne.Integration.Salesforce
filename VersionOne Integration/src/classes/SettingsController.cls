@@ -161,7 +161,7 @@ public class SettingsController {
             connector = new V1Connector(settings, requestor);
         }
 
-		return connector.getSourceId();
+        return connector.getSourceId();
     }
 
     public void setConnector(IV1Connector connector) {
@@ -176,5 +176,13 @@ public class SettingsController {
             options.add(new SelectOption(queue.Id, queue.Name));
         }
         return options;
+    }
+
+    public PageReference forceSync() {
+        (new SyncSchedule()).execute(null);
+        ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.CONFIRM,
+            'Cases have been syncronized with VersionOne.');
+        ApexPages.addMessage(msg);
+        return null;
     }
 }
