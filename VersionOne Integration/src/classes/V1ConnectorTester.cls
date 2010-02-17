@@ -182,9 +182,7 @@ private class V1ConnectorTester {
     }
 
     static testMethod void correctGetAlreadyExistedDefectsTest() {
-        V1Publisher.resetAllData();
-
-        //prepare data
+    	//prepare data
         Case case1 = new Case(Subject = 'case1');
         Case case2 = new Case(Subject = 'case2');
         Case case3 = new Case(Subject = 'case3');
@@ -212,9 +210,7 @@ private class V1ConnectorTester {
     }
 
     static testMethod void incorrectGetAlreadyExistedDefectsTest() {
-        V1Publisher.resetAllData();
-
-        //prepare data
+		//prepare data
         Case case1 = new Case(Subject = 'case1');
         Case case2 = new Case(Subject = 'case2');
         Case case3 = new Case(Subject = 'case3');

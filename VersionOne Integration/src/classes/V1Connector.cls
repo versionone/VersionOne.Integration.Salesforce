@@ -269,7 +269,6 @@ public with sharing class V1Connector implements IV1Connector {
 
         try {
             defectId = Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
-            createLinkV1ToSF(defectId, caseData.Id);
         } catch (VersionOneException ex) {
             V1Publisher.errorMessage(ex.getErrorMessage(), ex);
         } catch (Exception ex) {
