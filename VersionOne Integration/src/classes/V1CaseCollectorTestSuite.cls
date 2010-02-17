@@ -26,7 +26,6 @@ private class V1CaseCollectorTestSuite {
     }
 
     static testMethod void setCasesOwnerTest() {
-        V1Publisher.resetAllData();
         V1Publisher.setSettings(Settings.getTestSettings());
         String queueName = 'TestQueue1';
         Group queue = new Group(Type='Queue', Name=queueName);
@@ -80,7 +79,6 @@ private class V1CaseCollectorTestSuite {
     }
 
     static testMethod void getQueueIdByNameTest() {
-        V1Publisher.resetAllData();
         V1Publisher.setSettings(Settings.getTestSettings());
         String queueName = 'TestQueue1';
         Group group1 = new Group(Name=queueName);
@@ -94,7 +92,6 @@ private class V1CaseCollectorTestSuite {
     }
 
     static testMethod void getCasesByOwnerIdTest() {
-        V1Publisher.resetAllData();
         V1Publisher.setSettings(Settings.getTestSettings());
         String queueName = 'TestQueue1';
         Group queue = new Group(Type='Queue', Name=queueName);

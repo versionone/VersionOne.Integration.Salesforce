@@ -15,14 +15,9 @@ public with sharing class V1Publisher {
         settings = settingsData;
     }
 
-	//TODO remove this method and all usages
-    public static void resetAllData() {
-        //defaultProjectId = '0';
-    }
-
     @future (callout=true)
     public static void publish() {
-        resetAllData();
+        System.debug('-------------------------------- publish');
         if (settings == null) {
             settings = new Settings();
         }
@@ -42,9 +37,11 @@ public with sharing class V1Publisher {
 
         Map<String, Boolean> alreadyPortedCases;
         Map<String, String> projects;
+
+
         try {
-            alreadyPortedCases = connector.getAlreadyExistedDefects(cases);
-            projects = connector.findAllProjects();
+        	alreadyPortedCases = connector.getAlreadyExistedDefects(cases);
+        	projects = connector.findAllProjects();
         } catch (VersionOneException ex) {
             errorMessage(ex.getErrorMessage(), ex);
             return;
@@ -52,6 +49,7 @@ public with sharing class V1Publisher {
             errorMessage('Internal problems during getting existed defects from the VersionOne: ', ex);
             return;
         }
+
         processCases(alreadyPortedCases, cases, sourceId, projects);
     }
 
@@ -76,6 +74,7 @@ public with sharing class V1Publisher {
                     String projectId = findProjectId((String) caseData.get(settings.getV1Project()), projects);
                     Integer id = connector.createDefectInVersionOne(caseData, projectId, sourceId);
                     if (id > 0) {
+                    	connector.createLinkV1ToSF(id, caseData.Id);
                         processedCases.add(caseData);
                         urls.add(settings.getPath() + URL_TO_V1_TEMPLATE + id);
                     }

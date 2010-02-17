@@ -5,6 +5,7 @@ public class V1ConnectorMock implements IV1Connector {
     private Integer exceptionType = 0;
     private Boolean isExceptionEnabled = false;
     private Integer createdDefectId = 0;
+    private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
 
     public List<String> getClosedDefects() {
     	throwException();
@@ -25,6 +26,7 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     public Map<String, String> findAllProjects() {
+    	throwException();
     	Map<String, String> result = new Map<String, String>();
     	result.put('CI', '1081');
 
@@ -49,10 +51,12 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     public Map<String, Boolean> getAlreadyExistedDefects(List<Case> cases) {
-    	Map<String, Boolean> result = new Map<String, Boolean>();
-    	result.put('1234', true);
+    	throwException();
+    	return alreadyExistedDefects;
+    }
 
-    	return result;
+    public void setTestAlreadyExistedDefects(Map<String, Boolean> defects) {
+    	alreadyExistedDefects = defects;
     }
 
     /**
@@ -68,6 +72,7 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     private void throwException() {
+    	System.debug('isExceptionEnabled=' + isExceptionEnabled + ' | exceptionType=' + exceptionType);
         if (isExceptionEnabled && exceptionType == 1) {
         	System.debug('Throw VersionOneException');
             throw new VersionOneException(exceptionMessage, 'test body');
