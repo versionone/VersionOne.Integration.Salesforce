@@ -1,5 +1,5 @@
 <!-- Page -->
-<apex:page controller="SettingsController" action="{!initSettings}">
+<apex:page controller="SettingsController" action="{!initSettings}" title="Version One Integration Settings">
     <script>
         function disableAllButtons() {
             disableSaveButtons();
