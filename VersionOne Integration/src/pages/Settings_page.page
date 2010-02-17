@@ -18,6 +18,7 @@
 
     <apex:actionStatus startText="Testing settings..." id="test_status" />
     <apex:actionStatus startText="Saving settings..." id="save_status" />
+    <apex:actionStatus startText="Syncronization in progress..." id="sync_status" />
 
     <apex:form >
         <apex:pageBlock title="Settings" mode="edit">
@@ -83,6 +84,11 @@
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="Enable syncronization" for="EnableSync"/>
                     <apex:inputCheckbox value="{!isSyncEnabled}" id="EnableSync"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:commandButton action="{!forceSync}" value="Force Syncronization" id="forceSync"
+                        status="sync_status"/>
                 </apex:pageBlockSectionItem>
             </apex:pageBlockSection>
 
@@ -153,8 +159,5 @@
             strength="1" />
     </apex:outputPanel>
 
-    <apex:outputPanel >
-        <apex:pageMessages id="requiredfields" />
-    </apex:outputPanel>
-
+    <apex:pageMessages id="requiredfields" />
 </apex:page>

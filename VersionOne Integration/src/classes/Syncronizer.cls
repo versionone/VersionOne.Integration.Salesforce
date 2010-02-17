@@ -10,6 +10,7 @@ public class Syncronizer {
     }
 
     public void syncCases() {
+        System.debug('==> TODO sync job there!');
         //TODO sync job there
     }
 
