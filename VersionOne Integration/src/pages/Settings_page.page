@@ -88,7 +88,7 @@
 
                 <apex:pageBlockSectionItem >
                     <apex:commandButton action="{!forceSync}" value="Force Syncronization" id="forceSync"
-                        status="sync_status"/>
+                        status="sync_status" reRender="messages"/>
                 </apex:pageBlockSectionItem>
             </apex:pageBlockSection>
 
@@ -96,7 +96,7 @@
                 <apex:commandButton value="Save settings" action="{!saveSettings}"
                     disabled="{!isSettingsCorrect == false}" id="save_button1"
                     onclick="disableAllButtons()" status="save_status"
-                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, requiredfields">
+                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages">
                     <script type="text/javascript">
                         function disableSaveButton1() {
                         var ele = document.getElementById('{!$Component.save_button1}');
@@ -106,7 +106,7 @@
                 </script>
                 </apex:commandButton>
                 <apex:commandButton value="Test settings" action="{!testSettings}"
-                    rerender="out_testing, out_saving, message_test, messge_save, save_button1, save_button2, test_button1, test_button2, requiredfields"
+                    rerender="out_testing, out_saving, message_test, messge_save, save_button1, save_button2, test_button1, test_button2, messages"
                     onclick="disableAllButtons()"
                     status="test_status" id="test_button1">
                     <script type="text/javascript">
@@ -122,7 +122,7 @@
                 <apex:commandButton value="Save settings" action="{!saveSettings}"
                     disabled="{!isSettingsCorrect == false}" id="save_button2"
                     onclick="disableAllButtons()" status="save_status"
-                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, requiredfields">
+                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages">
                     <script type="text/javascript">
                     function disableSaveButton2() {
                         var ele = document.getElementById('{!$Component.save_button2}');
@@ -132,7 +132,7 @@
                 </script>
                 </apex:commandButton>
                 <apex:commandButton value="Test settings" action="{!testSettings}"
-                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, requiredfields"
+                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages"
                     onclick="disableAllButtons()"
                     status="test_status" id="test_button2">
                     <script type="text/javascript">
@@ -159,5 +159,5 @@
             strength="1" />
     </apex:outputPanel>
 
-    <apex:pageMessages id="requiredfields" />
+    <apex:pageMessages id="messages" />
 </apex:page>

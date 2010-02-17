@@ -179,9 +179,17 @@ public class SettingsController {
     }
 
     public PageReference forceSync() {
-        (new SyncSchedule()).execute(null);
-        ApexPages.Message msg = new ApexPages.Message(ApexPages.Severity.CONFIRM,
-            'Cases have been syncronized with VersionOne.');
+        ApexPages.Message msg;
+        try {
+            Integer count = (new Syncronizer(settings)).syncCases();
+            String countStr = (count == 0 ? 'No' : String.valueOf(count));
+            msg = new ApexPages.Message(ApexPages.Severity.CONFIRM,
+                countStr + ' Cases have been closed.');
+        } catch (Exception e) {
+            msg = new ApexPages.Message(ApexPages.Severity.ERROR,
+                'Failed to update Cases.');
+            ApexPages.addMessages(e);
+        }
         ApexPages.addMessage(msg);
         return null;
     }
