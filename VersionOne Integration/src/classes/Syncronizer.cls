@@ -4,14 +4,26 @@ public class Syncronizer {
     private final Settings settings;
     private final IV1Connector connector;
 
+    public Syncronizer(Settings settings) {
+        this.settings = settings;
+        connector = new V1Connector(settings, new Requestor(settings));
+    }
+
     public Syncronizer(Settings settings, IV1Connector connector) {
         this.settings = settings;
         this.connector = connector;
     }
 
-    public void syncCases() {
+    /**
+     * Update cases.
+     *
+     * Returns: count of updated Cases.
+     * Throws: Exception on errors.
+     */
+    public Integer syncCases() {
         System.debug('==> TODO sync job there!');
         //TODO sync job there
+        return 0;
     }
 
     public List<String> getClosedDefects() {
