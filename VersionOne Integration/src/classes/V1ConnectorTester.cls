@@ -71,7 +71,7 @@ private class V1ConnectorTester {
         assertContains(reference1, references, 'Can\'t find ' + references + ' reference');
         assertContains(reference2, references, 'Can\'t find ' + references + ' reference');
         System.assertEquals('2009-10-21 08:57:50', testSettings.getLastDateChangeAsset().format('yyyy-MM-dd HH:mm:ss'), 'Incorrect latest datetime of chaned asset.');
-        System.assertEquals('rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="' + sourceId + '";Defect.AssetState="Closed";ChangeDateUTC>\'' + expectedDate + '\')', ((RequestorMock)testRequestor).getSentUrl(0), 'Incorrect request url.');
+        System.assertEquals('rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="StorySource:' + sourceId + '";Defect.AssetState="Closed";ChangeDateUTC>\'' + expectedDate + '\')', ((RequestorMock)testRequestor).getSentUrl(0), 'Incorrect request url.');
     }
 
     static testMethod void correctGetSourceIdTester() {

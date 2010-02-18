@@ -6,4 +6,5 @@ public interface IV1Connector {
     void createLinkV1ToSF(Integer defectId, String caseId);
     Integer createDefectInVersionOne(Case caseData, String productId, String sourceId);
     Map<String, Boolean> getAlreadyExistedDefects(List<Case> cases);
+    Settings getSettings();
 }

@@ -1,5 +1,5 @@
 public with sharing class V1Connector implements IV1Connector {
-    private static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="{0}";Defect.AssetState="Closed"{1})';
+    private static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="StorySource:{0}";Defect.AssetState="Closed"{1})';
     private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
     private static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
     private static final String LINK_URL = 'rest-1.v1/Data/Link';
@@ -41,7 +41,7 @@ public with sharing class V1Connector implements IV1Connector {
             }
             if (latestDate != settings.getLastDateChangeAsset()) {
                 settings.setLastDateChangeAsset(latestDate);
-                settings.updateSettings();
+                //settings.updateSettings(); //TODO need to try to solve this problem (cases can't be updated at the same time)
             }
         }
 
@@ -296,5 +296,12 @@ public with sharing class V1Connector implements IV1Connector {
             value = value.replace('<', '&lt;').replace('>', '&gt;');
         }
         return '<Attribute act="set" name="' + name + '">' + value + '</Attribute>';
+    }
+
+    /**
+    * Returns current used settings
+    **/
+    public Settings getSettings() {
+    	return settings;
     }
 }

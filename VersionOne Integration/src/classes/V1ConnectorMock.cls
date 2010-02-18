@@ -59,6 +59,10 @@ public class V1ConnectorMock implements IV1Connector {
     	alreadyExistedDefects = defects;
     }
 
+    public Settings getSettings() {
+    	return Settings.getTestSettings();
+    }
+
     /**
     * Enables exceptions for call any methods
     * params : 	enableException - true enable exceptions, false - disable
