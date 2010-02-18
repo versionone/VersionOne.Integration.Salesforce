@@ -179,18 +179,15 @@ public class SettingsController {
     }
 
     public PageReference forceSync() {
-        ApexPages.Message msg;
         try {
             Integer count = (new Syncronizer(settings)).syncCases();
             String countStr = (count == 0 ? 'No' : String.valueOf(count));
-            msg = new ApexPages.Message(ApexPages.Severity.CONFIRM,
-                countStr + ' Cases have been closed.');
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM,
+                countStr + ' Cases have been closed.'));
         } catch (Exception e) {
-            msg = new ApexPages.Message(ApexPages.Severity.ERROR,
-                'Failed to update Cases.');
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, 'Failed to update Cases.'));
             ApexPages.addMessages(e);
         }
-        ApexPages.addMessage(msg);
         return null;
     }
 }
