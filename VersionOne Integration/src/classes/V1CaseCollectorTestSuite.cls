@@ -122,18 +122,25 @@ private class V1CaseCollectorTestSuite {
     }
 
     static testMethod void getCasesByCaseNumberTest() {
-    	Case case1 = new Case(Subject='TestCase1');
-    	Case case2 = new Case(Subject='TestCase2');
-    	Case case3 = new Case(Subject='TestCase3');
-    	insert new Case[] {case1, case2, case3};
-        case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
-        case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
-        case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
+        String queueName = 'TestQueue1';
+        Group queue = new Group(Type='Queue', Name=queueName);
+        insert queue;
+        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+        insert sobj;
+    	System.runAs(createUser('test4356')){
+	    	Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
+	    	Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id, Status = 'Closed');
+	    	Case case3 = new Case(Subject='TestCase3');
+	    	insert new Case[] {case1, case2, case3};
+	        case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
+	        case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
+	        case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
 
-		List<String> caseNumbers = new String[] {case1.CaseNumber, case2.CaseNumber, case3.CaseNumber};
-		System.debug('caseNumbers=' + caseNumbers);
-    	Case[] cases = V1CaseCollector.getCasesByCaseNumbers(caseNumbers);
-    	System.assertEquals(3, cases.size(), 'Incorrect numbers of cases.');
+			List<String> caseNumbers = new String[] {case1.CaseNumber, case2.CaseNumber, case3.CaseNumber};
+			System.debug('caseNumbers=' + caseNumbers);
+	    	Case[] cases = V1CaseCollector.getCasesByCaseNumbersAndOwnerId(caseNumbers, queue.Id);
+	    	System.assertEquals(1, cases.size(), 'Incorrect numbers of cases.');
+    	}
 	}
 
     static testMethod void closeCasesTest() {
