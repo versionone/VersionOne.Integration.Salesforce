@@ -24,20 +24,20 @@ public class Syncronizer {
         List<String> closedCases = getClosedDefects();
         Case[] cases = V1CaseCollector.getCasesByCaseNumbers(closedCases);
         if (cases != null && cases.size() == 0) {
-		    // store date of last closed defect in the VersionOne (date was set in the getCasesByCaseNumbers method)
-		    // because of MIXED_DML_OPERATION we can save it only if no one case is updated
-		    connector.getSettings().updateSettings();
-		} else if (cases != null) {
-        	V1CaseCollector.closeCases(cases, settings.getClosingCommentBody());
-		}
+            // store date of last closed defect in the VersionOne (date was set in the getCasesByCaseNumbers method)
+            // because of MIXED_DML_OPERATION we can save it only if no one case is updated
+            connector.getSettings().updateSettings();
+        } else if (cases != null) {
+            V1CaseCollector.closeCases(cases, settings.getCommentOnClosing());
+        }
 
         return cases.size();
     }
 
-	/**
-	* g
-	*
-	**/
+    /**
+    * g
+    *
+    **/
     public List<String> getClosedDefects() {
         List<Case> portedCases = V1CaseCollector.getCasesByOwnerId(settings.getDestQueueId(), false);
         if (portedCases.size() == 0) {

@@ -11,6 +11,14 @@ private class SettingsTestSuite {
         System.assertEquals(null, s.getDestQueueId(), 'Wrong default DestQueueId.');
     }
 
+    static testMethod void commentOnClosingTest() {
+        Settings s = new Settings();
+        s.setCommentOnClosing('');
+        System.assertEquals(null, s.getCommentOnClosing(), 'Wrong CommentOnClosing.');
+        s.setCommentOnClosing('test string');
+        System.assertEquals('test string', s.getCommentOnClosing(), 'Wrong CommentOnClosing.');
+    }
+
     static testMethod void commentBodyTest() {
         Settings s = new Settings();
         s.setCommentBody('');
