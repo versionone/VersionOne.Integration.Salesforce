@@ -9,6 +9,7 @@ add the following fileds:
   EscalateQueueId 	- Text(18)
   AssignedQueueId 	- Text(18)
   commentBody 	- Text Area(255)
+  CommentOnClosing - Text Area(255)
   V1SourceId	- Text(10)
   ScheduleId	- Text(18) 
   DateLastClosedAsset - Date/Time
