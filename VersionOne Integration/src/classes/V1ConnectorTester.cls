@@ -410,6 +410,14 @@ private class V1ConnectorTester {
         System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
     }
 
+    static testMethod void getSettingsTest() {
+        Settings testSettings = Settings.getTestSettings();
+        IRequestor requestor = new RequestorMock('', 200);
+		V1Connector connector = new V1Connector(testSettings, requestor);
+
+		System.assertEquals(testSettings, connector.getSettings(), 'Incorrect settings.');
+    }
+
     static void assertContains (String expect, List<String> actuals, String msg) {
         Boolean contains = false;
         for (String o : actuals) {

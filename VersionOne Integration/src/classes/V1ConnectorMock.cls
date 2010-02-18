@@ -6,14 +6,15 @@ public class V1ConnectorMock implements IV1Connector {
     private Boolean isExceptionEnabled = false;
     private Integer createdDefectId = 0;
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
+    private List<String> closedDefects = new List<String>();
 
     public List<String> getClosedDefects() {
     	throwException();
-        List<String> defects = new List<String>();
-        defects.add('defect_id_1');
-        defects.add('defect_id_2');
+        return closedDefects;
+    }
 
-        return defects;
+    public void setClosedDefects(List<String> closedDefects) {
+		this.closedDefects = closedDefects;
     }
 
     public String getSourceId() {

@@ -28,13 +28,14 @@ public class V1CaseCollector {
         return cases;
     }
 
-    /* Query not closed cases with specified case numbers
+    /* Query not closed cases with specified case numbers and owner
      * caseNumbers - array of case numbers
+     * ownerId - ID of an owner.
      * Return: Array of cases
      */
-    public static Case[] getCasesByCaseNumbers(List<String> caseNumbers) {
+    public static Case[] getCasesByCaseNumbersAndOwnerId(List<String> caseNumbers, String ownerId) {
         return [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject
-                          FROM Case WHERE CaseNumber in :caseNumbers and Status <> 'Closed'];
+                          FROM Case WHERE CaseNumber in :caseNumbers and Status <> 'Closed' and OwnerId = :ownerId];
 	}
 
 

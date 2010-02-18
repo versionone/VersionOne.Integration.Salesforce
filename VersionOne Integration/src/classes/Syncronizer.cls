@@ -22,7 +22,7 @@ public class Syncronizer {
      */
     public Integer syncCases() {
         List<String> closedCases = getClosedDefects();
-        Case[] cases = V1CaseCollector.getCasesByCaseNumbers(closedCases);
+        Case[] cases = V1CaseCollector.getCasesByCaseNumbersAndOwnerId(closedCases, settings.getDestQueueId());
         if (cases != null && cases.size() == 0) {
             // store date of last closed defect in the VersionOne (date was set in the getCasesByCaseNumbers method)
             // because of MIXED_DML_OPERATION we can save it only if no one case is updated
