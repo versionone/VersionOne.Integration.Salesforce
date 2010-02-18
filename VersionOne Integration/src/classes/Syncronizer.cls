@@ -21,11 +21,23 @@ public class Syncronizer {
      * Throws: Exception on errors.
      */
     public Integer syncCases() {
-        System.debug('==> TODO sync job there!');
-        //TODO sync job there
-        throw new VersionOneException('Not implemented.');
+        List<String> closedCases = getClosedDefects();
+        Case[] cases = V1CaseCollector.getCasesByCaseNumbers(closedCases);
+        if (cases != null && cases.size() == 0) {
+		    // store date of last closed defect in the VersionOne (date was set in the getCasesByCaseNumbers method)
+		    // because of MIXED_DML_OPERATION we can save it only if no one case is updated
+		    connector.getSettings().updateSettings();
+		} else if (cases != null) {
+        	V1CaseCollector.closeCases(cases, settings.getClosingCommentBody());
+		}
+
+        return cases.size();
     }
 
+	/**
+	* g
+	*
+	**/
     public List<String> getClosedDefects() {
         List<Case> portedCases = V1CaseCollector.getCasesByOwnerId(settings.getDestQueueId(), false);
         if (portedCases.size() == 0) {

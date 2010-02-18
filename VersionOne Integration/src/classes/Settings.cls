@@ -11,6 +11,7 @@ public with sharing class Settings {
     private String commentBody;
     private DateTime changeDateUTC;
     private String scheduleId;
+    private String closingCommentBody;
 
     public Settings () {
         this('V1Settings');
@@ -42,6 +43,7 @@ public with sharing class Settings {
             setDestQueueId(mycs.AssignedQueueId__c);
             changeDateUTC = mycs.DateLastClosedAsset__c;
             setScheduleId(mycs.scheduleId__c);
+            setClosingCommentBody('Closed in the VersionOne');
         }
     }
 
@@ -141,6 +143,18 @@ public with sharing class Settings {
             scheduleId = null;
         } else {
             scheduleId = id;
+        }
+    }
+
+    public String getClosingCommentBody() {
+    	return closingCommentBody;
+    }
+
+    public void setClosingCommentBody(String closingCommentBody) {
+        if (closingCommentBody == '') {
+            this.closingCommentBody = null;
+        } else {
+            this.closingCommentBody = closingCommentBody;
         }
     }
 

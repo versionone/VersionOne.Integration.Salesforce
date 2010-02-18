@@ -28,6 +28,16 @@ public class V1CaseCollector {
         return cases;
     }
 
+    /* Query not closed cases with specified case numbers
+     * caseNumbers - array of case numbers
+     * Return: Array of cases
+     */
+    public static Case[] getCasesByCaseNumbers(List<String> caseNumbers) {
+        return [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject
+                          FROM Case WHERE CaseNumber in :caseNumbers and Status <> 'Closed'];
+	}
+
+
     /* Update cases: set Owner and custom field to the specified values. Create Comment with specified body.
      * cases - list of cases to process.
      * ownerId - ID of the owner to set to all cases.
@@ -58,6 +68,30 @@ public class V1CaseCollector {
             insert comments;
         }
     }
+
+    /*
+     * Closes cases. Create comment with specified  body.
+     * cases 		- list of cases to process.
+     * commentBody	- text of comment body to attach to all cases. If null - no comments are created.
+     */
+    public static void closeCases(List<Case> cases, String commentBody) {
+        for (Integer i = 0; i < cases.size(); i++){
+            Case c = cases[i];
+            System.debug('BEFORE CHANGE: ' + c);
+            c.Status = 'Closed';
+            System.debug('AFTER CHANGE: ' + c);
+        }
+        Database.update(cases);
+
+        if (commentBody != null) {
+            List<CaseComment> comments = new List<CaseComment>();
+            for (Case c : cases) {
+                comments.add(new CaseComment(CommentBody = commentBody, ParentId = c.Id));
+            }
+            insert comments;
+        }
+    }
+
 
     /* Get Queue with specified Name.
      * Return: queue ID.
