@@ -23,7 +23,7 @@ public class Syncronizer {
     public Integer syncCases() {
         System.debug('==> TODO sync job there!');
         //TODO sync job there
-        return 0;
+        throw new VersionOneException('Not implemented.');
     }
 
     public List<String> getClosedDefects() {
