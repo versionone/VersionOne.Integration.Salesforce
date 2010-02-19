@@ -25,7 +25,7 @@ public class Synchronizer {
         if (cases != null && cases.size() == 0) {
             // store date of last closed defect in the VersionOne (date was set in the getCasesByCaseNumbers method)
             // because of MIXED_DML_OPERATION we can save it only if no one case is updated
-            connector.getSettings().updateOnlyDateLateClosedAsset();
+            connector.getSettings().updateDateLastClosedAsset();
         } else if (cases != null) {
             V1CaseCollector.closeCases(cases, settings.getCommentOnClosing());
         }
