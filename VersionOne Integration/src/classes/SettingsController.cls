@@ -36,7 +36,7 @@ public class SettingsController {
             return null;
         }
         if (!isSettingsCorrect) {
-            ApexPages.addMessage(getErrorMessage('Settings is not correct or was not validated.'));
+            addErrorMessage('Settings is not correct or was not validated.');
             return null;
         }
         String sourceId = getSourceId();
@@ -119,20 +119,20 @@ public class SettingsController {
         Boolean result = true;
         for (String key : requredData.keySet()) {
             if (key == null) {
-                ApexPages.addMessage(getErrorMessage(requredData.get(key)));
+                addErrorMessage(requredData.get(key));
                 result = false;
             }
         }
 
         if (settings.getDestQueueId() == settings.getSourceQueueId()) {
-            ApexPages.addMessage(getErrorMessage('Source Queue and Destination Queue must be different.'));
+            addErrorMessage('Source Queue and Destination Queue must be different.');
             result = false;
         }
         return result;
     }
 
-    private static ApexPages.Message getErrorMessage(String text) {
-        return new ApexPages.Message(ApexPages.Severity.ERROR, text);
+    private static ApexPages.Message addErrorMessage(String text) {
+        return ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, text));
     }
 
     public void initSettings() {
@@ -189,12 +189,18 @@ public class SettingsController {
             ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM,
                 countStr + ' Cases have been closed.'));
         } catch (VersionOneException ex) {
-            ApexPages.addMessage(getErrorMessage('Failed to update Cases.'));
-            ApexPages.addMessage(getErrorMessage(ex.getErrorMessage()));
+            addErrorMessage('Failed to update Cases.');
+            addErrorMessage(ex.getErrorMessage());
         } catch (Exception ex) {
-            ApexPages.addMessage(getErrorMessage('Failed to update Cases.'));
+            addErrorMessage('Failed to update Cases.');
             ApexPages.addMessages(ex);
         }
+        testMessage = '';
+        testSeverity = '';
+        saveSeverity = '';
+        saveMessage = '';
+        isSettingsValidated = false;
+        isSaved = false;
         return null;
     }
 }
