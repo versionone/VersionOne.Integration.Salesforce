@@ -6,9 +6,7 @@ global public class SyncSchedule implements Schedulable {
 
     /** Periodicaly executed method. */
     global void execute(SchedulableContext sc) {
-        Settings settings = new Settings();
-        IV1Connector connector = new V1Connector(settings, new Requestor(settings));
-        (new Synchronizer(settings, connector)).syncCases();
+        (new Synchronizer(new Settings())).syncCases();
     }
 
     /**

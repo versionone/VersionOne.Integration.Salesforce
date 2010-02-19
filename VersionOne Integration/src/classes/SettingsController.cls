@@ -12,7 +12,8 @@ public class SettingsController {
 
     private transient IV1Connector connector;
 
-    public String updateSchedule(String oldId) {
+    public String updateSchedule() {
+        String oldId = settings.getScheduleId();
         Boolean isScheduled = SyncSchedule.isScheduled(oldId);
         if (isSyncEnabled) {
             if (!isScheduled) {
@@ -22,7 +23,7 @@ public class SettingsController {
         }
         // Disable Sync
         if (isScheduled) {
-            SyncSchedule.unschedule(settings.getScheduleId());
+            SyncSchedule.unschedule(oldId);
         }
         return null;
     }
@@ -48,7 +49,7 @@ public class SettingsController {
             return null;
         }
         settings.setSourceId(sourceId);
-        settings.setScheduleId(updateSchedule(settings.getScheduleId()));
+        settings.setScheduleId(updateSchedule());
 
         System.debug('Save Settings');
         testMessage = '';
