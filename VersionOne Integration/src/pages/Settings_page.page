@@ -84,7 +84,7 @@
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel for="forceSync"/>
                     <apex:commandButton action="{!forceSync}" value="Force Synchronization" id="forceSync"
-                        status="sync_status" reRender="messages" styleClass="btnImportant"/>
+                        status="sync_status" reRender="messages, out_saving, out_testing" styleClass="btnImportant"/>
                 </apex:pageBlockSectionItem>
 
                 <apex:pageBlockSectionItem >

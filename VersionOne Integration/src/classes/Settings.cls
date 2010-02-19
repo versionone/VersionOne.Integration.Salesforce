@@ -25,10 +25,6 @@ public with sharing class Settings {
                 mycs = new V1Settings__c(Name = settingsName);
                 mycs.Path__c = 'http://example.com/VersionOne/';
                 mycs.UserName__c = 'admin';
-                //mycs.Password__c = 'admin';
-                //mycs.EscalateQueueId__c = null;
-                //mycs.AssignedQueueId__c = null;
-                //mycs.Source__c = 'SalesForce';
                 mycs.CommentBody__c = 'Escalated to VersionOne';
                 mycs.CommentOnClosing__c = 'Closed in the VersionOne';
                 insert mycs;
@@ -202,19 +198,17 @@ public with sharing class Settings {
             mycs.DateLastClosedAsset__c = changeDateUTC;
             mycs.ScheduleId__c = scheduleId;
             update mycs;
-        } else {
-            //TODO Can be there?
-        }
+        } //else Do nothing (used in tests)
     }
 
-	/**
-	* Store date of last closed asset to SF custom settings storage
-	**/
+    /**
+     * Store date of last closed asset to SF custom settings storage
+     */
     public void updateDateLastClosedAsset() {
-    	if (mycs != null) {
-    		mycs.DateLastClosedAsset__c = changeDateUTC;
-    		update mycs;
-    	}
+        if (mycs != null) {
+            mycs.DateLastClosedAsset__c = changeDateUTC;
+            update mycs;
+        } //else Do nothing (used in tests)
     }
 
     /**
