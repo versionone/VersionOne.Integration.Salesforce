@@ -41,7 +41,7 @@ public with sharing class V1Connector implements IV1Connector {
             }
             if (latestDate != settings.getLastDateChangeAsset()) {
             	// here we set date
-            	// settings will be updated in the Sybcronizer class, if no one case has to be updated
+            	// settings will be stored in the Syncronizer class, if no one case has to be updated
                 settings.setLastDateChangeAsset(latestDate);
             }
         }

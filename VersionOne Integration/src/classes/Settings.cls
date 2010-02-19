@@ -207,7 +207,10 @@ public with sharing class Settings {
         }
     }
 
-    public void updateOnlyDateLateClosedAsset() {
+	/**
+	* Store date of last closed asset to SF custom settings storage
+	**/
+    public void updateDateLastClosedAsset() {
     	if (mycs != null) {
     		mycs.DateLastClosedAsset__c = changeDateUTC;
     		update mycs;
