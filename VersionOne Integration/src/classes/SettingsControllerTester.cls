@@ -272,8 +272,8 @@ private class SettingsControllerTester {
         Settings testSettings = Settings.getTestSettings();
         String sourceIdExpected = '1010';
         testSettings.setSource('');
-        IV1Connector connector = new V1ConnectorMock();
-        ((V1ConnectorMock)connector).setTestSourceId(sourceIdExpected);
+        V1ConnectorMock connector = new V1ConnectorMock();
+        connector.setTestSourceId(sourceIdExpected);
         controller.setConnector(connector);
         controller.settings = testSettings;
 
@@ -281,4 +281,21 @@ private class SettingsControllerTester {
         System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
+    static testMethod void updateScheduleTest() {
+        SettingsController c = new SettingsController();
+        Settings s = Settings.getTestSettings();
+        c.settings = s;
+        c.isSyncEnabled = true;
+        String newId = c.updateSchedule();
+
+        System.assert(newId != null, 'New ID must be not null');
+        System.assert(SyncSchedule.isScheduled(newId), 'job must be scheduled');
+
+        s.setScheduleId(newId);
+        c.isSyncEnabled = false;
+        String newId2 = c.updateSchedule();
+
+        System.assert(newId2 == null, 'Second ID must be null');
+        System.assert(!SyncSchedule.isScheduled(newId), 'First job must be unscheduled');
+    }
 }
