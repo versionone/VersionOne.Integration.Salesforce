@@ -39,7 +39,7 @@
                     <apex:outputLabel value="Password" for="Password" />
                     <apex:outputPanel styleClass="requiredInput" layout="block">
                         <apex:outputPanel styleClass="requiredBlock" layout="block"/>
-                        <apex:inputSecret value="{!settings.Password}" size="40"
+                        <apex:inputSecret value="{!settings.Password}" size="40" redisplay="true"
                             id="Password" tabindex="3" onkeydown="disableSaveButtons()" onchange="disableSaveButtons()" maxlength="20"/>
                     </apex:outputPanel>
                 </apex:pageBlockSectionItem>

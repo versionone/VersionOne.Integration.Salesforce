@@ -1,15 +1,14 @@
-public class Syncronizer {
-    //StorySource%3a1009
+public class Synchronizer {
     private static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="{0}";Defect.AssetState="Closed"{1})';
     private final Settings settings;
     private final IV1Connector connector;
 
-    public Syncronizer(Settings settings) {
+    public Synchronizer(Settings settings) {
         this.settings = settings;
         connector = new V1Connector(settings, new Requestor(settings));
     }
 
-    public Syncronizer(Settings settings, IV1Connector connector) {
+    public Synchronizer(Settings settings, IV1Connector connector) {
         this.settings = settings;
         this.connector = connector;
     }
@@ -26,7 +25,7 @@ public class Syncronizer {
         if (cases != null && cases.size() == 0) {
             // store date of last closed defect in the VersionOne (date was set in the getCasesByCaseNumbers method)
             // because of MIXED_DML_OPERATION we can save it only if no one case is updated
-            connector.getSettings().updateSettings();
+            connector.getSettings().updateOnlyDateLateClosedAsset();
         } else if (cases != null) {
             V1CaseCollector.closeCases(cases, settings.getCommentOnClosing());
         }
