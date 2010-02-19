@@ -1,9 +1,9 @@
 @isTest
-private class SyncronizerTester {
+private class SynchronizerTester {
 
     static testMethod void getClosedDefectsTest() {
         // no ported cases
-        Syncronizer synch = new Syncronizer(Settings.getTestSettings());
+        Synchronizer synch = new Synchronizer(Settings.getTestSettings());
         System.assertEquals(null, synch.getClosedDefects(), 'No defects have to be found.');
 
         //there are ported cases
@@ -20,7 +20,7 @@ private class SyncronizerTester {
         IV1Connector testConnector = new V1ConnectorMock();
         String[] closedDefects = new String[]{'case number 1', 'case number 2'};
         ((V1ConnectorMock)testConnector).setClosedDefects(closedDefects);
-        synch = new Syncronizer(testSettings, testConnector);
+        synch = new Synchronizer(testSettings, testConnector);
 
         System.runAs(createUser('test4356')){
         	// it need just to pass verification that at least one opened ported case exist
@@ -35,7 +35,7 @@ private class SyncronizerTester {
     }
 
     static testMethod void syncCasesTest() {
-		Syncronizer synch;
+		Synchronizer synch;
         String queueName = 'TestQueue1';
         Group queue = new Group(Type='Queue', Name=queueName);
         insert queue;
@@ -60,7 +60,7 @@ private class SyncronizerTester {
 	        IV1Connector testConnector = new V1ConnectorMock();
 	        String[] closedTask = new String[] {case1.CaseNumber, case2.CaseNumber, case3.CaseNumber};
 	        ((V1ConnectorMock)testConnector).setClosedDefects(closedTask);
-	        synch = new Syncronizer(testSettings, testConnector);
+	        synch = new Synchronizer(testSettings, testConnector);
 
             Integer numberCases = synch.syncCases();
             System.assertEquals(1, numberCases, 'Incorrect numbers of defects.');

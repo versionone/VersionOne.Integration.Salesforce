@@ -184,7 +184,7 @@ public class SettingsController {
 
     public PageReference forceSync() {
         try {
-            Integer count = (new Syncronizer(new Settings())).syncCases();
+            Integer count = (new Synchronizer(settings)).syncCases();
             String countStr = (count == 0 ? 'No' : String.valueOf(count));
             ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM,
                 countStr + ' Cases have been closed.'));

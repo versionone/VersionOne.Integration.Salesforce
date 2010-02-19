@@ -207,6 +207,13 @@ public with sharing class Settings {
         }
     }
 
+    public void updateOnlyDateLateClosedAsset() {
+    	if (mycs != null) {
+    		mycs.DateLastClosedAsset__c = changeDateUTC;
+    		update mycs;
+    	}
+    }
+
     /**
      * Returns true if main attributes are not null
      */
