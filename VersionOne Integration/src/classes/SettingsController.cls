@@ -12,6 +12,21 @@ public class SettingsController {
 
     private transient IV1Connector connector;
 
+    public String updateSchedule(String oldId) {
+        Boolean isScheduled = SyncSchedule.isScheduled(oldId);
+        if (isSyncEnabled) {
+            if (!isScheduled) {
+                return SyncSchedule.addSchedule();
+            }
+            return oldId;
+        }
+        // Disable Sync
+        if (isScheduled) {
+            SyncSchedule.unschedule(settings.getScheduleId());
+        }
+        return null;
+    }
+
     public PageReference saveSettings() {
         if (!validateRequiredFields()) {
             isSettingsCorrect = false;
@@ -34,18 +49,7 @@ public class SettingsController {
         }
         settings.setSourceId(sourceId);
 
-        Boolean isScheduled = SyncSchedule.isScheduled(settings.getScheduleId());
-        if (isSyncEnabled) {
-            if (!isScheduled) {
-                String id = SyncSchedule.addSchedule();
-                settings.setScheduleId(id);
-            }
-        } else {
-            if (isScheduled) {
-                SyncSchedule.unschedule(settings.getScheduleId());
-            }
-            settings.setScheduleId(null);
-        }
+        settings.setScheduleId(updateSchedule(settings.getScheduleId()));
 
         System.debug('Save Settings');
         testMessage = '';
@@ -186,7 +190,7 @@ public class SettingsController {
                 countStr + ' Cases have been closed.'));
         } catch (VersionOneException ex) {
             ApexPages.addMessage(getErrorMessage('Failed to update Cases.'));
-			ApexPages.addMessage(getErrorMessage(ex.getErrorMessage()));
+            ApexPages.addMessage(getErrorMessage(ex.getErrorMessage()));
         } catch (Exception ex) {
             ApexPages.addMessage(getErrorMessage('Failed to update Cases.'));
             ApexPages.addMessages(ex);
