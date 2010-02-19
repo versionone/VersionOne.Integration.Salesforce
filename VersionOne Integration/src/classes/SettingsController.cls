@@ -48,18 +48,17 @@ public class SettingsController {
             return null;
         }
         settings.setSourceId(sourceId);
-
         settings.setScheduleId(updateSchedule(settings.getScheduleId()));
 
         System.debug('Save Settings');
         testMessage = '';
         testSeverity = '';
-        saveSeverity = 'info';
-        saveMessage = 'Settings has been saved.';
         isSettingsValidated = false;
         isSaved = true;
         try {
             settings.updateSettings();
+            saveSeverity = 'info';
+            saveMessage = 'Settings has been saved.';
         } catch (Exception ex) {
             saveSeverity = 'error';
             saveMessage = 'Settings has not been saved. Reason:' + ex.getMessage();
@@ -131,8 +130,8 @@ public class SettingsController {
         return result;
     }
 
-    private static ApexPages.Message addErrorMessage(String text) {
-        return ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, text));
+    private static void addErrorMessage(String text) {
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, text));
     }
 
     public void initSettings() {
