@@ -82,19 +82,19 @@
 
             <apex:pageBlockSection title="Case syncronization"  columns="1">
                 <apex:pageBlockSectionItem >
-                    <apex:outputLabel value="Enable syncronization" for="EnableSync"/>
+                    <apex:outputLabel for="forceSync"/>
+                    <apex:commandButton action="{!forceSync}" value="Force Syncronization" id="forceSync"
+                        status="sync_status" reRender="messages" styleClass="btnImportant"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Schedule syncronization" for="EnableSync"/>
                     <apex:inputCheckbox value="{!isSyncEnabled}" id="EnableSync"/>
                 </apex:pageBlockSectionItem>
 
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="Comment on closing" for="CommentOnClosing"/>
                     <apex:inputTextarea value="{!settings.CommentOnClosing}" id="CommentOnClosing" cols="75" rows="6"/>
-                </apex:pageBlockSectionItem>
-
-                <apex:pageBlockSectionItem >
-                    <apex:outputLabel for="forceSync"/>
-                    <apex:commandButton action="{!forceSync}" value="Force Syncronization" id="forceSync"
-                        status="sync_status" reRender="messages" styleClass="btnImportant"/>
                 </apex:pageBlockSectionItem>
             </apex:pageBlockSection>
 
