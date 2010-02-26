@@ -7,6 +7,7 @@ public with sharing class Settings {
     private String source;
     private String sourceId;
     private String sourceQueueId;
+    private String storyQueueId;
     private String destQueueId;
     private String commentBody;
     private DateTime changeDateUTC;
@@ -38,6 +39,7 @@ public with sharing class Settings {
             setSource(mycs.Source__c);
             setSourceId(mycs.V1SourceId__c);
             setSourceQueueId(mycs.EscalateQueueId__c);
+            setStoryQueueId(mycs.StoryQueueId__c);
             setDestQueueId(mycs.AssignedQueueId__c);
             changeDateUTC = mycs.DateLastClosedAsset__c;
             setScheduleId(mycs.scheduleId__c);
@@ -96,6 +98,18 @@ public with sharing class Settings {
             sourceQueueId = null;
         } else {
             sourceQueueId = id;
+        }
+    }
+
+    public String getStoryQueueId() {
+        return storyQueueId;
+    }
+
+    public void setStoryQueueId(String id) {
+        if (id == '') {
+            storyQueueId = null;
+        } else {
+            storyQueueId = id;
         }
     }
 

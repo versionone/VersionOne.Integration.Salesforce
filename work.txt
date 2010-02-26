@@ -8,6 +8,7 @@ add the following fileds:
   Source 		- Text maxlength=30
   EscalateQueueId 	- Text(18)
   AssignedQueueId 	- Text(18)
+  StoryQueueId 	- Text(18)
   commentBody 	- Text Area(255)
   CommentOnClosing - Text Area(255)
   V1SourceId	- Text(10)
