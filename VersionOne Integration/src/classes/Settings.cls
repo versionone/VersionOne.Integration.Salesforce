@@ -6,7 +6,7 @@ public with sharing class Settings {
     private String password;
     private String source;
     private String sourceId;
-    private String sourceQueueId;
+    private String defectQueueId;
     private String storyQueueId;
     private String destQueueId;
     private String commentBody;
@@ -38,7 +38,7 @@ public with sharing class Settings {
             setCommentOnClosing(mycs.CommentOnClosing__c);
             setSource(mycs.Source__c);
             setSourceId(mycs.V1SourceId__c);
-            setSourceQueueId(mycs.EscalateQueueId__c);
+            setDefectQueueId(mycs.EscalateQueueId__c);
             setStoryQueueId(mycs.StoryQueueId__c);
             setDestQueueId(mycs.AssignedQueueId__c);
             changeDateUTC = mycs.DateLastClosedAsset__c;
@@ -89,15 +89,15 @@ public with sharing class Settings {
         }
     }
 
-    public String getSourceQueueId() {
-        return sourceQueueId;
+    public String getDefectQueueId() {
+        return defectQueueId;
     }
 
-    public void setSourceQueueId(String id) {
+    public void setDefectQueueId(String id) {
         if (id == '') {
-            sourceQueueId = null;
+            defectQueueId = null;
         } else {
-            sourceQueueId = id;
+            defectQueueId = id;
         }
     }
 
@@ -204,7 +204,8 @@ public with sharing class Settings {
             mycs.UserName__c = userName;
             mycs.Password__c = password;
             mycs.Source__c = source;
-            mycs.EscalateQueueId__c = sourceQueueId;
+            mycs.EscalateQueueId__c = defectQueueId;
+            mycs.StoryQueueId__c = storyQueueId;
             mycs.AssignedQueueId__c = destQueueId;
             mycs.CommentBody__c = commentBody;
             mycs.CommentOnClosing__c = commentOnClosing;
@@ -225,12 +226,31 @@ public with sharing class Settings {
         } //else Do nothing (used in tests)
     }
 
-    /**
-     * Returns true if main attributes are not null
-     */
-    public boolean isCorrect() {
-        return getSource() != null && getDestQueueId() != null &&
-            getSourceQueueId() != null && getPath() != null &&
-            getUserName() != null && getPath() != null && getSourceId() != null;
+    /** Returns array of error messages or empty array if all is crrect. */
+    public String[] validate() {
+        Map<String, String> requredData = new Map<String, String>();
+        requredData.put(getPath(), 'URL is required field.');
+        requredData.put(getUserName(), 'User name is required field.');
+        requredData.put(getSource(), 'Source is required field.');
+        requredData.put(getDestQueueId(), 'You must choose a Destination Queue.');
+        requredData.put(getDefectQueueId(), 'You must choose a Source Queue for Defects.');
+        requredData.put(getStoryQueueId(), 'You must choose a Source Queue for Stories.');
+        requredData.put(getPassword(), 'Password is required field.');
+
+        List<String> res = new List<String>();
+        for (String key : requredData.keySet()) {
+            if (key == null) {
+                res.add(requredData.get(key));
+            }
+        }
+
+        Set<String> queues = new Set<String>();
+        queues.add(getDefectQueueId());
+        queues.add(getStoryQueueId());
+        queues.add(getDestQueueId());
+        if (queues.size() < 3){
+            res.add('All queues must be different.');
+        }
+        return res;
     }
 }

@@ -15,6 +15,12 @@ private class V1PublisherTester {
         QueueSobject sobj2 = new QueueSobject(QueueId = queue2.Id, SobjectType = 'Case');
         insert sobj2;
 
+        String queueName3 = 'TestQueue3';
+        Group queue3 = new Group(Type='Queue', Name=queueName3);
+        insert queue3;
+        QueueSobject sobj3 = new QueueSobject(QueueId = queue3.Id, SobjectType = 'Case');
+        insert sobj3;
+
         System.runAs(createUser('test4356')){
             //prepare cases
             Case case1 = new Case(Subject = 'case1', OwnerId = queue2.Id);
@@ -42,7 +48,7 @@ private class V1PublisherTester {
             String caseDescription = 'Case for testing';
             String path = 'http://localhost/';
             String userName = 'userName';
-			String comment = 'test comment';
+            String comment = 'test comment';
             String expectedSendBody = '<Asset>' +
                                 '<Relation act="set" name="Scope">' +
                                     '<Asset idref="Scope:' + productId + '"/>' +
@@ -57,7 +63,8 @@ private class V1PublisherTester {
             String additionPath = 'assetdetail.v1?oid=Defect%3a';
             Settings testSettings = Settings.getTestSettings();
             testSettings.setDestQueueId(queue.Id);
-            testSettings.setSourceQueueId(queue2.Id);
+            testSettings.setDefectQueueId(queue2.Id);
+            testSettings.setStoryQueueId(queue3.Id);
             testSettings.setPath(path);
             testSettings.setCommentBody(comment);
             testSettings.setSourceId(sourceId);
@@ -67,7 +74,7 @@ private class V1PublisherTester {
             IV1Connector connector = new V1ConnectorMock();
             ((V1ConnectorMock)connector).setCreatedDefectId(defectId);
             ((V1ConnectorMock)connector).setTestAlreadyExistedDefects(alreadyPortedCases);
-			V1Publisher.setConnector(connector);
+            V1Publisher.setConnector(connector);
             V1Publisher.setSettings(testSettings);
             //Map<String, String> projects = new Map<String, String>();
 
@@ -122,6 +129,12 @@ private class V1PublisherTester {
         QueueSobject sobj2 = new QueueSobject(QueueId = queue2.Id, SobjectType = 'Case');
         insert sobj2;
 
+        String queueName3 = 'TestQueue3';
+        Group queue3 = new Group(Type='Queue', Name=queueName3);
+        insert queue3;
+        QueueSobject sobj3 = new QueueSobject(QueueId = queue3.Id, SobjectType = 'Case');
+        insert sobj3;
+
         System.runAs(createUser('test4356')){
             //prepare cases
             Case case1 = new Case(Subject = 'case1', OwnerId = queue2.Id);
@@ -145,7 +158,7 @@ private class V1PublisherTester {
             String caseDescription = 'Case for testing';
             String path = 'http://localhost/';
             String userName = 'userName';
-			String comment = 'test comment';
+            String comment = 'test comment';
             String expectedSendBody = '<Asset>' +
                                 '<Relation act="set" name="Scope">' +
                                     '<Asset idref="Scope:' + productId + '"/>' +
@@ -160,7 +173,8 @@ private class V1PublisherTester {
             String additionPath = 'assetdetail.v1?oid=Defect%3a';
             Settings testSettings = Settings.getTestSettings();
             testSettings.setDestQueueId(queue.Id);
-            testSettings.setSourceQueueId(queue2.Id);
+            testSettings.setDefectQueueId(queue2.Id);
+            testSettings.setStoryQueueId(queue3.Id);
             testSettings.setPath(path);
             testSettings.setCommentBody(comment);
             testSettings.setSourceId(sourceId);
@@ -171,7 +185,7 @@ private class V1PublisherTester {
             ((V1ConnectorMock)connector).setCreatedDefectId(defectId);
             ((V1ConnectorMock)connector).setTestAlreadyExistedDefects(alreadyPortedCases);
             ((V1ConnectorMock)connector).enableException(true, 1, 'Just test exception.');
-			V1Publisher.setConnector(connector);
+            V1Publisher.setConnector(connector);
             V1Publisher.setSettings(testSettings);
             //Map<String, String> projects = new Map<String, String>();
 

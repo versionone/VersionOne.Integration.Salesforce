@@ -25,7 +25,7 @@ private class SettingsControllerTester {
         System.assert(contains, msg + '\n  ' + name + ' not found in ' + actuals);
     }
 
-    static testMethod void validateRequiredFieldsTest() {
+    static testMethod void validateSettingsTest() {
         SettingsController controller = new SettingsController();
         Test.setCurrentPage(new PageReference('apex/Settings_page'));
         Settings settingsData = Settings.getTestSettings();
@@ -36,66 +36,22 @@ private class SettingsControllerTester {
         settingsData.setPath('http://localhost');
         settingsData.setUserName('user');
         settingsData.setSource('source');
-        settingsData.setSourceQueueId('78234612347614298476');
+        settingsData.setDefectQueueId('78234612347614298476');
+        settingsData.setStoryQueueId('78234612347614298476');
         settingsData.setDestQueueId('235453764567567455345');
         settingsData.setCommentBody('test comment');
         settingsData.setPassword('password');
         controller.settings = settingsData;
-        System.assert(controller.validateRequiredFields(), 'Incorrect reuslt when all required parameters is filled.');
+        System.assert(controller.validateSettings(), 'Incorrect reuslt when all required parameters is filled.');
+        System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of errors when all required parameters is filled.');
 
         //empty path
         settingsData.setPath('');
         controller.settings = settingsData;
-        result = controller.validateRequiredFields();
+        result = controller.validateSettings();
         System.assert(!result, 'Incorrect result when path is empty.');
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when path is empty.');
-        System.assertEquals('URL is required field.', ApexPages.getMessages()[0].getSummary(), 'Incorrect message when path is empty.');
-        settingsData.setPath('http://localhost');
-
-        //empty SourceQueueId
-        settingsData.setSourceQueueId('');
-        System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when SourceQueueId is empty.');
-        settingsData.setSourceQueueId('78234612347614298476');
-
-        //empty DestQueueId
-        settingsData.setDestQueueId(null);
-        System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when DestQueueId is empty.');
-        settingsData.setDestQueueId('43564657586587456745');
-
-        //empty Comment
-        settingsData.setCommentBody(null);
-        System.assert(controller.validateRequiredFields(), 'Incorrect reuslt when CommentBody is empty.');
-        settingsData.setCommentBody('test comment');
-
-        //empty user name
-        settingsData.setUserName('');
-        result = controller.validateRequiredFields();
-        System.assertEquals(4, ApexPages.getMessages().size(), 'Incorrect number of errors when user name is empty.');
-        System.assert(!result, 'Incorrect result when user name is empty.');
-        System.assertEquals('User name is required field.', ApexPages.getMessages()[3].getSummary(), 'Incorrect message when user name is empty.');
-        settingsData.setUserName('user');
-
-        //empty source
-        settingsData.setSource('');
-        controller.settings = settingsData;
-        result = controller.validateRequiredFields();
-        System.assertEquals(5, ApexPages.getMessages().size(), 'Incorrect number of errors when source is empty.');
-        System.assert(!result, 'Incorrect result when source is empty.');
-        System.assertEquals('Source is required field.', ApexPages.getMessages()[4].getSummary(), 'Incorrect message when source is empty.');
-        settingsData.setSource('source');
-
-        //empty password
-        settingsData.setPassword('');
-        result = controller.validateRequiredFields();
-        System.assertEquals(6, ApexPages.getMessages().size(), 'Incorrect number of errors when user name is empty.');
-        System.assert(!result, 'Incorrect result when password is empty.');
-        System.assertEquals('Password is required field.', ApexPages.getMessages()[5].getSummary(), 'Incorrect message when user name is empty.');
-        settingsData.setUserName('password');
-
-        //empty path
-        settingsData.setPath('');
-        controller.settings = settingsData;
-        System.assert(!controller.validateRequiredFields(), 'Incorrect reuslt when path is empty.');
+        System.assert(ApexPages.getMessages()[0].getSummary().contains('URL'), 'Incorrect message when path is empty.');
         settingsData.setPath('http://localhost');
     }
 
@@ -154,7 +110,8 @@ private class SettingsControllerTester {
         settingsData.setUserName(userName);
         settingsData.setSource(source);
         settingsData.setDestQueueId(destQueueId);
-        settingsData.setSourceQueueId(sourceQueueId);
+        settingsData.setDefectQueueId(sourceQueueId);
+        settingsData.setStoryQueueId(sourceQueueId);
         settingsData.setPassword('password');
         controller.testSettings();
         System.assert(controller.isSettingsCorrect, 'Settings have to be correct.');
@@ -204,7 +161,8 @@ private class SettingsControllerTester {
         String source = 'Source';
         String path = 'http://localhost';
         String destQueueId = 'destQueueId';
-        String sourceQueueId = 'sourceQueueId';
+        String defectQueueId = 'defectQueueId';
+        String storyQueueId = 'storyQueueId';
         String password = 'password';
         String sourceIdExpected = '1010';
         Settings settingsData = Settings.getTestSettings();
@@ -212,7 +170,8 @@ private class SettingsControllerTester {
         settingsData.setUserName(userName);
         settingsData.setSource(source);
         settingsData.setDestQueueId(destQueueId);
-        settingsData.setSourceQueueId(sourceQueueId);
+        settingsData.setDefectQueueId(defectQueueId);
+        settingsData.setStoryQueueId(storyQueueId);
         settingsData.setPassword(password);
         settingsData.setScheduleId('wrong-id');
 
