@@ -40,8 +40,8 @@ public with sharing class V1Connector implements IV1Connector {
                 }
             }
             if (latestDate != settings.getLastDateChangeAsset()) {
-            	// here we set date
-            	// settings will be stored in the Syncronizer class, if no one case has to be updated
+                // here we set date
+                // settings will be stored in the Syncronizer class, if no one case has to be updated
                 settings.setLastDateChangeAsset(latestDate);
             }
         }
@@ -303,6 +303,6 @@ public with sharing class V1Connector implements IV1Connector {
     * Returns current used settings
     **/
     public Settings getSettings() {
-    	return settings;
+        return settings;
     }
 }

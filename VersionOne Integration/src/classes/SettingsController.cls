@@ -29,7 +29,7 @@ public class SettingsController {
     }
 
     public PageReference saveSettings() {
-        if (!validateRequiredFields()) {
+        if (!validateSettings()) {
             isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
@@ -68,7 +68,7 @@ public class SettingsController {
     }
 
     public PageReference testSettings() {
-        if (!validateRequiredFields()) {
+        if (!validateSettings()) {
             isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
@@ -100,35 +100,21 @@ public class SettingsController {
     }
 
     /**
-    * Validates required fields. Adds errors messages on page.
-    *
-    * settings - settings to validate.
-    * Returns 	true  - if all requred fields are filled.
-    *			false - if any of requred fields are not filled.
-    **/
-    public Boolean validateRequiredFields() {
-        Map<String, String> requredData = new Map<String, String>();
-        // key - value for verify on null, value - error, if value is null
-        requredData.put(settings.getPath(), 'URL is required field.');
-        requredData.put(settings.getUserName(), 'User name is required field.');
-        requredData.put(settings.getSource(), 'Source is required field.');
-        requredData.put(settings.getDestQueueId(), 'You must choose a Destination Queue.');
-        requredData.put(settings.getSourceQueueId(), 'You must choose a Source Queue.');
-        requredData.put(settings.getPassword(), 'Password is required field.');
-
-        Boolean result = true;
-        for (String key : requredData.keySet()) {
-            if (key == null) {
-                addErrorMessage(requredData.get(key));
-                result = false;
-            }
+     * Validates settings and adds errors messages on page if any.
+     *
+     * settings - settings to validate.
+     * Returns 	true  - if all requred fields are filled.
+     *			false - if any of requred fields are not filled.
+     */
+    public Boolean validateSettings() {
+        String[] errors = settings.validate();
+        if (errors.size() == 0) {
+            return true;
         }
-
-        if (settings.getDestQueueId() == settings.getSourceQueueId()) {
-            addErrorMessage('Source Queue and Destination Queue must be different.');
-            result = false;
+        for (String msg : errors) {
+            addErrorMessage(msg);
         }
-        return result;
+        return false;
     }
 
     private static void addErrorMessage(String text) {

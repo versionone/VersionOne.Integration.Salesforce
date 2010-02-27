@@ -24,7 +24,7 @@ public with sharing class V1Publisher {
         if (connector == null) {
             setConnector(new V1Connector(settings, new Requestor(settings)));
         }
-        if (!settings.isCorrect()) {
+        if (settings.validate().size() > 0) {
             errorMessage('Incorrect settings.');
             return;
         }
@@ -33,15 +33,15 @@ public with sharing class V1Publisher {
             errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
             return;
         }
-        List<Case> cases = V1CaseCollector.getCasesByOwnerId(settings.getSourceQueueId());
+        List<Case> cases = V1CaseCollector.getCasesByOwnerId(settings.getDefectQueueId());
 
         Map<String, Boolean> alreadyPortedCases;
         Map<String, String> projects;
 
 
         try {
-        	alreadyPortedCases = connector.getAlreadyExistedDefects(cases);
-        	projects = connector.findAllProjects();
+            alreadyPortedCases = connector.getAlreadyExistedDefects(cases);
+            projects = connector.findAllProjects();
         } catch (VersionOneException ex) {
             errorMessage(ex.getErrorMessage(), ex);
             return;
@@ -74,7 +74,7 @@ public with sharing class V1Publisher {
                     String projectId = findProjectId((String) caseData.get(settings.getV1Project()), projects);
                     Integer id = connector.createDefectInVersionOne(caseData, projectId, sourceId);
                     if (id > 0) {
-                    	connector.createLinkV1ToSF(id, caseData.Id);
+                        connector.createLinkV1ToSF(id, caseData.Id);
                         processedCases.add(caseData);
                         urls.add(settings.getPath() + URL_TO_V1_TEMPLATE + id);
                     }

@@ -53,10 +53,10 @@
 
             <apex:pageBlockSection title="Case publishing">
                 <apex:pageBlockSectionItem >
-                    <apex:outputLabel value="Source Queue" for="SourceQueue"/>
+                    <apex:outputLabel value="Source Queue for Defects" for="DefectQueue"/>
                     <apex:outputPanel styleClass="requiredInput" layout="block">
                         <apex:outputPanel styleClass="requiredBlock" layout="block"/>
-                        <apex:selectList value="{!settings.SourceQueueId}" size="1"	required="false" id="SourceQueue">
+                        <apex:selectList value="{!settings.DefectQueueId}" size="1" required="false" id="DefectQueue">
                             <apex:selectOptions value="{!QueueList}"/>
                         </apex:selectList>
                     </apex:outputPanel>
@@ -67,6 +67,16 @@
                     <apex:outputPanel styleClass="requiredInput" layout="block">
                         <apex:outputPanel styleClass="requiredBlock" layout="block"/>
                         <apex:selectList value="{!settings.DestQueueId}" size="1" required="false" id="DestQueue">
+                            <apex:selectOptions value="{!QueueList}"/>
+                        </apex:selectList>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Source Queue for Stories" for="StoryQueue"/>
+                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                        <apex:selectList value="{!settings.StoryQueueId}" size="1" required="false" id="StoryQueue">
                             <apex:selectOptions value="{!QueueList}"/>
                         </apex:selectList>
                     </apex:outputPanel>
