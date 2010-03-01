@@ -26,7 +26,6 @@ private class V1CaseCollectorTestSuite {
     }
 
     static testMethod void setCasesOwnerTest() {
-        V1Publisher.setSettings(Settings.getTestSettings());
         String queueName = 'TestQueue1';
         Group queue = new Group(Type='Queue', Name=queueName);
         insert queue;
@@ -34,7 +33,6 @@ private class V1CaseCollectorTestSuite {
         insert sobj;
 
         System.runAs(createUser('test4356')){
-            String customField = 'VersionOneUrl__c';
             Case case1 = new Case(Subject='TestCase1');
             Case case2 = new Case(Subject='TestCase2');
             Case case3 = new Case(Subject='TestCase3');
@@ -43,14 +41,13 @@ private class V1CaseCollectorTestSuite {
             Case[] cases = V1CaseCollector.getCasesByOwnerId(queue.Id);
             System.assertEquals(0, cases.size(), 'There is already owned cases.');
 
-            V1CaseCollector.updateCases(new Case[] {case1, case2}, queue.Id, 'test comment',
-                                        customField, new String[] {'999', null});
+            V1CaseCollector.updateCases(new Case[] {case1, case2}, queue.Id, 'test comment', new String[] {'999', null});
             System.assertEquals(queue.Id, case1.OwnerId, 'Case1 Owner doesn\'t changed.');
             System.assertEquals(queue.Id, case2.OwnerId, 'Case2 Owner doesn\'t changed.');
             System.assertEquals(null, case3.OwnerId, 'Case3 Owner set by mistake.');
-            System.assertEquals('999', case1.get(customField), 'Case1 customField doesn\'t changed.');
-            System.assertEquals(null, case2.get(customField), 'Case2 customField set by mistake.');
-            System.assertEquals(null, case3.get(customField), 'Case3 customField set by mistake.');
+            System.assertEquals('999', case1.VersionOneUrl__c, 'Case1 customField doesn\'t changed.');
+            System.assertEquals(null, case2.VersionOneUrl__c, 'Case2 customField set by mistake.');
+            System.assertEquals(null, case3.VersionOneUrl__c, 'Case3 customField set by mistake.');
 
             Case[] newCases = V1CaseCollector.getCasesByOwnerId(queue.Id);
             System.assertEquals(2, newCases.size(), 'Wrong count of owned cases.');
@@ -79,7 +76,6 @@ private class V1CaseCollectorTestSuite {
     }
 
     static testMethod void getQueueIdByNameTest() {
-        V1Publisher.setSettings(Settings.getTestSettings());
         String queueName = 'TestQueue1';
         Group group1 = new Group(Name=queueName);
         insert group1;
@@ -92,7 +88,6 @@ private class V1CaseCollectorTestSuite {
     }
 
     static testMethod void getCasesByOwnerIdTest() {
-        V1Publisher.setSettings(Settings.getTestSettings());
         String queueName = 'TestQueue1';
         Group queue = new Group(Type='Queue', Name=queueName);
         insert queue;
@@ -100,25 +95,25 @@ private class V1CaseCollectorTestSuite {
         insert sobj;
 
         System.runAs(createUser('test4356')){
-        	Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
-        	Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id);
-        	Case case3 = new Case(Subject='TestCase3', OwnerId = queue.Id);
-        	insert new Case[] {case1, case2, case3};
+            Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
+            Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id);
+            Case case3 = new Case(Subject='TestCase3', OwnerId = queue.Id);
+            insert new Case[] {case1, case2, case3};
 
-        	Case[] cases = V1CaseCollector.getCasesByOwnerId(queue.Id);
-        	System.assertEquals(3, cases.size(), 'Incorrect numbers of cases.');
+            Case[] cases = V1CaseCollector.getCasesByOwnerId(queue.Id);
+            System.assertEquals(3, cases.size(), 'Incorrect numbers of cases.');
 
-        	case2.status = 'Closed';
-        	update case2;
-        	System.debug('case 2 status : ' + case2.status);
-        	Case[] newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, true);
-        	System.assertEquals(1, newCases.size(), 'Incorrect numbers of cases. One cases have to be closed');
+            case2.status = 'Closed';
+            update case2;
+            System.debug('case 2 status : ' + case2.status);
+            Case[] newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, true);
+            System.assertEquals(1, newCases.size(), 'Incorrect numbers of cases. One cases have to be closed');
             assertContains(case2, newCases, 'Wrong owned case2.');
-        	newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, false);
-        	System.assertEquals(2, newCases.size(), 'Incorrect numbers of cases. Two classes have to be not closed');
+            newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, false);
+            System.assertEquals(2, newCases.size(), 'Incorrect numbers of cases. Two classes have to be not closed');
             assertContains(case1, newCases, 'Wrong owned case1.');
             assertContains(case3, newCases, 'Wrong owned case3.');
-		}
+        }
     }
 
     static testMethod void getCasesByCaseNumberTest() {
@@ -127,32 +122,32 @@ private class V1CaseCollectorTestSuite {
         insert queue;
         QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
         insert sobj;
-    	System.runAs(createUser('test4356')){
-	    	Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
-	    	Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id, Status = 'Closed');
-	    	Case case3 = new Case(Subject='TestCase3');
-	    	insert new Case[] {case1, case2, case3};
-	        case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
-	        case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
-	        case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
+        System.runAs(createUser('test4356')){
+            Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
+            Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id, Status = 'Closed');
+            Case case3 = new Case(Subject='TestCase3');
+            insert new Case[] {case1, case2, case3};
+            case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
+            case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
+            case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
 
-			List<String> caseNumbers = new String[] {case1.CaseNumber, case2.CaseNumber, case3.CaseNumber};
-			System.debug('caseNumbers=' + caseNumbers);
-	    	Case[] cases = V1CaseCollector.getCasesByCaseNumbersAndOwnerId(caseNumbers, queue.Id);
-	    	System.assertEquals(1, cases.size(), 'Incorrect numbers of cases.');
-    	}
-	}
+            List<String> caseNumbers = new String[] {case1.CaseNumber, case2.CaseNumber, case3.CaseNumber};
+            System.debug('caseNumbers=' + caseNumbers);
+            Case[] cases = V1CaseCollector.getCasesByCaseNumbersAndOwnerId(caseNumbers, queue.Id);
+            System.assertEquals(1, cases.size(), 'Incorrect numbers of cases.');
+        }
+    }
 
     static testMethod void closeCasesTest() {
-    	String testComment = 'Test comment';
-    	Case case1 = new Case(Subject='TestCase1');
-    	Case case2 = new Case(Subject='TestCase2');
-    	Case case3 = new Case(Subject='TestCase3');
-    	insert new Case[] {case1, case2, case3};
+        String testComment = 'Test comment';
+        Case case1 = new Case(Subject='TestCase1');
+        Case case2 = new Case(Subject='TestCase2');
+        Case case3 = new Case(Subject='TestCase3');
+        insert new Case[] {case1, case2, case3};
         case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
         case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
         case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
-    	V1CaseCollector.closeCases(new Case[] {case1, case2, case3}, testComment);
+        V1CaseCollector.closeCases(new Case[] {case1, case2, case3}, testComment);
 
         Case newCase1 = [SELECT Status FROM Case WHERE Id = :case1.Id];
         System.assertEquals('Closed', newCase1.Status, 'Incorrect status of case.');
@@ -163,7 +158,7 @@ private class V1CaseCollectorTestSuite {
         CaseComment newComment2 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase2.Id];
         System.assertEquals(testComment, newComment2.CommentBody);
         Case newCase3 = [SELECT Status FROM Case WHERE Id = :case3.Id];
-    	System.assertEquals('Closed', newCase3.Status, 'Incorrect status of case.');
+        System.assertEquals('Closed', newCase3.Status, 'Incorrect status of case.');
         CaseComment newComment3 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase3.Id];
         System.assertEquals(testComment, newComment3.CommentBody);
     }

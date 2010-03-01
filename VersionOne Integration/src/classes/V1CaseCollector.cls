@@ -36,27 +36,22 @@ public class V1CaseCollector {
     public static Case[] getCasesByCaseNumbersAndOwnerId(List<String> caseNumbers, String ownerId) {
         return [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject
                           FROM Case WHERE CaseNumber in :caseNumbers and Status <> 'Closed' and OwnerId = :ownerId];
-	}
+    }
 
 
     /* Update cases: set Owner and custom field to the specified values. Create Comment with specified body.
      * cases - list of cases to process.
      * ownerId - ID of the owner to set to all cases.
      * commentBody - text of comment body to attach to all cases. If null - no comments are created.
-     * fieldName - name of custom field.
-     * fieldValues - list values to set to custom field. Must be same size as list of cases.
-     * 				 Each value set to apropriate case: case[i].<fieldName> = fieldValues[i].
+     * v1Urls - list URLs to set to VersionOneUrl field. Must be same size as list of cases.
+     * 				 Each value set to apropriate case: case[i].VersionOneUrl__c = v1Urls[i].
      */
-    public static void updateCases(List<Case> cases, String ownerId, String commentBody,
-                                   String fieldName, List<Object> fieldValues) {
+    public static void updateCases(List<Case> cases, String ownerId, String commentBody, List<String> v1Urls) {
         for (Integer i = 0; i < cases.size(); i++){
             Case c = cases[i];
             System.debug('BEFORE CHANGE: ' + c);
             c.OwnerId = ownerId;
-            if (fieldValues[i] != null) {
-                c.put(fieldName, fieldValues[i]);
-                System.debug('update ' + fieldName + ' field to ' + fieldValues[i]);
-            }
+            c.VersionOneUrl__c = v1Urls[i];
             System.debug('AFTER CHANGE: ' + c);
         }
         Database.update(cases);

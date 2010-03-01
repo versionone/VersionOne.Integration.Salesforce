@@ -239,7 +239,7 @@ public with sharing class V1Connector implements IV1Connector {
     * returns 	defect id  	- all ok
     *			-1 			- defect was not created
     **/
-    public Integer createDefectInVersionOne(Case caseData, String productId, String sourceId) {
+    public Integer createDefectInV1(Case caseData, String productId) {
         Integer defectId = -1;
         XMLDom xmlParser = new XMLDom();
         try {
@@ -248,7 +248,7 @@ public with sharing class V1Connector implements IV1Connector {
                                 attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME)) +
                                 attributeNode('Reference', caseData.CaseNumber) +
                                 attributeNode('Description', (caseData.Description != null ? caseData.Description : '')) +
-                                relationNode('Source', 'StorySource:' + sourceId) +
+                                relationNode('Source', 'StorySource:' + settings.getSourceId()) +
                                       '</Asset>';
             System.debug('XML for create defect:' + createDefectBody);
 

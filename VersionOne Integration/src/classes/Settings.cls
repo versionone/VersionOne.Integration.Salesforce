@@ -1,4 +1,5 @@
 public with sharing class Settings {
+
     private final V1Settings__c mycs;
 
     private String path;
@@ -15,22 +16,12 @@ public with sharing class Settings {
     private String commentOnClosing;
 
     public Settings () {
-        this('V1Settings');
+        this(getMics('V1Settings'));
     }
 
-    private Settings(String settingsName) {
-        if (settingsName != null) {
-            mycs = V1Settings__c.getValues(settingsName);
-
-            if(mycs == null) {
-                mycs = new V1Settings__c(Name = settingsName);
-                mycs.Path__c = 'http://example.com/VersionOne/';
-                mycs.UserName__c = 'admin';
-                mycs.CommentBody__c = 'Escalated to VersionOne';
-                mycs.CommentOnClosing__c = 'Closed in the VersionOne';
-                insert mycs;
-            }
-
+    private Settings(V1Settings__c mycs) {
+        if (mycs != null) {
+            this.mycs = mycs;
             setPath(mycs.Path__c);
             setUserName(mycs.UserName__c);
             setPassword(mycs.Password__c);
@@ -46,9 +37,27 @@ public with sharing class Settings {
         }
     }
 
+    private static V1Settings__c getMics(String name) {
+        V1Settings__c res = V1Settings__c.getValues(name);
+        if(res == null) {
+            System.debug('Settings not found. Creating new one.');
+            res = new V1Settings__c(Name = name);
+            res.Path__c = 'http://example.com/VersionOne/';
+            res.UserName__c = 'admin';
+            res.CommentBody__c = 'Escalated to VersionOne';
+            res.CommentOnClosing__c = 'Closed in the VersionOne';
+            insert res;
+        }
+        return res;
+    }
+
     public static Settings getTestSettings() {
          Settings settings = new Settings(null);
          return settings;
+    }
+
+    public String getPathTitle() {
+        return 'URL to VersionOne';
     }
 
     public String getPath() {
@@ -65,16 +74,24 @@ public with sharing class Settings {
         this.path = path;
     }
 
+    public String getUserNameTitle() {
+        return 'User name';
+    }
+
     public String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        if (userName == '') {
-            this.userName = null;
+    public void setUserName(String name) {
+        if (name == '') {
+            userName = null;
         } else {
-            this.userName = userName;
+            userName = name;
         }
+    }
+
+    public String getPasswordTitle() {
+        return 'Password';
     }
 
     public String getPassword() {
@@ -89,6 +106,10 @@ public with sharing class Settings {
         }
     }
 
+    public String getDefectQueueIdTitle() {
+        return 'Source Queue for Defects';
+    }
+
     public String getDefectQueueId() {
         return defectQueueId;
     }
@@ -99,6 +120,10 @@ public with sharing class Settings {
         } else {
             defectQueueId = id;
         }
+    }
+
+    public String getStoryQueueIdTitle() {
+        return 'Source Queue for Stories';
     }
 
     public String getStoryQueueId() {
@@ -113,6 +138,10 @@ public with sharing class Settings {
         }
     }
 
+    public String getDestQueueIdTitle() {
+        return 'Destination Queue';
+    }
+
     public String getDestQueueId() {
         return destQueueId;
     }
@@ -125,8 +154,12 @@ public with sharing class Settings {
         }
     }
 
+    public String getSourceTitle() {
+        return 'Source';
+    }
+
     public String getSource() {
-        return this.source;
+        return source;
     }
 
     public void setSource(String source) {
@@ -157,6 +190,10 @@ public with sharing class Settings {
         }
     }
 
+    public String getCommentOnClosingTitle() {
+        return 'Comment on closing';
+    }
+
     public String getCommentOnClosing() {
         return commentOnClosing;
     }
@@ -167,6 +204,10 @@ public with sharing class Settings {
         } else {
             commentOnClosing = text;
         }
+    }
+
+    public String getCommentBodyTitle() {
+        return 'Comment on publishing';
     }
 
     public String getCommentBody() {
@@ -187,14 +228,6 @@ public with sharing class Settings {
 
     public DateTime getLastDateChangeAsset() {
         return this.changeDateUTC;
-    }
-
-    public String getV1Url() {
-        return 'VersionOneUrl__c';
-    }
-
-    public String getV1Project() {
-        return 'VersionOneProject__c';
     }
 
     public void updateSettings() {
@@ -228,29 +261,35 @@ public with sharing class Settings {
 
     /** Returns array of error messages or empty array if all is crrect. */
     public String[] validate() {
-        Map<String, String> requredData = new Map<String, String>();
-        requredData.put(getPath(), 'URL is required field.');
-        requredData.put(getUserName(), 'User name is required field.');
-        requredData.put(getSource(), 'Source is required field.');
-        requredData.put(getDestQueueId(), 'You must choose a Destination Queue.');
-        requredData.put(getDefectQueueId(), 'You must choose a Source Queue for Defects.');
-        requredData.put(getStoryQueueId(), 'You must choose a Source Queue for Stories.');
-        requredData.put(getPassword(), 'Password is required field.');
-
         List<String> res = new List<String>();
-        for (String key : requredData.keySet()) {
-            if (key == null) {
-                res.add(requredData.get(key));
-            }
-        }
+        addMessage(res, getPathTitle(), getPath());
+        addMessage(res, getUserNameTitle(), getUserName());
+        addMessage(res, getSourceTitle(), getSource());
+        addMessage(res, getDestQueueIdTitle(), getDestQueueId());
+        addMessage(res, getDefectQueueIdTitle(), getDefectQueueId());
+        addMessage(res, getStoryQueueIdTitle(), getStoryQueueId());
+        addMessage(res, getPasswordTitle(), getPassword());
 
-        Set<String> queues = new Set<String>();
-        queues.add(getDefectQueueId());
-        queues.add(getStoryQueueId());
-        queues.add(getDestQueueId());
+        Set<String> queues = new Set<String>{
+            getDefectQueueId(),
+            getStoryQueueId(),
+            getDestQueueId()
+        };
         if (queues.size() < 3){
             res.add('All queues must be different.');
         }
         return res;
+    }
+
+    /** Adds error message for specified field if value is null */
+    public static void addMessage(List<String> res, String fieldTitle, object value) {
+        if (value == null) {
+            res.add('You must fill ' + fieldTitle);
+        }
+    }
+
+    /** Returns true if settings are crrect. */
+    public Boolean isValid() {
+        return validate().size() == 0;
     }
 }

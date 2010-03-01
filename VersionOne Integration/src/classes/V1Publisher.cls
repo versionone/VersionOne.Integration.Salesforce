@@ -2,46 +2,31 @@
 // create parser for exceptions from the VersionOne, atm we just put xml to log
 
 public with sharing class V1Publisher {
-    private static IV1Connector connector;
-    private static Settings settings;
 
     private static final String URL_TO_V1_TEMPLATE = 'assetdetail.v1?oid=Defect%3a';
 
-    public static void setConnector(IV1Connector connectorData) {
-        connector = connectorData;
-    }
+    public static IV1Connector connector {set;get;}
+    public static Settings settings {set;get;}
 
-    public static void setSettings(Settings settingsData) {
-        settings = settingsData;
-    }
+    /** Lazy initialized map of projects (Name->ID) */
+    private Map<String, String> projects;
 
     @future (callout=true)
     public static void publish() {
-        System.debug('-------------------------------- publish');
-        if (settings == null) {
-            settings = new Settings();
+        if (check()) {
+            V1Publisher pub = new V1Publisher();
+            pub.publishDefects();
+            pub.publishStories();
         }
-        if (connector == null) {
-            setConnector(new V1Connector(settings, new Requestor(settings)));
-        }
-        if (settings.validate().size() > 0) {
-            errorMessage('Incorrect settings.');
-            return;
-        }
-        String sourceId = Settings.getSourceId();
-        if (sourceId == null) {
-            errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
-            return;
-        }
-        List<Case> cases = V1CaseCollector.getCasesByOwnerId(settings.getDefectQueueId());
+    }
 
-        Map<String, Boolean> alreadyPortedCases;
-        Map<String, String> projects;
-
-
+    public void publishDefects() {
         try {
-            alreadyPortedCases = connector.getAlreadyExistedDefects(cases);
-            projects = connector.findAllProjects();
+            List<Case> cases = V1CaseCollector.getCasesByOwnerId(settings.getDefectQueueId());
+            if (cases.size() > 0) {
+                Map<String, Boolean> alreadyPortedCases = connector.getAlreadyExistedDefects(cases);
+                processCases(alreadyPortedCases, cases);
+            }
         } catch (VersionOneException ex) {
             errorMessage(ex.getErrorMessage(), ex);
             return;
@@ -49,17 +34,51 @@ public with sharing class V1Publisher {
             errorMessage('Internal problems during getting existed defects from the VersionOne: ', ex);
             return;
         }
-
-        processCases(alreadyPortedCases, cases, sourceId, projects);
     }
 
+    public void publishStories() {
+        try {
+            List<Case> cases = V1CaseCollector.getCasesByOwnerId(settings.getStoryQueueId());
+            if (cases.size() > 0) {
+                //Map<String, Boolean> alreadyPortedCases = connector.getAlreadyExistedDefects(cases);
+                //processCases(alreadyPortedCases, cases, sourceId);
+            }
+        } catch (VersionOneException ex) {
+            errorMessage(ex.getErrorMessage(), ex);
+            return;
+        } catch (Exception ex) {
+            errorMessage('Internal problems during getting existed defects from the VersionOne: ', ex);
+            return;
+        }
+    }
 
-    /**
-    * Processes cases assigned to settings.getSourceQueueId() queue and update that cases
-    *
-    *
-    **/
-    public static void processCases(Map<String, Boolean> alreadyPortedCases, List<Case> cases, String sourceId, Map<String, String> projects) {
+    public static Boolean check() {
+        if (settings == null) {
+            settings = new Settings();
+        }
+        if (connector == null) {
+            connector = new V1Connector(settings, new Requestor(settings));
+        }
+        if (!settings.isValid()) {
+            errorMessage('Incorrect settings.');
+            return false;
+        }
+        if (settings.getSourceId() == null) {
+            errorMessage('Source ' + settings.getSource() + ' not found in VersionOne. Cases can\'t be ported to VersionOne.');
+            return false;
+        }
+        return true;
+    }
+
+    public Map<String, String> getProjects() {
+        if (projects == null) {
+            projects = connector.findAllProjects();
+        }
+        return projects;
+    }
+
+    /** Processes cases assigned to settings.getSourceQueueId() queue and update that cases. **/
+    public void processCases(Map<String, Boolean> alreadyPortedCases, List<Case> cases) {
         List<Case> processedCases = new List<Case>();
         List<String> urls = new List<String>();
         Integer maxPublishCases = 3; // we have restriction on 10 request by http.send
@@ -71,8 +90,8 @@ public with sharing class V1Publisher {
             } else {
                 if (maxPublishCases > 0) {
                     maxPublishCases--;
-                    String projectId = findProjectId((String) caseData.get(settings.getV1Project()), projects);
-                    Integer id = connector.createDefectInVersionOne(caseData, projectId, sourceId);
+                    String projectId = findProjectId(caseData.VersionOneProject__c);
+                    Integer id = connector.createDefectInV1(caseData, projectId);
                     if (id > 0) {
                         connector.createLinkV1ToSF(id, caseData.Id);
                         processedCases.add(caseData);
@@ -82,31 +101,23 @@ public with sharing class V1Publisher {
             }
         }
 
-        V1CaseCollector.updateCases(processedCases, settings.getDestQueueId(), settings.getCommentBody(), settings.getV1Url(), urls);
+        V1CaseCollector.updateCases(processedCases, settings.getDestQueueId(), settings.getCommentBody(), urls);
     }
 
-    /**
-    * Returns project id by product name
-    **/
-    public static String findProjectId(String productName, Map<String, String> projects) {
-        if (productName != null && projects.containsKey(productName)) {
-            return projects.get(productName);
+    /** Returns project id by project name. **/
+    public String findProjectId(String projectName) {
+        if (getProjects().containsKey(projectName)) {
+            return getProjects().get(projectName);
         }
-
         return connector.getDefaultProjectId();
     }
 
-
-    /**
-    * Handle error message
-    **/
+    /** Handles error message. **/
     public static void errorMessage(String message) {
         System.debug(message);
     }
 
-    /**
-    * Handle error message with exception
-    **/
+    /** Handles error message with exception. **/
     public static void errorMessage(String message, Exception ex) {
         if (ex instanceof VersionOneException ) {
             System.debug(message + ':' + ((VersionOneException)ex).getResponceBody());
