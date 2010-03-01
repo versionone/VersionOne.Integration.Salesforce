@@ -29,7 +29,6 @@ private class SettingsControllerTester {
         SettingsController controller = new SettingsController();
         Test.setCurrentPage(new PageReference('apex/Settings_page'));
         Settings settingsData = Settings.getTestSettings();
-        Boolean result;
         controller.setConnector(new V1ConnectorMock());
 
         //all fields is filled
@@ -37,7 +36,7 @@ private class SettingsControllerTester {
         settingsData.setUserName('user');
         settingsData.setSource('source');
         settingsData.setDefectQueueId('78234612347614298476');
-        settingsData.setStoryQueueId('78234612347614298476');
+        settingsData.setStoryQueueId('1111111111111111111');
         settingsData.setDestQueueId('235453764567567455345');
         settingsData.setCommentBody('test comment');
         settingsData.setPassword('password');
@@ -48,8 +47,7 @@ private class SettingsControllerTester {
         //empty path
         settingsData.setPath('');
         controller.settings = settingsData;
-        result = controller.validateSettings();
-        System.assert(!result, 'Incorrect result when path is empty.');
+        System.assert(!controller.validateSettings(), 'Incorrect result when path is empty.');
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when path is empty.');
         System.assert(ApexPages.getMessages()[0].getSummary().contains('URL'), 'Incorrect message when path is empty.');
         settingsData.setPath('http://localhost');
@@ -93,7 +91,8 @@ private class SettingsControllerTester {
         String source = 'Source';
         String path = 'http://localhost';
         String destQueueId = 'destQueueId';
-        String sourceQueueId = 'sourceQueueId';
+        String defectQueueId = 'defectQueueId';
+        String storyQueueId = 'storyQueueId';
         IV1Connector connector = new V1ConnectorMock();
         ((V1ConnectorMock)connector).setTestSourceId(sourceIdExpected);
         SettingsController controller = new SettingsController();
@@ -110,8 +109,8 @@ private class SettingsControllerTester {
         settingsData.setUserName(userName);
         settingsData.setSource(source);
         settingsData.setDestQueueId(destQueueId);
-        settingsData.setDefectQueueId(sourceQueueId);
-        settingsData.setStoryQueueId(sourceQueueId);
+        settingsData.setDefectQueueId(defectQueueId);
+        settingsData.setStoryQueueId(storyQueueId);
         settingsData.setPassword('password');
         controller.testSettings();
         System.assert(controller.isSettingsCorrect, 'Settings have to be correct.');

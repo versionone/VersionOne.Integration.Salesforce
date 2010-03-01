@@ -9,16 +9,16 @@ public class V1ConnectorMock implements IV1Connector {
     private List<String> closedDefects = new List<String>();
 
     public List<String> getClosedDefects() {
-    	throwException();
+        throwException();
         return closedDefects;
     }
 
     public void setClosedDefects(List<String> closedDefects) {
-		this.closedDefects = closedDefects;
+        this.closedDefects = closedDefects;
     }
 
     public String getSourceId() {
-		throwException();
+        throwException();
         return sourceId;
     }
 
@@ -27,41 +27,41 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     public Map<String, String> findAllProjects() {
-    	throwException();
-    	Map<String, String> result = new Map<String, String>();
-    	result.put('CI', '1081');
+        throwException();
+        Map<String, String> result = new Map<String, String>();
+        result.put('CI', '1081');
 
-    	return result;
+        return result;
     }
 
     public String getDefaultProjectId() {
-    	return '1010';
+        return '1010';
     }
 
     public void createLinkV1ToSF(Integer defectId, String caseId) {
 
     }
 
-    public Integer createDefectInVersionOne(Case caseData, String productId, String sourceId) {
-		return createdDefectId;
+    public Integer createDefectInV1(Case caseData, String productId) {
+        return createdDefectId;
     }
 
     public void setCreatedDefectId(Integer defectId) {
-    	throwException();
-    	createdDefectId = defectId;
+        throwException();
+        createdDefectId = defectId;
     }
 
     public Map<String, Boolean> getAlreadyExistedDefects(List<Case> cases) {
-    	throwException();
-    	return alreadyExistedDefects;
+        throwException();
+        return alreadyExistedDefects;
     }
 
     public void setTestAlreadyExistedDefects(Map<String, Boolean> defects) {
-    	alreadyExistedDefects = defects;
+        alreadyExistedDefects = defects;
     }
 
     public Settings getSettings() {
-    	return Settings.getTestSettings();
+        return Settings.getTestSettings();
     }
 
     /**
@@ -77,12 +77,12 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     private void throwException() {
-    	System.debug('isExceptionEnabled=' + isExceptionEnabled + ' | exceptionType=' + exceptionType);
+        System.debug('isExceptionEnabled=' + isExceptionEnabled + ' | exceptionType=' + exceptionType);
         if (isExceptionEnabled && exceptionType == 1) {
-        	System.debug('Throw VersionOneException');
+            System.debug('Throw VersionOneException');
             throw new VersionOneException(exceptionMessage, 'test body');
         } else if (isExceptionEnabled && exceptionType == 2) {
-        	System.debug('Throw NullPointerException');
+            System.debug('Throw NullPointerException');
             throw new NullPointerException();
         }
     }

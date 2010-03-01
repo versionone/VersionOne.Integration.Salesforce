@@ -9,49 +9,47 @@ private class V1PublisherTester {
         QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
         insert sobj;
 
-        String queueName2 = 'TestQueue2';
-        Group queue2 = new Group(Type='Queue', Name=queueName2);
-        insert queue2;
-        QueueSobject sobj2 = new QueueSobject(QueueId = queue2.Id, SobjectType = 'Case');
-        insert sobj2;
+        String queueNameD = 'TestQueue2';
+        Group queueD = new Group(Type='Queue', Name=queueNameD);
+        insert queueD;
+        QueueSobject sobjD = new QueueSobject(QueueId = queueD.Id, SobjectType = 'Case');
+        insert sobjD;
 
-        String queueName3 = 'TestQueue3';
-        Group queue3 = new Group(Type='Queue', Name=queueName3);
-        insert queue3;
-        QueueSobject sobj3 = new QueueSobject(QueueId = queue3.Id, SobjectType = 'Case');
-        insert sobj3;
+        String queueNameS = 'TestQueue3';
+        Group queueS = new Group(Type='Queue', Name=queueNameS);
+        insert queueS;
+        QueueSobject sobjS = new QueueSobject(QueueId = queueS.Id, SobjectType = 'Case');
+        insert sobjS;
 
         System.runAs(createUser('test4356')){
             //prepare cases
-            Case case1 = new Case(Subject = 'case1', OwnerId = queue2.Id);
+            Case case1 = new Case(Subject = 'case1', OwnerId = queueD.Id);
             Case case2 = new Case(Subject = 'case2', OwnerId = queue.Id);
-            Case case3 = new Case(Subject = 'case3', OwnerId = queue2.Id);
-            Case case4 = new Case(Subject = 'case4', OwnerId = queue2.Id);
-            Case case5 = new Case(Subject = 'case5', OwnerId = queue2.Id);
-            insert new Case[]{case1, case2, case3, case4, case5};
+            Case case3 = new Case(Subject = 'case3', OwnerId = queueD.Id);
+            Case case4 = new Case(Subject = 'case4', OwnerId = queueD.Id);
+            insert new Case[]{case1, case2, case3, case4};
+
             case1 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case1.Id];
             case2 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case2.Id];
             case3 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case3.Id];
             case4 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case4.Id];
-            case5 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case5.Id];
 
-            Map<String, Boolean> alreadyPortedCases = new Map<String, Boolean>();
-            alreadyPortedCases.put(case2.CaseNumber, true);
-            List<Case> cases = new Case[]{case1, case2, case3, case4, case5};
+            Map<String, Boolean> alreadyPortedCases = new Map<String, Boolean> {case2.CaseNumber => true};
 
             Integer defectId = 1699;
+            Integer product_Id = 123;
             //String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId +'/4596" id="Defect:' +defectId + ':4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
+            String path = 'http://localhost/';
             String sourceName = 'TestSource';
             String sourceId = '1010';
-            String productId = '123';
             String caseName = '<Test case>';
             String caseDescription = 'Case for testing';
-            String path = 'http://localhost/';
-            String userName = 'userName';
-            String comment = 'test comment';
+            String pComment = 'publishing comment';
+            String cComment = 'closing comment';
+
             String expectedSendBody = '<Asset>' +
                                 '<Relation act="set" name="Scope">' +
-                                    '<Asset idref="Scope:' + productId + '"/>' +
+                                    '<Asset idref="Scope:' + product_Id + '"/>' +
                                 '</Relation>' +
                                 '<Attribute act="set" name="Name">&lt;Test case&gt;</Attribute>' +
                                 '<Attribute act="set" name="Reference">' + case1.CaseNumber +'</Attribute>' +
@@ -61,57 +59,52 @@ private class V1PublisherTester {
                                 '</Relation>' +
                             '</Asset>';
             String additionPath = 'assetdetail.v1?oid=Defect%3a';
-            Settings testSettings = Settings.getTestSettings();
-            testSettings.setDestQueueId(queue.Id);
-            testSettings.setDefectQueueId(queue2.Id);
-            testSettings.setStoryQueueId(queue3.Id);
-            testSettings.setPath(path);
-            testSettings.setCommentBody(comment);
-            testSettings.setSourceId(sourceId);
-            testSettings.setSource(sourceName);
-            testSettings.setUserName(userName);
-            IRequestor requestor = new RequestorMock('', 200);
-            IV1Connector connector = new V1ConnectorMock();
-            ((V1ConnectorMock)connector).setCreatedDefectId(defectId);
-            ((V1ConnectorMock)connector).setTestAlreadyExistedDefects(alreadyPortedCases);
-            V1Publisher.setConnector(connector);
-            V1Publisher.setSettings(testSettings);
-            //Map<String, String> projects = new Map<String, String>();
 
-            //V1Publisher.processCases(alreadyPortedCases, cases, sourceId, projects);
+            Settings testSettings = Settings.getTestSettings();
+            testSettings.setPath(path);
+            testSettings.setUserName('user');
+            testSettings.setPassword('11111');
+            testSettings.setSource(sourceName);
+            testSettings.setSourceId(sourceId);
+            testSettings.setDestQueueId(queue.Id);
+            testSettings.setDefectQueueId(queueD.Id);
+            testSettings.setStoryQueueId(queueS.Id);
+            testSettings.setCommentBody(pComment);
+            testSettings.setCommentOnClosing(cComment);
+            IRequestor requestor = new RequestorMock('', 200);
+            V1ConnectorMock connector = new V1ConnectorMock();
+            connector.setCreatedDefectId(defectId);
+            connector.setTestAlreadyExistedDefects(alreadyPortedCases);
+            V1Publisher.settings = testSettings;
+            V1Publisher.connector = connector;
+
             Test.startTest();
             V1Publisher.publish();
             Test.stopTest();
 
             Case newCase1 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case1.Id];
-            System.assertEquals(path + additionPath + defectId, newCase1.get(testSettings.getV1Url()));
+            System.assertEquals(path + additionPath + defectId, newCase1.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase1.OwnerId);
             CaseComment newComment = [SELECT CommentBody FROM CaseComment where ParentId = :newCase1.Id];
-            System.assertEquals(comment, newComment.CommentBody);
+            System.assertEquals(pComment, newComment.CommentBody);
 
             Case newCase2 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case2.Id];
-            System.assertEquals(null, newCase2.get(testSettings.getV1Url()));
+            System.assertEquals(null, newCase2.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase2.OwnerId);
             List<CaseComment> newComment2 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase2.Id];
             System.assertEquals(0, newComment2.size(), 'Incorrect number of comments for case 2');
 
             Case newCase3 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case3.Id];
-            System.assertEquals(path + additionPath + defectId, newCase3.get(testSettings.getV1Url()));
+            System.assertEquals(path + additionPath + defectId, newCase3.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase3.OwnerId);
             CaseComment newComment3 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase3.Id];
-            System.assertEquals(comment, newComment3.CommentBody);
+            System.assertEquals(pComment, newComment3.CommentBody);
 
             Case newCase4 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case4.Id];
-            System.assertEquals(path + additionPath + defectId, newCase4.get(testSettings.getV1Url()));
+            System.assertEquals(path + additionPath + defectId, newCase4.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase4.OwnerId);
             CaseComment newComment4 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase4.Id];
-            System.assertEquals(comment, newComment4.CommentBody);
-
-            Case newCase5 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case5.Id];
-            System.assertEquals(null, newCase5.get(testSettings.getV1Url()));
-            System.assertEquals(queue2.Id, newCase5.OwnerId);
-            List<CaseComment> newComment5 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase5.Id];
-            System.assertEquals(0, newComment5.size(), 'Incorrect number of comments for case 5');
+            System.assertEquals(pComment, newComment4.CommentBody);
         }
     }
 
@@ -180,34 +173,32 @@ private class V1PublisherTester {
             testSettings.setSourceId(sourceId);
             testSettings.setSource(sourceName);
             testSettings.setUserName(userName);
+            V1Publisher.settings = testSettings;
             IRequestor requestor = new RequestorMock('', 200);
-            IV1Connector connector = new V1ConnectorMock();
-            ((V1ConnectorMock)connector).setCreatedDefectId(defectId);
-            ((V1ConnectorMock)connector).setTestAlreadyExistedDefects(alreadyPortedCases);
-            ((V1ConnectorMock)connector).enableException(true, 1, 'Just test exception.');
-            V1Publisher.setConnector(connector);
-            V1Publisher.setSettings(testSettings);
-            //Map<String, String> projects = new Map<String, String>();
+            V1ConnectorMock connector = new V1ConnectorMock();
+            connector.setCreatedDefectId(defectId);
+            connector.setTestAlreadyExistedDefects(alreadyPortedCases);
+            connector.enableException(true, 1, 'Just test exception.');
+            V1Publisher.connector = connector;
 
-            //V1Publisher.processCases(alreadyPortedCases, cases, sourceId, projects);
             Test.startTest();
             V1Publisher.publish();
             Test.stopTest();
 
             Case newCase1 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case1.Id];
-            System.assertEquals(case1.get(testSettings.getV1Url()), newCase1.get(testSettings.getV1Url()));
+            System.assertEquals(case1.VersionOneUrl__c, newCase1.VersionOneUrl__c);
             System.assertEquals(case1.OwnerId, newCase1.OwnerId);
             List<CaseComment> newComment1 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase1.Id];
             System.assertEquals(0, newComment1.size(), 'Incorrect number of comments for case 1');
 
             Case newCase2 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case2.Id];
-            System.assertEquals(case2.get(testSettings.getV1Url()), newCase2.get(testSettings.getV1Url()));
+            System.assertEquals(case2.VersionOneUrl__c, newCase2.VersionOneUrl__c);
             System.assertEquals(case2.OwnerId, newCase2.OwnerId);
             List<CaseComment> newComment2 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase2.Id];
             System.assertEquals(0, newComment2.size(), 'Incorrect number of comments for case 2');
 
             Case newCase3 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case3.Id];
-            System.assertEquals(case3.get(testSettings.getV1Url()), newCase3.get(testSettings.getV1Url()));
+            System.assertEquals(case3.VersionOneUrl__c, newCase3.VersionOneUrl__c);
             System.assertEquals(case3.OwnerId, newCase3.OwnerId);
             List<CaseComment> newComment3 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase3.Id];
             System.assertEquals(0, newComment3.size(), 'Incorrect number of comments for case 3');

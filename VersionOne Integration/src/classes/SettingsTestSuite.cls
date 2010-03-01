@@ -4,8 +4,6 @@ private class SettingsTestSuite {
     static testMethod void constructorTest() {
         delete [SELECT Id FROM V1Settings__c];
         Settings s = new Settings();
-        System.assertEquals('VersionOneUrl__c', s.getV1Url(), 'Wrong default V1 Url Field.');
-        System.assertEquals('VersionOneProject__c', s.getV1Project(), 'Wrong default V1 Project Field.');
         System.assertEquals('Escalated to VersionOne', s.getCommentBody(), 'Wrong default CommentBody.');
         System.assertEquals(null, s.getStoryQueueId(), 'Wrong default StoryQueueId.');
         System.assertEquals(null, s.getDefectQueueId(), 'Wrong default DefectQueueId.');
@@ -73,34 +71,38 @@ private class SettingsTestSuite {
     static testMethod void updateSettingsTest() {
         delete [SELECT Id FROM V1Settings__c];
         Settings s = new Settings();
-        String userName = 'UserName';
-        String source = 'Source';
         String path = 'http://localhost/';
+        String userName = 'UserName';
         String password = 'password';
+        String source = 'Source';
         String destQueueId = 'destQueueId';
         String defectQueueId = 'sourceQueueId';
         String storyQueueId = 'sourceQueueId';
         String comment = 'comment';
+        String comment1 = 'comment1';
+
         s.setPath(path);
         s.setUserName(userName);
         s.setSource(source);
         s.setPassword(password);
         s.setCommentBody(comment);
+        s.setCommentOnClosing(comment1);
         s.setDestQueueId(destQueueId);
         s.setDefectQueueId(defectQueueId);
         s.setStoryQueueId(storyQueueId);
 
         s.updateSettings();
 
-        V1Settings__c mycs = V1Settings__c.getValues('V1Settings');
-        System.assertEquals(path, mycs.Path__c, 'Wrong Path.');
-        System.assertEquals(userName, mycs.UserName__c, 'Wrong User Name.');
-        System.assertEquals(password, mycs.Password__c, 'Wrong Password.');
-        System.assertEquals(source, mycs.Source__c, 'Wrong Source.');
-        System.assertEquals(destQueueId, mycs.AssignedQueueId__c, 'Wrong Assigned Queue Id.');
-        System.assertEquals(defectQueueId, mycs.EscalateQueueId__c, 'Wrong Escalate Queue Id.');
-        System.assertEquals(storyQueueId, mycs.StoryQueueId__c, 'Wrong Story Queue Id.');
-        System.assertEquals(comment, mycs.CommentBody__c, 'Wrong Comment Body.');
+        Settings s1 = new Settings();
+        System.assertEquals(path, s1.getPath(), 'Wrong Path.');
+        System.assertEquals(userName, s1.getUserName(), 'Wrong User Name.');
+        System.assertEquals(password, s1.getPassword(), 'Wrong Password.');
+        System.assertEquals(source, s1.getSource(), 'Wrong Source.');
+        System.assertEquals(destQueueId, s1.getDestQueueId(), 'Wrong Dest Queue Id.');
+        System.assertEquals(defectQueueId, s1.getDefectQueueId(), 'Wrong Defect Queue Id.');
+        System.assertEquals(storyQueueId, s1.getStoryQueueId(), 'Wrong Story Queue Id.');
+        System.assertEquals(comment, s1.getCommentBody(), 'Wrong Comment Body.');
+        System.assertEquals(comment1, s1.getCommentOnClosing(), 'Wrong Comment on closing.');
     }
 
     static testMethod void validateTest() {
@@ -129,21 +131,21 @@ private class SettingsTestSuite {
         //empty user name
         settingsData.setUserName('');
         res = settingsData.validate();
-        System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when user name is empty.');
+        System.assertEquals(1, res.size(), 'Incorrect number of errors when user name is empty.');
         System.assert(res[0].contains('User'), res[0] + ' - Incorrect message.');
         settingsData.setUserName('user');
 
         //empty password
         settingsData.setPassword('');
         res = settingsData.validate();
-        System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors.');
+        System.assertEquals(1, res.size(), 'Incorrect number of errors.');
         System.assert(res[0].contains('Password'), res[0] + ' - Incorrect message.');
-        settingsData.setUserName('password');
+        settingsData.setPassword('password');
 
         //empty source
         settingsData.setSource('');
         res = settingsData.validate();
-        System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when source is empty.');
+        System.assertEquals(1, res.size(), 'Incorrect number of errors when source is empty.');
         System.assert(res[0].contains('Source'), res[0] + ' - Incorrect message.');
         settingsData.setSource('source');
 
@@ -158,7 +160,7 @@ private class SettingsTestSuite {
         settingsData.setStoryQueueId('');
         res = settingsData.validate();
         System.assertEquals(1, res.size(), 'Incorrect number of errors when StoryQueueId is empty.');
-        System.assert(res[0].contains('Story'), res[0] + ' - Incorrect message.');
+        System.assert(res[0].contains(settingsData.getStoryQueueIdTitle()), res[0] + ' - Incorrect message.');
         settingsData.setStoryQueueId('111111111111');
 
         //empty DestQueueId
@@ -167,12 +169,5 @@ private class SettingsTestSuite {
         System.assertEquals(1, res.size(), 'Incorrect number of errors when DestQueueId is empty.');
         System.assert(res[0].contains('Destination'), res[0] + ' - Incorrect message.');
         settingsData.setDestQueueId('43564657586587456745');
-
-        //empty Comment
-        settingsData.setCommentBody(null);
-        res = settingsData.validate();
-        System.assertEquals(1, res.size(), 'Incorrect number of errors when CommentBody is empty.');
-        System.assert(res[0].contains('Comment'), res[0] + ' - Incorrect message.');
-        settingsData.setCommentBody('test comment');
     }
 }

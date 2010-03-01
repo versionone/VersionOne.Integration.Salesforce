@@ -1,8 +1,8 @@
 public interface IV1Connector {
-	/**
-	* Makes request to the VersionOne and get all closed defects.
-	* Returns: list of CaseNumbers (references).
-	**/
+    /**
+    * Makes request to the VersionOne and get all closed defects.
+    * Returns: list of CaseNumbers (references).
+    **/
     List<String> getClosedDefects();
 
     /**
@@ -35,7 +35,7 @@ public interface IV1Connector {
     * sourceId - source id in the VersionOne
     * Return: id of created defect in the VersionOne
     **/
-    Integer createDefectInVersionOne(Case caseData, String productId, String sourceId);
+    Integer createDefectInV1(Case caseData, String productId);
 
     /**
     * Gathers all already ported cases
