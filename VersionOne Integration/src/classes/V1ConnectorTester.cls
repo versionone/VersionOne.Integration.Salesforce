@@ -181,14 +181,12 @@ private class V1ConnectorTester {
         //System.assertEquals(V1Publisher.findProjectId('Integrational tests project'), '0', 'Incorrect id for \'Integrational tests project\'.');
     }
 
-    static testMethod void correctGetAlreadyExistedDefectsTest() {
+    static testMethod void correctGetReferencedWorkitemsTest() {
         //prepare data
         Case case1 = new Case(Subject = 'case1');
         Case case2 = new Case(Subject = 'case2');
         Case case3 = new Case(Subject = 'case3');
-        Test.startTest();
         insert new Case[]{case1, case2, case3};
-        Test.stopTest();
         case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
         case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
         case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
@@ -198,14 +196,19 @@ private class V1ConnectorTester {
         String sourceName = 'TestSource';
         Settings testSettings = Settings.getTestSettings();
         testSettings.setSource(sourceName);
-        IRequestor requestor = new RequestorMock(body, 200);
+        RequestorMock requestor = new RequestorMock(body, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
+        Test.startTest();
         Map<String, Boolean> alreadyPorted = connector.getReferencedWorkitems(new Case[]{case1, case2, case3});
+        Test.stopTest();
+
         System.assertEquals(alreadyPorted.size(), 2, 'Error! Incorrect numbers of found defects.');
         System.assert(alreadyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
         System.assert(!alreadyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
-        System.assertEquals('rest-1.v1/Data/Defect?sel=Reference&where=((Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\');Source.Name="' + sourceName + '")', ((RequestorMock)requestor).getSentUrl(0), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
+        String reference = 'Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\'';
+        System.assertEquals(String.format(V1Connector.MULTI_DEFECT_CHECK_URL, new String[]{reference, sourceName}),
+            requestor.getSentUrl(0), 'Error! Wrong URL while quering referenced cases \'' + case3.CaseNumber);
         delete new Case[]{case1, case2, case3};
     }
 

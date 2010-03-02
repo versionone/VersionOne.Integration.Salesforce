@@ -25,7 +25,7 @@ private class V1CaseCollectorTestSuite {
         System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
     }
 
-    static testMethod void setCasesOwnerTest() {
+    static testMethod void updateCasesTest() {
         String queueName = 'TestQueue1';
         Group queue = new Group(Type='Queue', Name=queueName);
         insert queue;
@@ -41,11 +41,19 @@ private class V1CaseCollectorTestSuite {
             Case[] cases = V1CaseCollector.getCasesByOwnerId(queue.Id);
             System.assertEquals(0, cases.size(), 'There is already owned cases.');
 
-            V1CaseCollector.updateCases(new Case[] {case1, case2}, queue.Id, 'test comment', new String[] {'999', null});
-            System.assertEquals(queue.Id, case1.OwnerId, 'Case1 Owner doesn\'t changed.');
-            System.assertEquals(queue.Id, case2.OwnerId, 'Case2 Owner doesn\'t changed.');
-            System.assertEquals(null, case3.OwnerId, 'Case3 Owner set by mistake.');
-            System.assertEquals('999', case1.VersionOneUrl__c, 'Case1 customField doesn\'t changed.');
+            Test.startTest();
+            V1CaseCollector.updateCase(case1, queue.Id, 'test comment1', 'testUrl');
+            V1CaseCollector.updateCase(case2, queue.Id, 'test comment2', null);
+            Test.stopTest();
+
+            case1 = [SELECT ownerId, VersionOneUrl__c FROM Case WHERE Id = :case1.Id];
+            case2 = [SELECT ownerId, VersionOneUrl__c FROM Case WHERE Id = :case2.Id];
+            case3 = [SELECT ownerId, VersionOneUrl__c FROM Case WHERE Id = :case3.Id];
+
+            System.assertEquals(queue.Id, case1.OwnerId, 'Wrong Case owner.');
+            System.assertEquals(queue.Id, case2.OwnerId, 'Wrong Case owner.');
+            System.assertNotEquals(queue.Id, case3.OwnerId, 'Wrong Case owner.');
+            System.assertEquals('testUrl', case1.VersionOneUrl__c, 'Case1 customField doesn\'t changed.');
             System.assertEquals(null, case2.VersionOneUrl__c, 'Case2 customField set by mistake.');
             System.assertEquals(null, case3.VersionOneUrl__c, 'Case3 customField set by mistake.');
 
@@ -55,9 +63,9 @@ private class V1CaseCollectorTestSuite {
             assertContains(case2, newCases, 'Wrong owned case2.');
 
             CaseComment comment1 = [SELECT CommentBody, ParentId FROM CaseComment WHERE ParentId = :case1.Id];
-            System.assertEquals('test comment', comment1.CommentBody, 'Wrong comment of case1.');
+            System.assertEquals('test comment1', comment1.CommentBody, 'Wrong comment');
             CaseComment comment2 = [SELECT CommentBody, ParentId FROM CaseComment WHERE ParentId = :case2.Id];
-            System.assertEquals('test comment', comment2.CommentBody, 'Wrong comment of case1.');
+            System.assertEquals('test comment2', comment2.CommentBody, 'Wrong comment');
         }
     }
 

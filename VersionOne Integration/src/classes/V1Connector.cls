@@ -1,11 +1,11 @@
 public with sharing class V1Connector implements IV1Connector {
-    private static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="StorySource:{0}";Defect.AssetState="Closed"{1})';
-    private static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
-    private static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
-    private static final String LINK_URL = 'rest-1.v1/Data/Link';
-    private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
-    private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
-    private static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Workitem?sel=Reference&where=(({0});Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
+    public static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="StorySource:{0}";Defect.AssetState="Closed"{1})';
+    public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
+    public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
+    public static final String LINK_URL = 'rest-1.v1/Data/Link';
+    public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
+    public static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
+    public static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Workitem?sel=Reference&where=(({0});Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
 
     private final Settings settings;
     private final IRequestor requestor;
@@ -260,7 +260,7 @@ public with sharing class V1Connector implements IV1Connector {
         } catch (VersionOneException ex) {
             V1Publisher.errorMessage(ex.getErrorMessage(), ex);
             return -1;
-        } catch (Exception ex) {
+        }  catch (Exception ex) {
             V1Publisher.errorMessage('Internal problems during creating defect: ', ex);
             return -1;
         }

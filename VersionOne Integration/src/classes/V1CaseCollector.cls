@@ -38,18 +38,6 @@ public class V1CaseCollector {
                           FROM Case WHERE CaseNumber in :caseNumbers and Status <> 'Closed' and OwnerId = :ownerId];
     }
 
-
-    /* Update cases: set Owner and VersionOneUrl to the specified values. Create Comment with specified body.
-     * cases - list of cases to process.
-     * ownerId - ID of the owner to set to all cases.
-     * commentBody - text of comment body to attach to all cases. If null - no comments are created.
-     * v1Urls - list URLs to set to VersionOneUrl field. Must be same size as list of cases.
-     * 				 Each value set to apropriate case: case[i].VersionOneUrl__c = v1Urls[i].
-     */
-    public static void updateCases(List<Case> cases, String ownerId, String commentBody, List<String> v1Urls) {
-
-    }
-
     /* Update case: set Owner and VersionOneUrl to the specified values. Create Comment with specified body.
      * case - cases to process.
      * ownerId - ID of the owner to set to case.
