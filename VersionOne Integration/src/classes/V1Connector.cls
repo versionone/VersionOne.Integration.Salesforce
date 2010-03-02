@@ -5,7 +5,7 @@ public with sharing class V1Connector implements IV1Connector {
     private static final String LINK_URL = 'rest-1.v1/Data/Link';
     private static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
     private static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
-    private static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Defect?sel=Reference&where=({0}Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
+    private static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Workitem?sel=Reference&where=(({0});Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
 
     private final Settings settings;
     private final IRequestor requestor;
@@ -174,28 +174,22 @@ public with sharing class V1Connector implements IV1Connector {
     }
 
     /**
-    * Were defect already created in the VersionOne
-    *
-    * Returns - List<Integer> Already ported cases
-    **/
-    public Map<String, Boolean> getAlreadyExistedDefects(List<Case> cases) {
-        String sourceName = settings.getSource();
+     * Were defect already created in the VersionOne
+     *
+     * Returns - List<Integer> Already ported cases
+     */
+    public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
         XMLDom xmlParser = new XMLDom();
-        String escapedSourceName = EncodingUtil.urlEncode(sourceName, 'UTF-8');
-        Map<String, Boolean> defectsInfo = new Map<String, Boolean>();
 
         String reference = '';
-        if (cases.size() > 0) {
-            reference = '(';
-            for (Case caseData : cases) {
-                reference = reference + 'Reference=\''+ caseData.CaseNumber + '\'|';
-            }
-            reference = reference.substring(0, reference.length() - 1);
-            reference = reference + ');';
+        for (Case caseData : cases) {
+            reference += 'Reference=\''+ caseData.CaseNumber + '\'|';
         }
+        reference = reference.substring(0, reference.length() - 1);
 
         //Send the request, and get a response
-        requestor.request(requestor.createRequest('', String.format(MULTI_DEFECT_CHECK_URL, new String[]{reference, escapedSourceName}), 'GET'));
+        String source = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
+        requestor.request(requestor.createRequest('', String.format(MULTI_DEFECT_CHECK_URL, new String[]{reference, source}), 'GET'));
         if (requestor.getStatusCode() == 200) {
             xmlParser.parseFromString(requestor.getBody());
         } else {
@@ -203,6 +197,7 @@ public with sharing class V1Connector implements IV1Connector {
         }
 
         List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
+        Map<String, Boolean> defectsInfo = new Map<String, Boolean>();
         for (XMLDom.Element assetTag : assetTags) {
             defectsInfo.put(assetTag.getValue('Attribute'), true);
         }
@@ -253,30 +248,22 @@ public with sharing class V1Connector implements IV1Connector {
             System.debug('XML for create defect:' + createDefectBody);
 
             requestor.request(requestor.createRequest(createDefectBody, DEFECT_URL, 'POST'));
+
+            if (requestor.getStatusCode() == 200) {
+                xmlParser.parseFromString(requestor.getBody());
+            } else {
+                V1Publisher.errorMessage('Problem with creating new defect in the VersionOne' + requestor.getBody());
+                return -1;
+            }
+
+            return Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
         } catch (VersionOneException ex) {
             V1Publisher.errorMessage(ex.getErrorMessage(), ex);
             return -1;
-        }  catch (Exception ex) {
+        } catch (Exception ex) {
             V1Publisher.errorMessage('Internal problems during creating defect: ', ex);
             return -1;
         }
-
-        if (requestor.getStatusCode() == 200) {
-            xmlParser.parseFromString(requestor.getBody());
-        } else {
-            V1Publisher.errorMessage('Problem with creating new defect in the VersionOne' + requestor.getBody());
-            return -1;
-        }
-
-        try {
-            defectId = Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
-        } catch (VersionOneException ex) {
-            V1Publisher.errorMessage(ex.getErrorMessage(), ex);
-        } catch (Exception ex) {
-            V1Publisher.errorMessage('Internal problems during creating link to case: ' + ex);
-        }
-
-        return defectId;
     }
 
 

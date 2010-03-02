@@ -8,51 +8,31 @@ public with sharing class V1Publisher {
     public static IV1Connector connector {set;get;}
     public static Settings settings {set;get;}
 
-    /** Lazy initialized map of projects (Name->ID) */
+    /** Lazy initialized map of projects (Name->ID). */
     private Map<String, String> projects;
+    /** Lazy initialized list of casses need to be published. */
+    private List<Case> cases;
+    /** Lazy initialized map of casses which was already published (CaseID->?). */
+    private Map<String, Boolean> publishedCases;
 
     @future (callout=true)
     public static void publish() {
-        if (check()) {
-            V1Publisher pub = new V1Publisher();
-            pub.publishDefects();
-            pub.publishStories();
-        }
-    }
-
-    public void publishDefects() {
-        try {
-            List<Case> cases = V1CaseCollector.getCasesByOwnerId(settings.getDefectQueueId());
-            if (cases.size() > 0) {
-                Map<String, Boolean> alreadyPortedCases = connector.getAlreadyExistedDefects(cases);
-                processCases(alreadyPortedCases, cases);
+        if (init()) {
+            try {
+                V1Publisher pub = new V1Publisher();
+                pub.processCases();
+            } catch (VersionOneException ex) {
+                errorMessage(ex.getErrorMessage(), ex);
+                return;
+            } catch (Exception ex) {
+                errorMessage('Internal problems during getting existed defects from the VersionOne: ', ex);
+                return;
             }
-        } catch (VersionOneException ex) {
-            errorMessage(ex.getErrorMessage(), ex);
-            return;
-        } catch (Exception ex) {
-            errorMessage('Internal problems during getting existed defects from the VersionOne: ', ex);
-            return;
         }
     }
 
-    public void publishStories() {
-        try {
-            List<Case> cases = V1CaseCollector.getCasesByOwnerId(settings.getStoryQueueId());
-            if (cases.size() > 0) {
-                //Map<String, Boolean> alreadyPortedCases = connector.getAlreadyExistedDefects(cases);
-                //processCases(alreadyPortedCases, cases, sourceId);
-            }
-        } catch (VersionOneException ex) {
-            errorMessage(ex.getErrorMessage(), ex);
-            return;
-        } catch (Exception ex) {
-            errorMessage('Internal problems during getting existed defects from the VersionOne: ', ex);
-            return;
-        }
-    }
-
-    public static Boolean check() {
+    /** Initialize settings and connector, check whether settings are correct. */
+    public static Boolean init() {
         if (settings == null) {
             settings = new Settings();
         }
@@ -77,31 +57,48 @@ public with sharing class V1Publisher {
         return projects;
     }
 
-    /** Processes cases assigned to settings.getSourceQueueId() queue and update that cases. **/
-    public void processCases(Map<String, Boolean> alreadyPortedCases, List<Case> cases) {
-        List<Case> processedCases = new List<Case>();
-        List<String> urls = new List<String>();
-        Integer maxPublishCases = 3; // we have restriction on 10 request by http.send
-        for (Case caseData : cases) {
-            if (alreadyPortedCases.containsKey(caseData.CaseNumber)) {
-                errorMessage('Case "' + caseData.Subject + '" (' + caseData.CaseNumber +') was already ported.' );
-                processedCases.add(caseData);
-                urls.add(null);
+    public Case[] getCases() {
+        if (cases == null) {
+            List<Case> res = V1CaseCollector.getCasesByOwnerId(settings.getDefectQueueId());
+            res.addAll(V1CaseCollector.getCasesByOwnerId(settings.getStoryQueueId()));
+            cases = res;
+        }
+        return cases;
+    }
+
+    public Map<String, Boolean> getPublishedCases() {
+        if (publishedCases == null) {
+            if (getCases().size() == 0) {
+                publishedCases = new Map<String, Boolean>();
             } else {
-                if (maxPublishCases > 0) {
-                    maxPublishCases--;
-                    String projectId = findProjectId(caseData.VersionOneProject__c);
-                    Integer id = connector.createDefectInV1(caseData, projectId);
-                    if (id > 0) {
-                        connector.createLinkV1ToSF(id, caseData.Id);
-                        processedCases.add(caseData);
-                        urls.add(settings.getPath() + URL_TO_V1_TEMPLATE + id);
-                    }
-                }
+                publishedCases = connector.getReferencedWorkitems(cases);
             }
         }
+        return publishedCases;
+    }
 
-        V1CaseCollector.updateCases(processedCases, settings.getDestQueueId(), settings.getCommentBody(), urls);
+    /** Processes cases assigned to settings.getSourceQueueId() queue and update that cases. **/
+    public void processCases() {
+        Integer maxPublishCases = 3; // we have restriction on 10 request by http.send
+        for (Case caseData : getCases()) {
+            if (maxPublishCases-- > 0) {
+               processCase(caseData);
+            }
+        }
+    }
+
+    public void processCase(Case caseData) {
+        if (getPublishedCases().containsKey(caseData.CaseNumber)) {
+            errorMessage('Case "' + caseData.Subject + '" (' + caseData.CaseNumber +') was already ported.' );
+            V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), null);
+        } else {
+            String projectId = findProjectId(caseData.VersionOneProject__c);
+            Integer id = connector.createDefectInV1(caseData, projectId);
+            if (id > 0) {
+                connector.createLinkV1ToSF(id, caseData.Id);
+                V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), settings.getPath() + URL_TO_V1_TEMPLATE + id);
+            }
+        }
     }
 
     /** Returns project id by project name. **/

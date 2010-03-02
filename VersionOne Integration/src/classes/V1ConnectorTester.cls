@@ -201,7 +201,7 @@ private class V1ConnectorTester {
         IRequestor requestor = new RequestorMock(body, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        Map<String, Boolean> alreadyPorted = connector.getAlreadyExistedDefects(new Case[]{case1, case2, case3});
+        Map<String, Boolean> alreadyPorted = connector.getReferencedWorkitems(new Case[]{case1, case2, case3});
         System.assertEquals(alreadyPorted.size(), 2, 'Error! Incorrect numbers of found defects.');
         System.assert(alreadyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
         System.assert(!alreadyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
@@ -230,7 +230,7 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         try {
-            Map<String, Boolean> alreadyPorted =  connector.getAlreadyExistedDefects(new Case[]{case1, case2, case3});
+            Map<String, Boolean> alreadyPorted =  connector.getReferencedWorkitems(new Case[]{case1, case2, case3});
             System.assert(false, 'This place cannot be reached.');
         }catch(VersionOneException e){
             //Catch code

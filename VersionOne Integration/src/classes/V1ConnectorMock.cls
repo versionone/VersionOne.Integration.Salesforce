@@ -51,7 +51,7 @@ public class V1ConnectorMock implements IV1Connector {
         createdDefectId = defectId;
     }
 
-    public Map<String, Boolean> getAlreadyExistedDefects(List<Case> cases) {
+    public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
         throwException();
         return alreadyExistedDefects;
     }
