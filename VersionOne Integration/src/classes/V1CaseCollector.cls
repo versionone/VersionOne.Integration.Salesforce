@@ -39,7 +39,7 @@ public class V1CaseCollector {
     }
 
 
-    /* Update cases: set Owner and custom field to the specified values. Create Comment with specified body.
+    /* Update cases: set Owner and VersionOneUrl to the specified values. Create Comment with specified body.
      * cases - list of cases to process.
      * ownerId - ID of the owner to set to all cases.
      * commentBody - text of comment body to attach to all cases. If null - no comments are created.
@@ -47,21 +47,24 @@ public class V1CaseCollector {
      * 				 Each value set to apropriate case: case[i].VersionOneUrl__c = v1Urls[i].
      */
     public static void updateCases(List<Case> cases, String ownerId, String commentBody, List<String> v1Urls) {
-        for (Integer i = 0; i < cases.size(); i++){
-            Case c = cases[i];
-            System.debug('BEFORE CHANGE: ' + c);
-            c.OwnerId = ownerId;
-            c.VersionOneUrl__c = v1Urls[i];
-            System.debug('AFTER CHANGE: ' + c);
-        }
-        Database.update(cases);
+
+    }
+
+    /* Update case: set Owner and VersionOneUrl to the specified values. Create Comment with specified body.
+     * case - cases to process.
+     * ownerId - ID of the owner to set to case.
+     * commentBody - text of a comment to add to case. If null - comment will not be created.
+     * v1Url - URL to set to VersionOneUrl field.
+     */
+    public static void updateCase(Case c, String ownerId, String commentBody, String v1Url) {
+        System.debug('BEFORE CHANGE: ' + c);
+        c.OwnerId = ownerId;
+        c.VersionOneUrl__c = v1Url;
+        System.debug('AFTER CHANGE: ' + c);
+        update c;
 
         if (commentBody != null) {
-            List<CaseComment> comments = new List<CaseComment>();
-            for (Case c : cases) {
-                comments.add(new CaseComment(CommentBody = commentBody, ParentId = c.Id));
-            }
-            insert comments;
+            insert new CaseComment(CommentBody = commentBody, ParentId = c.Id);
         }
     }
 

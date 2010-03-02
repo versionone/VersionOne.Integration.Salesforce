@@ -39,10 +39,10 @@ public interface IV1Connector {
 
     /**
     * Gathers all already ported cases
-    * cases - list of cases which need to test on existion in the VersionOne
+    * cases - list of cases which need to test on existence in the VersionOne
     * Returns: List of correspond defects id, already exited in the VersionOne
     **/
-    Map<String, Boolean> getAlreadyExistedDefects(List<Case> cases);
+    Map<String, Boolean> getReferencedWorkitems(List<Case> cases);
 
     /**
     * Returns current settings for connector
