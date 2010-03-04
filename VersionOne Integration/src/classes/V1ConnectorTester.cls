@@ -242,9 +242,9 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
         //V1Publisher.setRequestor(requestor);
         //V1Publisher.setSettings(settings);
-        connector.createLinkV1ToSF(defectId, case1);
 
         testSettings.setDefectQueueId(case1.OwnerId);
+        connector.createLinkV1ToSF(defectId, case1);
         String body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
                         '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
@@ -254,10 +254,11 @@ private class V1ConnectorTester {
                         '</Relation>' +
                        '</Asset>';
 
-        System.assertEquals(requestor.getSentBody(0), body, 'Incorrect created body for POST.');
+        System.assertEquals(body, requestor.getSentBody(0), 'Incorrect created body for POST.');
 
         testSettings.setDefectQueueId(null);
         testSettings.setStoryQueueId(case1.OwnerId);
+        connector.createLinkV1ToSF(defectId, case1);
         body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
                         '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
@@ -267,7 +268,7 @@ private class V1ConnectorTester {
                         '</Relation>' +
                        '</Asset>';
 
-        System.assertEquals(requestor.getSentBody(0), body, 'Incorrect created body for POST.');
+        System.assertEquals(body, requestor.getSentBody(1), 'Incorrect created body for POST.');
     }
 
     static testMethod void incorrectCreatingLinkToSalesForceCaseTest() {
@@ -294,7 +295,7 @@ private class V1ConnectorTester {
                         '</Relation>' +
                        '</Asset>';
 
-        System.assertEquals(requestor.getSentBody(0), body, 'Incorrect created body for POST.');
+        System.assertEquals(body, requestor.getSentBody(0), 'Incorrect created body for POST.');
     }
 
     static testMethod void correctCreateDefectInVersionOne() {
