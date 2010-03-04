@@ -4,7 +4,7 @@ private class SynchronizerTester {
     static testMethod void getClosedDefectsTest() {
         // no ported cases
         Synchronizer synch = new Synchronizer(Settings.getTestSettings());
-        System.assertEquals(null, synch.getClosedDefects(), 'No defects have to be found.');
+        System.assert(!synch.publishedCasesExist(), 'No defects have to be found.');
 
         //there are ported cases
         String queueName = 'TestQueue1';
@@ -17,25 +17,22 @@ private class SynchronizerTester {
         Settings testSettings = Settings.getTestSettings();
         testSettings.setDestQueueId(queueId);
         testSettings.setSourceId(sourceId);
-        IV1Connector testConnector = new V1ConnectorMock();
+        V1ConnectorMock testConnector = new V1ConnectorMock();
         String[] closedDefects = new String[]{'case number 1', 'case number 2'};
-        ((V1ConnectorMock)testConnector).setClosedDefects(closedDefects);
+        testConnector.setClosedDefects(closedDefects);
         synch = new Synchronizer(testSettings, testConnector);
 
         System.runAs(createUser('test4356')){
-        	// it need just to pass verification that at least one opened ported case exist
+            // it need just to pass verification that at least one opened ported case exist
             Case case1 = new Case(Subject = 'case1', OwnerId = queue.Id);
             insert case1;
 
-            List<String> defects = synch.getClosedDefects();
-            System.assertEquals(2, defects.size(), 'Incorrect numbers of defects.');
-            assertContains(closedDefects[0], defects, 'Can\'t find ' + testConnector.getClosedDefects().get(0) + ' reference');
-            assertContains(closedDefects[1], defects, 'Can\'t find ' + testConnector.getClosedDefects().get(1) + ' reference');
+            System.assert(synch.publishedCasesExist(), 'Cases must be exist.');
         }
     }
 
     static testMethod void syncCasesTest() {
-		Synchronizer synch;
+        Synchronizer synch;
         String queueName = 'TestQueue1';
         Group queue = new Group(Type='Queue', Name=queueName);
         insert queue;
@@ -53,15 +50,16 @@ private class SynchronizerTester {
             Case case2 = new Case(Subject = 'case2', OwnerId = queue.Id, Status = 'New');
             Case case3 = new Case(Subject = 'case3', Status = 'New');
             insert new Case[]{case1, case2, case3};
-        	case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
-        	case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
-        	case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
+            case1 = [SELECT CaseNumber FROM Case WHERE Id = :case1.Id];
+            case2 = [SELECT CaseNumber FROM Case WHERE Id = :case2.Id];
+            case3 = [SELECT CaseNumber FROM Case WHERE Id = :case3.Id];
 
-	        IV1Connector testConnector = new V1ConnectorMock();
-	        String[] closedTask = new String[] {case1.CaseNumber, case2.CaseNumber, case3.CaseNumber};
-	        ((V1ConnectorMock)testConnector).setClosedDefects(closedTask);
-	        synch = new Synchronizer(testSettings, testConnector);
+            V1ConnectorMock testConnector = new V1ConnectorMock();
+            String[] closedTask = new String[] {case1.CaseNumber, case2.CaseNumber, case3.CaseNumber};
+            testConnector.setClosedDefects(closedTask);
+            synch = new Synchronizer(testSettings, testConnector);
 
+            System.assert(synch.publishedCasesExist(), 'publishedCases must exist.');
             Integer numberCases = synch.syncCases();
             System.assertEquals(1, numberCases, 'Incorrect numbers of defects.');
             Case newCase1 = [SELECT CaseNumber, Status FROM Case WHERE Id = :case1.Id];
