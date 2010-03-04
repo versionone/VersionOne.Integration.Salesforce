@@ -1,5 +1,5 @@
 public class Synchronizer {
-    private static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="{0}";Defect.AssetState="Closed"{1})';
+
     private final Settings settings;
     private final IV1Connector connector;
 
@@ -20,7 +20,10 @@ public class Synchronizer {
      * Throws: Exception on errors.
      */
     public Integer syncCases() {
-        List<String> closedCases = getClosedDefects();
+        if (!publishedCasesExist()) {
+            return 0;
+        }
+        List<String> closedCases = connector.getClosedWorkitems();
         Case[] cases = V1CaseCollector.getCasesByCaseNumbersAndOwnerId(closedCases, settings.getDestQueueId());
         if (cases != null && cases.size() == 0) {
             // store date of last closed defect in the VersionOne (date was set in the getCasesByCaseNumbers method)
@@ -29,21 +32,12 @@ public class Synchronizer {
         } else if (cases != null) {
             V1CaseCollector.closeCases(cases, settings.getCommentOnClosing());
         }
-
         return cases.size();
     }
 
-    /**
-    * g
-    *
-    **/
-    public List<String> getClosedDefects() {
+    public Boolean publishedCasesExist() {
         List<Case> portedCases = V1CaseCollector.getCasesByOwnerId(settings.getDestQueueId(), false);
-        if (portedCases.size() == 0) {
-            System.debug('There are no cases for close');
-            return null;
-        }
-
-        return connector.getClosedDefects();
+        System.debug('published cases exist: ' + portedCases.size());
+        return portedCases.size() > 0;
     }
 }

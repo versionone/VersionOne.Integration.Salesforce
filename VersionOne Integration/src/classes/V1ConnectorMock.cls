@@ -6,7 +6,7 @@ public class V1ConnectorMock implements IV1Connector {
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
     private List<String> closedDefects = new List<String>();
 
-    public List<String> getClosedDefects() {
+    public List<String> getClosedWorkitems() {
         throwException();
         return closedDefects;
     }
@@ -40,7 +40,7 @@ public class V1ConnectorMock implements IV1Connector {
 
     }
 
-    public Integer createDefectInV1(Case caseData, String productId) {
+    public Integer createWorkitemInV1(Case caseData, String productId) {
         return createdDefectId;
     }
 

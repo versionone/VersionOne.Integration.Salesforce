@@ -3,7 +3,7 @@ public interface IV1Connector {
     * Makes request to the VersionOne and get all closed defects.
     * Returns: list of CaseNumbers (references).
     **/
-    List<String> getClosedDefects();
+    List<String> getClosedWorkitems();
 
     /**
     * Returns: find and return id of current source(from Settings).
@@ -29,13 +29,13 @@ public interface IV1Connector {
     void createLinkV1ToSF(Integer defectId, String caseId);
 
     /**
-    * Creates defect in the VersionOne
+    * Creates defect or story in the VersionOne
     * caseData - SalesForce case
-    * productId - project id in the VersionOne
+    * projectId - project id in the VersionOne
     * sourceId - source id in the VersionOne
-    * Return: id of created defect in the VersionOne
+    * Return: id of created workitem in the VersionOne
     **/
-    Integer createDefectInV1(Case caseData, String productId);
+    Integer createWorkitemInV1(Case caseData, String projectId);
 
     /**
     * Gathers all already ported cases

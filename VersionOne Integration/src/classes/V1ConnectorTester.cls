@@ -42,7 +42,7 @@ private class V1ConnectorTester {
         System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');
     }
 
-    static testMethod void getClosedDefectsTest() {
+    static testMethod void getClosedWorkitemsTest() {
         String reference1 = '33';
         String reference2 = '4354304350893';
         String queueId = '12345667';
@@ -60,18 +60,20 @@ private class V1ConnectorTester {
                         '</Asset>' +
                       '</Assets>';
         Settings testSettings = Settings.getTestSettings();
-        IRequestor testRequestor = new RequestorMock(xml, 200);
+        RequestorMock testRequestor = new RequestorMock(xml, 200);
         testSettings.setDestQueueId(queueId);
         testSettings.setSourceId(sourceId);
         String expectedDate = '2009-10-20T09:57:33';
         testSettings.setLastDateChangeAsset(Datetime.newInstance(2009, 10, 20, 9, 57, 33));
         V1Connector connector = new V1Connector(testSettings, testRequestor);
-        List<String> references = connector.getClosedDefects();
+        List<String> references = connector.getClosedWorkitems();
         System.assertEquals(2, references.size(), 'Incorrect number of assets.');
         assertContains(reference1, references, 'Can\'t find ' + references + ' reference');
         assertContains(reference2, references, 'Can\'t find ' + references + ' reference');
         System.assertEquals('2009-10-21 08:57:50', testSettings.getLastDateChangeAsset().format('yyyy-MM-dd HH:mm:ss'), 'Incorrect latest datetime of chaned asset.');
-        System.assertEquals('rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="StorySource:' + sourceId + '";Defect.AssetState="Closed";ChangeDateUTC>\'' + expectedDate + '\')', ((RequestorMock)testRequestor).getSentUrl(0), 'Incorrect request url.');
+        System.assertEquals(1, testRequestor.numberRequest, 'Wrong requests count.');
+        System.assert(testRequestor.getSentUrl(0).contains('Source=\'StorySource:' + sourceId), 'Incorrect request url: ' + testRequestor.getSentUrl(0));
+        System.assert(testRequestor.getSentUrl(0).contains(expectedDate), 'Incorrect request url.');
     }
 
     static testMethod void correctGetSourceIdTester() {
@@ -244,7 +246,7 @@ private class V1ConnectorTester {
                         '<Attribute act="set" name="URL">https://na7.salesforce.com/' + caseId + '</Attribute>' +
                         '<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
                         '<Relation act="set" name="Asset">' +
-                            '<Asset idref="Defect:' + defectId + '"/>' +
+                            '<Asset idref="PrimaryWorkitem:' + defectId + '"/>' +
                         '</Relation>' +
                        '</Asset>';
 
@@ -253,29 +255,25 @@ private class V1ConnectorTester {
 
     static testMethod void incorrectCreatingLinkToSalesForceCaseTest() {
         //test has to complete without any errors
-        IRequestor requestor = new RequestorMock('', 400);
+        RequestorMock requestor = new RequestorMock('', 400);
         Settings testSettings = Settings.getTestSettings();
         Integer defectId = 123;
         String caseId = 'CaseId';
         V1Connector connector = new V1Connector(testSettings, requestor);
-        //V1Publisher.setRequestor(requestor);
-        //V1Publisher.setSettings(settings);
         try {
             connector.createLinkV1ToSF(defectId, 'CaseId');
             System.assert(false, 'This place cannot be reached.');
-        }catch(V1RequestException e){
-            //Catch code
-        }
+        }catch(V1RequestException e){ }
         String body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
                         '<Attribute act="set" name="URL">https://na7.salesforce.com/' + caseId + '</Attribute>' +
                         '<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
                         '<Relation act="set" name="Asset">' +
-                            '<Asset idref="Defect:' + defectId + '"/>' +
+                            '<Asset idref="PrimaryWorkitem:' + defectId + '"/>' +
                         '</Relation>' +
                        '</Asset>';
 
-        System.assertEquals(((RequestorMock)requestor).getSentBody(0), body, 'Incorrect created body for POST.');
+        System.assertEquals(requestor.getSentBody(0), body, 'Incorrect created body for POST.');
     }
 
     static testMethod void correctCreateDefectInVersionOne() {
@@ -286,7 +284,7 @@ private class V1ConnectorTester {
         Test.startTest();
         insert caseData;
         Test.stopTest();
-        caseData = [SELECT CaseNumber, Subject, Description FROM Case WHERE Id = :caseData.Id];
+        caseData = [SELECT CaseNumber, Subject, Description, OwnerId FROM Case WHERE Id = :caseData.Id];
 
         // case 1
         String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/1699/4596" id="Defect:1699:4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
@@ -306,10 +304,11 @@ private class V1ConnectorTester {
                         '</Asset>';
         Settings testSettings = Settings.getTestSettings();
         testSettings.setSourceId(sourceId);
+        testSettings.setDefectQueueId(caseData.OwnerId);
         RequestorMock requestor = new RequestorMock(body, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        Integer defectId = connector.createDefectInV1(caseData, productId);
+        Integer defectId = connector.createWorkitemInV1(caseData, productId);
 
         System.assertEquals(expectedSendBody, requestor.getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
         System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
@@ -334,7 +333,7 @@ private class V1ConnectorTester {
         caseData.Subject = '';
         caseData.Description = '';
 
-        defectId = connector.createDefectInV1(caseData, productId);
+        defectId = connector.createWorkitemInV1(caseData, productId);
         System.assertEquals(expectedSendBody, requestor.getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
         System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
     }
@@ -354,7 +353,7 @@ private class V1ConnectorTester {
 
         try {
             Test.startTest();
-            Integer defectId = connector.createDefectInV1(caseData, productId);
+            Integer defectId = connector.createWorkitemInV1(caseData, productId);
             Test.stopTest();
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (V1RequestException ex) {}
@@ -375,7 +374,7 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         try {
-            Integer defectId = connector.createDefectInV1(caseData, productId);
+            Integer defectId = connector.createWorkitemInV1(caseData, productId);
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (V1RequestException ex) {}
 
@@ -385,7 +384,7 @@ private class V1ConnectorTester {
         connector = new V1Connector(testSettings, requestor);
 
         try {
-            Integer defectId = connector.createDefectInV1(caseData, productId);
+            Integer defectId = connector.createWorkitemInV1(caseData, productId);
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (NullPointerException ex) {}
 
@@ -394,7 +393,7 @@ private class V1ConnectorTester {
         requestor = new RequestorMock(body, 200, new Exception[]{null, new V1RequestException('test error')});
         connector = new V1Connector(testSettings, requestor);
 
-        Integer defectId = connector.createDefectInV1(caseData, productId);
+        Integer defectId = connector.createWorkitemInV1(caseData, productId);
         System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
         System.debug('exceptionsCreateDefectInVersionOne: 4');
@@ -402,7 +401,7 @@ private class V1ConnectorTester {
         requestor = new RequestorMock(body, 200, new Exception[]{null, new NullPointerException()});
         connector = new V1Connector(testSettings, requestor);
 
-        defectId = connector.createDefectInV1(caseData, productId);
+        defectId = connector.createWorkitemInV1(caseData, productId);
         System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
     }
 

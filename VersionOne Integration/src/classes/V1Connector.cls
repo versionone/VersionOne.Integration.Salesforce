@@ -1,12 +1,14 @@
 public with sharing class V1Connector implements IV1Connector {
 
-    public static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="StorySource:{0}";Defect.AssetState="Closed"{1})';
-    public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
+    public static final String CLOSED_WORKITEMS_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Number,ChangeDateUTC,Reference&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'Closed\'{1})';
+    public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'{0}\'';
     public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
-    public static final String LINK_URL = 'rest-1.v1/Data/Link';
+    public static final String CREATE_LINK_URL = 'rest-1.v1/Data/Link';
+    public static final String CREATE_DEFECT_URL = 'rest-1.v1/Data/Defect';
+    public static final String CREATE_STORY_URL = 'rest-1.v1/Data/Story';
+    public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'{1}\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
+
     public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
-    public static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
-    public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/Workitem?sel=Reference&where=(({0});Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
 
     private final Settings settings;
     private final transient IRequestor requestor;
@@ -18,17 +20,17 @@ public with sharing class V1Connector implements IV1Connector {
         this.requestor = requestor;
     }
 
-    public List<String> getClosedDefects() {
-        XMLDom xmlParser = new XMLDom();
+    public List<String> getClosedWorkitems() {
         List<String> references = new List<String>();
         String dateRestriction = '';
         if (settings.getLastDateChangeAsset() != null) {
             dateRestriction = ';ChangeDateUTC>\'' +settings.getLastDateChangeAsset().format('yyyy-MM-dd\'T\'HH:mm:ss') + '\'';
         }
         //Send the request, and get a response
-        requestor.request(requestor.createRequest('',
-            String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), dateRestriction}), 'GET'));
+        String url = String.format(CLOSED_WORKITEMS_URL, new String[]{settings.getSourceId(), dateRestriction});
+        requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
+        XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
         DateTime latestDate = settings.getLastDateChangeAsset();
@@ -218,12 +220,11 @@ public with sharing class V1Connector implements IV1Connector {
                         attributeNode('OnMenu', 'true') +
                         attributeNode('URL', 'https://na7.salesforce.com/' + caseId) +
                         attributeNode('Name', 'SalesForce Case') +
-                        relationNode('Asset', 'Defect:' + String.valueOf(defectId)) +
+                        relationNode('Asset', 'PrimaryWorkitem:' + defectId) +
                        '</Asset>';
-        XMLDom xmlParser = new XMLDom();
 
         //Send the request, and get a response
-        requestor.request(requestor.createRequest(body, LINK_URL, 'POST'));
+        requestor.request(requestor.createRequest(body, CREATE_LINK_URL, 'POST'));
         if (requestor.getStatusCode() != 200) {
             throw new V1RequestException('Problem to create link to case', requestor);
         }
@@ -231,28 +232,28 @@ public with sharing class V1Connector implements IV1Connector {
 
 
     /**
-     * Creates defect in the VersionOne and assign link to it.
+     * Creates defect or story in the VersionOne and assign link to it.
      *
-     * returns: 	id of the created defect
+     * returns: 	id of the created workitem
      * throws:  V1RequestException, Exception
      */
-    public Integer createDefectInV1(Case caseData, String productId) {
-        Integer defectId = -1;
-        XMLDom xmlParser = new XMLDom();
-        String createDefectBody = '<Asset>'
-            + relationNode('Scope', 'Scope:' + productId)
+    public Integer createWorkitemInV1(Case caseData, String projectId) {
+        String body = '<Asset>'
+            + relationNode('Scope', 'Scope:' + projectId)
             + attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME))
             + attributeNode('Reference', caseData.CaseNumber)
             + attributeNode('Description', (caseData.Description != null ? caseData.Description : ''))
             + relationNode('Source', 'StorySource:' + settings.getSourceId())
             + '</Asset>';
-        System.debug('XML for create defect:' + createDefectBody);
-        String url = true ? DEFECT_URL : '';
-        requestor.request(requestor.createRequest(createDefectBody, url, 'POST'));
+        System.debug('XML for creating workitem:' + body);
+        String url = caseData.OwnerId == settings.getDefectQueueId() ? CREATE_DEFECT_URL : CREATE_STORY_URL;
+        System.debug('URL for creating workitem:' + url);
+        requestor.request(requestor.createRequest(body, url, 'POST'));
 
         if (requestor.getStatusCode() != 200) {
             throw new V1RequestException('Problem with creating new defect in the VersionOne', requestor);
         }
+        XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         return Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
     }
