@@ -21,11 +21,8 @@ public with sharing class V1Publisher {
             try {
                 V1Publisher pub = new V1Publisher();
                 pub.processCases();
-            } catch (VersionOneException ex) {
-                errorMessage(ex.getErrorMessage(), ex);
-                return;
             } catch (Exception ex) {
-                errorMessage('Internal problems during getting existed defects from the VersionOne: ', ex);
+                errorMessage('Problems during getting existed defects from the VersionOne.', ex);
                 return;
             }
         }
@@ -94,10 +91,8 @@ public with sharing class V1Publisher {
         } else {
             String projectId = findProjectId(caseData.VersionOneProject__c);
             Integer id = connector.createDefectInV1(caseData, projectId);
-            if (id > 0) {
-                connector.createLinkV1ToSF(id, caseData.Id);
-                V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), settings.getPath() + URL_TO_V1_TEMPLATE + id);
-            }
+            connector.createLinkV1ToSF(id, caseData.Id);
+            V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), settings.getPath() + URL_TO_V1_TEMPLATE + id);
         }
     }
 
@@ -109,17 +104,13 @@ public with sharing class V1Publisher {
         return connector.getDefaultProjectId();
     }
 
-    /** Handles error message. **/
+    /** Logs error message. **/
     public static void errorMessage(String message) {
         System.debug(message);
     }
 
-    /** Handles error message with exception. **/
+    /** Logs error message with exception. **/
     public static void errorMessage(String message, Exception ex) {
-        if (ex instanceof VersionOneException ) {
-            System.debug(message + ':' + ((VersionOneException)ex).getResponceBody());
-        } else {
-            System.debug('Internal error:' + ex.getMessage());
-        }
+        System.debug(message + '/n' + ex);
     }
 }

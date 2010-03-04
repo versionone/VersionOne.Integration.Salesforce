@@ -1,9 +1,7 @@
 public class V1ConnectorMock implements IV1Connector {
 
     private String sourceId = '123456';
-    private String exceptionMessage = '';
-    private Integer exceptionType = 0;
-    private Boolean isExceptionEnabled = false;
+    private Exception ex;
     private Integer createdDefectId = 0;
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
     private List<String> closedDefects = new List<String>();
@@ -65,25 +63,15 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     /**
-    * Enables exceptions for call any methods
-    * params : 	enableException - true enable exceptions, false - disable
-    *  			type 			- 1 VersionOneException, 2 NullPointerException
-    *			message			- message
-    **/
-    public void enableException(boolean enableException, Integer exceptionType, String message) {
-        this.exceptionMessage = message;
-        this.exceptionType = exceptionType;
-        isExceptionEnabled = enableException;
+     * Enables exception throwing on next calls of any methods.
+     */
+    public void enableException(Exception ex) {
+        this.ex = ex;
     }
 
     private void throwException() {
-        System.debug('isExceptionEnabled=' + isExceptionEnabled + ' | exceptionType=' + exceptionType);
-        if (isExceptionEnabled && exceptionType == 1) {
-            System.debug('Throw VersionOneException');
-            throw new VersionOneException(exceptionMessage, 'test body');
-        } else if (isExceptionEnabled && exceptionType == 2) {
-            System.debug('Throw NullPointerException');
-            throw new NullPointerException();
+        if (ex != null) {
+            throw ex;
         }
     }
 }
