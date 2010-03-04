@@ -91,7 +91,7 @@ public with sharing class V1Publisher {
         } else {
             String projectId = findProjectId(caseData.VersionOneProject__c);
             Integer id = connector.createWorkitemInV1(caseData, projectId);
-            connector.createLinkV1ToSF(id, caseData.Id);
+            connector.createLinkV1ToSF(id, caseData);
             V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), settings.getPath() + URL_TO_V1_TEMPLATE + id);
         }
     }
