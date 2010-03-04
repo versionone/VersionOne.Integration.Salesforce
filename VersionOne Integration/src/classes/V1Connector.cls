@@ -255,7 +255,13 @@ public with sharing class V1Connector implements IV1Connector {
     }
 
     public String getRelatedTo(Case caseData) {
-        return caseData.OwnerId == settings.getDefectQueueId() ? 'Defect' : 'Story';
+        System.debug('getRelatedTo() case=' + caseData + ' defectQueue=' + settings.getDefectQueueId() + ' storyQueue=' + settings.getStoryQueueId());
+        if (caseData.OwnerId == settings.getDefectQueueId()) {
+            return 'Defect';
+        } else if (caseData.OwnerId == settings.getStoryQueueId()) {
+            return 'Story';
+        }
+        throw new V1RequestException('Unknown workitem type for ' + caseData);
     }
 
     /**
