@@ -36,7 +36,7 @@ public class V1ConnectorMock implements IV1Connector {
         return '1010';
     }
 
-    public void createLinkV1ToSF(Integer defectId, String caseId) {
+    public void createLinkV1ToSF(Integer defectId, Case caseData) {
 
     }
 
