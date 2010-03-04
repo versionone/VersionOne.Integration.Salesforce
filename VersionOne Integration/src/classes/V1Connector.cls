@@ -1,12 +1,12 @@
 public with sharing class V1Connector implements IV1Connector {
 
-    public static final String CLOSED_WORKITEMS_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Number,ChangeDateUTC,Reference&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'Closed\'{1})';
-    public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'{0}\'';
+    public static final String CLOSED_WORKITEMS_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Number,ChangeDateUTC,Reference&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'\'Closed\'\'{1})';
+    public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'\'{0}\'\'';
     public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
     public static final String CREATE_LINK_URL = 'rest-1.v1/Data/Link';
     public static final String CREATE_DEFECT_URL = 'rest-1.v1/Data/Defect';
     public static final String CREATE_STORY_URL = 'rest-1.v1/Data/Story';
-    public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'{1}\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
+    public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'\'{1}\'\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
 
     public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
 
