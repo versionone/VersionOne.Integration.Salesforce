@@ -1,14 +1,15 @@
 public with sharing class V1Connector implements IV1Connector {
+
     public static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=Defect.Number,Defect.ChangeDateUTC,Defect.Reference&where=(Defect.Source="StorySource:{0}";Defect.AssetState="Closed"{1})';
     public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name="{0}"';
     public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
     public static final String LINK_URL = 'rest-1.v1/Data/Link';
     public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
     public static final String DEFECT_URL = 'rest-1.v1/Data/Defect';
-    public static final String MULTI_DEFECT_CHECK_URL = 'rest-1.v1/Data/Workitem?sel=Reference&where=(({0});Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
+    public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/Workitem?sel=Reference&where=(({0});Source.Name="{1}")';// {0} - Reference='%ref1%'|Reference='%ref2%'
 
     private final Settings settings;
-    private final IRequestor requestor;
+    private final transient IRequestor requestor;
 
     private String defaultProjectId;
 
@@ -25,64 +26,67 @@ public with sharing class V1Connector implements IV1Connector {
             dateRestriction = ';ChangeDateUTC>\'' +settings.getLastDateChangeAsset().format('yyyy-MM-dd\'T\'HH:mm:ss') + '\'';
         }
         //Send the request, and get a response
-        requestor.request(requestor.createRequest('', String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), dateRestriction}), 'GET'));
-        if (isResponceStatusCodeCorrect()) {
-            xmlParser.parseFromString(requestor.getBody());
-            List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
-            DateTime latestDate = settings.getLastDateChangeAsset();
-            for (XMLDom.Element asset : assetTags) {
-                String reference = getValue('Reference', asset.childNodes);
-                String changeDateUTC = getValue('ChangeDateUTC', asset.childNodes);
-                references.add(reference);
-                DateTime testDate = convertToDateTime(changeDateUTC);
-                if (latestDate == null || testDate > latestDate) {
-                    latestDate = testDate;
-                }
-            }
-            if (latestDate != settings.getLastDateChangeAsset()) {
-                // here we set date
-                // settings will be stored in the Syncronizer class, if no one case has to be updated
-                settings.setLastDateChangeAsset(latestDate);
+        requestor.request(requestor.createRequest('',
+            String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), dateRestriction}), 'GET'));
+        validateResponse();
+        xmlParser.parseFromString(requestor.getBody());
+        XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
+        DateTime latestDate = settings.getLastDateChangeAsset();
+        for (XMLDom.Element asset : assetTags) {
+            String reference = getValue('Reference', asset.childNodes);
+            String changeDateUTC = getValue('ChangeDateUTC', asset.childNodes);
+            references.add(reference);
+            DateTime testDate = convertToDateTime(changeDateUTC);
+            if (latestDate == null || testDate > latestDate) {
+                latestDate = testDate;
             }
         }
-
+        if (latestDate != settings.getLastDateChangeAsset()) {
+            // here we set date
+            // settings will be stored in the Syncronizer class, if no one case has to be updated
+            settings.setLastDateChangeAsset(latestDate);
+        }
         return references;
     }
 
     public String getSourceId() {
+        String source = settings.getSource();
+        if (source == null) {
+            return null;
+        }
         XMLDom xmlParser = new XMLDom();
-        String escapedSourceName = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
+        String escapedSourceName = EncodingUtil.urlEncode(source, 'UTF-8');
 
         //Send the request, and get a response
-        requestor.request(requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET'));
+        HttpRequest req = requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET');
+        requestor.request(req);
         System.debug('Responce code = ' + requestor.getStatusCode());
         System.debug('Responce body = ' + requestor.getBody());
-        if (isResponceStatusCodeCorrect()) {
-            xmlParser.parseFromString(requestor.getBody());
-            XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
-            System.debug('assetTag = ' + assetTag);
-            if (assetTag != null) {
-                return assetTag.getAttribute('id').split(':')[1];
-            }
+        validateResponse();
+        xmlParser.parseFromString(requestor.getBody());
+        XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
+        System.debug('assetTag = ' + assetTag);
+        if (assetTag != null) {
+            return assetTag.getAttribute('id').split(':')[1];
         }
-
         return null;
     }
 
     /**
-    * Verifies that responce is correct and returns true if all is ok or
-    * thorws VersionOneException is responce is not correct.
-    **/
-    public boolean isResponceStatusCodeCorrect() {
-        if (requestor.getStatusCode() == 200) {
-            return true;
-        }else if (requestor.getStatusCode() == 401){
-            throw new VersionOneException('Credentials is not correct.', '');
-        }else if (requestor.getStatusCode() == 500 || requestor.getStatusCode() == 404){
-            throw new VersionOneException('URL is not correct or VersionOne server has some problems at the moment.', '');
+     * Verifies that responce is correct.
+     *
+     * thorws: V1RequestException if responce is not correct.
+     */
+    public void validateResponse() {
+        Integer status = requestor.getStatusCode();
+        if (status == 200) {
+            return;
+        } else if (status == 401){
+            throw new V1RequestException('Credentials are not correct.');
+        } else if (status == 500 || status == 404){
+            throw new V1RequestException('URL is not correct or VersionOne server has some problems at the moment.');
         }
-
-        throw new VersionOneException('Problem with getting data from the VersionOne. (' + requestor.getStatusCode() + ')', requestor.getBody());
+        throw new V1RequestException('Problem with getting data from the VersionOne.', requestor);
     }
 
     /**
@@ -138,11 +142,10 @@ public with sharing class V1Connector implements IV1Connector {
 
         //Send the request, and get a response
         requestor.request(requestor.createRequest('', SCOPE_URL, 'GET'));
-        if (requestor.getStatusCode() == 200) {
-            xmlParser.parseFromString(requestor.getBody());
-        } else {
-            throw new VersionOneException('Problem with getting projects from the VersionOne.', requestor.getBody());
+        if (requestor.getStatusCode() != 200) {
+            throw new V1RequestException('Problem with getting projects from the VersionOne.', requestor);
         }
+        xmlParser.parseFromString(requestor.getBody());
         List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
 
         Integer testId = 999999999;
@@ -189,19 +192,18 @@ public with sharing class V1Connector implements IV1Connector {
 
         //Send the request, and get a response
         String source = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
-        requestor.request(requestor.createRequest('', String.format(MULTI_DEFECT_CHECK_URL, new String[]{reference, source}), 'GET'));
-        if (requestor.getStatusCode() == 200) {
-            xmlParser.parseFromString(requestor.getBody());
-        } else {
-            throw new VersionOneException('Problem with getting data from the VersionOne', requestor.getBody());
+        requestor.request(requestor.createRequest('',
+            String.format(WORKITEM_REFERENCE_SEARCH_URL, new String[]{reference, source}), 'GET'));
+        if (requestor.getStatusCode() != 200) {
+            throw new V1RequestException('Problem with getting data from the VersionOne', requestor);
         }
+        xmlParser.parseFromString(requestor.getBody());
 
         List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
         Map<String, Boolean> defectsInfo = new Map<String, Boolean>();
         for (XMLDom.Element assetTag : assetTags) {
             defectsInfo.put(assetTag.getValue('Attribute'), true);
         }
-
         return defectsInfo;
     }
 
@@ -223,47 +225,36 @@ public with sharing class V1Connector implements IV1Connector {
         //Send the request, and get a response
         requestor.request(requestor.createRequest(body, LINK_URL, 'POST'));
         if (requestor.getStatusCode() != 200) {
-            throw new VersionOneException('Problem to create link to case', requestor.getBody());
+            throw new V1RequestException('Problem to create link to case', requestor);
         }
     }
 
 
     /**
-    * Creates defect in the VersionOne and assign link to it
-    *
-    * returns 	defect id  	- all ok
-    *			-1 			- defect was not created
-    **/
+     * Creates defect in the VersionOne and assign link to it.
+     *
+     * returns: 	id of the created defect
+     * throws:  V1RequestException, Exception
+     */
     public Integer createDefectInV1(Case caseData, String productId) {
         Integer defectId = -1;
         XMLDom xmlParser = new XMLDom();
-        try {
-            String createDefectBody = '<Asset>' +
-                                relationNode('Scope', 'Scope:' + productId) +
-                                attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME)) +
-                                attributeNode('Reference', caseData.CaseNumber) +
-                                attributeNode('Description', (caseData.Description != null ? caseData.Description : '')) +
-                                relationNode('Source', 'StorySource:' + settings.getSourceId()) +
-                                      '</Asset>';
-            System.debug('XML for create defect:' + createDefectBody);
+        String createDefectBody = '<Asset>'
+            + relationNode('Scope', 'Scope:' + productId)
+            + attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME))
+            + attributeNode('Reference', caseData.CaseNumber)
+            + attributeNode('Description', (caseData.Description != null ? caseData.Description : ''))
+            + relationNode('Source', 'StorySource:' + settings.getSourceId())
+            + '</Asset>';
+        System.debug('XML for create defect:' + createDefectBody);
+        String url = true ? DEFECT_URL : '';
+        requestor.request(requestor.createRequest(createDefectBody, url, 'POST'));
 
-            requestor.request(requestor.createRequest(createDefectBody, DEFECT_URL, 'POST'));
-
-            if (requestor.getStatusCode() == 200) {
-                xmlParser.parseFromString(requestor.getBody());
-            } else {
-                V1Publisher.errorMessage('Problem with creating new defect in the VersionOne' + requestor.getBody());
-                return -1;
-            }
-
-            return Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
-        } catch (VersionOneException ex) {
-            V1Publisher.errorMessage(ex.getErrorMessage(), ex);
-            return -1;
-        }  catch (Exception ex) {
-            V1Publisher.errorMessage('Internal problems during creating defect: ', ex);
-            return -1;
+        if (requestor.getStatusCode() != 200) {
+            throw new V1RequestException('Problem with creating new defect in the VersionOne', requestor);
         }
+        xmlParser.parseFromString(requestor.getBody());
+        return Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
     }
 
 

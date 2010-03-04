@@ -88,16 +88,14 @@ private class V1ConnectorTester {
     }
 
     static testMethod void incorrectGetSourceIdTester() {
-        String sourceName = 'TestSource';
-        String sourceIdExpected = null;
         Settings testSettings = Settings.getTestSettings();
-        testSettings.setSource(sourceName);
+        testSettings.setSource('TestSource');
         String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="0" pageSize="0" pageStart="0"></Assets>';
         IRequestor requestor = new RequestorMock(body, 200);
         IV1Connector connector = new V1Connector(testSettings, requestor);
 
         String sourceId = connector.getSourceId();
-        System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
+        System.assertEquals(null, sourceId, 'sourceId must not be returned.');
     }
 
     static testMethod void exceptionsGetSourceIdTester() {
@@ -112,9 +110,7 @@ private class V1ConnectorTester {
         try {
             String sourceId = connector.getSourceId();
             System.assert(false, 'This cannot be reached.');
-        } catch (VersionOneException ex) {
-            System.assertEquals('Credentials is not correct.', ex.getErrorMessage(), 'Incorrect error message.');
-        }
+        } catch (V1RequestException ex) {}
 
         //another exception
         requestor = new RequestorMock(body, 500);
@@ -123,9 +119,7 @@ private class V1ConnectorTester {
         try {
             String sourceId = connector.getSourceId();
             System.assert(false, 'This cannot be reached.');
-        } catch (VersionOneException ex) {
-            System.assertEquals('URL is not correct or VersionOne server has some problems at the moment.', ex.getErrorMessage(), 'Incorrect error message.');
-        }
+        } catch (V1RequestException ex) {}
 
         //another exception
         requestor = new RequestorMock(body, 404);
@@ -134,9 +128,7 @@ private class V1ConnectorTester {
         try {
             String sourceId = connector.getSourceId();
             System.assert(false, 'This cannot be reached.');
-        } catch (VersionOneException ex) {
-            System.assertEquals('URL is not correct or VersionOne server has some problems at the moment.', ex.getErrorMessage(), 'Incorrect error message.');
-        }
+        } catch (V1RequestException ex) {}
 
         //another exception
         requestor = new RequestorMock(body, 111);
@@ -145,10 +137,7 @@ private class V1ConnectorTester {
         try {
             String sourceId = connector.getSourceId();
             System.assert(false, 'This cannot be reached.');
-        } catch (VersionOneException ex) {
-            System.assertEquals('Problem with getting data from the VersionOne. (111)', ex.getErrorMessage(), 'Incorrect error message.');
-        }
-
+        } catch (V1RequestException ex) {}
     }
 
     static testMethod void correctProjectsListTest() {
@@ -173,7 +162,7 @@ private class V1ConnectorTester {
         try{
             projects = connector.findAllProjects();
             System.assert(false, 'This place cannot be reached.');
-        }catch(VersionOneException e){
+        }catch(V1RequestException e){
             //Catch code
         }
         System.assertEquals(null, projects, 'Error! Incorrect amount of projects.');
@@ -207,7 +196,7 @@ private class V1ConnectorTester {
         System.assert(alreadyPorted.containsKey(case1.CaseNumber), 'Error! Case \'' + case1.CaseNumber + '\' has to be found.');
         System.assert(!alreadyPorted.containsKey(case3.CaseNumber), 'Error! Case \'' + case3.CaseNumber + '\' has to be found.');
         String reference = 'Reference=\'' + case1.CaseNumber + '\'|Reference=\'' + case2.CaseNumber + '\'|Reference=\'' + case3.CaseNumber + '\'';
-        System.assertEquals(String.format(V1Connector.MULTI_DEFECT_CHECK_URL, new String[]{reference, sourceName}),
+        System.assertEquals(String.format(V1Connector.WORKITEM_REFERENCE_SEARCH_URL, new String[]{reference, sourceName}),
             requestor.getSentUrl(0), 'Error! Wrong URL while quering referenced cases \'' + case3.CaseNumber);
         delete new Case[]{case1, case2, case3};
     }
@@ -235,7 +224,7 @@ private class V1ConnectorTester {
         try {
             Map<String, Boolean> alreadyPorted =  connector.getReferencedWorkitems(new Case[]{case1, case2, case3});
             System.assert(false, 'This place cannot be reached.');
-        }catch(VersionOneException e){
+        }catch(V1RequestException e){
             //Catch code
         }
     }
@@ -274,7 +263,7 @@ private class V1ConnectorTester {
         try {
             connector.createLinkV1ToSF(defectId, 'CaseId');
             System.assert(false, 'This place cannot be reached.');
-        }catch(VersionOneException e){
+        }catch(V1RequestException e){
             //Catch code
         }
         String body = '<Asset>' +
@@ -348,8 +337,6 @@ private class V1ConnectorTester {
         defectId = connector.createDefectInV1(caseData, productId);
         System.assertEquals(expectedSendBody, requestor.getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
         System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
-
-        delete caseData;
     }
 
     static testMethod void incorrectCreateDefectInVersionOne() {
@@ -358,17 +345,19 @@ private class V1ConnectorTester {
         String productId = '123';
         String caseDescription = 'Case for testing';
         Case caseData = new Case(Subject = caseName, Description = caseDescription);
-        Test.startTest();
         insert caseData;
-        Test.stopTest();
+
         RequestorMock requestor = new RequestorMock('', 400);
         Settings cfg = Settings.getTestSettings();
         cfg.setSourceId(sourceId);
         V1Connector connector = new V1Connector(cfg, requestor);
 
-        Integer defectId = connector.createDefectInV1(caseData, productId);
-        System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
-        delete caseData;
+        try {
+            Test.startTest();
+            Integer defectId = connector.createDefectInV1(caseData, productId);
+            Test.stopTest();
+            System.assert(false, 'Error! V1RequestException must be thrown.');
+        } catch (V1RequestException ex) {}
     }
 
     static testMethod void exceptionsCreateDefectInVersionOne() {
@@ -382,35 +371,35 @@ private class V1ConnectorTester {
         Case caseData = new Case(Subject = caseName, Description = caseDescription);
         Settings testSettings = Settings.getTestSettings();
         testSettings.setSourceId(sourceId);
-        Exception[] exceptions = new Exception[]{new VersionOneException('test error', '<html>error</html>')};
-        RequestorMock requestor = new RequestorMock(body, 200, exceptions);
+        RequestorMock requestor = new RequestorMock(body, 200, new Exception[]{new V1RequestException('test error')});
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        Integer defectId = connector.createDefectInV1(caseData, productId);
-        System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
+        try {
+            Integer defectId = connector.createDefectInV1(caseData, productId);
+            System.assert(false, 'Error! V1RequestException must be thrown.');
+        } catch (V1RequestException ex) {}
 
         System.debug('exceptionsCreateDefectInVersionOne: 2');
         // ecxeption during creating defect in the VersionOne
-        exceptions = new Exception[]{new NullPointerException()};
-        requestor = new RequestorMock(body, 200, exceptions);
+        requestor = new RequestorMock(body, 200, new Exception[]{new NullPointerException()});
         connector = new V1Connector(testSettings, requestor);
 
-        defectId = connector.createDefectInV1(caseData, productId);
-        System.assertEquals(-1, defectId, 'Error! Incorrect defect id');
+        try {
+            Integer defectId = connector.createDefectInV1(caseData, productId);
+            System.assert(false, 'Error! V1RequestException must be thrown.');
+        } catch (NullPointerException ex) {}
 
         System.debug('exceptionsCreateDefectInVersionOne: 3');
         // incorrect responce from the VersionOne during creating link to case in the VersionOne
-        exceptions = new Exception[]{null, new VersionOneException('test error', '<html>error</html>')};
-        requestor = new RequestorMock(body, 200, exceptions);
+        requestor = new RequestorMock(body, 200, new Exception[]{null, new V1RequestException('test error')});
         connector = new V1Connector(testSettings, requestor);
 
-        defectId = connector.createDefectInV1(caseData, productId);
+        Integer defectId = connector.createDefectInV1(caseData, productId);
         System.assertEquals(1699, defectId, 'Error! Incorrect defect id');
 
         System.debug('exceptionsCreateDefectInVersionOne: 4');
         // ecxeption during creating link to case in the VersionOne
-        exceptions = new Exception[]{null, new NullPointerException()};
-        requestor = new RequestorMock(body, 200, exceptions);
+        requestor = new RequestorMock(body, 200, new Exception[]{null, new NullPointerException()});
         connector = new V1Connector(testSettings, requestor);
 
         defectId = connector.createDefectInV1(caseData, productId);

@@ -1,16 +1,40 @@
 public class SettingsController {
 
-    public String testSeverity{ get; set; }
-    public String saveSeverity{ get; set; }
-    public String testMessage{ get; set; }
-    public String saveMessage{ get; set; }
-    public Boolean isSettingsValidated { get; set; }
-    public Boolean isSettingsCorrect { get; set; }
-    public Boolean isSaved { get; set; }
-    public Settings settings {get; set;}
+    public String testSeverity{get; set;}
+    public String saveSeverity{get; set;}
+    public String testMessage{get; set;}
+    public String saveMessage{get; set;}
+    public Boolean isSettingsValidated {get; set;}
+    public Boolean isSettingsCorrect {get; set;}
+    public Boolean isSaved {get; set;}
+    public Settings settings {get {
+        if (settings == null) {
+            settings = new Settings();
+        }
+        return settings;} set;}
     public Boolean isSyncEnabled {get; set;}
 
-    private transient IV1Connector connector;
+    private transient IV1Connector innerConnector;
+    public IV1Connector connector {
+        get {
+            if (innerConnector == null) {
+                innerConnector = new V1Connector(settings, new Requestor(settings));
+            }
+            return innerConnector;
+        }
+        set {
+            innerConnector = value;
+        }}
+
+    /** Must be called before usage of any other method. */
+    public void initSettings() {
+        testMessage = '';
+        saveMessage = '';
+        isSettingsValidated = false;
+        isSettingsCorrect = false;
+        isSaved = false;
+        isSyncEnabled = SyncSchedule.isScheduled(settings.getScheduleId());
+    }
 
     public String updateSchedule() {
         String oldId = settings.getScheduleId();
@@ -40,7 +64,7 @@ public class SettingsController {
             addErrorMessage('Settings is not correct or was not validated.');
             return null;
         }
-        String sourceId = getSourceId();
+        String sourceId = connector.getSourceId();
         if (sourceId == null) {
             isSettingsCorrect = false;
             isSettingsValidated = false;
@@ -80,13 +104,9 @@ public class SettingsController {
             testSeverity = 'info';
             testMessage = 'Settings correct.';
             isSettingsCorrect = true;
-        } catch (VersionOneException ex) {
-            testSeverity = 'error';
-            testMessage = ex.getErrorMessage();
-            isSettingsCorrect = false;
         } catch (Exception ex) {
             testSeverity = 'error';
-            testMessage = 'Internal error:' + ex.getMessage();
+            testMessage = ex.getMessage();
             isSettingsCorrect = false;
         }
 
@@ -108,54 +128,20 @@ public class SettingsController {
      */
     public Boolean validateSettings() {
         String[] errors = settings.validate();
-        if (errors.size() == 0) {
-            return true;
-        }
         for (String msg : errors) {
             addErrorMessage(msg);
         }
-        return false;
+        return errors.size() == 0;
     }
 
     private static void addErrorMessage(String text) {
         ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, text));
     }
 
-    public void initSettings() {
-        testMessage = '';
-        saveMessage = '';
-        isSettingsValidated = false;
-        isSettingsCorrect = false;
-        isSaved = false;
-        if (settings == null) {
-            settings = new Settings();
+    public void validateConnectionAndSource() {
+        if (settings.getSource() == null || connector.getSourceId() == null) {
+            throw new V1RequestException('Incorrect source.');
         }
-        isSyncEnabled = SyncSchedule.isScheduled(settings.getScheduleId());
-    }
-
-    public boolean validateConnectionAndSource() {
-        if (settings.getSource() == null) {
-            throw new VersionOneException('Incorrect source.', '');
-        }
-
-        if (getSourceId() != null) {
-            return true;
-        }
-
-        throw new VersionOneException('Source setting is not correct.', '');
-    }
-
-    public String getSourceId() {
-        if (connector == null) {
-            IRequestor requestor = new Requestor(settings);
-            connector = new V1Connector(settings, requestor);
-        }
-
-        return connector.getSourceId();
-    }
-
-    public void setConnector(IV1Connector connector) {
-        this.connector = connector;
     }
 
     public static List<SelectOption> getQueueList() {
@@ -174,9 +160,6 @@ public class SettingsController {
             String countStr = (count == 0 ? 'No' : String.valueOf(count));
             ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM,
                 countStr + ' Cases have been closed.'));
-        } catch (VersionOneException ex) {
-            addErrorMessage('Failed to update Cases.');
-            addErrorMessage(ex.getErrorMessage());
         } catch (Exception ex) {
             addErrorMessage('Failed to update Cases.');
             ApexPages.addMessages(ex);

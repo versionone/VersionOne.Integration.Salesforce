@@ -178,7 +178,7 @@ private class V1PublisherTester {
             V1ConnectorMock connector = new V1ConnectorMock();
             connector.setCreatedDefectId(defectId);
             connector.setTestAlreadyExistedDefects(alreadyPortedCases);
-            connector.enableException(true, 1, 'Just test exception.');
+            connector.enableException(new V1RequestException('Just test exception.'));
             V1Publisher.connector = connector;
 
             Test.startTest();

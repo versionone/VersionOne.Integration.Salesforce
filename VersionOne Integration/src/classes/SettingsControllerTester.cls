@@ -29,7 +29,7 @@ private class SettingsControllerTester {
         SettingsController controller = new SettingsController();
         Test.setCurrentPage(new PageReference('apex/Settings_page'));
         Settings settingsData = Settings.getTestSettings();
-        controller.setConnector(new V1ConnectorMock());
+        controller.connector = new V1ConnectorMock();
 
         //all fields is filled
         settingsData.setPath('http://localhost');
@@ -59,28 +59,26 @@ private class SettingsControllerTester {
         String sourceName = 'TestSource';
         String sourceIdExpected = '1010';
         settingsData.setSource(sourceName);
-        IV1Connector connector = new V1ConnectorMock();
-        ((V1ConnectorMock)connector).setTestSourceId(sourceIdExpected);
-        controller.setConnector(connector);
+        V1ConnectorMock connector = new V1ConnectorMock();
+        connector.setTestSourceId(sourceIdExpected);
+        controller.connector = connector;
         controller.settings = settingsData;
         controller.initSettings();
-        System.assert(controller.validateConnectionAndSource(), 'Incorrect result of test.');
+        controller.validateConnectionAndSource();
 
         //thorw exception
-        ((V1ConnectorMock)connector).enableException(true, 1, 'Just test exception.');
-        controller.setConnector(connector);
+        connector.enableException(new V1RequestException('Just test exception.'));
         try {
             controller.validateConnectionAndSource();
             System.assert(false, 'This place cannot be reached.');
-        }catch(VersionOneException e){}
+        }catch(V1RequestException e){}
 
         //source was not found
-        ((V1ConnectorMock)connector).setTestSourceId(null);
-        controller.setConnector(connector);
+        connector.setTestSourceId(null);
         try {
             controller.validateConnectionAndSource();
             System.assert(false, 'This place cannot be reached.');
-        }catch(VersionOneException e){}
+        }catch(V1RequestException e){}
     }
 
     static testMethod void testSettingsTest() {
@@ -93,11 +91,11 @@ private class SettingsControllerTester {
         String destQueueId = 'destQueueId';
         String defectQueueId = 'defectQueueId';
         String storyQueueId = 'storyQueueId';
-        IV1Connector connector = new V1ConnectorMock();
-        ((V1ConnectorMock)connector).setTestSourceId(sourceIdExpected);
+        V1ConnectorMock connector = new V1ConnectorMock();
+        connector.setTestSourceId(sourceIdExpected);
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
-        controller.setConnector(connector);
+        controller.connector = connector;
         controller.settings = settingsData;
         controller.testSettings();
         System.assert(!controller.isSettingsCorrect, 'Settings have to be not correct.');
@@ -119,39 +117,34 @@ private class SettingsControllerTester {
         System.assertEquals('info', controller.testSeverity, 'Incorrect severity.');
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
 
-        //VersionOneException during test connection
-        ((V1ConnectorMock)connector).enableException(true, 1, 'Credentials is not correct.');
-        controller.setConnector(connector);
+        //V1RequestorException during test connection
+        connector.enableException(new V1RequestException('TEST-TEST'));
         controller.testSettings();
         System.assert(!controller.isSettingsCorrect, 'Settings have to be not correct.');
         System.assert(controller.isSettingsValidated, 'Settings have to be validated.');
-        System.assertEquals('Credentials is not correct.', controller.testMessage, 'Incorrect message after testing.');
+        System.assertEquals('TEST-TEST', controller.testMessage, 'Incorrect message after testing.');
         System.assertEquals('error', controller.testSeverity, 'Incorrect severity.');
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
 
         //Unknown exception during test connection
-        ((V1ConnectorMock)connector).enableException(true, 2, '');
-        controller.setConnector(connector);
+        connector.enableException(new NullPointerException());
         controller.testSettings();
         System.assert(!controller.isSettingsCorrect, 'Settings have to be not correct.');
         System.assert(controller.isSettingsValidated, 'Settings have to be validated.');
-        System.assertEquals('Internal error:Script-thrown exception', controller.testMessage, 'Incorrect message after testing.');
+        System.assertEquals('Script-thrown exception', controller.testMessage, 'Incorrect message after testing.');
         System.assertEquals('error', controller.testSeverity, 'Incorrect severity.');
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
 
         //source is null
         System.debug('//source is null');
-        ((V1ConnectorMock)connector).enableException(false, 0, '');
-        ((V1ConnectorMock)connector).setTestSourceId(null);
-        controller.setConnector(connector);
+        connector.enableException(null);
+        connector.setTestSourceId(null);
         controller.testSettings();
         System.assert(!controller.isSettingsCorrect, 'Settings have to be not correct.');
         System.assert(controller.isSettingsValidated, 'Settings have to be validated.');
-        System.assertEquals('Source setting is not correct.', controller.testMessage, 'Incorrect message after testing.');
+        System.assert(controller.testMessage.toLowerCase().contains('source'), 'Incorrect message after testing: ' + controller.testMessage);
         System.assertEquals('error', controller.testSeverity, 'Incorrect severity.');
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
-
-        controller.testSettings();
     }
 
     static testMethod void saveSettingsTester() {
@@ -177,7 +170,7 @@ private class SettingsControllerTester {
         V1ConnectorMock connector = new V1ConnectorMock();
         connector.setTestSourceId(sourceIdExpected);
         SettingsController controller = new SettingsController();
-        controller.setConnector(connector);
+        controller.connector = connector;
         controller.settings = settingsData;
         controller.initSettings();
         controller.isSettingsCorrect = true;
@@ -192,7 +185,7 @@ private class SettingsControllerTester {
         System.assertEquals('', controller.testSeverity, 'Incorrect test severity.');
 
         String scheduleId = settingsData.getScheduleId();
-        System.assert(scheduleId != null , 'Schedule have to be created.');
+        System.assertNotEquals(null, scheduleId, 'Schedule have to be created.');
         System.assert(SyncSchedule.isScheduled(scheduleId), 'Schedule don\'t exist.');
 
         controller.isSyncEnabled = false;
@@ -202,8 +195,7 @@ private class SettingsControllerTester {
         System.assert(!SyncSchedule.isScheduled(scheduleId), 'Schedule have to be removed.');
 
         //no source id
-        ((V1ConnectorMock)connector).setTestSourceId(null);
-        controller.setConnector(connector);
+        connector.setTestSourceId(null);
         controller.saveSettings();
         System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
         System.assert(!controller.isSettingsCorrect, 'Settings have to not be correct.');
@@ -222,21 +214,6 @@ private class SettingsControllerTester {
         System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
         System.assert(!controller.isSettingsCorrect, 'Settings have to not be correct.');
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
-    }
-
-
-    static testMethod void correctGetSourceIdTester() {
-        SettingsController controller = new SettingsController();
-        Settings testSettings = Settings.getTestSettings();
-        String sourceIdExpected = '1010';
-        testSettings.setSource('');
-        V1ConnectorMock connector = new V1ConnectorMock();
-        connector.setTestSourceId(sourceIdExpected);
-        controller.setConnector(connector);
-        controller.settings = testSettings;
-
-        String sourceId = controller.getSourceId();
-        System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
     static testMethod void updateScheduleTest() {
