@@ -24,9 +24,9 @@ public interface IV1Connector {
     /**
     * Creates link to SalesForce web page with information about case
     * defectId  - defect id in the VersionOne
-    * caseId	- case id in the SalesForce
+    * caseData	- case to create link to
     **/
-    void createLinkV1ToSF(Integer defectId, String caseId);
+    void createLinkV1ToSF(Integer defectId, Case caseData);
 
     /**
     * Creates defect or story in the VersionOne

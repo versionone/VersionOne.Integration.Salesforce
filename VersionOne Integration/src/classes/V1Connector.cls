@@ -1,11 +1,9 @@
 public with sharing class V1Connector implements IV1Connector {
 
+    public static final String DATA_URL = 'rest-1.v1/Data/';
     public static final String CLOSED_WORKITEMS_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Number,ChangeDateUTC,Reference&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'\'Closed\'\'{1})';
     public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'\'{0}\'\'';
     public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
-    public static final String CREATE_LINK_URL = 'rest-1.v1/Data/Link';
-    public static final String CREATE_DEFECT_URL = 'rest-1.v1/Data/Defect';
-    public static final String CREATE_STORY_URL = 'rest-1.v1/Data/Story';
     public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'\'{1}\'\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
 
     public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
@@ -215,21 +213,20 @@ public with sharing class V1Connector implements IV1Connector {
     /**
     * Creates link to the corresponding case in the SalesForce
     **/
-    public void createLinkV1ToSF(Integer defectId, String caseId) {
+    public void createLinkV1ToSF(Integer defectId, Case caseData) {
         String body = '<Asset>' +
                         attributeNode('OnMenu', 'true') +
-                        attributeNode('URL', 'https://na7.salesforce.com/' + caseId) +
+                        attributeNode('URL', 'https://na7.salesforce.com/' + caseData.Id) +
                         attributeNode('Name', 'SalesForce Case') +
-                        relationNode('Asset', 'PrimaryWorkitem:' + defectId) +
+                        relationNode('Asset', getRelatedTo(caseData) + ':' + defectId) +
                        '</Asset>';
 
         //Send the request, and get a response
-        requestor.request(requestor.createRequest(body, CREATE_LINK_URL, 'POST'));
+        requestor.request(requestor.createRequest(body, DATA_URL + 'Link', 'POST'));
         if (requestor.getStatusCode() != 200) {
             throw new V1RequestException('Problem to create link to case', requestor);
         }
     }
-
 
     /**
      * Creates defect or story in the VersionOne and assign link to it.
@@ -245,10 +242,9 @@ public with sharing class V1Connector implements IV1Connector {
             + attributeNode('Description', (caseData.Description != null ? caseData.Description : ''))
             + relationNode('Source', 'StorySource:' + settings.getSourceId())
             + '</Asset>';
-        System.debug('XML for creating workitem:' + body);
-        String url = caseData.OwnerId == settings.getDefectQueueId() ? CREATE_DEFECT_URL : CREATE_STORY_URL;
-        System.debug('URL for creating workitem:' + url);
-        requestor.request(requestor.createRequest(body, url, 'POST'));
+        String workitemType = getRelatedTo(caseData);
+        System.debug('XML for creating ' + workitemType + ': ' + body);
+        requestor.request(requestor.createRequest(body, DATA_URL + workitemType, 'POST'));
 
         if (requestor.getStatusCode() != 200) {
             throw new V1RequestException('Problem with creating new defect in the VersionOne', requestor);
@@ -258,6 +254,9 @@ public with sharing class V1Connector implements IV1Connector {
         return Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
     }
 
+    public String getRelatedTo(Case caseData) {
+        return caseData.OwnerId == settings.getDefectQueueId() ? 'Defect' : 'Story';
+    }
 
     /**
     * Creates Relation node for request

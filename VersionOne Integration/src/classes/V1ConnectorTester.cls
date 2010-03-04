@@ -232,25 +232,42 @@ private class V1ConnectorTester {
     }
 
     static testMethod void correctCreatingLinkToSalesForceCaseTest() {
-        IRequestor requestor = new RequestorMock('', 200);
+        Case case1 = new Case(Subject = 'case1');
+        insert case1;
+        case1 = [SELECT CaseNumber, OwnerId FROM Case WHERE Id = :case1.Id];
+
+        RequestorMock requestor = new RequestorMock('', 200);
         Settings testSettings = Settings.getTestSettings();
         Integer defectId = 123;
-        String caseId = 'CaseId';
         V1Connector connector = new V1Connector(testSettings, requestor);
         //V1Publisher.setRequestor(requestor);
         //V1Publisher.setSettings(settings);
-        connector.createLinkV1ToSF(defectId, 'CaseId');
+        connector.createLinkV1ToSF(defectId, case1);
 
+        testSettings.setDefectQueueId(case1.OwnerId);
         String body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
-                        '<Attribute act="set" name="URL">https://na7.salesforce.com/' + caseId + '</Attribute>' +
+                        '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
                         '<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
                         '<Relation act="set" name="Asset">' +
-                            '<Asset idref="PrimaryWorkitem:' + defectId + '"/>' +
+                            '<Asset idref="Defect:' + defectId + '"/>' +
                         '</Relation>' +
                        '</Asset>';
 
-        System.assertEquals(((RequestorMock)requestor).getSentBody(0), body, 'Incorrect created body for POST.');
+        System.assertEquals(requestor.getSentBody(0), body, 'Incorrect created body for POST.');
+
+        testSettings.setDefectQueueId(null);
+        testSettings.setStoryQueueId(case1.OwnerId);
+        body = '<Asset>' +
+                        '<Attribute act="set" name="OnMenu">true</Attribute>' +
+                        '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
+                        '<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
+                        '<Relation act="set" name="Asset">' +
+                            '<Asset idref="Story:' + defectId + '"/>' +
+                        '</Relation>' +
+                       '</Asset>';
+
+        System.assertEquals(requestor.getSentBody(0), body, 'Incorrect created body for POST.');
     }
 
     static testMethod void incorrectCreatingLinkToSalesForceCaseTest() {
