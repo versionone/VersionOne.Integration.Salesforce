@@ -271,22 +271,26 @@ private class V1ConnectorTester {
     }
 
     static testMethod void incorrectCreatingLinkToSalesForceCaseTest() {
+        Case case1 = new Case(Subject = 'case1');
+        insert case1;
+        case1 = [SELECT CaseNumber, OwnerId FROM Case WHERE Id = :case1.Id];
+
         //test has to complete without any errors
         RequestorMock requestor = new RequestorMock('', 400);
         Settings testSettings = Settings.getTestSettings();
+        testSettings.setDefectQueueId(case1.OwnerId);
         Integer defectId = 123;
-        String caseId = 'CaseId';
         V1Connector connector = new V1Connector(testSettings, requestor);
         try {
-            connector.createLinkV1ToSF(defectId, 'CaseId');
+            connector.createLinkV1ToSF(defectId, case1);
             System.assert(false, 'This place cannot be reached.');
         }catch(V1RequestException e){ }
         String body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
-                        '<Attribute act="set" name="URL">https://na7.salesforce.com/' + caseId + '</Attribute>' +
+                        '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
                         '<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
                         '<Relation act="set" name="Asset">' +
-                            '<Asset idref="PrimaryWorkitem:' + defectId + '"/>' +
+                            '<Asset idref="Defect:' + defectId + '"/>' +
                         '</Relation>' +
                        '</Asset>';
 
