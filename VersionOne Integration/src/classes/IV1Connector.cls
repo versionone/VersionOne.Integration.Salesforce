@@ -26,7 +26,7 @@ public interface IV1Connector {
     * defectId  - defect id in the VersionOne
     * caseData	- case to create link to
     **/
-    void createLinkV1ToSF(Integer defectId, Case caseData);
+    void createLinkV1ToSF(String workitemId, Case caseData);
 
     /**
     * Creates defect or story in the VersionOne
@@ -35,7 +35,7 @@ public interface IV1Connector {
     * sourceId - source id in the VersionOne
     * Return: id of created workitem in the VersionOne
     **/
-    Integer createWorkitemInV1(Case caseData, String projectId);
+    String createWorkitemInV1(Case caseData, String projectId);
 
     /**
     * Gathers all already ported cases
@@ -48,4 +48,7 @@ public interface IV1Connector {
     * Returns current settings for connector
     **/
     Settings getSettings();
+
+    /** Returns name of V1 entity case related to. */
+    String getRelatedTo(Case caseData);
 }

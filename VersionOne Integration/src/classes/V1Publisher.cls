@@ -3,7 +3,7 @@
 
 public with sharing class V1Publisher {
 
-    private static final String URL_TO_V1_TEMPLATE = 'assetdetail.v1?oid=Defect%3a';
+    private static final String URL_TO_V1_TEMPLATE = 'assetdetail.v1?oid=';
 
     public static IV1Connector connector {set;get;}
     public static Settings settings {set;get;}
@@ -76,23 +76,41 @@ public with sharing class V1Publisher {
 
     /** Processes cases assigned to settings.getSourceQueueId() queue and update that cases. **/
     public void processCases() {
-        Integer maxPublishCases = 3; // we have restriction on 10 request by http.send
+        List<Case> updateCase = new List<Case>();
+        List<String> updateId = new List<String>();
         for (Case caseData : getCases()) {
-            if (maxPublishCases-- > 0) {
-               processCase(caseData);
+            if (!canMakeCallouts(2)) {
+               break;
             }
+            updateId.add(processCase(caseData));
+            updateCase.add(caseData);
+        }
+        System.debug('PROCESSED, UPDATING\n' + updateCase + '\n' + updateId);
+        for (Integer i = 0; i < updateCase.size(); i++) {
+            Case caseData = updateCase[i];
+            String v1id = updateId[i];
+            String url = (v1id == null) ? null : settings.getPath() + URL_TO_V1_TEMPLATE + EncodingUtil.urlEncode(v1id, 'UTF-8');
+            V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), url);
         }
     }
 
-    public void processCase(Case caseData) {
+    public Boolean canMakeCallouts(Integer count) {
+        System.debug('Limits.getCallouts()='+Limits.getCallouts());
+        System.debug('Limits.getLimitCallouts()='+Limits.getLimitCallouts());
+        return Limits.getCallouts() + count <= Limits.getLimitCallouts();
+    }
+
+    /** Returns id of created workitem or null if workitem wsa already created. */
+    public String processCase(Case caseData) {
+        System.debug(caseData);
         if (getPublishedCases().containsKey(caseData.CaseNumber)) {
             errorMessage('Case "' + caseData.Subject + '" (' + caseData.CaseNumber +') was already ported.' );
-            V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), null);
+            return null;
         } else {
             String projectId = findProjectId(caseData.VersionOneProject__c);
-            Integer id = connector.createWorkitemInV1(caseData, projectId);
+            String id = connector.createWorkitemInV1(caseData, projectId);
             connector.createLinkV1ToSF(id, caseData);
-            V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), settings.getPath() + URL_TO_V1_TEMPLATE + id);
+            return id;
         }
     }
 

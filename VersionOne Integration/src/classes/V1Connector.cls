@@ -213,12 +213,12 @@ public with sharing class V1Connector implements IV1Connector {
     /**
     * Creates link to the corresponding case in the SalesForce
     **/
-    public void createLinkV1ToSF(Integer defectId, Case caseData) {
+    public void createLinkV1ToSF(String workitemId, Case caseData) {
         String body = '<Asset>' +
                         attributeNode('OnMenu', 'true') +
                         attributeNode('URL', 'https://na7.salesforce.com/' + caseData.Id) +
                         attributeNode('Name', 'SalesForce Case') +
-                        relationNode('Asset', getRelatedTo(caseData) + ':' + defectId) +
+                        relationNode('Asset', workitemId) +
                        '</Asset>';
 
         //Send the request, and get a response
@@ -234,7 +234,7 @@ public with sharing class V1Connector implements IV1Connector {
      * returns: 	id of the created workitem
      * throws:  V1RequestException, Exception
      */
-    public Integer createWorkitemInV1(Case caseData, String projectId) {
+    public String createWorkitemInV1(Case caseData, String projectId) {
         String body = '<Asset>'
             + relationNode('Scope', 'Scope:' + projectId)
             + attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME))
@@ -251,7 +251,8 @@ public with sharing class V1Connector implements IV1Connector {
         }
         XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
-        return Integer.valueOf(xmlParser.getElementByTagName('Asset').getAttribute('id').split(':')[1]);
+        String[] id = xmlParser.getElementByTagName('Asset').getAttribute('id').split(':');
+        return id[0]+':'+id[1];
     }
 
     public String getRelatedTo(Case caseData) {
