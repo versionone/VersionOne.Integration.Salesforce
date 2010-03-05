@@ -48,7 +48,4 @@ public interface IV1Connector {
     * Returns current settings for connector
     **/
     Settings getSettings();
-
-    /** Returns name of V1 entity case related to. */
-    String getRelatedTo(Case caseData);
 }

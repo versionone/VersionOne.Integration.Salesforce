@@ -5,7 +5,6 @@ public class V1ConnectorMock implements IV1Connector {
     public String createdWorkitemId;
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
     private List<String> closedDefects = new List<String>();
-    public String relatedTo;
 
     public List<String> getClosedWorkitems() {
         throwException();
@@ -63,10 +62,6 @@ public class V1ConnectorMock implements IV1Connector {
      */
     public void enableException(Exception ex) {
         this.ex = ex;
-    }
-
-    public String getRelatedTo(Case caseData) {
-        return relatedTo;
     }
 
     private void throwException() {
