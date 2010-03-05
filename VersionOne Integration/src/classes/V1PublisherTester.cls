@@ -36,7 +36,7 @@ private class V1PublisherTester {
 
             Map<String, Boolean> alreadyPortedCases = new Map<String, Boolean> {case2.CaseNumber => true};
 
-            Integer defectId = 1699;
+            String defectId = 'Defect:1699';
             Integer product_Id = 123;
             //String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId +'/4596" id="Defect:' +defectId + ':4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
             String path = 'http://localhost/';
@@ -58,7 +58,7 @@ private class V1PublisherTester {
                                     '<Asset idref="StorySource:' + sourceId + '"/>' +
                                 '</Relation>' +
                             '</Asset>';
-            String additionPath = 'assetdetail.v1?oid=Defect%3a';
+            String additionPath = 'assetdetail.v1?oid=';
 
             Settings testSettings = Settings.getTestSettings();
             testSettings.setPath(path);
@@ -73,7 +73,7 @@ private class V1PublisherTester {
             testSettings.setCommentOnClosing(cComment);
             IRequestor requestor = new RequestorMock('', 200);
             V1ConnectorMock connector = new V1ConnectorMock();
-            connector.setCreatedDefectId(defectId);
+            connector.createdWorkitemId = defectId;
             connector.setTestAlreadyExistedDefects(alreadyPortedCases);
             V1Publisher.settings = testSettings;
             V1Publisher.connector = connector;
@@ -83,25 +83,29 @@ private class V1PublisherTester {
             Test.stopTest();
 
             Case newCase1 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case1.Id];
-            System.assertEquals(path + additionPath + defectId, newCase1.VersionOneUrl__c);
+            System.debug(newCase1);
+            System.assertEquals(path + additionPath + EncodingUtil.urlEncode(defectId, 'UTF-8'), newCase1.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase1.OwnerId);
             CaseComment newComment = [SELECT CommentBody FROM CaseComment where ParentId = :newCase1.Id];
             System.assertEquals(pComment, newComment.CommentBody);
 
             Case newCase2 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case2.Id];
+            System.debug(newCase1);
             System.assertEquals(null, newCase2.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase2.OwnerId);
             List<CaseComment> newComment2 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase2.Id];
             System.assertEquals(0, newComment2.size(), 'Incorrect number of comments for case 2');
 
             Case newCase3 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case3.Id];
-            System.assertEquals(path + additionPath + defectId, newCase3.VersionOneUrl__c);
+            System.debug(newCase3);
+            System.assertEquals(path + additionPath + EncodingUtil.urlEncode(defectId, 'UTF-8'), newCase3.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase3.OwnerId);
             CaseComment newComment3 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase3.Id];
             System.assertEquals(pComment, newComment3.CommentBody);
 
             Case newCase4 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case4.Id];
-            System.assertEquals(path + additionPath + defectId, newCase4.VersionOneUrl__c);
+            System.debug(newCase4);
+            System.assertEquals(path + additionPath + EncodingUtil.urlEncode(defectId, 'UTF-8'), newCase4.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase4.OwnerId);
             CaseComment newComment4 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase4.Id];
             System.assertEquals(pComment, newComment4.CommentBody);
@@ -142,7 +146,7 @@ private class V1PublisherTester {
             alreadyPortedCases.put(case2.CaseNumber, true);
             List<Case> cases = new Case[]{case1, case2, case3};
 
-            Integer defectId = 1699;
+            String defectId = 'Defect:1699';
             //String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId +'/4596" id="Defect:' +defectId + ':4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
             String sourceName = 'TestSource';
             String sourceId = '1010';
@@ -176,7 +180,7 @@ private class V1PublisherTester {
             V1Publisher.settings = testSettings;
             IRequestor requestor = new RequestorMock('', 200);
             V1ConnectorMock connector = new V1ConnectorMock();
-            connector.setCreatedDefectId(defectId);
+            connector.createdWorkitemId = 'Defect%3a' + defectId;
             connector.setTestAlreadyExistedDefects(alreadyPortedCases);
             connector.enableException(new V1RequestException('Just test exception.'));
             V1Publisher.connector = connector;

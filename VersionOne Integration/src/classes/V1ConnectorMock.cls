@@ -2,9 +2,10 @@ public class V1ConnectorMock implements IV1Connector {
 
     private String sourceId = '123456';
     private Exception ex;
-    private Integer createdDefectId = 0;
+    public String createdWorkitemId;
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
     private List<String> closedDefects = new List<String>();
+    public String relatedTo;
 
     public List<String> getClosedWorkitems() {
         throwException();
@@ -36,17 +37,12 @@ public class V1ConnectorMock implements IV1Connector {
         return '1010';
     }
 
-    public void createLinkV1ToSF(Integer defectId, Case caseData) {
+    public void createLinkV1ToSF(String defectId, Case caseData) {
 
     }
 
-    public Integer createWorkitemInV1(Case caseData, String productId) {
-        return createdDefectId;
-    }
-
-    public void setCreatedDefectId(Integer defectId) {
-        throwException();
-        createdDefectId = defectId;
+    public String createWorkitemInV1(Case caseData, String productId) {
+        return createdWorkitemId;
     }
 
     public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
@@ -67,6 +63,10 @@ public class V1ConnectorMock implements IV1Connector {
      */
     public void enableException(Exception ex) {
         this.ex = ex;
+    }
+
+    public String getRelatedTo(Case caseData) {
+        return relatedTo;
     }
 
     private void throwException() {
