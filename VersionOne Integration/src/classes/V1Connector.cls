@@ -279,6 +279,7 @@ public with sharing class V1Connector implements IV1Connector {
     **/
     public static String attributeNode(String name, String value) {
         if (value != null) {
+            value = value.replace('&', '&amp;');
             value = value.replace('<', '&lt;').replace('>', '&gt;');
         }
         return '<Attribute act="set" name="' + name + '">' + value + '</Attribute>';
