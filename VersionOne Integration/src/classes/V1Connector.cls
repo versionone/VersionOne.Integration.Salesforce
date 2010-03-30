@@ -1,4 +1,4 @@
-public with sharing class V1Connector implements IV1Connector {
+global with sharing class V1Connector implements IV1Connector {
 
     public static final String DATA_URL = 'rest-1.v1/Data/';
     public static final String CLOSED_WORKITEMS_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Number,ChangeDateUTC,Reference&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'\'Closed\'\'{1})';

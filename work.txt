@@ -14,6 +14,7 @@ add the following fileds:
   V1SourceId	- Text(10)
   ScheduleId	- Text(18) 
   DateLastClosedAsset - Date/Time
+  BatchId	- Text(25)
 ----------------------
 Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
 ----------------------
