@@ -38,6 +38,15 @@ public class V1CaseCollector {
                           FROM Case WHERE CaseNumber in :caseNumbers and Status <> 'Closed' and OwnerId = :ownerId];
     }
 
+    /* Query not closed cases with specified case number
+     * caseNumbers - case number
+     * Return: found case
+     */
+    public static Case getCaseByCaseNumber(String caseNumber) {
+        return [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c
+                          FROM Case WHERE CaseNumber = :caseNumber and Status <> 'Closed'];
+    }
+
     /* Update case: set Owner and VersionOneUrl to the specified values. Create Comment with specified body.
      * case - cases to process.
      * ownerId - ID of the owner to set to case.
@@ -55,6 +64,13 @@ public class V1CaseCollector {
             insert new CaseComment(CommentBody = commentBody, ParentId = c.Id);
         }
     }
+
+    public static void updateUrlToVersionOneInCase(Case c, String v1Url) {
+    	System.debug('BEFORE CHANGE: ' + c);
+    	c.VersionOneUrl__c = v1Url;
+        System.debug('AFTER CHANGE: ' + c);
+        update c;
+	}
 
     /*
      * Closes cases. Create comment with specified  body.

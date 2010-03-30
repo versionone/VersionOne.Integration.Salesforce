@@ -138,6 +138,10 @@ public class SettingsController {
         ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, text));
     }
 
+    private static void addInfoMessage(String text) {
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, text));
+    }
+
     public void validateConnectionAndSource() {
         if (settings.getSource() == null || connector.getSourceId() == null) {
             throw new V1RequestException('Incorrect source.');

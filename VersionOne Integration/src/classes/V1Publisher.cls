@@ -1,12 +1,11 @@
 //TODO
 // create parser for exceptions from the VersionOne, atm we just put xml to log
+global with sharing class V1Publisher {
 
-public with sharing class V1Publisher {
+    global static final String URL_TO_V1_TEMPLATE = 'assetdetail.v1?oid=';
 
-    private static final String URL_TO_V1_TEMPLATE = 'assetdetail.v1?oid=';
-
-    public static IV1Connector connector {set;get;}
-    public static Settings settings {set;get;}
+    global static IV1Connector connector {set;get;}
+    global static Settings settings {set;get;}
 
     /** Lazy initialized map of projects (Name->ID). */
     private Map<String, String> projects;
