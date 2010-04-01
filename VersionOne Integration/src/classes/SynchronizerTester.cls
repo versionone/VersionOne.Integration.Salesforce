@@ -91,15 +91,4 @@ private class SynchronizerTester {
         user.LanguageLocaleKey = 'en_US';
         return user;
     }
-
-    static void assertContains (String expect, List<String> actuals, String msg) {
-        Boolean contains = false;
-        for (String o : actuals) {
-            if (o.equals(expect)) {
-                contains = true;
-                break;
-            }
-        }
-        System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
-    }
 }
