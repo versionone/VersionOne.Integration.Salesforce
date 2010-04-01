@@ -7,12 +7,21 @@ public class SettingsController {
     public Boolean isSettingsValidated {get; set;}
     public Boolean isSettingsCorrect {get; set;}
     public Boolean isSaved {get; set;}
-    public Settings settings {get {
-        if (settings == null) {
-            settings = new Settings();
-        }
-        return settings;} set;}
+    public Boolean isBatchRunned {get; set;}
+    public Settings settings {
+    	get {
+        	if (settings == null) {
+	            settings = new Settings();
+        	}
+        	return settings;
+        } set;}
     public Boolean isSyncEnabled {get; set;}
+    public Integer casesForPorting {
+    	get {
+            return V1CaseCollector.getCasesByOwnerId(settings.getDefectQueueId()).size() +
+            	V1CaseCollector.getCasesByOwnerId(settings.getStoryQueueId()).size();
+    	} set;
+    }
 
     private transient IV1Connector innerConnector;
     public IV1Connector connector {
@@ -28,12 +37,21 @@ public class SettingsController {
 
     /** Must be called before usage of any other method. */
     public void initSettings() {
+    	System.debug('initSettings:' + settings.getBatchId());
         testMessage = '';
         saveMessage = '';
         isSettingsValidated = false;
         isSettingsCorrect = false;
         isSaved = false;
         isSyncEnabled = SyncSchedule.isScheduled(settings.getScheduleId());
+        isBatchRunned = BatchPublisher.isRunned(settings.getBatchId());
+		if (settings.getBatchId() != null) {
+        	displayBatchProgress(settings.getBatchId());
+		}
+        if (!isBatchRunned && settings.getBatchId() != null) {
+            settings.setBatchId(null);
+            settings.updateBatchId();
+        }
     }
 
     public String updateSchedule() {
@@ -168,6 +186,19 @@ public class SettingsController {
             addErrorMessage('Failed to update Cases.');
             ApexPages.addMessages(ex);
         }
+
+        try {
+            BatchPublisher batch = new BatchPublisher();
+            ID batchprocessid = Database.executeBatch(batch, 1);
+            updateBatchIdInSettings(batchprocessid);
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM,
+                'Publisher was ran.'));
+            isBatchRunned = true;
+        } catch (Exception ex) {
+            addErrorMessage('Failed to running cases publisher.');
+            ApexPages.addMessages(ex);
+        }
+
         testMessage = '';
         testSeverity = '';
         saveSeverity = '';
@@ -175,5 +206,24 @@ public class SettingsController {
         isSettingsValidated = false;
         isSaved = false;
         return null;
+    }
+
+    private void displayBatchProgress(String id) {
+		Map<String, String> batchData = BatchPublisher.getBatchData(id);
+		if (batchData == null) {
+			return;
+		}
+		addInfoMessage('Publishing case status:' + batchData.get('Status'));
+		addInfoMessage('Cases Processed: ' + batchData.get('JobItemsProcessed'));
+		addInfoMessage('Total cases: ' + batchData.get('TotalJobItems'));
+		addInfoMessage('Number of errors: ' + batchData.get('NumberOfErrors'));
+    }
+
+    @Future
+    private static void updateBatchIdInSettings(String batchprocessid) {
+    	Settings mySettings = new Settings();
+        mySettings.setBatchId(batchprocessid);
+
+        mySettings.updateBatchId();
     }
 }

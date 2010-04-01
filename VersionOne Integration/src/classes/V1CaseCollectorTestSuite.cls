@@ -124,6 +124,44 @@ private class V1CaseCollectorTestSuite {
         }
     }
 
+    static testMethod void getCaseByCaseNumberTest() {
+        String queueName = 'TestQueue1';
+        Group queue = new Group(Type='Queue', Name=queueName);
+        insert queue;
+        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+        insert sobj;
+        System.runAs(createUser('test4356')){
+            Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
+            insert new Case[] {case1};
+            case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
+
+            Case newCase = V1CaseCollector.getCaseByCaseNumber(case1.CaseNumber);
+            System.assertEquals(case1.CaseNumber, newCase.CaseNumber, 'Incorrect case numbers.');
+            System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
+        }
+	}
+
+    static testMethod void updateUrlToVersionOneInCaseTest() {
+        String queueName = 'TestQueue1';
+        String url = 'http://test.com';
+        Group queue = new Group(Type='Queue', Name=queueName);
+        insert queue;
+        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+        insert sobj;
+        System.runAs(createUser('test4356')){
+            Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
+            insert new Case[] {case1};
+            case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
+
+            V1CaseCollector.updateUrlToVersionOneInCase(case1, url);
+
+            Case newCase = [SELECT CaseNumber, Subject, VersionOneUrl__c FROM Case WHERE Id = :case1.Id];
+            System.assertEquals(case1.CaseNumber, newCase.CaseNumber, 'Incorrect case numbers.');
+            System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
+            System.assertEquals(url, newCase.VersionOneUrl__c, 'Incorrect url.');
+        }
+	}
+
     static testMethod void getCasesByCaseNumberTest() {
         String queueName = 'TestQueue1';
         Group queue = new Group(Type='Queue', Name=queueName);

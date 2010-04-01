@@ -81,6 +81,10 @@
                         </apex:selectList>
                     </apex:outputPanel>
                 </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Cases to publishing"/>
+                    <apex:outputLabel value="{!casesForPorting}"/>
+                </apex:pageBlockSectionItem>
             </apex:pageBlockSection>
 
             <apex:pageBlockSection columns="1">
@@ -91,11 +95,6 @@
             </apex:pageBlockSection>
 
             <apex:pageBlockSection title="Case synchronization"  columns="1">
-                <apex:pageBlockSectionItem >
-                    <apex:outputLabel for="forceSync"/>
-                    <apex:commandButton action="{!forceSync}" value="Force Synchronization" id="forceSync"
-                        status="sync_status" reRender="messages, out_saving, out_testing" styleClass="btnImportant"/>
-                </apex:pageBlockSectionItem>
 
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="Schedule synchronization" for="EnableSync"/>
@@ -133,6 +132,9 @@
                         }
                 </script>
                 </apex:commandButton>
+                <apex:commandButton action="{!forceSync}" value="Force Synchronization" id="forceSync1"
+                     status="sync_status" reRender="messages, out_saving, out_testing, forceSync1, forceSync2" styleClass="btnImportant"
+                     disabled="{!isBatchRunned}"/>
             </apex:pageBlockButtons>
             <apex:pageBlockButtons location="bottom">
                 <apex:commandButton value="Save settings" action="{!saveSettings}"
@@ -159,6 +161,9 @@
                     }
                 </script>
                 </apex:commandButton>
+                <apex:commandButton action="{!forceSync}" value="Force Synchronization" id="forceSync2"
+                     status="sync_status" reRender="messages, out_saving, out_testing, forceSync1, forceSync2" styleClass="btnImportant"
+                     disabled="{!isBatchRunned}"/>
             </apex:pageBlockButtons>
         </apex:pageBlock>
     </apex:form>

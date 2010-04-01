@@ -14,6 +14,7 @@ public with sharing class Settings {
     private DateTime changeDateUTC;
     private String scheduleId;
     private String commentOnClosing;
+    private String batchId;
 
     public Settings () {
         this(getMics('V1Settings'));
@@ -34,6 +35,7 @@ public with sharing class Settings {
             setDestQueueId(mycs.AssignedQueueId__c);
             changeDateUTC = mycs.DateLastClosedAsset__c;
             setScheduleId(mycs.scheduleId__c);
+            setbatchId(mycs.BatchId__c);
         }
     }
 
@@ -226,6 +228,14 @@ public with sharing class Settings {
         this.changeDateUTC = changeDateUTC;
     }
 
+    public void setBatchId(String id) {
+        batchId = id;
+    }
+
+    public String getBatchId() {
+        return batchId;
+    }
+
     public DateTime getLastDateChangeAsset() {
         return this.changeDateUTC;
     }
@@ -247,6 +257,14 @@ public with sharing class Settings {
             mycs.ScheduleId__c = scheduleId;
             update mycs;
         } //else Do nothing (used in tests)
+    }
+
+    public void updateBatchId() {
+        System.debug('update BatchId');
+        if (mycs != null) {
+            mycs.BatchId__c = batchId;
+            update mycs;
+        }
     }
 
     /**
