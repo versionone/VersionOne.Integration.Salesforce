@@ -112,6 +112,12 @@ private class BatchPublisherTester {
             System.assertEquals(queue.Id, newCase4.OwnerId);
             CaseComment newComment4 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase4.Id];
             System.assertEquals(pComment, newComment4.CommentBody);
+
+            Map<String, String> batchData = BatchPublisher.getBatchData(batchprocessid);
+            System.assertEquals('Completed', batchData.get('Status'));
+            System.assertEquals('0', batchData.get('NumberOfErrors'));
+            System.assertEquals(false, BatchPublisher.isRan(batchprocessid));
+
         }
     }
 
