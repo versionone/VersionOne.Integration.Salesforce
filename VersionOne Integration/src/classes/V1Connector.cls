@@ -18,7 +18,7 @@ global with sharing class V1Connector implements IV1Connector {
         this.requestor = requestor;
     }
 
-    public List<String> getClosedWorkitems() {
+    global List<String> getClosedWorkitems() {
         List<String> references = new List<String>();
         String dateRestriction = '';
         if (settings.getLastDateChangeAsset() != null) {
@@ -49,7 +49,7 @@ global with sharing class V1Connector implements IV1Connector {
         return references;
     }
 
-    public String getSourceId() {
+    global String getSourceId() {
         String source = settings.getSource();
         if (source == null) {
             return null;
@@ -136,7 +136,7 @@ global with sharing class V1Connector implements IV1Connector {
     /**
     * Gathers all project from the VersionOne, and assign default project
     **/
-    public Map<String, String> findAllProjects() {
+    global Map<String, String> findAllProjects() {
         XMLDom xmlParser = new XMLDom();
         Map<String, String> projects = new Map<String, String>();
 
@@ -169,7 +169,7 @@ global with sharing class V1Connector implements IV1Connector {
     /**
     * Returns default project. It we will use if user doesn't assign case to project
     **/
-    public String getDefaultProjectId() {
+    global String getDefaultProjectId() {
         if (defaultProjectId == null) {
             findAllProjects();
         }
@@ -181,7 +181,7 @@ global with sharing class V1Connector implements IV1Connector {
      *
      * Returns - List<Integer> Already ported cases
      */
-    public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
+    global Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
         XMLDom xmlParser = new XMLDom();
 
         String reference = '';
@@ -213,7 +213,7 @@ global with sharing class V1Connector implements IV1Connector {
     /**
     * Creates link to the corresponding case in the SalesForce
     **/
-    public void createLinkV1ToSF(String workitemId, Case caseData) {
+    global void createLinkV1ToSF(String workitemId, Case caseData) {
         String body = '<Asset>' +
                         attributeNode('OnMenu', 'true') +
                         attributeNode('URL', 'https://na7.salesforce.com/' + caseData.Id) +
@@ -234,7 +234,7 @@ global with sharing class V1Connector implements IV1Connector {
      * returns: 	id of the created workitem
      * throws:  V1RequestException, Exception
      */
-    public String createWorkitemInV1(Case caseData, String projectId) {
+    global String createWorkitemInV1(Case caseData, String projectId) {
         String body = '<Asset>'
             + relationNode('Scope', 'Scope:' + projectId)
             + attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME))
@@ -288,7 +288,7 @@ global with sharing class V1Connector implements IV1Connector {
     /**
     * Returns current used settings
     **/
-    public Settings getSettings() {
+    global Settings getSettings() {
         return settings;
     }
 }

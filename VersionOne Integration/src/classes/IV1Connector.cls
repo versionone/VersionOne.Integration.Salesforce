@@ -1,4 +1,4 @@
-public interface IV1Connector {
+global interface IV1Connector {
     /**
     * Makes request to the VersionOne and get all closed defects.
     * Returns: list of CaseNumbers (references).

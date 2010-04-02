@@ -61,6 +61,7 @@ public class V1CaseCollector {
         update c;
 
         if (commentBody != null) {
+			System.debug('Add new comment: ' + commentBody + ' for ' + c.Id + ' case');
             insert new CaseComment(CommentBody = commentBody, ParentId = c.Id);
         }
     }

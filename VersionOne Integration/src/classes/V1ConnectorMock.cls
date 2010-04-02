@@ -1,4 +1,4 @@
-public class V1ConnectorMock implements IV1Connector {
+global class V1ConnectorMock implements IV1Connector {
 
     private String sourceId = '123456';
     private Exception ex;
@@ -6,7 +6,7 @@ public class V1ConnectorMock implements IV1Connector {
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
     private List<String> closedDefects = new List<String>();
 
-    public List<String> getClosedWorkitems() {
+    global List<String> getClosedWorkitems() {
         throwException();
         return closedDefects;
     }
@@ -15,7 +15,7 @@ public class V1ConnectorMock implements IV1Connector {
         this.closedDefects = closedDefects;
     }
 
-    public String getSourceId() {
+    global String getSourceId() {
         throwException();
         return sourceId;
     }
@@ -24,7 +24,7 @@ public class V1ConnectorMock implements IV1Connector {
         this.sourceId = sourceId;
     }
 
-    public Map<String, String> findAllProjects() {
+    global Map<String, String> findAllProjects() {
         throwException();
         Map<String, String> result = new Map<String, String>();
         result.put('CI', '1081');
@@ -32,19 +32,19 @@ public class V1ConnectorMock implements IV1Connector {
         return result;
     }
 
-    public String getDefaultProjectId() {
+    global String getDefaultProjectId() {
         return '1010';
     }
 
-    public void createLinkV1ToSF(String defectId, Case caseData) {
+    global void createLinkV1ToSF(String defectId, Case caseData) {
 
     }
 
-    public String createWorkitemInV1(Case caseData, String productId) {
+    global String createWorkitemInV1(Case caseData, String productId) {
         return createdWorkitemId;
     }
 
-    public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
+    global Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
         throwException();
         return alreadyExistedDefects;
     }
@@ -53,7 +53,7 @@ public class V1ConnectorMock implements IV1Connector {
         alreadyExistedDefects = defects;
     }
 
-    public Settings getSettings() {
+    global Settings getSettings() {
         return Settings.getTestSettings();
     }
 
