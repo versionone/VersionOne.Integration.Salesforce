@@ -191,7 +191,6 @@ public class SettingsController {
 
     public PageReference forceSync() {
         try {
-            Synchronizer.setSettingsForFuture(settings);
             Synchronizer.runSynchronizerWithVersionOne();
             Synchronizer.isFutureRan();
         } catch (Exception ex) {
