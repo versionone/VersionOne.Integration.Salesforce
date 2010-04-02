@@ -1,4 +1,4 @@
-public with sharing class Settings {
+global with sharing class Settings {
 
     private final V1Settings__c mycs;
 

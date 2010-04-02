@@ -1,25 +1,29 @@
 global class BatchPublisher implements Database.Batchable<Case>, Database.AllowsCallouts, Database.Stateful {
-
-    private String query = 'Select id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c from Case where CaseNumber=\'00004155\'';
-
     global Map<String, String> projects;
     global String defaultProject;
     global final List<Case> cases;
-    global final IV1Connector connector;
+    global IConnectionFactory factory;
 
-    global BatchPublisher() {
-        V1Publisher.init();
-        V1Publisher publisher = new V1Publisher();
+    global BatchPublisher(IConnectionFactory factory) {
+        this.factory = factory;
+        V1Publisher publisher = getV1Publisher();
         cases = publisher.getCases();
+        System.debug('BatchPublisher cases:'+cases);
+    }
+
+    private V1Publisher getV1Publisher() {
+        V1Publisher.connector = factory.getConnector();
+        V1Publisher.settings = factory.getSettings();
+        V1Publisher.init();
+        return new V1Publisher();
     }
 
     global Iterable<Case> start(Database.BatchableContext bc){
-        System.debug('start connector: ' + connector);
         if (cases.size() == 0) {
             return cases;
         }
-        V1Publisher.init();
-        V1Publisher publisher = new V1Publisher();
+
+        V1Publisher publisher = getV1Publisher();
         List<Case> casesForProcess = new List<Case>();
         Map<String, Boolean> publishedCases = publisher.getPublishedCases();
         //it's like fake case to get project list from the VersionOne
@@ -37,19 +41,24 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
             casesForProcess.add(caseData);
             update caseData;
         }
-
+        System.debug('start casesForProcess:'+casesForProcess);
         return casesForProcess;
     }
 
     global void execute(Database.BatchableContext bc, List<Case> scope){
-        Settings settings = new Settings();
-        V1Connector connector = new V1Connector(settings, new Requestor(settings));
+        IV1Connector connector = factory.getConnector();
+        Settings settings = factory.getSettings();
         if (projects == null) {
             System.debug('Init projects.');
             System.debug('execute connector: ' + connector);
             projects = connector.findAllProjects();
             defaultProject = connector.getDefaultProjectId();
-            return;
+            //this is only for testing. because we have restriction to run only one execure in test method.
+            if (scope.size() == 1) {
+                return;
+            } else {
+                scope.remove(0);
+            }
         }
 
         for(Case caseData : scope){
@@ -61,7 +70,6 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
                 String url = (workitemId == null) ? null : settings.getPath() + V1Publisher.URL_TO_V1_TEMPLATE + EncodingUtil.urlEncode(workitemId, 'UTF-8');
                 V1CaseCollector.updateUrlToVersionOneInCase(caseData, url);
             } else { //assign link to SalesForce's case in the VersionOne
-                //VersionOne/assetdetail.v1?oid=Defect%3a1273
                 String url = newCase.VersionOneUrl__c;
                 String id = url.substring(url.indexOf('=') + 1).replace('%3a', ':').replace('%3A', ':');
                 connector.createLinkV1ToSF(id, caseData);
@@ -115,7 +123,7 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
 
     }
 
-    public static Boolean isRunned(String id) {
+    public static Boolean isRan(String id) {
         if (id == null) {
             return false;
         }

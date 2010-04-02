@@ -7,20 +7,21 @@ public class SettingsController {
     public Boolean isSettingsValidated {get; set;}
     public Boolean isSettingsCorrect {get; set;}
     public Boolean isSaved {get; set;}
-    public Boolean isBatchRunned {get; set;}
+    public Boolean isBatchRan {get; set;}
+    public Boolean isFutureRan {get; set;}
     public Settings settings {
-    	get {
-        	if (settings == null) {
-	            settings = new Settings();
-        	}
-        	return settings;
+        get {
+            if (settings == null) {
+                settings = new Settings();
+            }
+            return settings;
         } set;}
     public Boolean isSyncEnabled {get; set;}
     public Integer casesForPorting {
-    	get {
+        get {
             return V1CaseCollector.getCasesByOwnerId(settings.getDefectQueueId()).size() +
-            	V1CaseCollector.getCasesByOwnerId(settings.getStoryQueueId()).size();
-    	} set;
+                V1CaseCollector.getCasesByOwnerId(settings.getStoryQueueId()).size();
+        } set;
     }
 
     private transient IV1Connector innerConnector;
@@ -37,18 +38,30 @@ public class SettingsController {
 
     /** Must be called before usage of any other method. */
     public void initSettings() {
-    	System.debug('initSettings:' + settings.getBatchId());
+        System.debug('initSettings:' + settings.getBatchId());
         testMessage = '';
         saveMessage = '';
         isSettingsValidated = false;
         isSettingsCorrect = false;
         isSaved = false;
         isSyncEnabled = SyncSchedule.isScheduled(settings.getScheduleId());
-        isBatchRunned = BatchPublisher.isRunned(settings.getBatchId());
-		if (settings.getBatchId() != null) {
-        	displayBatchProgress(settings.getBatchId());
-		}
-        if (!isBatchRunned && settings.getBatchId() != null) {
+        showSynchronizerInfo();
+    }
+
+    public void showSynchronizerInfo() {
+        isBatchRan = BatchPublisher.isRan(settings.getBatchId());
+        if (settings.getBatchId() != null) {
+            displayBatchProgress(settings.getBatchId());
+        }
+        Map<String, String> futureData = Synchronizer.getFutureCurrentFuture();
+        isFutureRan = futureData != null;
+        if (isFutureRan) {
+            displayFutureProgress(futureData.get('Status'));
+        } else if(!isFutureRan && settings.getBatchId() != null) {
+            displayFutureProgress('Completed');
+        }
+
+        if (!isBatchRan && !isFutureRan && settings.getBatchId() != null) {
             settings.setBatchId(null);
             settings.updateBatchId();
         }
@@ -178,26 +191,29 @@ public class SettingsController {
 
     public PageReference forceSync() {
         try {
-            Integer count = (new Synchronizer(settings)).syncCases();
-            String countStr = (count == 0 ? 'No' : String.valueOf(count));
-            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM,
-                countStr + ' Cases have been closed.'));
+            Synchronizer.setSettingsForFuture(settings);
+            Synchronizer.runSynchronizerWithVersionOne();
+            Synchronizer.isFutureRan();
         } catch (Exception ex) {
-            addErrorMessage('Failed to update Cases.');
+            addErrorMessage('Failed to run cases updater.');
             ApexPages.addMessages(ex);
         }
 
         try {
-            BatchPublisher batch = new BatchPublisher();
+            BatchPublisher batch = new BatchPublisher(new ConnectionFactory());
             ID batchprocessid = Database.executeBatch(batch, 1);
-            updateBatchIdInSettings(batchprocessid);
-            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM,
-                'Publisher was ran.'));
-            isBatchRunned = true;
+            settings.setBatchId(batchprocessid);
+            isBatchRan = true;
         } catch (Exception ex) {
-            addErrorMessage('Failed to running cases publisher.');
+            addErrorMessage('Failed to run cases publisher.');
             ApexPages.addMessages(ex);
         }
+
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM,
+                'Synchronizer was started.'));
+
+
+        settings.updateBatchId();
 
         testMessage = '';
         testSeverity = '';
@@ -209,21 +225,17 @@ public class SettingsController {
     }
 
     private void displayBatchProgress(String id) {
-		Map<String, String> batchData = BatchPublisher.getBatchData(id);
-		if (batchData == null) {
-			return;
-		}
-		addInfoMessage('Publishing case status:' + batchData.get('Status'));
-		addInfoMessage('Cases Processed: ' + batchData.get('JobItemsProcessed'));
-		addInfoMessage('Total cases: ' + batchData.get('TotalJobItems'));
-		addInfoMessage('Number of errors: ' + batchData.get('NumberOfErrors'));
+        Map<String, String> batchData = BatchPublisher.getBatchData(id);
+        if (batchData == null) {
+            return;
+        }
+        addInfoMessage('Case publish status: ' + batchData.get('Status'));
+        addInfoMessage('Cases published: ' + batchData.get('JobItemsProcessed'));
+        //addInfoMessage('Number of errors: ' + batchData.get('NumberOfErrors'));
+        //addInfoMessage('Total cases: ' + batchData.get('TotalJobItems'));
     }
 
-    @Future
-    private static void updateBatchIdInSettings(String batchprocessid) {
-    	Settings mySettings = new Settings();
-        mySettings.setBatchId(batchprocessid);
-
-        mySettings.updateBatchId();
+    private void displayFutureProgress(String status) {
+        addInfoMessage('Case update status: ' + status);
     }
 }
