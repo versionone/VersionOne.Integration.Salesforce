@@ -50,7 +50,6 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
         Settings settings = factory.getSettings();
         if (projects == null) {
             System.debug('Init projects.');
-            System.debug('execute connector: ' + connector);
             projects = connector.findAllProjects();
             defaultProject = connector.getDefaultProjectId();
             //this is only for testing. because we have restriction to run only one execure in test method.
