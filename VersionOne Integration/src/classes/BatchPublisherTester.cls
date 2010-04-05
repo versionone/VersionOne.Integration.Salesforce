@@ -6,10 +6,12 @@ private class BatchPublisherTester {
     	Integer value2 = 12;
     	Integer value3 = 1;
     	Integer value4 = 25;
+    	Integer value5 = 2;
         System.assertEquals(6, BatchPublisher.calculateValue(value1));
-        System.assertEquals(6, BatchPublisher.calculateValue(value2));
+        System.assertEquals(5, BatchPublisher.calculateValue(value2));
         System.assertEquals(0, BatchPublisher.calculateValue(value3));
         System.assertEquals(12, BatchPublisher.calculateValue(value4));
+        System.assertEquals(0, BatchPublisher.calculateValue(value5));
     }
 
     static testMethod void getBatchDataWithIncorrectIdTest() {
