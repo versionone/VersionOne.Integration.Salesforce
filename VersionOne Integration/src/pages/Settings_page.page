@@ -107,11 +107,12 @@
             </apex:pageBlockSection>
 
             <apex:pageBlockSection title="Case synchronization"  columns="1">
-
+				<!-- Maybe in one day scheduler would make call out.
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="Schedule synchronization" for="EnableSync"/>
                     <apex:inputCheckbox value="{!isSyncEnabled}" id="EnableSync"/>
                 </apex:pageBlockSectionItem>
+                 -->
 
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="{!settings.CommentOnClosingTitle}" for="CommentOnClosing"/>

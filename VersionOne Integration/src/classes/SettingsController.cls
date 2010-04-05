@@ -50,17 +50,13 @@ public class SettingsController {
 
     public void showSynchronizerInfo() {
         isBatchRan = BatchPublisher.isRan(settings.getBatchId());
-        if (settings.getBatchId() != null) {
-            displayBatchProgress(settings.getBatchId());
-        }
         Map<String, String> futureData = Synchronizer.getFutureCurrentFuture();
         isFutureRan = futureData != null;
-        if (isFutureRan) {
-            displayFutureProgress(futureData.get('Status'));
-        } else if(!isFutureRan && settings.getBatchId() != null) {
-            displayFutureProgress('Completed');
-        }
+        displayBatchProgress(settings.getBatchId());
 
+        if (isFutureRan || settings.getBatchId() != null) {
+            displayFutureProgress(futureData);
+        }
         if (!isBatchRan && !isFutureRan && settings.getBatchId() != null) {
             settings.setBatchId(null);
             settings.updateBatchId();
@@ -234,7 +230,13 @@ public class SettingsController {
         //addInfoMessage('Total cases: ' + batchData.get('TotalJobItems'));
     }
 
-    private void displayFutureProgress(String status) {
+    private void displayFutureProgress(Map<String, String> data) {
+    	String status;
+    	if (data != null) {
+			status = data.get('Status');
+    	} else {
+    		status = 'Completed';
+    	}
         addInfoMessage('Case update status: ' + status);
     }
 }
