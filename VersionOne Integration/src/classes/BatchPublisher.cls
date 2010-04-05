@@ -48,6 +48,7 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
     global void execute(Database.BatchableContext bc, List<Case> scope){
         IV1Connector connector = factory.getConnector();
         Settings settings = factory.getSettings();
+        // at first call execute we fill in project list
         if (projects == null) {
             System.debug('Init projects.');
             projects = connector.findAllProjects();
@@ -113,13 +114,12 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
     }
 
     public static Integer calculateValue(Integer value) {
-        if (value == 0) {
+        if (value < 3) {
             return 0;
         }
-        Decimal decValue = value;
+        Decimal decValue = --value;
         decValue = decValue.divide(2, 0, System.RoundingMode.DOWN);
         return decValue.intValue();
-
     }
 
     public static Boolean isRan(String id) {
