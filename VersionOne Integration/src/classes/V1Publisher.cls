@@ -107,11 +107,21 @@ global with sharing class V1Publisher {
             return null;
         } else {
             String projectId = findProjectId(caseData.VersionOneProject__c);
-            String id = connector.createWorkitemInV1(caseData, projectId);
-            connector.createLinkV1ToSF(id, caseData);
-            return id;
+            return createDataInVersionOne(caseData, projectId);
         }
     }
+
+	/** return id created woritem or null in case any errors */
+	public String createDataInVersionOne(Case caseData, String projectId) {
+        String id;
+        try {
+        	id = connector.createWorkitemInV1(caseData, projectId);
+        } catch (Exception ex) {
+        	//here need to restore mark about processing
+        }
+		connector.createLinkV1ToSF(id, caseData);
+        return id;
+	}
 
     /** Returns project id by project name. **/
     public String findProjectId(String projectName) {

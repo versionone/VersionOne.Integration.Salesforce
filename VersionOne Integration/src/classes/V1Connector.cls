@@ -214,6 +214,9 @@ global with sharing class V1Connector implements IV1Connector {
     * Creates link to the corresponding case in the SalesForce
     **/
     global void createLinkV1ToSF(String workitemId, Case caseData) {
+    	if (workitemId == null) {
+    		return;
+    	}
         String body = '<Asset>' +
                         attributeNode('OnMenu', 'true') +
                         attributeNode('URL', 'https://na7.salesforce.com/' + caseData.Id) +
