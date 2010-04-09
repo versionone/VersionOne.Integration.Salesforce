@@ -1,0 +1,22 @@
+<apex:page controller="V1SynchronizerController" action="{!initData}">
+<apex:sectionHeader title="Synchronizer"></apex:sectionHeader>
+<apex:actionStatus startText="Syncronization in progress..." id="sync_status" />
+<apex:form >
+	<apex:pageBlock >
+		<apex:pageBlockButtons location="bottom">
+		    <apex:commandButton action="{!forceSync}" value="Force Synchronization" id="forceSync"
+		         status="sync_status" reRender="forceSync, messages" styleClass="btnImportant"
+		         disabled="{!isBatchRan || isFutureRan}" onClick="disableSynchButton();">
+                    <script type="text/javascript">
+                        function disableSynchButton() {
+                        var ele = document.getElementById('{!$Component.forceSync}');
+                        ele.disabled = true;
+                        ele.className = 'btnDisabled';
+                    }
+                	</script>
+	        </apex:commandButton>
+		</apex:pageBlockButtons>
+	</apex:pageBlock>
+	<apex:pageMessages id="messages" />
+</apex:form>
+</apex:page>
