@@ -44,7 +44,7 @@ public class V1CaseCollector {
      * Return: found case
      */
     public static Case getCaseByCaseNumber(String caseNumber) {
-        return [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c
+        return [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c, V1Processing__c
                           FROM Case WHERE CaseNumber = :caseNumber and Status <> 'Closed'];
     }
 

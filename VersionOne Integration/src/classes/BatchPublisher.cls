@@ -4,6 +4,7 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
     global final List<Case> cases;
     global IConnectionFactory factory;
     global Boolean isCreatingFailed = false;
+    global List<Case> updatedCases = new List<Case>();
 
     global BatchPublisher(IConnectionFactory factory) {
         this.factory = factory;
@@ -26,7 +27,6 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
 
         V1Publisher publisher = getV1Publisher();
         List<Case> casesForProcess = new List<Case>();
-        List<Case> realCasesForProcess = new List<Case>();
         Map<String, Boolean> publishedCases = publisher.getPublishedCases();
         //it's like fake case to get project list from the VersionOne
         casesForProcess.add(cases.get(0));
@@ -36,16 +36,15 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
                 continue;
             }
             caseData.VersionOneUrl__c = '';
+            caseData.V1Processing__c = true;
             //add every case twice because:
             //  at first we will create workitems in the VersionOne
             //  at second we will create link to SalesForce's case in the VersionOne
             casesForProcess.add(caseData);
             casesForProcess.add(caseData);
-            realCasesForProcess.add(caseData);
             update caseData;
         }
         System.debug('start casesForProcess:'+casesForProcess);
-        V1CaseCollector.updateProcessInVersionOneInCase(realCasesForProcess, true);
         return casesForProcess;
     }
 
@@ -60,14 +59,15 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
         if (updateProjects(connector, scope)) {
             return;
         }
-
+		System.debug('execute going to process:' + scope);
         for(Case caseData : scope){
             Case newCase = V1CaseCollector.getCaseByCaseNumber(caseData.CaseNumber);
-            System.debug('execute newCase.VersionOneUrl__c: ' + newCase.VersionOneUrl__c);
+            System.debug('execute newCase.VersionOneUrl__c: ' + newCase.VersionOneUrl__c + ' name:' + newCase.Subject);
             if (isCasePorted(newCase)) {
-                portCaseToVersionOne(caseData, settings, connector);
+                portCaseToVersionOne(newCase, settings, connector);
             } else {
                 createLinkInVersionOneAndCompletePorting(newCase, settings, connector);
+                updatedCases.add(newCase);
             }
         }
     }
@@ -137,7 +137,8 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
     }
 
     global void finish(Database.BatchableContext bc){
-        V1CaseCollector.updateProcessInVersionOneInCase(cases, false);
+    	System.debug('finish cases:' + updatedCases);
+        V1CaseCollector.updateProcessInVersionOneInCase(updatedCases, false);
     }
 
     /** Returns project id by project name. **/
