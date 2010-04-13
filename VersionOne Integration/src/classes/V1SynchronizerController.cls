@@ -1,16 +1,21 @@
 public class V1SynchronizerController {
 
-	public V1SynchronizerController() {
-	}
+    public V1SynchronizerController() {
+    }
 
-	public void initData() {
-		showSynchronizerInfo();
-	}
+    public void initData() {
+        showSynchronizerInfo();
+    }
 
     public PageReference forceSync() {
+        settings = null;
+        if (settings.getBatchId() != null || Synchronizer.isFutureRan() || V1Publisher.isFutureRan()) {
+            showSynchronizerInfo();
+            return null;
+        }
+
         try {
             Synchronizer.runSynchronizerWithVersionOne();
-            Synchronizer.isFutureRan();
         } catch (Exception ex) {
             addErrorMessage('Failed to run cases updater.');
             ApexPages.addMessages(ex);
@@ -20,6 +25,7 @@ public class V1SynchronizerController {
             BatchPublisher batch = new BatchPublisher(new ConnectionFactory());
             ID batchprocessid = Database.executeBatch(batch, 1);
             settings.setBatchId(batchprocessid);
+            settings.updateBatchId();
             isBatchRan = true;
         } catch (Exception ex) {
             addErrorMessage('Failed to run cases publisher.');
@@ -27,8 +33,6 @@ public class V1SynchronizerController {
         }
 
         addConfirmMessage('Synchronizer was started.');
-
-        settings.updateBatchId();
 
         return null;
     }
@@ -41,7 +45,7 @@ public class V1SynchronizerController {
             return settings;
         } set;}
 
-	//Synchronize action
+    //Synchronize action
     public Boolean isBatchRan {get; set;}
     public Boolean isFutureRan {get; set;}
 
@@ -58,6 +62,11 @@ public class V1SynchronizerController {
             settings.setBatchId(null);
             settings.updateBatchId();
         }
+        futureData = V1Publisher.getFutureCurrentFuture();
+        if (futureData != null) {
+            isFutureRan = true;
+            displayFutureProgress(futureData);
+        }
     }
 
     private void displayBatchProgress(String id) {
@@ -72,12 +81,12 @@ public class V1SynchronizerController {
     }
 
     private void displayFutureProgress(Map<String, String> data) {
-    	String status;
-    	if (data != null) {
-			status = data.get('Status');
-    	} else {
-    		status = 'Completed';
-    	}
+        String status;
+        if (data != null) {
+            status = data.get('Status');
+        } else {
+            status = 'Completed';
+        }
         addInfoMessage('Case update status: ' + status);
     }
 

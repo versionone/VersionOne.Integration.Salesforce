@@ -2,11 +2,11 @@
 private class BatchPublisherTester {
 
     static testMethod void calculateValueTest() {
-    	Integer value1 = 13;
-    	Integer value2 = 12;
-    	Integer value3 = 1;
-    	Integer value4 = 25;
-    	Integer value5 = 2;
+        Integer value1 = 13;
+        Integer value2 = 12;
+        Integer value3 = 1;
+        Integer value4 = 25;
+        Integer value5 = 2;
         System.assertEquals(6, BatchPublisher.calculateValue(value1));
         System.assertEquals(5, BatchPublisher.calculateValue(value2));
         System.assertEquals(0, BatchPublisher.calculateValue(value3));
@@ -15,8 +15,8 @@ private class BatchPublisherTester {
     }
 
     static testMethod void getBatchDataWithIncorrectIdTest() {
-    	Map<String, String> data = BatchPublisher.getBatchData('1234567');
-    	System.assertEquals(null, data);
+        Map<String, String> data = BatchPublisher.getBatchData('1234567');
+        System.assertEquals(null, data);
     }
 
     static testMethod void batchProcessTest() {
@@ -45,12 +45,15 @@ private class BatchPublisherTester {
             Case case2 = new Case(Subject = 'case2', OwnerId = queue.Id);
             Case case3 = new Case(Subject = 'case3', OwnerId = queueD.Id);
             Case case4 = new Case(Subject = 'case4', OwnerId = queueD.Id);
-            insert new Case[]{case1, case2, case3, case4};
+            //will not processed because already processing by someone
+            Case case5 = new Case(Subject = 'case5', OwnerId = queueD.Id, V1Processing__c = true);
+            insert new Case[]{case1, case2, case3, case4, case5};
 
             case1 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case1.Id];
             case2 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case2.Id];
             case3 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case3.Id];
             case4 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case4.Id];
+            case5 = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, VersionOneUrl__c FROM Case WHERE Id = :case5.Id];
 
             Map<String, Boolean> alreadyPortedCases = new Map<String, Boolean> {case2.CaseNumber => true};
 
@@ -81,39 +84,41 @@ private class BatchPublisherTester {
             connector.createdWorkitemId = defectId;
             connector.setTestAlreadyExistedDefects(alreadyPortedCases);
 
-		    BatchPublisher batch = new BatchPublisher(new ConnectionFactoryMock(testSettings, connector));
+            BatchPublisher batch = new BatchPublisher(new ConnectionFactoryMock(testSettings, connector));
 
-		    Test.startTest();
-		    ID batchprocessid = Database.executeBatch(batch);
-		    Test.stopTest();
+            Test.startTest();
+            ID batchprocessid = Database.executeBatch(batch);
+            Test.stopTest();
 
             Case newCase1 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case1.Id];
-            System.debug(newCase1);
             System.assertEquals(path + additionPath + EncodingUtil.urlEncode(defectId, 'UTF-8'), newCase1.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase1.OwnerId);
             CaseComment newComment = [SELECT CommentBody FROM CaseComment where ParentId = :newCase1.Id];
             System.assertEquals(pComment, newComment.CommentBody);
 
             Case newCase2 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case2.Id];
-            System.debug(newCase1);
             System.assertEquals(null, newCase2.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase2.OwnerId);
             List<CaseComment> newComment2 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase2.Id];
             System.assertEquals(0, newComment2.size(), 'Incorrect number of comments for case 2');
 
             Case newCase3 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case3.Id];
-            System.debug(newCase3);
             System.assertEquals(path + additionPath + EncodingUtil.urlEncode(defectId, 'UTF-8'), newCase3.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase3.OwnerId);
             CaseComment newComment3 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase3.Id];
             System.assertEquals(pComment, newComment3.CommentBody);
 
             Case newCase4 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case4.Id];
-            System.debug(newCase4);
             System.assertEquals(path + additionPath + EncodingUtil.urlEncode(defectId, 'UTF-8'), newCase4.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase4.OwnerId);
             CaseComment newComment4 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase4.Id];
             System.assertEquals(pComment, newComment4.CommentBody);
+
+            Case newCase5 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case5.Id];
+            System.assertEquals(null, newCase5.VersionOneUrl__c);
+            System.assertEquals(queueD.Id, newCase5.OwnerId);
+            List<CaseComment> newComment5 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase5.Id];
+            System.assertEquals(0, newComment5.size(), 'Incorrect number of comments for case 5');
 
             Map<String, String> batchData = BatchPublisher.getBatchData(batchprocessid);
             System.assertEquals('Completed', batchData.get('Status'));

@@ -18,8 +18,8 @@ public class SettingsController {
     public Boolean isSyncEnabled {get; set;}
     public Integer casesForPorting {
         get {
-            return V1CaseCollector.getCasesByOwnerId(settings.getDefectQueueId()).size() +
-                V1CaseCollector.getCasesByOwnerId(settings.getStoryQueueId()).size();
+            V1Publisher publisher = new V1Publisher();
+            return publisher.getCasesToPublish().size();
         } set;
     }
 

@@ -42,8 +42,8 @@ private class V1CaseCollectorTestSuite {
             System.assertEquals(0, cases.size(), 'There is already owned cases.');
 
             Test.startTest();
-            V1CaseCollector.updateCase(case1, queue.Id, 'test comment1', 'testUrl');
-            V1CaseCollector.updateCase(case2, queue.Id, 'test comment2', null);
+            V1CaseCollector.updateCase(case1, queue.Id, 'test comment1', 'testUrl', false);
+            V1CaseCollector.updateCase(case2, queue.Id, 'test comment2', null, false);
             Test.stopTest();
 
             case1 = [SELECT ownerId, VersionOneUrl__c FROM Case WHERE Id = :case1.Id];
@@ -106,6 +106,8 @@ private class V1CaseCollectorTestSuite {
             Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
             Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id);
             Case case3 = new Case(Subject='TestCase3', OwnerId = queue.Id);
+            //will not in the list because of processing
+            Case case4 = new Case(Subject='TestCase4', OwnerId = queue.Id, V1Processing__c = true);
             insert new Case[] {case1, case2, case3};
 
             Case[] cases = V1CaseCollector.getCasesByOwnerId(queue.Id);
@@ -139,7 +141,7 @@ private class V1CaseCollectorTestSuite {
             System.assertEquals(case1.CaseNumber, newCase.CaseNumber, 'Incorrect case numbers.');
             System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
         }
-	}
+    }
 
     static testMethod void updateUrlToVersionOneInCaseTest() {
         String queueName = 'TestQueue1';
@@ -160,7 +162,7 @@ private class V1CaseCollectorTestSuite {
             System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
             System.assertEquals(url, newCase.VersionOneUrl__c, 'Incorrect url.');
         }
-	}
+    }
 
     static testMethod void getCasesByCaseNumberTest() {
         String queueName = 'TestQueue1';
@@ -207,5 +209,37 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals('Closed', newCase3.Status, 'Incorrect status of case.');
         CaseComment newComment3 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase3.Id];
         System.assertEquals(testComment, newComment3.CommentBody);
+    }
+
+    static testMethod void updateProcessInVersionOneInCaseTest() {
+        Case case1 = new Case(Subject='TestCase1');
+        Case case2 = new Case(Subject='TestCase2');
+        Case case3 = new Case(Subject='TestCase3');
+        insert new Case[] {case1, case2, case3};
+        case1 = [SELECT V1Processing__c FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT V1Processing__c FROM Case WHERE Id = :case2.Id];
+        case3 = [SELECT V1Processing__c FROM Case WHERE Id = :case3.Id];
+
+        System.assertEquals(false, case1.V1Processing__c, 'Incorrect start value.');
+        System.assertEquals(false, case2.V1Processing__c, 'Incorrect start value.');
+        System.assertEquals(false, case3.V1Processing__c, 'Incorrect start value.');
+
+        V1CaseCollector.updateProcessInVersionOneInCase(new Case[] {case1, case3}, true);
+
+        Case newCase1 = [SELECT V1Processing__c FROM Case WHERE Id = :case1.Id];
+        Case newCase2 = [SELECT V1Processing__c FROM Case WHERE Id = :case2.Id];
+        Case newCase3 = [SELECT V1Processing__c FROM Case WHERE Id = :case3.Id];
+        System.assertEquals(true, newCase1.V1Processing__c, 'Incorrect value after first processing.');
+        System.assertEquals(false, newCase2.V1Processing__c, 'Incorrect value after first processing.');
+        System.assertEquals(true, newCase3.V1Processing__c, 'Incorrect value after first processing.');
+
+        V1CaseCollector.updateProcessInVersionOneInCase(new Case[] {case1, case2, case3}, false);
+
+        newCase1 = [SELECT V1Processing__c FROM Case WHERE Id = :case1.Id];
+        newCase2 = [SELECT V1Processing__c FROM Case WHERE Id = :case2.Id];
+        newCase3 = [SELECT V1Processing__c FROM Case WHERE Id = :case3.Id];
+        System.assertEquals(false, newCase1.V1Processing__c, 'Incorrect value after second processing.');
+        System.assertEquals(false, newCase2.V1Processing__c, 'Incorrect value after second processing.');
+        System.assertEquals(false, newCase3.V1Processing__c, 'Incorrect value after second processing.');
     }
 }
