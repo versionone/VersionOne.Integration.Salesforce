@@ -44,7 +44,6 @@ public class Synchronizer {
     public static Map<String, String> getFutureCurrentFuture() {
         String jobType = 'future';
         String methodName = 'runSynchronizerWithVersionOne';
-        String className = 'Synchronizer';
         String[] statuses = new String[]{'Queued', 'Processing'};
         AsyncApexJob aaj;
         try {
@@ -56,14 +55,14 @@ public class Synchronizer {
         } catch (QueryException ex) {
             // no current future was ran
             return null;
-		}
+        }
 
         Map<String, String> futureData = new Map<String, String>();
         futureData.put('Status', aaj.Status);
         futureData.put('NumberOfErrors', String.valueof(aaj.NumberOfErrors));
 
         return futureData;
-	}
+    }
 
     public static Boolean isFutureRan() {
         Map<String, String> futureData = getFutureCurrentFuture();
@@ -71,7 +70,7 @@ public class Synchronizer {
             return false;
         }
         return futureData.get('Status') == 'Queued' || futureData.get('Status') == 'Processing';
-	}
+    }
 
     public static Integer amountUpdatedCases { set; get; }
 
@@ -82,5 +81,5 @@ public class Synchronizer {
         } catch (Exception ex) {
             System.debug('Failed to update Cases. ' + ex.getMessage());
         }
-	}
+    }
 }

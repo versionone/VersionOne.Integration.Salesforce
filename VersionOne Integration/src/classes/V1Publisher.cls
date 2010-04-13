@@ -53,7 +53,7 @@ global with sharing class V1Publisher {
         return projects;
     }
 
-    public Case[] getCases() {
+    public Case[] getCasesToPublish() {
         if (cases == null) {
             List<Case> res = V1CaseCollector.getCasesByOwnerId(settings.getDefectQueueId());
             res.addAll(V1CaseCollector.getCasesByOwnerId(settings.getStoryQueueId()));
@@ -64,7 +64,7 @@ global with sharing class V1Publisher {
 
     public Map<String, Boolean> getPublishedCases() {
         if (publishedCases == null) {
-            if (getCases().size() == 0) {
+            if (getCasesToPublish().size() == 0) {
                 publishedCases = new Map<String, Boolean>();
             } else {
                 publishedCases = connector.getReferencedWorkitems(cases);
@@ -77,7 +77,7 @@ global with sharing class V1Publisher {
     public void processCases() {
         List<Case> updateCase = new List<Case>();
         List<String> updateId = new List<String>();
-        for (Case caseData : getCases()) {
+        for (Case caseData : getCasesToPublish()) {
             if (!canMakeCallouts(2)) {
                break;
             }
@@ -89,7 +89,7 @@ global with sharing class V1Publisher {
             Case caseData = updateCase[i];
             String v1id = updateId[i];
             String url = (v1id == null) ? null : settings.getPath() + URL_TO_V1_TEMPLATE + EncodingUtil.urlEncode(v1id, 'UTF-8');
-            V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), url);
+            V1CaseCollector.updateCase(caseData, settings.getDestQueueId(), settings.getCommentBody(), url, false);
         }
     }
 
@@ -111,17 +111,17 @@ global with sharing class V1Publisher {
         }
     }
 
-	/** return id created woritem or null in case any errors */
-	public String createDataInVersionOne(Case caseData, String projectId) {
+    /** return id created woritem or null in case any errors */
+    public String createDataInVersionOne(Case caseData, String projectId) {
         String id;
         try {
-        	id = connector.createWorkitemInV1(caseData, projectId);
+            id = connector.createWorkitemInV1(caseData, projectId);
         } catch (Exception ex) {
-        	//here need to restore mark about processing
+            //here need to restore mark about processing
         }
-		connector.createLinkV1ToSF(id, caseData);
+        connector.createLinkV1ToSF(id, caseData);
         return id;
-	}
+    }
 
     /** Returns project id by project name. **/
     public String findProjectId(String projectName) {
@@ -139,5 +139,36 @@ global with sharing class V1Publisher {
     /** Logs error message with exception. **/
     public static void errorMessage(String message, Exception ex) {
         System.debug(message + '/n' + ex);
+    }
+
+    public static Map<String, String> getFutureCurrentFuture() {
+        String jobType = 'future';
+        String methodName = 'publish';
+        String[] statuses = new String[]{'Queued', 'Processing'};
+        AsyncApexJob aaj;
+        try {
+            aaj = [SELECT Id, Status, NumberOfErrors
+                FROM AsyncApexJob WHERE
+                    JobType =: jobType AND
+                    MethodName =: methodName AND
+                    Status in: statuses];
+        } catch (QueryException ex) {
+            // no current future was ran
+            return null;
+        }
+
+        Map<String, String> futureData = new Map<String, String>();
+        futureData.put('Status', aaj.Status);
+        futureData.put('NumberOfErrors', String.valueof(aaj.NumberOfErrors));
+
+        return futureData;
+    }
+
+    public static Boolean isFutureRan() {
+        Map<String, String> futureData = getFutureCurrentFuture();
+        if (futureData == null) {
+            return false;
+        }
+        return futureData.get('Status') == 'Queued' || futureData.get('Status') == 'Processing';
     }
 }

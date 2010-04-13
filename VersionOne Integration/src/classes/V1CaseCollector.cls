@@ -1,6 +1,7 @@
 public class V1CaseCollector {
 
-    /* Query not closed cases with specified owner.
+    /* Query not closed cases with specified owner which can be ported to the VersionOne.
+     * cases aren't closed and isn't processing atm.
      * ownerId - ID of an owner.
      * Return: Array of cases.
      */
@@ -8,7 +9,7 @@ public class V1CaseCollector {
         return getCasesByOwnerId(ownerId, false);
     }
 
-    /* Query cases with specified owner.
+    /* Query cases with specified owner, and cases aren't processing atm.
      * ownerId - ID of an owner.
      * isClosed - is case closed.
      *			true  - gather only not closed cases
@@ -19,10 +20,10 @@ public class V1CaseCollector {
         Case[] cases;
         if (isClosed) {
             cases = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject
-                          FROM Case WHERE OwnerId = :ownerId and Status = 'Closed'];
+                          FROM Case WHERE OwnerId = :ownerId and Status = 'Closed' and V1Processing__c = false ];
         } else {
             cases = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject
-                          FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed'];
+                          FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed' and V1Processing__c = false ];
         }
         System.debug('==> getCasesByOwnerId() found: ' + cases.size());
         return cases;
@@ -48,30 +49,49 @@ public class V1CaseCollector {
     }
 
     /* Update case: set Owner and VersionOneUrl to the specified values. Create Comment with specified body.
-     * case - cases to process.
+     * case - case to process.
      * ownerId - ID of the owner to set to case.
      * commentBody - text of a comment to add to case. If null - comment will not be created.
      * v1Url - URL to set to VersionOneUrl field.
      */
-    public static void updateCase(Case c, String ownerId, String commentBody, String v1Url) {
+    public static void updateCase(Case c, String ownerId, String commentBody, String v1Url, Boolean isProcessing) {
         System.debug('BEFORE CHANGE: ' + c);
         c.OwnerId = ownerId;
         c.VersionOneUrl__c = v1Url;
+        c.V1Processing__c = isProcessing;
         System.debug('AFTER CHANGE: ' + c);
         update c;
 
         if (commentBody != null) {
-			System.debug('Add new comment: ' + commentBody + ' for ' + c.Id + ' case');
+            System.debug('Add new comment: ' + commentBody + ' for ' + c.Id + ' case');
             insert new CaseComment(CommentBody = commentBody, ParentId = c.Id);
         }
     }
 
+    /**
+     * Update case: set VersionOneUrl custom field to specified value.
+     * case  - case to process
+     * v1Url - URL to set to VersionOneUrl field.
+     **/
     public static void updateUrlToVersionOneInCase(Case c, String v1Url) {
-    	System.debug('BEFORE CHANGE: ' + c);
-    	c.VersionOneUrl__c = v1Url;
+        System.debug('BEFORE CHANGE: ' + c);
+        c.VersionOneUrl__c = v1Url;
         System.debug('AFTER CHANGE: ' + c);
         update c;
-	}
+    }
+
+    /**
+     *
+     *
+     **/
+    public static void updateProcessInVersionOneInCase(List<Case> cases, boolean isProcess) {
+        for (Case c : cases) {
+            System.debug('BEFORE CHANGE: ' + c);
+            c.V1Processing__c = isProcess;
+            System.debug('AFTER CHANGE: ' + c);
+        }
+        Database.update(cases);
+    }
 
     /*
      * Closes cases. Create comment with specified  body.
@@ -79,8 +99,7 @@ public class V1CaseCollector {
      * commentBody	- text of comment body to attach to all cases. If null - no comments are created.
      */
     public static void closeCases(List<Case> cases, String commentBody) {
-        for (Integer i = 0; i < cases.size(); i++){
-            Case c = cases[i];
+        for (Case c : cases){
             System.debug('BEFORE CHANGE: ' + c);
             c.Status = 'Closed';
             System.debug('AFTER CHANGE: ' + c);
