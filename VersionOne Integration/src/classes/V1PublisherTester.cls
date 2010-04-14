@@ -214,6 +214,10 @@ private class V1PublisherTester {
         }
     }
 
+    static testMethod void testFuture() {
+    	System.assertEquals(false, V1Publisher.isFutureRan(), 'Incorrect status of V1Publisher future.');
+    }
+
 
     static User createUser(String alias) {
         User user = new User();
