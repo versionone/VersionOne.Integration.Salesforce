@@ -95,10 +95,8 @@ global with sharing class V1Connector implements IV1Connector {
     * String attributeValue - value of name attribute for looking for.
     **/
     public String getValue(String attributeValue, List<XMLDom.Element> assetsData) {
-        System.debug('assetsData size = ' + assetsData.size());
         for (XMLDom.Element element : assetsData) {
             String attibuteValue = element.getAttribute('name');
-            System.debug('attibuteValue.equals(attributeValue)=' + attibuteValue.equals(attributeValue));
             if (attibuteValue != null && attibuteValue.equals(attributeValue)) {
                 return element.nodeValue;
             }

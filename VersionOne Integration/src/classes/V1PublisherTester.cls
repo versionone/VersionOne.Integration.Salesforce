@@ -86,28 +86,24 @@ private class V1PublisherTester {
             Test.stopTest();
 
             Case newCase1 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case1.Id];
-            System.debug(newCase1);
             System.assertEquals(path + additionPath + EncodingUtil.urlEncode(defectId, 'UTF-8'), newCase1.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase1.OwnerId);
             CaseComment newComment = [SELECT CommentBody FROM CaseComment where ParentId = :newCase1.Id];
             System.assertEquals(pComment, newComment.CommentBody);
 
             Case newCase2 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case2.Id];
-            System.debug(newCase1);
             System.assertEquals(null, newCase2.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase2.OwnerId);
             List<CaseComment> newComment2 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase2.Id];
             System.assertEquals(0, newComment2.size(), 'Incorrect number of comments for case 2');
 
             Case newCase3 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case3.Id];
-            System.debug(newCase3);
             System.assertEquals(path + additionPath + EncodingUtil.urlEncode(defectId, 'UTF-8'), newCase3.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase3.OwnerId);
             CaseComment newComment3 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase3.Id];
             System.assertEquals(pComment, newComment3.CommentBody);
 
             Case newCase4 = [SELECT CaseNumber, VersionOneUrl__c, OwnerId FROM Case WHERE Id = :case4.Id];
-            System.debug(newCase4);
             System.assertEquals(path + additionPath + EncodingUtil.urlEncode(defectId, 'UTF-8'), newCase4.VersionOneUrl__c);
             System.assertEquals(queue.Id, newCase4.OwnerId);
             CaseComment newComment4 = [SELECT CommentBody FROM CaseComment where ParentId = :newCase4.Id];
