@@ -78,6 +78,10 @@ private class SynchronizerTester {
         }
     }
 
+    static testMethod void testFuture() {
+    	System.assertEquals(false, Synchronizer.isFutureRan(), 'Incorrect status of Synchronizer future.');
+    }
+
     static User createUser(String alias) {
         User user = new User();
         user.Username = alias + '@not-a-mail.com';
