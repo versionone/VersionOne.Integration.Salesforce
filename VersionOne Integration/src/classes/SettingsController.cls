@@ -115,7 +115,6 @@ public class SettingsController {
             isSettingsCorrect = false;
         }
 
-        System.debug('Path:' + Settings.getPath() + ', UserName:' + Settings.getUserName() + ', Password:' + Settings.getPassword());
         System.debug('testMessage=' + testMessage);
 
         isSettingsValidated = true;
