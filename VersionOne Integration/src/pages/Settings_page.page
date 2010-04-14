@@ -108,7 +108,7 @@
             <apex:pageBlockButtons location="top">
                 <apex:commandButton value="Save settings" action="{!saveSettings}"
                     disabled="{!isSettingsCorrect == false}" id="save_button1"
-                    onclick="disableAllButtons();formSaved();" status="save_status"
+                    onclick="disableAllButtons();" status="save_status"
                     rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages">
                     <script type="text/javascript">
                         function disableSaveButton1() {
@@ -134,7 +134,7 @@
             <apex:pageBlockButtons location="bottom">
                 <apex:commandButton value="Save settings" action="{!saveSettings}"
                     disabled="{!isSettingsCorrect == false}" id="save_button2"
-                    onclick="disableAllButtons();formSaved();" status="save_status"
+                    onclick="disableAllButtons();" status="save_status"
                     rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages">
                     <script type="text/javascript">
                     function disableSaveButton2() {

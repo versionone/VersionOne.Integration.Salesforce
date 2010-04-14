@@ -3,13 +3,14 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
     global String defaultProject;
     global final List<Case> cases;
     global IConnectionFactory factory;
-    global Boolean isCreatingFailed = false;
+    global Boolean isCreatingFailed;
     global List<Case> updatedCases = new List<Case>();
 
     global BatchPublisher(IConnectionFactory factory) {
         this.factory = factory;
         V1Publisher publisher = getV1Publisher();
         cases = publisher.getCasesToPublish();
+        isCreatingFailed = false;
         System.debug('BatchPublisher cases:'+cases);
     }
 
@@ -51,6 +52,7 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
     global void execute(Database.BatchableContext bc, List<Case> scope){
         if (isCreatingFailed) {
             isCreatingFailed = false;
+            System.debug('Was error in previous processing.');
             return;
         }
 
@@ -111,6 +113,7 @@ global class BatchPublisher implements Database.Batchable<Case>, Database.Allows
             isCreatingFailed = true;
             V1Publisher.errorMessage('Error during creating workitem in the VersionOne.', ex);
             V1CaseCollector.updateProcessInVersionOneInCase(new Case[] {caseData}, false);
+            return;
         }
         String url = (workitemId == null) ? null : settings.getPath() + V1Publisher.URL_TO_V1_TEMPLATE + EncodingUtil.urlEncode(workitemId, 'UTF-8');
         V1CaseCollector.updateUrlToVersionOneInCase(caseData, url);
