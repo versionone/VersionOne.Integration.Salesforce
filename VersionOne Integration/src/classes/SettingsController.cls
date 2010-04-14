@@ -63,25 +63,20 @@ public class SettingsController {
     }
 
     public PageReference saveSettings() {
-        if (!validateSettings()) {
-            isSettingsCorrect = false;
+    	isSettingsCorrect = validateSettings();
+    	String sourceId;
+    	try {
+    		sourceId = connector.getSourceId();
+    	} catch (Exception ex) {}
+        if (!isSettingsCorrect || sourceId == null) {
+        	isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
             isSaved = false;
-            return null;
-        }
-        if (!isSettingsCorrect) {
             addErrorMessage('Settings is not correct or was not validated.');
             return null;
         }
-        String sourceId = connector.getSourceId();
-        if (sourceId == null) {
-            isSettingsCorrect = false;
-            isSettingsValidated = false;
-            testMessage = '';
-            isSaved = false;
-            return null;
-        }
+
         settings.setSourceId(sourceId);
         settings.setScheduleId(updateSchedule());
 
