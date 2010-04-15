@@ -145,7 +145,7 @@ global with sharing class V1Publisher {
         String jobType = 'future';
         String methodName = 'publish';
         String[] statuses = new String[]{'Queued', 'Processing'};
-        AsyncApexJob aaj;
+        List<AsyncApexJob> aaj;
         try {
             aaj = [SELECT Id, Status, NumberOfErrors
                 FROM AsyncApexJob WHERE
@@ -156,10 +156,13 @@ global with sharing class V1Publisher {
             // no current future was ran
             return null;
         }
+        if (aaj.size() == 0) {
+        	return null;
+        }
 
         Map<String, String> futureData = new Map<String, String>();
-        futureData.put('Status', aaj.Status);
-        futureData.put('NumberOfErrors', String.valueof(aaj.NumberOfErrors));
+        futureData.put('Status', aaj.get(0).Status);
+        futureData.put('NumberOfErrors', String.valueof(aaj.get(0).NumberOfErrors));
 
         return futureData;
     }

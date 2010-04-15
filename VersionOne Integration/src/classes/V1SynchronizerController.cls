@@ -1,10 +1,16 @@
 public class V1SynchronizerController {
 
+	private static final String CASE_UPDATE_STATUS_TEXT = 'Case update status';
+	private static final String CASE_PUBLISH_STATUS_TEXT = 'Case publish status';
+	private static final String CASE_PUBLISHED_TEXT = 'Cases published';
+	private static final String STATUS_COMPLETED_TEXT = 'Completed';
+
     public V1SynchronizerController() {
     }
 
     public void initData() {
         showSynchronizerInfo();
+        showPublisherInfo();
     }
 
     public PageReference forceSync() {
@@ -56,16 +62,19 @@ public class V1SynchronizerController {
         displayBatchProgress(settings.getBatchId());
 
         if (isFutureRan || settings.getBatchId() != null) {
-            displayFutureProgress(futureData);
+            displayFutureProgress(CASE_UPDATE_STATUS_TEXT, futureData);
         }
         if (!isBatchRan && !isFutureRan && settings.getBatchId() != null) {
             settings.setBatchId(null);
             settings.updateBatchId();
         }
-        futureData = V1Publisher.getFutureCurrentFuture();
+    }
+
+    public void showPublisherInfo() {
+        Map<String, String> futureData = V1Publisher.getFutureCurrentFuture();
         if (futureData != null) {
             isFutureRan = true;
-            displayFutureProgress(futureData);
+            displayFutureProgress(CASE_PUBLISH_STATUS_TEXT, futureData);
         }
     }
 
@@ -74,20 +83,20 @@ public class V1SynchronizerController {
         if (batchData == null) {
             return;
         }
-        addInfoMessage('Case publish status: ' + batchData.get('Status'));
-        addInfoMessage('Cases published: ' + batchData.get('JobItemsProcessed'));
+        addInfoMessage(CASE_PUBLISH_STATUS_TEXT + ' : ' + batchData.get('Status'));
+        addInfoMessage(CASE_PUBLISHED_TEXT + ' : ' + batchData.get('JobItemsProcessed'));
         //addInfoMessage('Number of errors: ' + batchData.get('NumberOfErrors'));
         //addInfoMessage('Total cases: ' + batchData.get('TotalJobItems'));
     }
 
-    private void displayFutureProgress(Map<String, String> data) {
+    private void displayFutureProgress(String text, Map<String, String> data) {
         String status;
         if (data != null) {
             status = data.get('Status');
         } else {
-            status = 'Completed';
+            status = STATUS_COMPLETED_TEXT;
         }
-        addInfoMessage('Case update status: ' + status);
+        addInfoMessage(text + ':' + status);
     }
 
     //Messages

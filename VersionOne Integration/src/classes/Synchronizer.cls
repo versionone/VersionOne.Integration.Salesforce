@@ -45,7 +45,7 @@ public class Synchronizer {
         String jobType = 'future';
         String methodName = 'runSynchronizerWithVersionOne';
         String[] statuses = new String[]{'Queued', 'Processing'};
-        AsyncApexJob aaj;
+        List<AsyncApexJob> aaj;
         try {
             aaj = [SELECT Id, Status, NumberOfErrors
                 FROM AsyncApexJob WHERE
@@ -57,9 +57,13 @@ public class Synchronizer {
             return null;
         }
 
+        if (aaj.size() == 0) {
+            return null;
+		}
+
         Map<String, String> futureData = new Map<String, String>();
-        futureData.put('Status', aaj.Status);
-        futureData.put('NumberOfErrors', String.valueof(aaj.NumberOfErrors));
+        futureData.put('Status', aaj.get(0).Status);
+        futureData.put('NumberOfErrors', String.valueof(aaj.get(0).NumberOfErrors));
 
         return futureData;
     }
@@ -72,12 +76,10 @@ public class Synchronizer {
         return futureData.get('Status') == 'Queued' || futureData.get('Status') == 'Processing';
     }
 
-    public static Integer amountUpdatedCases { set; get; }
-
     @future (callout=true)
     public static void runSynchronizerWithVersionOne() {
         try {
-            amountUpdatedCases = new Synchronizer(new Settings()).syncCases();
+            new Synchronizer(new Settings()).syncCases();
         } catch (Exception ex) {
             System.debug('Failed to update Cases. ' + ex.getMessage());
         }
