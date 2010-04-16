@@ -19,14 +19,23 @@ public class V1CaseCollector {
     public static Case[] getCasesByOwnerId(String ownerId, Boolean isClosed) {
         Case[] cases;
         if (isClosed) {
-            cases = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject
+            cases = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, V1Processing__c
                           FROM Case WHERE OwnerId = :ownerId and Status = 'Closed' and V1Processing__c = false ];
         } else {
-            cases = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject
+            cases = [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, V1Processing__c
                           FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed' and V1Processing__c = false ];
         }
         System.debug('==> getCasesByOwnerId() found: ' + cases.size());
         return cases;
+    }
+
+    /**
+     * Query cases with specified owners, with any status of processing and not closed.
+     * ownerId - ID list of owners.
+     **/
+    public static Case[] getCasesWaitingOrPortingByOwners(List<String> ownerId) {
+        return [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, V1Processing__c
+                          FROM Case WHERE OwnerId in :ownerId and Status <> 'Closed'];
     }
 
     /* Query not closed cases with specified case numbers and owner

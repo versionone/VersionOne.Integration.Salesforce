@@ -242,4 +242,34 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals(false, newCase2.V1Processing__c, 'Incorrect value after second processing.');
         System.assertEquals(false, newCase3.V1Processing__c, 'Incorrect value after second processing.');
     }
+
+    static testMethod void getCasesWaitingOrPortingByOwnersTest() {
+        String queueName = 'TestQueue';
+        Group queue = new Group(Type='Queue', Name=queueName + '1');
+        insert queue;
+        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+        insert sobj;
+        Group queue2 = new Group(Type='Queue', Name=queueName+'2');
+        insert queue2;
+        QueueSobject sobj2 = new QueueSobject(QueueId = queue2.Id, SobjectType = 'Case');
+        insert sobj2;
+        Group queue3 = new Group(Type='Queue', Name=queueName+'3');
+        insert queue3;
+        QueueSobject sobj3 = new QueueSobject(QueueId = queue3.Id, SobjectType = 'Case');
+        insert sobj3;
+
+        System.runAs(createUser('test4356')){
+            Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id);
+            Case case2 = new Case(Subject='TestCase2', OwnerId = queue2.Id);
+            Case case3 = new Case(Subject='TestCase3', OwnerId = queue3.Id);
+            Case case4 = new Case(Subject='TestCase4', OwnerId = queue.Id, V1Processing__c = true);
+            insert new Case[] {case1, case2, case3, case4};
+
+            Case[] newCases = V1CaseCollector.getCasesWaitingOrPortingByOwners(new String[]{queue.Id, queue2.Id});
+            System.assertEquals(3, newCases.size(), 'Incorrect number of case.');
+            assertContains(case1, newCases, 'TestCase1 has to be in the list');
+            assertContains(case2, newCases, 'TestCase2 has to be in the list');
+            assertContains(case4, newCases, 'TestCase4 has to be in the list');
+        }
+    }
 }
