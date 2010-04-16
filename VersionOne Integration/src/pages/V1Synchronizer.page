@@ -14,7 +14,7 @@
 		        title="" summary="No cases are waitining porting to VersionOne."
 		        rendered="{!isNoDataForTable1}" strength="1" />
 		</apex:outputPanel>
-		<div align="right" style="display:{!IF(NOT(isNoDataForTable1),'block','none')}">
+		<div align="right" style="display:{!IF(isNoDataForTable1,'none','block')}">
 		<font size="1pt">Page #:&nbsp;<apex:outputLabel value="{!table1PageNumber}"/>&nbsp;out of&nbsp;<apex:outputLabel value="{!table1TotalPageNumber}"/>&nbsp;in&nbsp;<apex:outputLabel value="{!RecordsNumber}"/> results &nbsp;&nbsp;</font>
 			<apex:commandButton value="Previous" action="{!table1PreviousBtnClick}" disabled="{!Table1PreviousButtonDisabled}" reRender="table1PageBlock"></apex:commandButton>
 			<apex:commandButton value="Next" action="{!table1NextBtnClick}" reRender="table1PageBlock" disabled="{!table1NextButtonDisabled}" ></apex:commandButton>
@@ -32,16 +32,72 @@
 			</apex:column>
 			<apex:column >
 				<apex:facet name="header">Processing</apex:facet>
-				<apex:outputText value="{!IF((c.V1Processing__c),'in progress','')}"/>
+				<apex:outputText value="{!IF(c.V1Processing__c,'in progress','')}"/>
 			</apex:column>
 		</apex:pageBlockTable>
-		<div align="right" style="display:{!IF(NOT(isNoDataForTable1),'block','none')}">
+		<div align="right" style="display:{!IF(isNoDataForTable1,'none','block')}">
 			<br/>
 			<font size="1pt">Page #:&nbsp;<apex:outputLabel value="{!table1PageNumber}"/>&nbsp;out of&nbsp;<apex:outputLabel value="{!table1TotalPageNumber}"/>&nbsp;in&nbsp;<apex:outputLabel value="{!RecordsNumber}"/> results &nbsp;&nbsp;</font>
 			<apex:commandButton value="Previous" action="{!table1PreviousBtnClick}" disabled="{!Table1PreviousButtonDisabled}" reRender="table1PageBlock"></apex:commandButton>
 			<apex:commandButton value="Next" action="{!table1NextBtnClick}" reRender="table1PageBlock" disabled="{!table1NextButtonDisabled}" ></apex:commandButton>
 		</div>
 	</apex:pageBlock>
+
+	<!-- table 2 -->
+	<apex:pageBlock title="Cases in VersionOne" id="table2PageBlock">
+		<!-- <apex:pageBlockButtons location="top">
+		<apex:commandButton value="Refresh" action="{!ViewData}" id="theButton" rerender="table2PageBlock"></apex:commandButton>
+		</apex:pageBlockButtons> -->
+		<!-- <apex:pageMessages ></apex:pageMessages>-->
+		<apex:outputPanel id="out_testing">
+		    <apex:pageMessage severity="INFO"
+		        title="" summary="Data not available for this view."
+		        rendered="{!isNoDataForTable2}" strength="1" />
+		</apex:outputPanel>
+		<div align="right" style="display:{!IF(isNoDataForTable2,'none','block')}">
+		<font size="1pt">Page #:&nbsp;<apex:outputLabel value="{!table2PageNumber}"/>&nbsp;out of&nbsp;<apex:outputLabel value="{!table2TotalPageNumber}"/>&nbsp;in&nbsp;<apex:outputLabel value="{!Table2RecordsNumber}"/> results &nbsp;&nbsp;</font>
+		<apex:commandButton value="Previous" action="{!table2PreviousBtnClick}" disabled="{!table2PreviousButtonDisabled}" reRender="table2PageBlock"></apex:commandButton>
+		<apex:commandButton value="Next" action="{!table2NextBtnClick}" reRender="table2PageBlock" disabled="{!table2NextButtonDisabled}" ></apex:commandButton>
+		</div>
+		<br/><br/>
+		<apex:pageBlockTable value="{!table2Cases}" var="c" rendered="{!NOT(isNoDataForTable2)}" rows="{!table2PageSize}">
+			<apex:column >
+				<apex:facet name="header">Case Id</apex:facet>
+				<apex:outputLink value="/{!c.Id}" target="_blank">{!c.Id}</apex:outputLink>
+			</apex:column>
+			<apex:column value="{!c.Subject}"></apex:column>
+			<apex:column >
+				<apex:facet name="header">VersionOne project</apex:facet>
+				<apex:outputText value="{!IF((c.VersionOneProject__c != ''),c.VersionOneProject__c,'Default')}"/>
+			</apex:column>
+		</apex:pageBlockTable>
+		<div align="right" style="display:{!IF(isNoDataForTable2,'none','block')}">
+			<br/>
+	        <!-- ========================================== -->
+	        <!-- PAGE SHORTCUTS                             -->
+	        <!-- ========================================== -->
+	        <apex:repeat value="{!table2PagesList}" var="pageNumber">
+	            <apex:outputPanel rendered="{!(pageNumber + 1) != table2PageNumber}">
+	                <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
+	                    value="#">{!pageNumber + 1}
+	                </apex:outputLink>
+	            </apex:outputPanel>
+	            <apex:outputPanel rendered="{!(pageNumber + 1) == table2PageNumber}">
+	                <apex:outputText value="{!pageNumber + 1}"/>
+	            </apex:outputPanel>
+	            &nbsp;&nbsp;
+	        </apex:repeat>
+            <apex:actionFunction name="goToPage" action="{!goToPage}" rerender="table2PageBlock">
+                <apex:param name="pageNumber" value=""/>
+            </apex:actionFunction>
+
+			<font size="1pt">Page #:&nbsp;<apex:outputLabel value="{!table2PageNumber}"/>&nbsp;out of&nbsp;<apex:outputLabel value="{!table2TotalPageNumber}"/>&nbsp;in&nbsp;<apex:outputLabel value="{!Table2RecordsNumber}"/> results &nbsp;&nbsp;</font>
+			<apex:commandButton value="Previous" action="{!table2PreviousBtnClick}" disabled="{!table2PreviousButtonDisabled}" reRender="table2PageBlock"></apex:commandButton>
+			<apex:commandButton value="Next" action="{!table2NextBtnClick}" reRender="table2PageBlock" disabled="{!table2NextButtonDisabled}" ></apex:commandButton>
+		</div>
+
+	</apex:pageBlock>
+
 
 	<apex:pageBlock >
 		<apex:pageBlockButtons location="bottom">
