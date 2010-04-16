@@ -1,7 +1,7 @@
 @isTest
 private class V1SynchronizerControllerTester {
 
-    static testMethod void tableBindDataTest() {
+    static testMethod void table1BindDataTest() {
         String queueName = 'TestQueue';
         Group queue = new Group(Type='Queue', Name=queueName + '1');
         insert queue;
@@ -63,6 +63,64 @@ private class V1SynchronizerControllerTester {
         }
     }
 
+    static testMethod void table2BindDataTest() {
+        String queueName = 'TestQueue';
+        Group queue = new Group(Type='Queue', Name=queueName + '1');
+        insert queue;
+        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+        insert sobj;
+        Integer numberOfCases = 60;
+        List<Case> cases = new List<Case>();
+
+        System.runAs(createUser('test4356')){
+            for (Integer i = 0; i<numberOfCases; i++) {
+                Case caseData = new Case(Subject='TestCase1', OwnerId = queue.Id);
+                cases.add(caseData);
+            }
+            insert cases;
+
+            V1SynchronizerController controller = new V1SynchronizerController();
+            Settings settingsData = Settings.getTestSettings();
+            settingsData.setDestQueueId(queue.Id);
+            controller.settings = settingsData;
+
+            controller.initData();
+            System.assertEquals(numberOfCases, controller.getTable2RecordsNumber(), 'Incorrect number of cases');
+            System.assertEquals(3, controller.getTable2TotalPageNumber(), 'Incorrect number of pages');
+
+
+            System.assertEquals(1, controller.getTable2PageNumber(), 'Incorrect number of current page');
+            System.assertEquals(false, controller.isNoDataForTable2, 'Data have to be!');
+            System.assertEquals(controller.getTable2PageSize(), controller.getTable2Cases().size(), 'Incorrect number of cases on the first page');
+            System.assertEquals(true, controller.getTable2PreviousButtonDisabled(), 'The Previous button has to be disabled.');
+            System.assertEquals(false, controller.getTable2NextButtonDisabled(), 'The Next button has to be enabled.');
+            controller.table2NextBtnClick();
+            System.assertEquals(false, controller.isNoDataForTable2, 'Data have to be!');
+            System.assertEquals(2, controller.getTable2PageNumber(), 'Incorrect number of current page');
+            System.assertEquals(controller.getTable2PageSize(), controller.getTable2Cases().size(), 'Incorrect number of cases on the second page');
+            System.assertEquals(false, controller.getTable2PreviousButtonDisabled(), 'The Previous button has to be enabled.');
+            System.assertEquals(false, controller.getTable2NextButtonDisabled(), 'The Next button has to be enabled.');
+            controller.Table2NextBtnClick();
+            System.debug('controller.getTable2Cases().size()' + controller.getTable2Cases().size());
+            System.assertEquals(false, controller.isNoDataForTable2, 'Data have to be!');
+            System.assertEquals(3, controller.getTable2PageNumber(), 'Incorrect number of current page');
+            System.assertEquals(20, controller.getTable2Cases().size(), 'Incorrect number of cases on the third page');
+            System.assertEquals(false, controller.getTable2PreviousButtonDisabled(), 'The Previous button has to be enabled.');
+            System.assertEquals(true, controller.getTable2NextButtonDisabled(), 'The Next button has to be disabled.');
+            controller.Table2PreviousBtnClick();
+            System.assertEquals(false, controller.isNoDataForTable2, 'Data have to be!');
+            System.assertEquals(2, controller.getTable2PageNumber(), 'Incorrect number of current page');
+            System.assertEquals(controller.getTable2PageSize(), controller.getTable2Cases().size(), 'Incorrect number of cases on the second page');
+            System.assertEquals(false, controller.getTable2PreviousButtonDisabled(), 'The Previous button has to be enabled.');
+            System.assertEquals(false, controller.getTable2NextButtonDisabled(), 'The Next button has to be enabled.');
+            controller.Table2PreviousBtnClick();
+            System.assertEquals(false, controller.isNoDataForTable2, 'Data have to be!');
+            System.assertEquals(1, controller.getTable2PageNumber(), 'Incorrect number of current page');
+            System.assertEquals(controller.getTable2PageSize(), controller.getTable2Cases().size(), 'Incorrect number of cases on the first page');
+            System.assertEquals(true, controller.getTable2PreviousButtonDisabled(), 'The Previous button has to be disabled.');
+            System.assertEquals(false, controller.getTable2NextButtonDisabled(), 'The Next button has to be enabled.');
+        }
+    }
 
     static User createUser(String alias) {
         User user = new User();

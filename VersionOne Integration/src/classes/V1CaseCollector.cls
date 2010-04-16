@@ -33,7 +33,7 @@ public class V1CaseCollector {
      * Query cases with specified owners, with any status of processing and not closed.
      * ownerId - ID list of owners.
      **/
-    public static Case[] getCasesWaitingOrPortingByOwners(List<String> ownerId) {
+    public static Case[] getCasesByOwners(List<String> ownerId) {
         return [SELECT id, OwnerId, CaseNumber, Description, VersionOneProject__c, Subject, V1Processing__c
                           FROM Case WHERE OwnerId in :ownerId and Status <> 'Closed'];
     }

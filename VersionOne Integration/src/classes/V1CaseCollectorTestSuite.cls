@@ -265,7 +265,7 @@ private class V1CaseCollectorTestSuite {
             Case case4 = new Case(Subject='TestCase4', OwnerId = queue.Id, V1Processing__c = true);
             insert new Case[] {case1, case2, case3, case4};
 
-            Case[] newCases = V1CaseCollector.getCasesWaitingOrPortingByOwners(new String[]{queue.Id, queue2.Id});
+            Case[] newCases = V1CaseCollector.getCasesByOwners(new String[]{queue.Id, queue2.Id});
             System.assertEquals(3, newCases.size(), 'Incorrect number of case.');
             assertContains(case1, newCases, 'TestCase1 has to be in the list');
             assertContains(case2, newCases, 'TestCase2 has to be in the list');
