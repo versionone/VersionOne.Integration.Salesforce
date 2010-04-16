@@ -2,6 +2,47 @@
 <apex:sectionHeader title="Synchronizer"></apex:sectionHeader>
 <apex:actionStatus startText="Syncronization in progress..." id="sync_status" />
 <apex:form >
+	<!-- table 1 -->
+	<apex:pageBlock title="Cases are waiting synchronization" id="table1PageBlock">
+	<!--
+	<apex:pageBlockButtons location="top">
+		<apex:commandButton value="Refresh" action="{!ViewData}" id="theButton" rerender="table1PageBlock"></apex:commandButton>
+	</apex:pageBlockButtons> -->
+<!--  <apex:pageMessages ></apex:pageMessages> -->
+		<apex:outputPanel id="out_testing">
+		    <apex:pageMessage severity="INFO"
+		        title="" summary="No cases are waitining porting to VersionOne."
+		        rendered="{!isNoDataForTable1}" strength="1" />
+		</apex:outputPanel>
+		<div align="right" style="display:{!IF(NOT(isNoDataForTable1),'block','none')}">
+		<font size="1pt">Page #:&nbsp;<apex:outputLabel value="{!table1PageNumber}"/>&nbsp;out of&nbsp;<apex:outputLabel value="{!table1TotalPageNumber}"/>&nbsp;in&nbsp;<apex:outputLabel value="{!RecordsNumber}"/> results &nbsp;&nbsp;</font>
+			<apex:commandButton value="Previous" action="{!table1PreviousBtnClick}" disabled="{!Table1PreviousButtonDisabled}" reRender="table1PageBlock"></apex:commandButton>
+			<apex:commandButton value="Next" action="{!table1NextBtnClick}" reRender="table1PageBlock" disabled="{!table1NextButtonDisabled}" ></apex:commandButton>
+		</div>
+		<br/><br/>
+		<apex:pageBlockTable value="{!table1Cases}" var="c" rendered="{!NOT(isNoDataForTable1)}" rows="{!table1PageSize}">
+			<apex:column >
+				<apex:facet name="header">Case Id</apex:facet>
+				<apex:outputLink value="/{!c.Id}" target="_blank">{!c.Id}</apex:outputLink>
+			</apex:column>
+			<apex:column value="{!c.Subject}"></apex:column>
+			<apex:column >
+				<apex:facet name="header">VersionOne type</apex:facet>
+				<apex:outputText value="{!IF((c.OwnerId == settings.defectQueueId),'Defect','Story')}"/>
+			</apex:column>
+			<apex:column >
+				<apex:facet name="header">Processing</apex:facet>
+				<apex:outputText value="{!IF((c.V1Processing__c),'in progress','')}"/>
+			</apex:column>
+		</apex:pageBlockTable>
+		<div align="right" style="display:{!IF(NOT(isNoDataForTable1),'block','none')}">
+			<br/>
+			<font size="1pt">Page #:&nbsp;<apex:outputLabel value="{!table1PageNumber}"/>&nbsp;out of&nbsp;<apex:outputLabel value="{!table1TotalPageNumber}"/>&nbsp;in&nbsp;<apex:outputLabel value="{!RecordsNumber}"/> results &nbsp;&nbsp;</font>
+			<apex:commandButton value="Previous" action="{!table1PreviousBtnClick}" disabled="{!Table1PreviousButtonDisabled}" reRender="table1PageBlock"></apex:commandButton>
+			<apex:commandButton value="Next" action="{!table1NextBtnClick}" reRender="table1PageBlock" disabled="{!table1NextButtonDisabled}" ></apex:commandButton>
+		</div>
+	</apex:pageBlock>
+
 	<apex:pageBlock >
 		<apex:pageBlockButtons location="bottom">
 		    <apex:commandButton action="{!forceSync}" value="Force Synchronization" id="forceSync"
