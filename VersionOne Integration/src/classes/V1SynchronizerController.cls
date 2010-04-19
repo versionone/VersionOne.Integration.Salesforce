@@ -27,7 +27,7 @@ public class V1SynchronizerController {
         casesWaitingPorting = null;
         casesPorted = null;
 
-        TableBindData(1);
+        Table1BindData(1);
         Table2BindData(1);
 
         showSynchronizerInfo();
@@ -133,6 +133,30 @@ public class V1SynchronizerController {
         ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.CONFIRM, text));
     }
 
+    // ------------- Common for tables --------------
+    private List<Case> fillCasesForCurrentPage(Integer newPageIndex, List<Case> cases, Integer pageNumber, Integer pageSize) {
+        System.debug('fillCasesForCurrentPage cases:' + cases);
+        Transient Integer counter = 0;
+        Transient Integer min = 0;
+        Transient Integer max = 0;
+        if (newPageIndex > pageNumber) {
+            min = pageNumber * pageSize;
+            max = newPageIndex * pageSize;
+        } else {
+            max = newPageIndex * pageSize;
+            min = max - pageSize;
+        }
+        List<Case> currentCases = new List<Case>();
+        for(Case c : cases) {
+            counter++;
+            if (counter > min && counter <= max) {
+                currentCases.add(c);
+            }
+        }
+        System.debug('currentCases cases:' + currentCases);
+        return currentCases;
+    }
+
     // -------- Table 1------------------
 
     public Boolean isNoDataForTable1 {get; set;}
@@ -143,6 +167,26 @@ public class V1SynchronizerController {
         } else {
             return casesWaitingPorting.size();
         }
+    }
+
+    public PageReference goToTable1Page() {
+        String pageNumber = ApexPages.currentPage().getParameters().get('pageNumber');
+        System.debug('go to page table 1:' + pageNumber);
+        try {
+            table1BindData(Integer.valueof(pageNumber));
+        } catch (Exception ex) {
+            //do nothing
+        }
+        return null;
+    }
+
+    public List<Integer> getTable1PagesList() {
+        List<Integer> pagesNumbers = new List<Integer>();
+        Integer amountPages = getTable1TotalPageNumber();
+        for (Integer i=0; i<amountPages; i++) {
+            pagesNumbers.add(i);
+        }
+        return pagesNumbers;
     }
 
     public Integer getTable1PageNumber(){
@@ -191,7 +235,7 @@ public class V1SynchronizerController {
         set;
     }
 
-    private void tableBindData(Integer newPageIndex) {
+    private void table1BindData(Integer newPageIndex) {
         try {
             pageCases = fillCasesForCurrentPage(newPageIndex, casesWaitingPorting, getTable1PageNumber(), getTable1PageSize());
             pageNumber = newPageIndex;
@@ -205,36 +249,13 @@ public class V1SynchronizerController {
         }
     }
 
-    private List<Case> fillCasesForCurrentPage(Integer newPageIndex, List<Case> cases, Integer pageNumber, Integer pageSize) {
-        System.debug('fillCasesForCurrentPage cases:' + cases);
-        Transient Integer counter = 0;
-        Transient Integer min = 0;
-        Transient Integer max = 0;
-        if (newPageIndex > pageNumber) {
-            min = pageNumber * pageSize;
-            max = newPageIndex * pageSize;
-        } else {
-            max = newPageIndex * pageSize;
-            min = max - pageSize;
-        }
-        List<Case> currentCases = new List<Case>();
-        for(Case c : cases) {
-            counter++;
-            if (counter > min && counter <= max) {
-                currentCases.add(c);
-            }
-        }
-        System.debug('currentCases cases:' + currentCases);
-        return currentCases;
-    }
-
     public PageReference table1NextBtnClick() {
-        tableBindData(pageNumber + 1);
+        table1BindData(pageNumber + 1);
         return null;
     }
 
     public PageReference table1PreviousBtnClick() {
-        tableBindData(pageNumber - 1);
+        table1BindData(pageNumber - 1);
         return null;
     }
     //\\-----------Table 1------------------
@@ -298,7 +319,7 @@ public class V1SynchronizerController {
         }
     }
 
-    public PageReference goToPage() {
+    public PageReference goToTable2Page() {
         String pageNumber = ApexPages.currentPage().getParameters().get('pageNumber');
         System.debug('go to page:' + pageNumber);
         try {
