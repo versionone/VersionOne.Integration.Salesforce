@@ -45,7 +45,7 @@
 	        <apex:repeat value="{!table1Paginator.pagesList}" var="pageNumber"  rendered="{!table1Paginator.totalPageNumber > 1}">
 	            <apex:outputPanel rendered="{!(pageNumber + 1) != table1Paginator.pageNumber}">
 	                <apex:outputLink onclick="javascript: goToTable1Page({!pageNumber + 1});"
-	                    value="#">{!pageNumber + 1}
+	                    value="javascript:return false;">{!pageNumber + 1}
 	                </apex:outputLink>
 	            </apex:outputPanel>
 	            <apex:outputPanel rendered="{!(pageNumber + 1) == table1Paginator.pageNumber}">
@@ -100,7 +100,7 @@
 	        <apex:repeat value="{!table2Paginator.pagesList}" var="pageNumber" rendered="{!table2Paginator.totalPageNumber > 1}">
 	            <apex:outputPanel rendered="{!(pageNumber + 1) != table2Paginator.pageNumber}">
 	                <apex:outputLink onclick="javascript: goToTable2Page({!pageNumber + 1});"
-	                    value="#">{!pageNumber + 1}
+	                    value="javascript:return false;">{!pageNumber + 1}
 	                </apex:outputLink>
 	            </apex:outputPanel>
 	            <apex:outputPanel rendered="{!(pageNumber + 1) == table2Paginator.pageNumber}">
