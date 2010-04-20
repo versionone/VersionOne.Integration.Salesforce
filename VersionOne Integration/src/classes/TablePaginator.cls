@@ -110,12 +110,11 @@ public class TablePaginator {
 
 
     private void bindData(Integer newPageIndex) {
-    	if (newPageIndex > getTotalPageNumber() || newPageIndex < 1) {
-    		return;
+    	if (newPageIndex <= getTotalPageNumber() && newPageIndex > 0) {
+			pageCases = fillCasesForCurrentPage(newPageIndex, cases);
+	        pageNumber = newPageIndex;
+	        isNoData = false;
     	}
-		pageCases = fillCasesForCurrentPage(newPageIndex, cases);
-        pageNumber = newPageIndex;
-        isNoData = false;
         if (pageCases == null || pageCases.size() == 0) {
             isNoData = true;
         }
