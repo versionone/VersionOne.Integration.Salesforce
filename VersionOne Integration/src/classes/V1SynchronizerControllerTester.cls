@@ -60,6 +60,20 @@ private class V1SynchronizerControllerTester {
             System.assertEquals(paginator.getPageSize(), paginator.getCases().size(), 'Incorrect number of cases on the first page');
             System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
             System.assertEquals(false, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
+
+			ApexPages.currentPage().getParameters().put('pageNumber', '3');
+			controller.goToTable1Page();
+            System.assertEquals(3, paginator.getPageNumber(), 'Incorrect number of current page');
+            System.assertEquals(5, paginator.getCases().size(), 'Incorrect number of cases on the third page');
+            System.assertEquals(false, paginator.getPreviousButtonDisabled(), 'The Previous button has to be enabled.');
+            System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be disabled.');
+
+			ApexPages.currentPage().getParameters().put('pageNumber', '<script>alert(1)</script>');
+			controller.goToTable1Page();
+            System.assertEquals(3, paginator.getPageNumber(), 'Incorrect number of current page');
+            System.assertEquals(5, paginator.getCases().size(), 'Incorrect number of cases on the third page');
+            System.assertEquals(false, paginator.getPreviousButtonDisabled(), 'The Previous button has to be enabled.');
+            System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be disabled.');
         }
     }
 
@@ -114,36 +128,50 @@ private class V1SynchronizerControllerTester {
             System.assertEquals(paginator.getPageSize(), paginator.getCases().size(), 'Incorrect number of cases on the first page');
             System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
             System.assertEquals(false, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
+
+			ApexPages.currentPage().getParameters().put('pageNumber', '3');
+			controller.goToTable2Page();
+            System.assertEquals(3, paginator.getPageNumber(), 'Incorrect number of current page');
+            System.assertEquals(20, paginator.getCases().size(), 'Incorrect number of cases on the third page');
+            System.assertEquals(false, paginator.getPreviousButtonDisabled(), 'The Previous button has to be enabled.');
+            System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be disabled.');
+
+			ApexPages.currentPage().getParameters().put('pageNumber', '<script>alert(1)</script>');
+			controller.goToTable2Page();
+            System.assertEquals(3, paginator.getPageNumber(), 'Incorrect number of current page');
+            System.assertEquals(20, paginator.getCases().size(), 'Incorrect number of cases on the third page');
+            System.assertEquals(false, paginator.getPreviousButtonDisabled(), 'The Previous button has to be enabled.');
+            System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be disabled.');
         }
     }
 
 
-	static testMethod void emptyPagesTest() {
-		V1SynchronizerController controller = new V1SynchronizerController();
+    static testMethod void emptyPagesTest() {
+        V1SynchronizerController controller = new V1SynchronizerController();
         Settings settingsData = Settings.getTestSettings();
         settingsData.setDestQueueId('12345');
         controller.settings = settingsData;
-		controller.initData();
+        controller.initData();
 
-		TablePaginator paginator = controller.table1Paginator;
+        TablePaginator paginator = controller.table1Paginator;
         System.assertEquals(0, paginator.getRecordsNumber(), 'Incorrect number of cases');
         System.assertEquals(0, paginator.getTotalPageNumber(), 'Incorrect number of pages');
 
-	    System.assertEquals(0, paginator.getPageNumber(), 'Incorrect number of current page');
-	    System.assertEquals(null, paginator.getCases(), 'Incorrect number of cases on the first page');
-	    System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
-	    System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
-	    controller.table1NextBtnClick();
-	    System.assertEquals(0, paginator.getPageNumber(), 'Incorrect number of current page');
-	    System.assertEquals(null, paginator.getCases(), 'Incorrect number of cases on the first page');
-	    System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
-	    System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
-	    controller.table1PreviousBtnClick();
-	    System.assertEquals(0, paginator.getPageNumber(), 'Incorrect number of current page');
-	    System.assertEquals(null, paginator.getCases(), 'Incorrect number of cases on the first page');
-	    System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
-	    System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
-	}
+        System.assertEquals(0, paginator.getPageNumber(), 'Incorrect number of current page');
+        System.assertEquals(null, paginator.getCases(), 'Incorrect number of cases on the first page');
+        System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
+        System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
+        controller.table1NextBtnClick();
+        System.assertEquals(0, paginator.getPageNumber(), 'Incorrect number of current page');
+        System.assertEquals(null, paginator.getCases(), 'Incorrect number of cases on the first page');
+        System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
+        System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
+        controller.table1PreviousBtnClick();
+        System.assertEquals(0, paginator.getPageNumber(), 'Incorrect number of current page');
+        System.assertEquals(null, paginator.getCases(), 'Incorrect number of cases on the first page');
+        System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
+        System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
+    }
 
     static User createUser(String alias) {
         User user = new User();
