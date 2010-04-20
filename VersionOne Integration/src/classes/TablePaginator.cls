@@ -98,7 +98,7 @@ public class TablePaginator {
     }
 
     public Integer getTotalPageNumber() {
-        if (totalPageNumber == 0 && cases !=null) {
+        if (totalPageNumber == 0 && cases != null) {
             totalPageNumber = cases.size() / pageSize;
             Integer mod = cases.size() - (totalPageNumber * pageSize);
             if (mod > 0) {
@@ -110,6 +110,9 @@ public class TablePaginator {
 
 
     private void bindData(Integer newPageIndex) {
+    	if (newPageIndex > getTotalPageNumber() || newPageIndex < 1) {
+    		return;
+    	}
 		pageCases = fillCasesForCurrentPage(newPageIndex, cases);
         pageNumber = newPageIndex;
         isNoData = false;

@@ -117,6 +117,34 @@ private class V1SynchronizerControllerTester {
         }
     }
 
+
+	static testMethod void emptyPagesTest() {
+		V1SynchronizerController controller = new V1SynchronizerController();
+        Settings settingsData = Settings.getTestSettings();
+        settingsData.setDestQueueId('12345');
+        controller.settings = settingsData;
+		controller.initData();
+
+		TablePaginator paginator = controller.table1Paginator;
+        System.assertEquals(0, paginator.getRecordsNumber(), 'Incorrect number of cases');
+        System.assertEquals(0, paginator.getTotalPageNumber(), 'Incorrect number of pages');
+
+	    System.assertEquals(0, paginator.getPageNumber(), 'Incorrect number of current page');
+	    System.assertEquals(null, paginator.getCases(), 'Incorrect number of cases on the first page');
+	    System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
+	    System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
+	    controller.table1NextBtnClick();
+	    System.assertEquals(0, paginator.getPageNumber(), 'Incorrect number of current page');
+	    System.assertEquals(null, paginator.getCases(), 'Incorrect number of cases on the first page');
+	    System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
+	    System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
+	    controller.table1PreviousBtnClick();
+	    System.assertEquals(0, paginator.getPageNumber(), 'Incorrect number of current page');
+	    System.assertEquals(null, paginator.getCases(), 'Incorrect number of cases on the first page');
+	    System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
+	    System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
+	}
+
     static User createUser(String alias) {
         User user = new User();
         user.Username = alias + '@not-a-mail.com';
