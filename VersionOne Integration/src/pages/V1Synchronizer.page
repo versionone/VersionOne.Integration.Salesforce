@@ -12,7 +12,7 @@
 <!--  <apex:pageMessages ></apex:pageMessages> -->
 		<apex:outputPanel id="out_testing">
 		    <apex:pageMessage severity="INFO"
-		        title="" summary="No cases are waitining porting to VersionOne."
+		        title="" summary="There are no cases are waitining porting to VersionOne."
 		        rendered="{!table1Paginator.isNoData}" strength="1" />
 		</apex:outputPanel>
 		<div align="right" style="display:{!IF(table1Paginator.isNoData,'none','block')}">
@@ -72,7 +72,7 @@
 		<!-- <apex:pageMessages ></apex:pageMessages>-->
 		<apex:outputPanel id="out_testing">
 		    <apex:pageMessage severity="INFO"
-		        title="" summary="Data not available for this view."
+		        title="" summary="There are no opened cases in VersionOne."
 		        rendered="{!table2Paginator.isNoData}" strength="1" />
 		</apex:outputPanel>
 		<div align="right" style="display:{!IF(table2Paginator.isNoData,'none','block')}">
