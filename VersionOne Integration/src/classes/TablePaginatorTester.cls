@@ -60,7 +60,6 @@ private class TablePaginatorTester {
             System.assertEquals(false, paginator.getPreviousButtonDisabled(), 'The Previous button has to be enabled.');
             System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be disabled.');
         }
-
 	}
 
     static User createUser(String alias) {
