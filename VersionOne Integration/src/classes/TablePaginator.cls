@@ -7,7 +7,7 @@ public class TablePaginator {
     private Integer totalPageNumber;
 
     public TablePaginator(List<Case> cases) {
-    	this.cases = cases;
+        this.cases = cases;
         pageNumber = 0;
         totalPageNumber = 0;
         pageSize = 20;
@@ -15,12 +15,11 @@ public class TablePaginator {
     }
 
     public void init() {
-		bindData(1);
+        bindData(1);
     }
 
     // ------------- Common for tables --------------
     private List<Case> fillCasesForCurrentPage(Integer newPageIndex, List<Case> cases) {
-        System.debug('fillCasesForCurrentPage cases:' + cases);
         Transient Integer counter = 0;
         Transient Integer min = 0;
         Transient Integer max = 0;
@@ -40,7 +39,6 @@ public class TablePaginator {
                 currentCases.add(c);
             }
         }
-        System.debug('currentCases cases:' + currentCases);
         return currentCases;
     }
 
@@ -55,12 +53,8 @@ public class TablePaginator {
     }
 
     public void goToPage(Integer pageNumber) {
-        System.debug('go to page table 1:' + pageNumber);
-        try {
-            bindData(Integer.valueof(pageNumber));
-        } catch (Exception ex) {
-            //do nothing
-        }
+        System.debug('go to page:' + pageNumber);
+        bindData(pageNumber);
     }
 
     public List<Integer> getPagesList() {
@@ -85,7 +79,6 @@ public class TablePaginator {
     }
 
     public Boolean getPreviousButtonDisabled() {
-        System.debug('pageNumber = ' + pageNumber);
         return !(pageNumber > 1);
     }
 
@@ -110,11 +103,11 @@ public class TablePaginator {
 
 
     private void bindData(Integer newPageIndex) {
-    	if (newPageIndex <= getTotalPageNumber() && newPageIndex > 0) {
-			pageCases = fillCasesForCurrentPage(newPageIndex, cases);
-	        pageNumber = newPageIndex;
-	        isNoData = false;
-    	}
+        if (newPageIndex <= getTotalPageNumber() && newPageIndex > 0) {
+            pageCases = fillCasesForCurrentPage(newPageIndex, cases);
+            pageNumber = newPageIndex;
+            isNoData = false;
+        }
         if (pageCases == null || pageCases.size() == 0) {
             isNoData = true;
         }

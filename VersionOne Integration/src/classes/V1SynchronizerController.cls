@@ -95,8 +95,6 @@ public class V1SynchronizerController {
         }
         addInfoMessage(CASE_PUBLISH_STATUS_TEXT + ' : ' + batchData.get('Status'));
         addInfoMessage(CASE_PUBLISHED_TEXT + ' : ' + batchData.get('JobItemsProcessed'));
-        //addInfoMessage('Number of errors: ' + batchData.get('NumberOfErrors'));
-        //addInfoMessage('Total cases: ' + batchData.get('TotalJobItems'));
     }
 
     private void displayFutureProgress(String text, Map<String, String> data) {
@@ -124,10 +122,10 @@ public class V1SynchronizerController {
 
     // -------- Table 1------------------
     public PageReference goToTable1Page() {
-    	String pageNumber = ApexPages.currentPage().getParameters().get('pageNumber');
-    	System.debug('go to page table 1:' + pageNumber);
+        String pageNumber = ApexPages.currentPage().getParameters().get('pageNumber');
+        System.debug('go to page table 1:' + pageNumber);
         try {
-        	table1Paginator.goToPage(Integer.valueof(pageNumber));
+            table1Paginator.goToPage(Integer.valueof(pageNumber));
         } catch (Exception ex) {
             //do nothing
         }
@@ -145,12 +143,12 @@ public class V1SynchronizerController {
     }
 
     public PageReference table1NextBtnClick() {
-    	table1Paginator.nextBtnClick();
+        table1Paginator.nextBtnClick();
         return null;
     }
 
     public PageReference table1PreviousBtnClick() {
-    	table1Paginator.previousBtnClick();
+        table1Paginator.previousBtnClick();
         return null;
     }
     //\\-----------Table 1------------------
@@ -178,7 +176,7 @@ public class V1SynchronizerController {
     }
 
     public PageReference table2NextBtnClick() {
-    	table2Paginator.nextBtnClick();
+        table2Paginator.nextBtnClick();
         return null;
     }
 
