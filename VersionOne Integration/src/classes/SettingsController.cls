@@ -15,13 +15,6 @@ public class SettingsController {
             }
             return settings;
         } set;}
-    public Boolean isSyncEnabled {get; set;}
-    public Integer casesForPorting {
-        get {
-            V1Publisher publisher = new V1Publisher();
-            return publisher.getCasesToPublish().size();
-        } set;
-    }
 
     private transient IV1Connector innerConnector;
     public IV1Connector connector {
@@ -37,30 +30,13 @@ public class SettingsController {
 
     /** Must be called before usage of any other method. */
     public void initSettings() {
-        System.debug('initSettings:' + settings.getBatchId());
         testMessage = '';
         saveMessage = '';
         isSettingsValidated = false;
         isSettingsCorrect = false;
         isSaved = false;
-        isSyncEnabled = SyncSchedule.isScheduled(settings.getScheduleId());
     }
 
-    public String updateSchedule() {
-        String oldId = settings.getScheduleId();
-        Boolean isScheduled = SyncSchedule.isScheduled(oldId);
-        if (isSyncEnabled) {
-            if (!isScheduled) {
-                return SyncSchedule.addSchedule();
-            }
-            return oldId;
-        }
-        // Disable Sync
-        if (isScheduled) {
-            SyncSchedule.unschedule(oldId);
-        }
-        return null;
-    }
 
     public PageReference saveSettings() {
     	isSettingsCorrect = validateSettings();
@@ -78,7 +54,6 @@ public class SettingsController {
         }
 
         settings.setSourceId(sourceId);
-        settings.setScheduleId(updateSchedule());
 
         System.debug('Save Settings');
         testMessage = '';
@@ -150,15 +125,5 @@ public class SettingsController {
         if (settings.getSource() == null || connector.getSourceId() == null) {
             throw new V1RequestException('Incorrect source.');
         }
-    }
-
-    public static List<SelectOption> getQueueList() {
-        Group[] queues = V1CaseCollector.getQueuesList();
-        List<SelectOption> options = new List<SelectOption>();
-        options.add(new SelectOption('', '--None--'));
-        for(Group queue : queues) {
-            options.add(new SelectOption(queue.Id, queue.Name));
-        }
-        return options;
     }
 }

@@ -243,7 +243,7 @@ global with sharing class V1Connector implements IV1Connector {
             + attributeNode('Description', (caseData.Description != null ? caseData.Description : ''))
             + relationNode('Source', 'StorySource:' + settings.getSourceId())
             + '</Asset>';
-        String workitemType = getRelatedTo(caseData);
+        String workitemType = 'Defect';
         System.debug('XML for creating ' + workitemType + ': ' + body);
         requestor.request(requestor.createRequest(body, DATA_URL + workitemType, 'POST'));
 
@@ -254,16 +254,6 @@ global with sharing class V1Connector implements IV1Connector {
         xmlParser.parseFromString(requestor.getBody());
         String[] id = xmlParser.getElementByTagName('Asset').getAttribute('id').split(':');
         return id[0]+':'+id[1];
-    }
-
-    public String getRelatedTo(Case caseData) {
-        System.debug('getRelatedTo() case=' + caseData + ' defectQueue=' + settings.getDefectQueueId() + ' storyQueue=' + settings.getStoryQueueId());
-        if (caseData.OwnerId == settings.getDefectQueueId()) {
-            return 'Defect';
-        } else if (caseData.OwnerId == settings.getStoryQueueId()) {
-            return 'Story';
-        }
-        throw new V1RequestException('Unknown workitem type for ' + caseData);
     }
 
     /**

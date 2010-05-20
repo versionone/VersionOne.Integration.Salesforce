@@ -7,14 +7,14 @@ global with sharing class Settings {
     private String password;
     private String source;
     private String sourceId;
-    private String defectQueueId;
-    private String storyQueueId;
-    private String destQueueId;
-    private String commentBody;
+    //private String defectQueueId;
+    //private String storyQueueId;
+    //private String destQueueId;
+    //private String commentBody;
     private DateTime changeDateUTC;
-    private String scheduleId;
-    private String commentOnClosing;
-    private String batchId;
+    //private String scheduleId;
+    //private String commentOnClosing;
+    //private String batchId;
 
     public Settings () {
         this(getMics('V1Settings'));
@@ -26,16 +26,16 @@ global with sharing class Settings {
             setPath(mycs.Path__c);
             setUserName(mycs.UserName__c);
             setPassword(mycs.Password__c);
-            setCommentBody(mycs.CommentBody__c);
-            setCommentOnClosing(mycs.CommentOnClosing__c);
+            //setCommentBody(mycs.CommentBody__c);
+            //setCommentOnClosing(mycs.CommentOnClosing__c);
             setSource(mycs.Source__c);
             setSourceId(mycs.V1SourceId__c);
-            setDefectQueueId(mycs.EscalateQueueId__c);
-            setStoryQueueId(mycs.StoryQueueId__c);
-            setDestQueueId(mycs.AssignedQueueId__c);
+            //setDefectQueueId(mycs.EscalateQueueId__c);
+            //setStoryQueueId(mycs.StoryQueueId__c);
+            //setDestQueueId(mycs.AssignedQueueId__c);
             changeDateUTC = mycs.DateLastClosedAsset__c;
-            setScheduleId(mycs.scheduleId__c);
-            setbatchId(mycs.BatchId__c);
+            //setScheduleId(mycs.scheduleId__c);
+            //setbatchId(mycs.BatchId__c);
         }
     }
 
@@ -108,6 +108,7 @@ global with sharing class Settings {
         }
     }
 
+	/*
     public String getDefectQueueIdTitle() {
         return 'Source Queue for Defects';
     }
@@ -127,6 +128,7 @@ global with sharing class Settings {
     public String getStoryQueueIdTitle() {
         return 'Source Queue for Stories';
     }
+
 
     public String getStoryQueueId() {
         return storyQueueId;
@@ -155,6 +157,7 @@ global with sharing class Settings {
             destQueueId = id;
         }
     }
+    */
 
     public String getSourceTitle() {
         return 'Source';
@@ -180,6 +183,7 @@ global with sharing class Settings {
         sourceId = id;
     }
 
+	/*
     public String getScheduleId() {
         return scheduleId;
     }
@@ -223,11 +227,13 @@ global with sharing class Settings {
             commentBody = text;
         }
     }
+    */
 
     public void setLastDateChangeAsset(DateTime changeDateUTC) {
         this.changeDateUTC = changeDateUTC;
     }
 
+/*
     public void setBatchId(String id) {
         batchId = id;
     }
@@ -235,6 +241,7 @@ global with sharing class Settings {
     public String getBatchId() {
         return batchId;
     }
+    */
 
     public DateTime getLastDateChangeAsset() {
         return this.changeDateUTC;
@@ -247,18 +254,19 @@ global with sharing class Settings {
             mycs.UserName__c = userName;
             mycs.Password__c = password;
             mycs.Source__c = source;
-            mycs.EscalateQueueId__c = defectQueueId;
-            mycs.StoryQueueId__c = storyQueueId;
-            mycs.AssignedQueueId__c = destQueueId;
-            mycs.CommentBody__c = commentBody;
-            mycs.CommentOnClosing__c = commentOnClosing;
+            //mycs.EscalateQueueId__c = defectQueueId;
+            //mycs.StoryQueueId__c = storyQueueId;
+            //mycs.AssignedQueueId__c = destQueueId;
+            //mycs.CommentBody__c = commentBody;
+            //mycs.CommentOnClosing__c = commentOnClosing;
             mycs.V1SourceId__c = sourceId;
             mycs.DateLastClosedAsset__c = changeDateUTC;
-            mycs.ScheduleId__c = scheduleId;
+            //mycs.ScheduleId__c = scheduleId;
             update mycs;
         } //else Do nothing (used in tests)
     }
 
+	/*
     public void updateBatchId() {
         System.debug('update BatchId');
         if (mycs != null) {
@@ -266,6 +274,7 @@ global with sharing class Settings {
             update mycs;
         }
     }
+    */
 
     /**
      * Store date of last closed asset to SF custom settings storage
@@ -283,11 +292,12 @@ global with sharing class Settings {
         addMessage(res, getPathTitle(), getPath());
         addMessage(res, getUserNameTitle(), getUserName());
         addMessage(res, getSourceTitle(), getSource());
-        addMessage(res, getDestQueueIdTitle(), getDestQueueId());
-        addMessage(res, getDefectQueueIdTitle(), getDefectQueueId());
-        addMessage(res, getStoryQueueIdTitle(), getStoryQueueId());
+        //addMessage(res, getDestQueueIdTitle(), getDestQueueId());
+        //addMessage(res, getDefectQueueIdTitle(), getDefectQueueId());
+        //addMessage(res, getStoryQueueIdTitle(), getStoryQueueId());
         addMessage(res, getPasswordTitle(), getPassword());
 
+		/*
         Set<String> queues = new Set<String>{
             getDefectQueueId(),
             getStoryQueueId(),
@@ -296,6 +306,7 @@ global with sharing class Settings {
         if (queues.size() < 3){
             res.add('All queues must be different.');
         }
+        */
         return res;
     }
 

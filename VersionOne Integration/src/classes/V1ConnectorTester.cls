@@ -61,7 +61,6 @@ private class V1ConnectorTester {
                       '</Assets>';
         Settings testSettings = Settings.getTestSettings();
         RequestorMock testRequestor = new RequestorMock(xml, 200);
-        testSettings.setDestQueueId(queueId);
         testSettings.setSourceId(sourceId);
         String expectedDate = '2009-10-20T09:57:33';
         testSettings.setLastDateChangeAsset(Datetime.newInstance(2009, 10, 20, 9, 57, 33));
@@ -264,7 +263,6 @@ private class V1ConnectorTester {
         //test has to complete without any errors
         RequestorMock requestor = new RequestorMock('', 400);
         Settings testSettings = Settings.getTestSettings();
-        testSettings.setDefectQueueId(case1.OwnerId);
         String defectId = 'Defect:123';
         V1Connector connector = new V1Connector(testSettings, requestor);
         try {
@@ -311,7 +309,6 @@ private class V1ConnectorTester {
                         '</Asset>';
         Settings testSettings = Settings.getTestSettings();
         testSettings.setSourceId(sourceId);
-        testSettings.setDefectQueueId(caseData.OwnerId);
         RequestorMock requestor = new RequestorMock(body, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 

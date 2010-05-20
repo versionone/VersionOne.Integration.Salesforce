@@ -2,19 +2,19 @@
 [15.01.2010]
 Create Custom Settings(Setup>Develop>Custom Settings) with "V1Settings" name.
 add the following fileds:
-  Path 		- URL maxlength 255
+  Path 		- URL maxlength 255		
   UserName 	- Text maxlength=20
   Password 	- Text maxlength=20
   Source 		- Text maxlength=30
-  EscalateQueueId 	- Text(18)
-  AssignedQueueId 	- Text(18)
-  StoryQueueId 	- Text(18)
-  commentBody 	- Text Area(255)
-  CommentOnClosing - Text Area(255)
-  V1SourceId	- Text(10)
-  ScheduleId	- Text(18) 
+  EscalateQueueId 	- Text(18)		remove
+  AssignedQueueId 	- Text(18)		remove
+  StoryQueueId 	- Text(18)			remove
+  commentBody 	- Text Area(255)		remove
+  CommentOnClosing - Text Area(255)		remove
+  V1SourceId	- Text(10)			
+  ScheduleId	- Text(18) 			remove
   DateLastClosedAsset - Date/Time
-  BatchId	- Text(25)
+  BatchId	- Text(25)			remove
 ----------------------
 Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.
 ----------------------
