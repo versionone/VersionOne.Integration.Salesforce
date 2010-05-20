@@ -1,19 +1,6 @@
 @isTest
 private class SettingsControllerTester {
 
-    static testMethod void getQueueListTest() {
-        String queueName = 'TestQueue';
-        Group queue1 = new Group(Type='Queue', Name=queueName+'1');
-        insert queue1;
-        Group queue2 = new Group(Type='Queue', Name=queueName+'2');
-        insert queue2;
-        Group queue3 = new Group(Name=queueName+'3');
-        insert queue3;
-        List<SelectOption> options = SettingsController.getQueueList();
-        assertContainsOption(queueName+'1', options, 'Wrong option 1');
-        assertContainsOption(queueName+'1', options, 'Wrong option 2');
-    }
-
     static void assertContainsOption(String name, List<SelectOption> actuals, String msg) {
         Boolean contains = false;
         for (SelectOption o : actuals) {
@@ -35,10 +22,6 @@ private class SettingsControllerTester {
         settingsData.setPath('http://localhost');
         settingsData.setUserName('user');
         settingsData.setSource('source');
-        settingsData.setDefectQueueId('78234612347614298476');
-        settingsData.setStoryQueueId('1111111111111111111');
-        settingsData.setDestQueueId('235453764567567455345');
-        settingsData.setCommentBody('test comment');
         settingsData.setPassword('password');
         controller.settings = settingsData;
         System.assert(controller.validateSettings(), 'Incorrect reuslt when all required parameters is filled.');
@@ -106,9 +89,6 @@ private class SettingsControllerTester {
         settingsData.setPath(path);
         settingsData.setUserName(userName);
         settingsData.setSource(source);
-        settingsData.setDestQueueId(destQueueId);
-        settingsData.setDefectQueueId(defectQueueId);
-        settingsData.setStoryQueueId(storyQueueId);
         settingsData.setPassword('password');
         controller.testSettings();
         System.assert(controller.isSettingsCorrect, 'Settings have to be correct.');
@@ -161,11 +141,7 @@ private class SettingsControllerTester {
         settingsData.setPath(path);
         settingsData.setUserName(userName);
         settingsData.setSource(source);
-        settingsData.setDestQueueId(destQueueId);
-        settingsData.setDefectQueueId(defectQueueId);
-        settingsData.setStoryQueueId(storyQueueId);
         settingsData.setPassword(password);
-        settingsData.setScheduleId('wrong-id');
 
         V1ConnectorMock connector = new V1ConnectorMock();
         connector.setTestSourceId(sourceIdExpected);
@@ -174,7 +150,6 @@ private class SettingsControllerTester {
         controller.settings = settingsData;
         controller.initSettings();
         controller.isSettingsCorrect = true;
-        controller.isSyncEnabled = true;
         controller.saveSettings();
 
         System.assert(controller.isSaved, 'Settings have to be saved.');
@@ -184,15 +159,7 @@ private class SettingsControllerTester {
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
         System.assertEquals('', controller.testSeverity, 'Incorrect test severity.');
 
-        String scheduleId = settingsData.getScheduleId();
-        System.assertNotEquals(null, scheduleId, 'Schedule have to be created.');
-        System.assert(SyncSchedule.isScheduled(scheduleId), 'Schedule don\'t exist.');
-
-        controller.isSyncEnabled = false;
         controller.saveSettings();
-
-        System.assert(settingsData.getScheduleId() == null , 'Schedule ID must be empty.');
-        System.assert(!SyncSchedule.isScheduled(scheduleId), 'Schedule have to be removed.');
 
         //no source id
         connector.setTestSourceId(null);
@@ -202,7 +169,6 @@ private class SettingsControllerTester {
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
 
         //settings was incorrect, and person submited data by hack
-        controller.isSettingsCorrect = false;
         controller.saveSettings();
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when path is empty.');
         System.assertEquals('Settings is not correct or was not validated.', ApexPages.getMessages()[0].getSummary(), 'Incorrect message when settings is not validated.');
@@ -214,23 +180,5 @@ private class SettingsControllerTester {
         System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
         System.assert(!controller.isSettingsCorrect, 'Settings have to not be correct.');
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
-    }
-
-    static testMethod void updateScheduleTest() {
-        SettingsController c = new SettingsController();
-        Settings s = Settings.getTestSettings();
-        c.settings = s;
-        c.isSyncEnabled = true;
-        String newId = c.updateSchedule();
-
-        System.assert(newId != null, 'New ID must be not null');
-        System.assert(SyncSchedule.isScheduled(newId), 'job must be scheduled');
-
-        s.setScheduleId(newId);
-        c.isSyncEnabled = false;
-        String newId2 = c.updateSchedule();
-
-        System.assert(newId2 == null, 'Second ID must be null');
-        System.assert(!SyncSchedule.isScheduled(newId), 'First job must be unscheduled');
     }
 }

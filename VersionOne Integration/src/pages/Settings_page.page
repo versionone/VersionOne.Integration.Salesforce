@@ -51,7 +51,7 @@
                         onkeydown="disableSaveButtons();" onchange="disableSaveButtons();" maxlength="30"/>
                 </apex:pageBlockSectionItem>
             </apex:pageBlockSection>
-
+<!--
             <apex:pageBlockSection title="Case publishing">
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="{!settings.DefectQueueIdTitle}" for="DefectQueue"/>
@@ -92,19 +92,13 @@
             </apex:pageBlockSection>
 
             <apex:pageBlockSection title="Case synchronization"  columns="1">
-				<!-- Maybe in one day scheduler would make call out.
-                <apex:pageBlockSectionItem >
-                    <apex:outputLabel value="Schedule synchronization" for="EnableSync"/>
-                    <apex:inputCheckbox value="{!isSyncEnabled}" id="EnableSync"/>
-                </apex:pageBlockSectionItem>
-                 -->
 
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="{!settings.CommentOnClosingTitle}" for="CommentOnClosing"/>
                     <apex:inputTextarea value="{!settings.CommentOnClosing}" id="CommentOnClosing" cols="75" rows="6"/>
                 </apex:pageBlockSectionItem>
             </apex:pageBlockSection>
-
+-->
             <apex:pageBlockButtons location="top">
                 <apex:commandButton value="Save settings" action="{!saveSettings}"
                     disabled="{!isSettingsCorrect == false}" id="save_button1"
