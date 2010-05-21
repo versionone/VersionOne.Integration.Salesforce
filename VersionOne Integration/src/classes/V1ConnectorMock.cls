@@ -8,6 +8,8 @@ global class V1ConnectorMock implements IV1Connector {
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
     private List<String> closedDefects = new List<String>();
 
+    public static String defaultProjectId = '1010';
+
     global List<String> getClosedWorkitems() {
         throwException();
         return closedDefects;
@@ -35,7 +37,7 @@ global class V1ConnectorMock implements IV1Connector {
     }
 
     global String getDefaultProjectId() {
-        return '1010';
+        return defaultProjectId;
     }
 
     global void createLinkV1ToSF(String defectId, Case caseData) {

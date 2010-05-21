@@ -181,4 +181,18 @@ private class SettingsControllerTester {
         System.assert(!controller.isSettingsCorrect, 'Settings have to not be correct.');
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
     }
+
+    static testMethod void updateProjectDataTester() {
+        SettingsController controller = new SettingsController();
+        Test.setCurrentPage(new PageReference('apex/Settings_page'));
+        Settings settingsData = Settings.getTestSettings();
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+
+        System.assert(controller.updateProjectData());
+        System.assertEquals(V1ConnectorMock.defaultProjectId, settingsData.getProjectId());
+
+        System.assertEquals(false, controller.updateProjectData());
+        System.assertEquals(V1ConnectorMock.defaultProjectId, settingsData.getProjectId());
+    }
 }
