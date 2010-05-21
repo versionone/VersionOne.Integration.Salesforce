@@ -22,8 +22,8 @@
     <apex:actionStatus startText="Saving settings..." id="save_status" />
 
     <apex:form >
-        <apex:pageBlock title="Settings" mode="edit">
-            <apex:pageBlockSection title="VersionOne settings" columns="1">
+        <apex:pageBlock title="Connection settings" mode="edit">
+            <apex:pageBlockSection columns="1">
                 <!-- title="Connection" -->
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="{!settings.pathTitle}" for="V1Path" />
@@ -103,7 +103,7 @@
                 <apex:commandButton value="Save settings" action="{!saveSettings}"
                     disabled="{!isSettingsCorrect == false}" id="save_button1"
                     onclick="disableAllButtons();" status="save_status"
-                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages">
+                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
                     <script type="text/javascript">
                         function disableSaveButton1() {
                         var ele = document.getElementById('{!$Component.save_button1}');
@@ -129,7 +129,7 @@
                 <apex:commandButton value="Save settings" action="{!saveSettings}"
                     disabled="{!isSettingsCorrect == false}" id="save_button2"
                     onclick="disableAllButtons();" status="save_status"
-                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages">
+                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
                     <script type="text/javascript">
                     function disableSaveButton2() {
                         var ele = document.getElementById('{!$Component.save_button2}');
@@ -151,6 +151,18 @@
                 	</script>
                 </apex:commandButton>
             </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <apex:pageBlock title="VersionOne Project for Defect Creation" id="ProjectMapping">
+            <apex:pageBlockSection rendered="{!isGotProjects}" >
+                <apex:pageBlockSectionItem >
+                    <apex:outputPanel layout="block">
+                        <apex:outputPanel layout="block"/>
+                        <apex:selectList value="{!settings.ProjectId}" size="1" required="false" id="ProjectId">
+                            <apex:selectOptions value="{!VersionOneProjectsList}"/>
+                        </apex:selectList>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
         </apex:pageBlock>
     </apex:form>
 

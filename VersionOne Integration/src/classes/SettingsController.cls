@@ -7,14 +7,20 @@ public class SettingsController {
     public Boolean isSettingsValidated {get; set;}
     public Boolean isSettingsCorrect {get; set;}
     public Boolean isSaved {get; set;}
+    public Boolean isGotProjects {get; set;}
 
+	private transient Settings innerSettings;
+	private Map<String, String> projects;
     public Settings settings {
         get {
-            if (settings == null) {
-                settings = new Settings();
+            if (innerSettings == null) {
+                innerSettings = new Settings();
             }
-            return settings;
-        } set;}
+            return innerSettings;
+        }
+        set {
+        	innerSettings = value;
+        }}
 
     private transient IV1Connector innerConnector;
     public IV1Connector connector {
@@ -35,6 +41,24 @@ public class SettingsController {
         isSettingsValidated = false;
         isSettingsCorrect = false;
         isSaved = false;
+        if (updateProjectData()) {
+        	settings.updateSettings();
+        }
+    }
+
+    public boolean updateProjectData() {
+    	boolean isUpdated = false;
+        try {
+			projects = connector.findAllProjects();
+			isGotProjects = true;
+			if (settings.getProjectId() == '' || settings.getProjectId() == null) {
+				settings.setProjectId(connector.getDefaultProjectId());
+				isUpdated = true;
+			}
+        } catch (Exception ex) {
+        	isGotProjects = false;
+        }
+        return isUpdated;
     }
 
 
@@ -60,6 +84,7 @@ public class SettingsController {
         testSeverity = '';
         isSettingsValidated = false;
         isSaved = true;
+		updateProjectData();
         try {
             settings.updateSettings();
             saveSeverity = 'info';
@@ -126,4 +151,13 @@ public class SettingsController {
             throw new V1RequestException('Incorrect source.');
         }
     }
+
+    public List<SelectOption> getVersionOneProjectsList() {
+        List<SelectOption> options = new List<SelectOption>();
+        for(String id : projects.keySet()) {
+            options.add(new SelectOption(projects.get(id), id));
+        }
+        return options;
+    }
+
 }

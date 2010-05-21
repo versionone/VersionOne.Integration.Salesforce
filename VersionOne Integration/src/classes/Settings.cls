@@ -8,6 +8,7 @@ global with sharing class Settings {
     private String source;
     private String sourceId;
     private DateTime changeDateUTC;
+    private String projectId;
 
     public Settings () {
         this(getMics('V1Settings'));
@@ -21,6 +22,7 @@ global with sharing class Settings {
             setPassword(mycs.Password__c);
             setSource(mycs.Source__c);
             setSourceId(mycs.V1SourceId__c);
+            setProjectId(mycs.V1ProjectId__c);
             changeDateUTC = mycs.DateLastClosedAsset__c;
         }
     }
@@ -116,6 +118,14 @@ global with sharing class Settings {
         sourceId = id;
     }
 
+    public void setProjectId(String id) {
+    	projectId = id;
+    }
+
+    public String getProjectId() {
+    	return projectId;
+    }
+
     public void setLastDateChangeAsset(DateTime changeDateUTC) {
         this.changeDateUTC = changeDateUTC;
     }
@@ -133,6 +143,7 @@ global with sharing class Settings {
             mycs.Source__c = source;
             mycs.V1SourceId__c = sourceId;
             mycs.DateLastClosedAsset__c = changeDateUTC;
+            mycs.V1ProjectId__c = projectId;
             update mycs;
         } //else Do nothing (used in tests)
     }
