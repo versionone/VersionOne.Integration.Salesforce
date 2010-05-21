@@ -184,7 +184,6 @@ private class SettingsControllerTester {
 
     static testMethod void updateProjectDataTester() {
         SettingsController controller = new SettingsController();
-        Test.setCurrentPage(new PageReference('apex/Settings_page'));
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
@@ -194,5 +193,15 @@ private class SettingsControllerTester {
 
         System.assertEquals(false, controller.updateProjectData());
         System.assertEquals(V1ConnectorMock.defaultProjectId, settingsData.getProjectId());
+    }
+
+    static testMethod void getVersionOneProjectsListTester() {
+        SettingsController controller = new SettingsController();
+        Settings settingsData = Settings.getTestSettings();
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+		controller.initSettings();
+        List<SelectOption> options = controller.getVersionOneProjectsList();
+        assertContainsOption('CI', options, 'Wrong option');
     }
 }
