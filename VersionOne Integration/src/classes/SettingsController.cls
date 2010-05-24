@@ -51,8 +51,11 @@ public class SettingsController {
         try {
 			projects = connector.findAllProjects();
 			isGotProjects = true;
-			if (settings.getProjectId() == '' || settings.getProjectId() == null) {
-				settings.setProjectId(connector.getDefaultProjectId());
+			if (settings.getProjectId() == '' || settings.getProjectId() == null ||
+			    settings.getProjectName() == '' || settings.getProjectName() == null) {
+				String projectId = connector.getDefaultProjectId();
+				settings.setProjectId(projectId);
+				settings.setProjectName(projects.get(projectId));
 				isUpdated = true;
 			}
         } catch (Exception ex) {
@@ -155,9 +158,33 @@ public class SettingsController {
     public List<SelectOption> getVersionOneProjectsList() {
         List<SelectOption> options = new List<SelectOption>();
         for(String id : projects.keySet()) {
-            options.add(new SelectOption(projects.get(id), id));
+            options.add(new SelectOption(id, projects.get(id)));
         }
         return options;
     }
 
+    public List<Mapping> getMappings() {
+    	Mapping mapping = new Mapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()));
+    	List<Mapping> mappings = new Mapping[] {mapping};
+
+    	return mappings;
+    }
+
+	public class Mapping {
+		private String projectName;
+		private Boolean isVisible;
+
+		public Mapping(String projectName, Boolean isVisible) {
+			this.projectName = projectName;
+			this.isVisible = isVisible;
+		}
+
+		public String getProjectName() {
+			return projectName;
+		}
+
+		public Boolean getIsVisible() {
+			return isVisible;
+		}
+	}
 }
