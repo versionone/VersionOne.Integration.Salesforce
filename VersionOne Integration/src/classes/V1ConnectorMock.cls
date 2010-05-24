@@ -31,7 +31,8 @@ global class V1ConnectorMock implements IV1Connector {
     global Map<String, String> findAllProjects() {
         throwException();
         Map<String, String> result = new Map<String, String>();
-        result.put('CI', '1081');
+        result.put('1081', 'CI');
+        result.put(defaultProjectId, 'Main project');
 
         return result;
     }

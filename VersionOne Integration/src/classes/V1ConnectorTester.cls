@@ -149,9 +149,9 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
         Map<String, String> projects = connector.findAllProjects();
 
-        System.assertEquals(12, projects.size(), 'Error! Incorrect amount of projects.');
+        System.assertEquals(21, projects.size(), 'Error! Incorrect amount of projects.');
         System.assertEquals('1', connector.getDefaultProjectId(), 'Error! Incorect default project.');
-        System.assertEquals('1457', projects.get('Integrational tests project'), 'Incorrect id for \'Integrational tests project.');
+        System.assertEquals('Integrational tests project', projects.get('1457'), 'Incorrect id for \'Integrational tests project.');
     }
 
     static testMethod void incorrectProjectsListTest() {

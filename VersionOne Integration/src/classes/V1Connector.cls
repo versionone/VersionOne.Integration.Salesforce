@@ -153,8 +153,8 @@ global with sharing class V1Connector implements IV1Connector {
                 testId = Integer.valueOf(id);
             }
             String projectName = assetTag.getValue('Attribute');
-            if (!projects.containsKey(projectName)) {
-                projects.put(projectName, id);
+            if (!projects.containsKey(id)) {
+                projects.put(id, projectName);
             }
         }
         defaultProjectId = String.valueof(testId);
