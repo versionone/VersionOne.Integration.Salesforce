@@ -10,7 +10,7 @@ public class SettingsController {
     public Boolean isGotProjects {get; set;}
 
 	private transient Settings innerSettings;
-	private Map<String, String> projects;
+	//private Map<String, String> projects;
     public Settings settings {
         get {
             if (innerSettings == null) {
@@ -20,7 +20,8 @@ public class SettingsController {
         }
         set {
         	innerSettings = value;
-        }}
+        }
+	}
 
     private transient IV1Connector innerConnector;
     public IV1Connector connector {
@@ -32,7 +33,40 @@ public class SettingsController {
         }
         set {
             innerConnector = value;
-        }}
+        }
+	}
+
+    private String innerCurrentProjectId;
+    public String CurrentProjectId {
+    	get {
+    		return settings.getProjectId();
+    	}
+    	set {
+    		innerCurrentProjectId = value;
+    	}
+    }
+
+    private Map<String, String> innerProjects;
+    public Map<String, String> projects {
+        get {
+            if (innerProjects == null || innerProjects.keySet().size() == 0) {
+				refreshProjectsList();
+            }
+            return innerProjects;
+        }
+        set {}
+	}
+
+	private void refreshProjectsList() {
+		try {
+        	innerProjects = connector.findAllProjects();
+        	isGotProjects = true;
+        } catch (Exception ex) {
+        	innerProjects = new Map<String, String>();
+        	System.debug('Exception was thrown.' + ex);
+        	isGotProjects = false;
+        }
+	}
 
     /** Must be called before usage of any other method. */
     public void initSettings() {
@@ -41,6 +75,8 @@ public class SettingsController {
         isSettingsValidated = false;
         isSettingsCorrect = false;
         isSaved = false;
+        isGotProjects = false;
+        refreshProjectsList();
         if (updateProjectData()) {
         	settings.updateSettings();
         }
@@ -48,20 +84,20 @@ public class SettingsController {
 
     public boolean updateProjectData() {
     	boolean isUpdated = false;
-        try {
-			projects = connector.findAllProjects();
-			isGotProjects = true;
-			if (settings.getProjectId() == '' || settings.getProjectId() == null ||
-			    settings.getProjectName() == '' || settings.getProjectName() == null) {
-				String projectId = connector.getDefaultProjectId();
-				settings.setProjectId(projectId);
-				settings.setProjectName(projects.get(projectId));
-				isUpdated = true;
-			}
-        } catch (Exception ex) {
-        	isGotProjects = false;
-        }
+
+		if (settings.validate().size() == 0 &&
+			(settings.getProjectId() == '' || settings.getProjectId() == null ||
+		     settings.getProjectName() == '' || settings.getProjectName() == null)) {
+			updateProjectSettings(connector.getDefaultProjectId());
+			isUpdated = true;
+		}
+
         return isUpdated;
+    }
+
+    public void updateProjectSettings(String id) {
+		settings.setProjectId(id);
+		settings.setProjectName(projects.get(id));
     }
 
 
@@ -87,7 +123,9 @@ public class SettingsController {
         testSeverity = '';
         isSettingsValidated = false;
         isSaved = true;
-		updateProjectData();
+        if(!updateProjectData()) {
+			refreshProjectsList();
+        }
         try {
             settings.updateSettings();
             saveSeverity = 'info';
@@ -164,10 +202,17 @@ public class SettingsController {
     }
 
     public List<Mapping> getMappings() {
-    	Mapping mapping = new Mapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()));
-    	List<Mapping> mappings = new Mapping[] {mapping};
+		List<Mapping> mappings = new List<Mapping>();
+		System.debug('isGotProjects:' + isGotProjects);
+		Mapping mapping = new Mapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()));
+		mappings.add(mapping);
 
     	return mappings;
+    }
+
+    public void updateProject() {
+		updateProjectSettings(innerCurrentProjectId);
+		settings.updateSettings();
     }
 
 	public class Mapping {

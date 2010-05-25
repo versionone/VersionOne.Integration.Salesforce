@@ -188,11 +188,36 @@ private class SettingsControllerTester {
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
 
+        System.assertEquals(false, controller.updateProjectData());//settings is not correct(no full filled)
+        System.assertEquals(null, settingsData.getProjectId());
+
+        settingsData.setPath('http://aaa.com/v1');
+        settingsData.setUserName('user');
+        settingsData.setSource('12345');
+        settingsData.setPassword('password');
+        controller.settings = settingsData;
         System.assert(controller.updateProjectData());
         System.assertEquals(V1ConnectorMock.defaultProjectId, settingsData.getProjectId());
+        System.assertEquals('Main project', settingsData.getProjectName());
 
         System.assertEquals(false, controller.updateProjectData());
         System.assertEquals(V1ConnectorMock.defaultProjectId, settingsData.getProjectId());
+        System.assertEquals('Main project', settingsData.getProjectName());
+    }
+
+    static testMethod void getMappingsTester() {
+    	String projectName = 'Project name';
+        SettingsController controller = new SettingsController();
+        Settings settingsData = Settings.getTestSettings();
+        settingsData.setProjectId(V1ConnectorMock.defaultProjectId);
+        settingsData.setProjectName(projectName);
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+
+        List<SettingsController.Mapping> mappings = controller.getMappings();
+        System.assertEquals(1, mappings.size(), 'Incorrect numbers of mapped projects.');
+        System.assertEquals(projectName, mappings.get(0).getProjectName(), 'Incorrect mapped project.');
+        System.assert(mappings.get(0).getIsVisible(), 'Incorrect "visible" status');
     }
 
     static testMethod void getVersionOneProjectsListTester() {
