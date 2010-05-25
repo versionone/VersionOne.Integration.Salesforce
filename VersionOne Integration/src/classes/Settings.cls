@@ -172,16 +172,16 @@ global with sharing class Settings {
     /** Returns array of error messages or empty array if all is crrect. */
     public String[] validate() {
         List<String> res = new List<String>();
-        addMessage(res, getPathTitle(), getPath());
-        addMessage(res, getUserNameTitle(), getUserName());
-        addMessage(res, getSourceTitle(), getSource());
-        addMessage(res, getPasswordTitle(), getPassword());
+        testAndAddMessage(res, getPathTitle(), getPath());
+        testAndAddMessage(res, getUserNameTitle(), getUserName());
+        testAndAddMessage(res, getSourceTitle(), getSource());
+        testAndAddMessage(res, getPasswordTitle(), getPassword());
 
         return res;
     }
 
     /** Adds error message for specified field if value is null */
-    public static void addMessage(List<String> res, String fieldTitle, object value) {
+    public static void testAndAddMessage(List<String> res, String fieldTitle, object value) {
         if (value == null) {
             res.add('You must fill ' + fieldTitle);
         }
