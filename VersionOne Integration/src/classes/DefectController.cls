@@ -2,6 +2,9 @@ public class DefectController {
 
 	public Boolean isEditForm {get; set;}
 
+	public DefectController(ApexPages.StandardController stdController) {
+
+	}
 
     public void init() {
     	isEditForm = false;

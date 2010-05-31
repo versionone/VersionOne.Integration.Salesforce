@@ -1,4 +1,4 @@
-<apex:page controller="DefectController" action="{!init}" tabStyle="Case">
+<apex:page extensions="DefectController" standardController="Case" action="{!init}" tabStyle="Case">
     <apex:actionStatus startText="" id="empty" />
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
