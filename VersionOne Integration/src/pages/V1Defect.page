@@ -1,0 +1,29 @@
+<apex:page controller="DefectController" action="{!init}" tabStyle="Case">
+    <apex:actionStatus startText="" id="empty" />
+    <apex:form >
+        <apex:pageBlock id="CreateDefectSector">
+            <apex:pageBlockSection columns="1" rendered="{!not(isEditForm)}" id="buttons">
+				<apex:commandButton value="Create Defect" id="createDefectButton"
+					rerender="CreateDefectSector" status="empty"
+					action="{!showForm}"/>
+			</apex:pageBlockSection>
+            <apex:pageBlockSection columns="3" rendered="{!isEditForm}" id="createDefectForm">
+                <apex:pageBlockSectionItem >
+                    <input type="text" value="Title" size="40"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+					<textarea id="description" ROWS="2" COLS="35"> Description </textarea>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+			        <input type="button" class="btn" value="Create" /><br><br>
+					<apex:commandButton value="Cancel" id="CancelButton"
+						rerender="CreateDefectSector" status="empty"
+						action="{!cancelForm}"/>
+                </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+
+        </apex:pageBlock>
+	</apex:form>
+
+</apex:page>
