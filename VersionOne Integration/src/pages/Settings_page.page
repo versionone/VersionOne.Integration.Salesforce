@@ -1,7 +1,6 @@
 <!-- Page -->
 <apex:page controller="SettingsController" action="{!initSettings}" title="VersionOne Integration Settings">
-    <script>
-    	var saveFormAlert = 'Please save form before synchronization.';
+    <script type="text/javascript">
         function disableAllButtons() {
             disableSaveButtons();
             disableTestButtons();
@@ -13,6 +12,10 @@
         function disableTestButtons() {
             disableTestButton1();
             disableTestButton2();
+        }
+        function disableElement(ele) {
+            ele.disabled = true;
+            ele.className = 'btnDisabled';
         }
 
     </script>
@@ -58,10 +61,8 @@
                     rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
                     <script type="text/javascript">
                         function disableSaveButton1() {
-                        var ele = document.getElementById('{!$Component.save_button1}');
-                        ele.disabled = true;
-                        ele.className = 'btnDisabled';
-                    }
+	                        disableElement(document.getElementById('{!$Component.save_button1}'));
+    	                }
                 	</script>
                 </apex:commandButton>
                 <apex:commandButton value="Test settings" action="{!testSettings}"
@@ -70,9 +71,7 @@
                     status="test_status" id="test_button1">
                     <script type="text/javascript">
                         function disableTestButton1() {
-                            var ele = document.getElementById('{!$Component.test_button1}');
-                            ele.disabled = true;
-                            ele.className = 'btnDisabled';
+                            disableElement(document.getElementById('{!$Component.test_button1}'));
                         }
                 	</script>
                 </apex:commandButton>
@@ -84,9 +83,7 @@
                     rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
                     <script type="text/javascript">
                     function disableSaveButton2() {
-                        var ele = document.getElementById('{!$Component.save_button2}');
-                        ele.disabled = true;
-                        ele.className = 'btnDisabled';
+                        disableElement(document.getElementById('{!$Component.save_button2}'));
                     }
                 	</script>
                 </apex:commandButton>
@@ -96,9 +93,7 @@
                     status="test_status" id="test_button2">
                     <script type="text/javascript">
                         function disableTestButton2() {
-                        var ele = document.getElementById('{!$Component.test_button2}');
-                        ele.disabled = true;
-                        ele.className = 'btnDisabled';
+                        disableElement(document.getElementById('{!$Component.test_button2}'));
                     }
                 	</script>
                 </apex:commandButton>
