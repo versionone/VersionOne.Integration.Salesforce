@@ -1,28 +1,78 @@
 <apex:page extensions="DefectController" standardController="Case" action="{!init}" tabStyle="Case">
     <apex:actionStatus startText="" id="empty" />
+    <apex:actionStatus startText="Creating defect in the VersionOne..." id="create" />
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
-            <apex:pageBlockSection columns="1" rendered="{!not(isEditForm)}" id="buttons">
+        	<!-- Create Defect button -->
+            <apex:pageBlockSection columns="3" rendered="{!not(isEditForm)}" id="buttons">
 				<apex:commandButton value="Create Defect" id="createDefectButton"
 					rerender="CreateDefectSector" status="empty"
-					action="{!showForm}"/>
+					action="{!showForm}"/> for <apex:outputLabel value="{!CaseID}" for="CaseID" />
 			</apex:pageBlockSection>
+
+
+			<!--  Defect creation form -->
+			<script type="text/javascript">
+          		////<![CDATA[
+				function verifyForm() {
+					var result = true;
+					var message = "";
+					var fields = {Tltle: getTitle(), Desciption: getDesciption()};
+
+					for (var name in fields) {
+						if (fields[name] == "") {
+							result = false;
+							if (message != "") {
+								message += ", ";
+							}
+							message += name;
+						}
+					}
+
+					if (message != "") {
+						alert (message + " required.");
+					}
+					return result;
+				}
+                  //]]>
+			</script>
             <apex:pageBlockSection columns="3" rendered="{!isEditForm}" id="createDefectForm">
-                <apex:pageBlockSectionItem >
-                    <input type="text" value="Title" size="40"/>
+	                <apex:pageBlockSectionItem >
+				    <apex:outputPanel layout="block" styleClass="requiredInput">
+				    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+				    <apex:inputText value="{!defect.title}" size="40" id="DefectTitle"
+                        tabindex="1" maxlength="255">
+                       	<script type="text/javascript">
+	                        function getTitle() {
+	                            return document.getElementById('{!$Component.DefectTitle}').value;
+	                        }
+                       	</script>
+					</apex:inputText>
+					</apex:outputPanel>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
-					<textarea id="description" ROWS="2" COLS="35"> Description </textarea>
+				    <apex:outputPanel layout="block" styleClass="requiredInput">
+				    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+						<apex:inputTextarea id="DefectDescription" value="{!defect.description}" rows="2" cols="35">
+                       	<script type="text/javascript">
+	                        function getDesciption() {
+	                            return document.getElementById('{!$Component.DefectDescription}').value;
+	                        }
+                       	</script>
+						</apex:inputTextarea>
+					</apex:outputPanel>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
-			        <input type="button" class="btn" value="Create" /><br><br>
+					<apex:commandButton value="Create" id="CreateButton"
+						rerender="CreateDefectSector, messages" status="create"
+						action="{!createDefect}" onClick="if (!verifyForm()) {return;}"/>
 					<apex:commandButton value="Cancel" id="CancelButton"
 						rerender="CreateDefectSector" status="empty"
 						action="{!cancelForm}"/>
                 </apex:pageBlockSectionItem>
 
             </apex:pageBlockSection>
-
+		    <apex:pageMessages id="messages" />
         </apex:pageBlock>
 	</apex:form>
 
