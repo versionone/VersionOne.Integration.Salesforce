@@ -20,6 +20,7 @@ public class DefectController {
 
     public PageReference cancelForm() {
     	isEditForm = false;
+    	defect = new Defect();
     	return null;
     }
 
