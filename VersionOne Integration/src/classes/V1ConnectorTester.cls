@@ -433,7 +433,7 @@ private class V1ConnectorTester {
     	String resolution = 'Duplicate';
     	String project = 'SalesForce test';
     	String description = 'q2312313132';
-    	String id = 'D-01398';
+    	String token = 'D-01398';
     	String name = 'for paging testing 1';
     	String priority = 'Medium';
     	String status = 'In Progress';
@@ -443,7 +443,7 @@ private class V1ConnectorTester {
 						'<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
 						'<Attribute name="Scope.Name">' + project + '</Attribute>' +
 						'<Attribute name="Description">' + description + '</Attribute>' +
-						'<Attribute name="Number">' + id + '</Attribute>' +
+						'<Attribute name="Number">' + token + '</Attribute>' +
 						'<Attribute name="AssetState">128</Attribute>' +
 						'<Attribute name="Status.Name">' + status + '</Attribute>' +
 						'<Attribute name="Name">' + name + '</Attribute>' +
@@ -453,7 +453,8 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
 		Defect defectData = connector.getDefectById(defectId);
 
-		System.assertEquals(id, defectData.id, 'Incorrect id.');
+		System.assertEquals(token, defectData.token, 'Incorrect id.');
+		System.assertEquals(defectId, defectData.id, 'Incorrect id.');
 		System.assertEquals(resolution, defectData.resolution, 'Incorrect resolution.');
 		System.assertEquals(project, defectData.project, 'Incorrect project name.');
 		System.assertEquals(description, defectData.description, 'Incorrect defect description.');

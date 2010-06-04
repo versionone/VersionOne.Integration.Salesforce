@@ -62,7 +62,8 @@ global with sharing class V1Connector implements IV1Connector {
         defectData.resolution = getValue('ResolutionReason.Name', asset.childNodes);
         defectData.project = getValue('Scope.Name', asset.childNodes);
         defectData.description = getValue('Description', asset.childNodes);
-        defectData.id = getValue('Number', asset.childNodes);
+        defectData.token = getValue('Number', asset.childNodes);
+        defectData.id = defectId;
         defectData.isClosed = getValue('AssetState', asset.childNodes) == Defect.ClosedAssetState;
         defectData.priority = getValue('Priority.Name', asset.childNodes);
         defectData.status = getValue('Status.Name', asset.childNodes);
