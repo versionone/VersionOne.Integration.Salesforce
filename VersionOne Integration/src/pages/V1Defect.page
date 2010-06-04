@@ -92,36 +92,44 @@
 
 
             <!-- Detail defect information  -->
-			<apex:pageBlockTable value="{!AssignedDefect}" var="d" rendered="{!isDefectAssigned}">
-				<apex:column >
-					<apex:facet name="header">ID</apex:facet>
-					<apex:outputLink value="/{!d.Id}" target="_blank">{!d.Id}</apex:outputLink>
-				</apex:column>
-				<apex:column >
-					<apex:facet name="header">Title</apex:facet>
-					<apex:outputText value="{!d.title}"/>
-				</apex:column>
-				<apex:column >
-					<apex:facet name="header">Project</apex:facet>
-					<apex:outputText value="{!d.project}"/>
-				</apex:column>
-				<apex:column >
-					<apex:facet name="header">Priority</apex:facet>
-					<apex:outputText value="{!d.priority}"/>
-				</apex:column>
-				<apex:column >
-					<apex:facet name="header">Status</apex:facet>
-					<apex:outputText value="{!d.status}"/>
-				</apex:column>
-				<apex:column >
-					<apex:facet name="header">Resolution</apex:facet>
-					<apex:outputText value="{!d.resolution}"/>
-				</apex:column>
-				<apex:column >
-					<apex:facet name="header">Is Closed</apex:facet>
-					<apex:outputText value="{!IF((d.isClosed),'V','X')}"/>
-				</apex:column>
-			</apex:pageBlockTable>
+            <apex:pageBlockSection rendered="{!isDefectAssigned}" id="assignedDefect" columns="1">
+				<apex:pageBlockSectionItem >
+					<apex:pageBlockTable value="{!AssignedDefect}" var="d" rendered="{!isDefectAssigned}">
+						<apex:column >
+							<apex:facet name="header">ID</apex:facet>
+							<apex:outputLink value="/{!d.Id}" target="_blank">{!d.token}</apex:outputLink>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Title</apex:facet>
+							<apex:outputText value="{!d.title}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Project</apex:facet>
+							<apex:outputText value="{!d.project}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Priority</apex:facet>
+							<apex:outputText value="{!d.priority}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Status</apex:facet>
+							<apex:outputText value="{!d.status}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Resolution</apex:facet>
+							<apex:outputText value="{!d.resolution}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Is Closed</apex:facet>
+							<apex:outputText value="{!IF((d.isClosed),'V','X')}"/>
+						</apex:column>
+					</apex:pageBlockTable>
+				</apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+	                <apex:outputText value="Description:" style="text-align:left"/>
+					<apex:outputText value="{!AssignedDefect.description}"/>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
 
 		    <apex:pageMessages id="messages" />
         </apex:pageBlock>

@@ -13,6 +13,7 @@ public class Defect {
 
 	public String title {get; set;}
 	public String description {get; set;}
+	public String token {get; set;}
 	public String id {get; set;}
 	public String project {get; set;}
 	public String priority {get; set;}

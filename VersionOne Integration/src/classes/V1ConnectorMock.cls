@@ -19,6 +19,13 @@ global class V1ConnectorMock implements IV1Connector {
         this.closedDefects = closedDefects;
     }
 
+	public Defect getDefectById(String id) {
+		Defect defectData = new Defect();
+		defectData.id = id;
+
+		return defectData;
+	}
+
     global String getSourceId() {
         throwException();
         return sourceId;
