@@ -1,13 +1,28 @@
 <apex:page extensions="DefectController" standardController="Case" action="{!init}" tabStyle="Case">
+	<script type="text/javascript">
+		////<![CDATA[
+        function disableElement(ele) {
+            ele.disabled = true;
+            ele.className = 'btnDisabled';
+        }
+		//]]>
+    </script>
     <apex:actionStatus startText="" id="empty" />
+    <apex:actionStatus startText="Generating form..." id="createForm" />
     <apex:actionStatus startText="Creating defect in the VersionOne..." id="create" />
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
         	<!-- Create Defect button -->
-            <apex:pageBlockSection columns="3" rendered="{!not(isEditForm)}" id="buttons">
+            <apex:pageBlockSection columns="3" rendered="{!not(isEditForm) && not(isDefectAssigned)}" id="buttons">
 				<apex:commandButton value="Create Defect" id="createDefectButton"
-					rerender="CreateDefectSector" status="empty"
-					action="{!showForm}"/> for <apex:outputLabel value="{!CaseID}" for="CaseID" />
+					rerender="CreateDefectSector" status="createForm"
+					action="{!showForm}" onClick="disableCreateDefectButton()">
+                      	<script type="text/javascript">
+	                        function disableCreateDefectButton() {
+	                            disableElement(document.getElementById('{!$Component.createDefectButton}'));
+	                        }
+                       	</script>
+                </apex:commandButton>
 			</apex:pageBlockSection>
 
 
@@ -37,7 +52,8 @@
                   //]]>
 			</script>
             <apex:pageBlockSection columns="3" rendered="{!isEditForm}" id="createDefectForm">
-	                <apex:pageBlockSectionItem >
+                <apex:pageBlockSectionItem >
+	                <apex:outputLabel value="Title" for="DefectTitle" />
 				    <apex:outputPanel layout="block" styleClass="requiredInput">
 				    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
 				    <apex:inputText value="{!defect.title}" size="40" id="DefectTitle"
@@ -51,6 +67,7 @@
 					</apex:outputPanel>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
+	                <apex:outputLabel value="Description" for="DefectDescription" />
 				    <apex:outputPanel layout="block" styleClass="requiredInput">
 				    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
 						<apex:inputTextarea id="DefectDescription" value="{!defect.description}" rows="2" cols="35">
@@ -72,6 +89,40 @@
                 </apex:pageBlockSectionItem>
 
             </apex:pageBlockSection>
+
+
+            <!-- Detail defect information  -->
+			<apex:pageBlockTable value="{!AssignedDefect}" var="d" rendered="{!isDefectAssigned}">
+				<apex:column >
+					<apex:facet name="header">ID</apex:facet>
+					<apex:outputLink value="/{!d.Id}" target="_blank">{!d.Id}</apex:outputLink>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">Title</apex:facet>
+					<apex:outputText value="{!d.title}"/>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">Project</apex:facet>
+					<apex:outputText value="{!d.project}"/>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">Priority</apex:facet>
+					<apex:outputText value="{!d.priority}"/>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">Status</apex:facet>
+					<apex:outputText value="{!d.status}"/>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">Resolution</apex:facet>
+					<apex:outputText value="{!d.resolution}"/>
+				</apex:column>
+				<apex:column >
+					<apex:facet name="header">Is Closed</apex:facet>
+					<apex:outputText value="{!IF((d.isClosed),'V','X')}"/>
+				</apex:column>
+			</apex:pageBlockTable>
+
 		    <apex:pageMessages id="messages" />
         </apex:pageBlock>
 	</apex:form>

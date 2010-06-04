@@ -427,4 +427,39 @@ private class V1ConnectorTester {
         }
         System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
     }
+
+    static testMethod void getDefectByIdTest() {
+    	String defectId = '2345';
+    	String resolution = 'Duplicate';
+    	String project = 'SalesForce test';
+    	String description = 'q2312313132';
+    	String id = 'D-01398';
+    	String name = 'for paging testing 1';
+    	String priority = 'Medium';
+    	String status = 'In Progress';
+    	String expectedUrl = 'rest-1.v1/Data/Defect/' + defectId + '?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState';
+        Settings testSettings = Settings.getTestSettings();
+        String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="Defect:' + defectId + '">' +
+						'<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
+						'<Attribute name="Scope.Name">' + project + '</Attribute>' +
+						'<Attribute name="Description">' + description + '</Attribute>' +
+						'<Attribute name="Number">' + id + '</Attribute>' +
+						'<Attribute name="AssetState">128</Attribute>' +
+						'<Attribute name="Status.Name">' + status + '</Attribute>' +
+						'<Attribute name="Name">' + name + '</Attribute>' +
+						'<Attribute name="Priority.Name">' + priority + '</Attribute>' +
+					  '</Asset>';
+        IRequestor requestor = new RequestorMock(xml, 200);
+        V1Connector connector = new V1Connector(testSettings, requestor);
+		Defect defectData = connector.getDefectById(defectId);
+
+		System.assertEquals(id, defectData.id, 'Incorrect id.');
+		System.assertEquals(resolution, defectData.resolution, 'Incorrect resolution.');
+		System.assertEquals(project, defectData.project, 'Incorrect project name.');
+		System.assertEquals(description, defectData.description, 'Incorrect defect description.');
+		System.assertEquals(name, defectData.title, 'Incorrect defect name.');
+		System.assertEquals(priority, defectData.priority, 'Incorrect defect priority.');
+		System.assertEquals(true, defectData.isClosed, 'Defect is closed!');
+		System.assertEquals(expectedUrl, ((RequestorMock)requestor).getSentUrl(0), 'Incorrect requested URL.');
+    }
 }

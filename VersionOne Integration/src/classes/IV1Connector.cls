@@ -1,9 +1,16 @@
-global interface IV1Connector {
+public interface IV1Connector {
     /**
     * Makes request to the VersionOne and get all closed defects.
     * Returns: list of CaseNumbers (references).
     **/
     List<String> getClosedWorkitems();
+
+    /**
+    * Makes request to the VersionOne and get specify defect.
+    * defectId  - defect id in the VersionOne
+    * Returns: Defect with information from VersionOne.
+    **/
+    Defect getDefectById(String defectId);
 
     /**
     * Returns: find and return id of current source(from Settings).

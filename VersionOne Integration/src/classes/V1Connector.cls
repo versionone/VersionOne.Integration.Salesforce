@@ -5,6 +5,7 @@ global with sharing class V1Connector implements IV1Connector {
     public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'\'{0}\'\'';
     public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
     public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'\'{1}\'\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
+    public static final String DEFECT_REQUEST_URL = 'rest-1.v1/Data/Defect/{0}?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState';
 
     public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
 
@@ -47,6 +48,26 @@ global with sharing class V1Connector implements IV1Connector {
             settings.setLastDateChangeAsset(latestDate);
         }
         return references;
+    }
+
+    public Defect getDefectById(String defectId) {
+    	Defect defectData = new Defect();
+        String url = String.format(DEFECT_REQUEST_URL, new String[]{defectId});
+        requestor.request(requestor.createRequest('', url, 'GET'));
+        validateResponse();
+        XMLDom xmlParser = new XMLDom();
+        xmlParser.parseFromString(requestor.getBody());
+        XMLDom.Element asset = xmlParser.getElementByTagName('Asset');
+        defectData.title = getValue('Name', asset.childNodes);
+        defectData.resolution = getValue('ResolutionReason.Name', asset.childNodes);
+        defectData.project = getValue('Scope.Name', asset.childNodes);
+        defectData.description = getValue('Description', asset.childNodes);
+        defectData.id = getValue('Number', asset.childNodes);
+        defectData.isClosed = getValue('AssetState', asset.childNodes) == Defect.ClosedAssetState;
+        defectData.priority = getValue('Priority.Name', asset.childNodes);
+        defectData.status = getValue('Status.Name', asset.childNodes);
+
+        return defectData;
     }
 
     global String getSourceId() {
@@ -236,6 +257,9 @@ global with sharing class V1Connector implements IV1Connector {
      * throws:  V1RequestException, Exception
      */
     global String createWorkitemInV1(Case caseData, String projectId) {
+    	System.debug('**** settings:' + settings);
+    	System.debug('**** requestor:' + requestor);
+
         String body = '<Asset>'
             + relationNode('Scope', 'Scope:' + projectId)
             + attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME))
