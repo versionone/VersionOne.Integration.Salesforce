@@ -1,5 +1,7 @@
 public class Defect {
 
+	public static String ClosedAssetState = '128';
+
 	public Defect() {
 		this('Title', 'Description');
 	}
@@ -11,4 +13,10 @@ public class Defect {
 
 	public String title {get; set;}
 	public String description {get; set;}
+	public String id {get; set;}
+	public String project {get; set;}
+	public String priority {get; set;}
+	public String status {get; set;}
+	public String resolution {get; set;}
+	public Boolean isClosed{get; set;}
 }
