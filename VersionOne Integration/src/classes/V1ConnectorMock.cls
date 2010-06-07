@@ -1,4 +1,4 @@
-global class V1ConnectorMock implements IV1Connector {
+public class V1ConnectorMock implements IV1Connector {
 
     private String sourceId = '123456';
     private Exception ex;
@@ -10,7 +10,7 @@ global class V1ConnectorMock implements IV1Connector {
 
     public static String defaultProjectId = '1010';
 
-    global List<String> getClosedWorkitems() {
+    public List<String> getClosedWorkitems() {
         throwException();
         return closedDefects;
     }
@@ -26,7 +26,7 @@ global class V1ConnectorMock implements IV1Connector {
 		return defectData;
 	}
 
-    global String getSourceId() {
+    public String getSourceId() {
         throwException();
         return sourceId;
     }
@@ -35,7 +35,7 @@ global class V1ConnectorMock implements IV1Connector {
         this.sourceId = sourceId;
     }
 
-    global Map<String, String> findAllProjects() {
+    public Map<String, String> findAllProjects() {
         throwException();
         Map<String, String> result = new Map<String, String>();
         result.put('1081', 'CI');
@@ -44,32 +44,32 @@ global class V1ConnectorMock implements IV1Connector {
         return result;
     }
 
-    global String getDefaultProjectId() {
+    public String getDefaultProjectId() {
         return defaultProjectId;
     }
 
-    global void createLinkV1ToSF(String defectId, Case caseData) {
+    public void createLinkV1ToSF(String defectId, Case caseData) {
 		if (createLinkException != null) {
 			throw createLinkException;
 		}
     }
 
-    global void setExceptionForLinkCreationInV1(Exception ex) {
+    public void setExceptionForLinkCreationInV1(Exception ex) {
     	createLinkException = ex;
     }
 
-    global String createWorkitemInV1(Case caseData, String productId) {
+    public String createWorkitemInV1(Case caseData, Defect defectData) {
     	if (creationWorkitemException != null) {
     		throw creationWorkitemException;
     	}
         return createdWorkitemId;
     }
 
-    global void setExceptionForCreationWorkitemInV1(Exception ex) {
+    public void setExceptionForCreationWorkitemInV1(Exception ex) {
 		creationWorkitemException = ex;
     }
 
-    global Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
+    public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
         throwException();
         return alreadyExistedDefects;
     }
@@ -78,7 +78,7 @@ global class V1ConnectorMock implements IV1Connector {
         alreadyExistedDefects = defects;
     }
 
-    global Settings getSettings() {
+    public Settings getSettings() {
         return Settings.getTestSettings();
     }
 

@@ -1,4 +1,4 @@
-global with sharing class V1Connector implements IV1Connector {
+public class V1Connector implements IV1Connector {
 
     public static final String DATA_URL = 'rest-1.v1/Data/';
     public static final String CLOSED_WORKITEMS_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Number,ChangeDateUTC,Reference&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'\'Closed\'\'{1})';
@@ -19,7 +19,7 @@ global with sharing class V1Connector implements IV1Connector {
         this.requestor = requestor;
     }
 
-    global List<String> getClosedWorkitems() {
+    public List<String> getClosedWorkitems() {
         List<String> references = new List<String>();
         String dateRestriction = '';
         if (settings.getLastDateChangeAsset() != null) {
@@ -71,7 +71,7 @@ global with sharing class V1Connector implements IV1Connector {
         return defectData;
     }
 
-    global String getSourceId() {
+    public String getSourceId() {
         String source = settings.getSource();
         if (source == null) {
             return null;
@@ -156,7 +156,7 @@ global with sharing class V1Connector implements IV1Connector {
     /**
     * Gathers all project from the VersionOne, and assign default project
     **/
-    global Map<String, String> findAllProjects() {
+    public Map<String, String> findAllProjects() {
         XMLDom xmlParser = new XMLDom();
         Map<String, String> projects = new Map<String, String>();
 
@@ -189,7 +189,7 @@ global with sharing class V1Connector implements IV1Connector {
     /**
     * Returns default project. It we will use if user doesn't assign case to project
     **/
-    global String getDefaultProjectId() {
+    public String getDefaultProjectId() {
         if (defaultProjectId == null) {
             findAllProjects();
         }
@@ -201,7 +201,7 @@ global with sharing class V1Connector implements IV1Connector {
      *
      * Returns - List<Integer> Already ported cases
      */
-    global Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
+    public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
         XMLDom xmlParser = new XMLDom();
 
         String reference = '';
@@ -233,7 +233,7 @@ global with sharing class V1Connector implements IV1Connector {
     /**
     * Creates link to the corresponding case in the SalesForce
     **/
-    global void createLinkV1ToSF(String workitemId, Case caseData) {
+    public void createLinkV1ToSF(String workitemId, Case caseData) {
     	if (workitemId == null) {
     		return;
     	}
@@ -257,15 +257,15 @@ global with sharing class V1Connector implements IV1Connector {
      * returns: 	id of the created workitem
      * throws:  V1RequestException, Exception
      */
-    global String createWorkitemInV1(Case caseData, String projectId) {
+    public String createWorkitemInV1(Case caseData, Defect defectData) {
     	System.debug('**** settings:' + settings);
     	System.debug('**** requestor:' + requestor);
 
         String body = '<Asset>'
-            + relationNode('Scope', 'Scope:' + projectId)
-            + attributeNode('Name', (caseData.Subject != null ? caseData.Subject : DEFAULT_DEFECT_NAME))
+            + relationNode('Scope', 'Scope:' + settings.getProjectId())
+            + attributeNode('Name', (defectData.title != null ? defectData.title : DEFAULT_DEFECT_NAME))
             + attributeNode('Reference', caseData.CaseNumber)
-            + attributeNode('Description', (caseData.Description != null ? caseData.Description : ''))
+            + attributeNode('Description', (defectData.Description != null ? defectData.Description : ''))
             + relationNode('Source', 'StorySource:' + settings.getSourceId())
             + '</Asset>';
         String workitemType = 'Defect';
@@ -304,7 +304,7 @@ global with sharing class V1Connector implements IV1Connector {
     /**
     * Returns current used settings
     **/
-    global Settings getSettings() {
+    public Settings getSettings() {
         return settings;
     }
 }
