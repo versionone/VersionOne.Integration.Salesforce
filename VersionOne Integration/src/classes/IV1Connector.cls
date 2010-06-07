@@ -42,7 +42,7 @@ public interface IV1Connector {
     * sourceId - source id in the VersionOne
     * Return: id of created workitem in the VersionOne
     **/
-    String createWorkitemInV1(Case caseData, String projectId);
+    String createWorkitemInV1(Case caseData, Defect defectData);
 
     /**
     * Gathers all already ported cases

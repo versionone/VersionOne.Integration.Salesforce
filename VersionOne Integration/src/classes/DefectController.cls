@@ -51,33 +51,54 @@ public class DefectController {
     }
 
     public PageReference createDefect() {
-    	String id = createDataInVersionOne(caseData, settings.getProjectId());
-
+		defect.project = settings.getProjectName();
+		defect.isClosed = false;
+    	String id = createDataInVersionOne(caseData);
+		defect.id = id;
     	V1CaseCollector.updateCase(caseData, id, true);
-    	addInfoMessage(defect.title + ' // ' + defect.description);
-    	return null;
+    	//addInfoMessage(defect.title + ' // ' + defect.description);
+    	isEditForm = false;
+
+		return ApexPages.currentPage();
     }
 
 	public Boolean getIsDefectAssigned() {
-		return caseData.V1DefectId__c != '' && caseData.V1DefectId__c != null;
+		System.debug('caseData.V1DefectId__c=' + caseData.V1DefectId__c);
+		System.debug('caseData.V1Association__c=' + caseData.V1Association__c);
+		return (caseData.V1DefectId__c != '' && caseData.V1DefectId__c != null) && caseData.V1Association__c;
 	}
 
-	public Defect getDefect() {
+	public Defect getCreatingDefect() {
 		return defect;
 	}
 
 	public Defect getAssignedDefect() {
-		return connector.getDefectById(caseData.V1DefectId__c.split(':')[1]);
+		if (!getIsDefectAssigned()) {
+			return null;
+		}
+
+
+		System.debug('****defect=' + defect);
+		System.debug('****defectId=' + caseData.V1DefectId__c);
+
+		if (defect != null && defect.id == caseData.V1DefectId__c) {
+			return defect;
+		} else {
+			return connector.getDefectById(caseData.V1DefectId__c.split(':')[1]);
+		}
+
 	}
 
     /** return id created woritem or null in case any errors */
-    public String createDataInVersionOne(Case caseData, String projectId) {
+    public String createDataInVersionOne(Case caseData) {
         String id;
         try {
-            id = connector.createWorkitemInV1(caseData, projectId);
+            id = connector.createWorkitemInV1(caseData, defect);
         } catch (Exception ex) {
         }
-        connector.createLinkV1ToSF(id, caseData);
+        if (id != null) {
+        	connector.createLinkV1ToSF(id, caseData);
+        }
         return id;
     }
 
