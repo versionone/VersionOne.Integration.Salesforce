@@ -13,7 +13,7 @@
     </script>
     <apex:actionStatus startText="" id="empty" />
     <apex:actionStatus startText="Generating form..." id="createForm" />
-    <apex:actionStatus startText="Creating defect in the VersionOne..." id="create" />
+    <apex:actionStatus startText="Creating defect in the VersionOne..." id="defectCreate"/>
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
         	<!-- Create Defect button -->
@@ -85,7 +85,7 @@
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
 					<apex:commandButton value="Create" id="CreateDefectButton"
-						rerender="CreateDefectSector, messages" status="empty"
+						rerender="messages" status="defectCreate"
 						action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableCreateDefectButton();" oncomplete="refreshWindow()">
                       	<script type="text/javascript">
 	                        function disableCreateDefectButton() {
@@ -143,7 +143,7 @@
 				</apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
 	                <apex:outputText value="Description:" style="text-align:left"/>
-	                <apex:outputPanel layout="block">
+	                <apex:outputPanel layout="block" style="background-color:white;border-style:solid;border-width:1px;">
 						<apex:outputText value="{!AssignedDefect.description}"/>
 					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
