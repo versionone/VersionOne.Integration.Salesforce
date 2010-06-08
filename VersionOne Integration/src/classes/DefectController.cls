@@ -2,6 +2,7 @@ public class DefectController {
 	private Case caseData;
 	private Defect defect;
 	public Boolean isEditForm {set;get; }
+	public String areThereErrors {set;get;}
 
 	private transient Settings innerSettings;
     public Settings settings {
@@ -29,11 +30,25 @@ public class DefectController {
         }
 	}
 
+	private transient IDefectFacade innerDefectFacade;
+	public IDefectFacade defectFacade {
+        get {
+            if (innerDefectFacade == null) {
+                innerDefectFacade = new DefectFacade(connector);
+            }
+            return innerDefectFacade;
+        }
+        set {
+            innerDefectFacade = value;
+        }
+	}
+
 	public DefectController(ApexPages.StandardController stdController) {
 		caseData = V1CaseCollector.getCaseByCaseId(stdController.getRecord().ID);
 		defect = getDefeaultDefectData();
 		System.debug(caseData);
 		isEditForm = false;
+		areThereErrors = 'false';
 	}
 
     public void init() {
@@ -51,15 +66,23 @@ public class DefectController {
     }
 
     public PageReference createDefect() {
-		defect.project = settings.getProjectName();
-		defect.isClosed = false;
-    	String id = createDataInVersionOne(caseData);
-		defect.id = id;
-    	V1CaseCollector.updateCase(caseData, id, true);
-    	//addInfoMessage(defect.title + ' // ' + defect.description);
+    	String id;
+    	PageReference currentPage = ApexPages.currentPage();
     	isEditForm = false;
+    	areThereErrors = 'false';
+    	try {
+    		id = defectFacade.createDefectInVersionOne(caseData, defect);
+			defect.project = settings.getProjectName();
+			defect.isClosed = false;
+			defect.id = id;
+    	} catch (Exception ex) {
+    		System.debug('ex=' + ex);
+			addErrorMessage('Error:' + ex.getMessage());
+			return null;
+    	}
+    	//addInfoMessage(defect.title + ' // ' + defect.description);
 
-		return ApexPages.currentPage();
+		return currentPage;
     }
 
 	public Boolean getIsDefectAssigned() {
@@ -89,21 +112,9 @@ public class DefectController {
 
 	}
 
-    /** return id created woritem or null in case any errors */
-    public String createDataInVersionOne(Case caseData) {
-        String id;
-        try {
-            id = connector.createWorkitemInV1(caseData, defect);
-        } catch (Exception ex) {
-        }
-        if (id != null) {
-        	connector.createLinkV1ToSF(id, caseData);
-        }
-        return id;
-    }
-
-    private static void addInfoMessage(String text) {
-        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, text));
+    private void addErrorMessage(String text) {
+    	areThereErrors = 'true';
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, text));
     }
 
     private Defect getDefeaultDefectData() {

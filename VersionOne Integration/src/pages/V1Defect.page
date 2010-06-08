@@ -6,8 +6,17 @@
             ele.className = 'btnDisabled';
         }
 
+        function enableElement(ele) {
+            ele.disabled = false;
+            ele.className = 'btn';
+        }
+
         function refreshWindow() {
-			parent.location.href="/{!Case.Id}";
+        	if (!areThereAnyErrors()) {
+				parent.location.href="/{!Case.Id}";
+			} else {
+				enableCreateDefectButton();
+			}
 		}
 		//]]>
     </script>
@@ -16,19 +25,65 @@
     <apex:actionStatus startText="Creating defect in the VersionOne..." id="defectCreate"/>
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
-        	<!-- Create Defect button -->
-            <apex:pageBlockSection columns="3" rendered="{!not(isEditForm) && not(isDefectAssigned)}" id="buttons">
-				<apex:commandButton value="Create Defect" id="createFormDefectButton"
+        	<!-- Buttons secton -->
+			<apex:pageBlockButtons location="top" >
+				<!-- Create Defect button -->
+				<apex:commandButton value="Create" id="createFormDefectButton"
 					rerender="CreateDefectSector" status="createForm"
-					action="{!showForm}" onClick="disableCreateFormDefectButton()">
+					action="{!showForm}" onClick="disableCreateFormDefectButton()"
+					rendered="{!not(isEditForm) && not(isDefectAssigned)}">
                       	<script type="text/javascript">
 	                        function disableCreateFormDefectButton() {
 	                            disableElement(document.getElementById('{!$Component.createFormDefectButton}'));
 	                        }
                        	</script>
                 </apex:commandButton>
-			</apex:pageBlockSection>
 
+                <!-- Operations during defect creation -->
+				<apex:commandButton value="Create Defect" id="CreateDefectButton"
+					rerender="errorMessages, areThereErrorsBlock" status="defectCreate"
+					action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableCreateDefectButton();" oncomplete="refreshWindow()"
+					rendered="{!isEditForm}">
+                     	<script type="text/javascript">
+                        function disableCreateDefectButton() {
+                            disableElement(document.getElementById('{!$Component.CreateDefectButton}'));
+                        }
+
+						function enableCreateDefectButton() {
+                            enableElement(document.getElementById('{!$Component.CreateDefectButton}'));
+                        }
+                      	</script>
+                   </apex:commandButton>
+				<apex:commandButton value="Cancel" id="CancelButton"
+					rerender="CreateDefectSector" status="empty"
+					action="{!cancelForm}" onClick="disableCancelButton()"
+					rendered="{!isEditForm}">
+                     	<script type="text/javascript">
+                        function disableCancelButton() {
+                            disableElement(document.getElementById('{!$Component.CancelButton}'));
+                        }
+                      	</script>
+				</apex:commandButton>
+
+                <!-- Operations with assiged defect -->
+			    <apex:commandButton value="Unassign" id="unussignButton" status="empty"
+			        rendered="{!isDefectAssigned}">
+			        <script type="text/javascript">
+			            function disableSaveButton1() {
+			             disableElement(document.getElementById('{!$Component.unussignButton}'));
+			         }
+			    	</script>
+			    </apex:commandButton>
+			    <apex:commandButton value="Publish Status" status="empty" id="updateStatusButton"
+			        rendered="{!isDefectAssigned}">
+			        <script type="text/javascript">
+			            function disableTestButton1() {
+			                disableElement(document.getElementById('{!$Component.updateStatusButton}'));
+			            }
+			    	</script>
+			    </apex:commandButton>
+
+			</apex:pageBlockButtons>
 
 			<!--  Defect creation form -->
 			<script type="text/javascript">
@@ -55,7 +110,7 @@
 				}
                   //]]>
 			</script>
-            <apex:pageBlockSection columns="3" rendered="{!isEditForm}" id="createDefectForm">
+            <apex:pageBlockSection columns="2" rendered="{!isEditForm}" id="createDefectForm">
                 <apex:pageBlockSectionItem >
 	                <apex:outputLabel value="Title" for="DefectTitle" />
 				    <apex:outputPanel layout="block" styleClass="requiredInput">
@@ -82,26 +137,6 @@
                        	</script>
 						</apex:inputTextarea>
 					</apex:outputPanel>
-                </apex:pageBlockSectionItem>
-                <apex:pageBlockSectionItem >
-					<apex:commandButton value="Create" id="CreateDefectButton"
-						rerender="messages" status="defectCreate"
-						action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableCreateDefectButton();" oncomplete="refreshWindow()">
-                      	<script type="text/javascript">
-	                        function disableCreateDefectButton() {
-	                            disableElement(document.getElementById('{!$Component.CreateDefectButton}'));
-	                        }
-                       	</script>
-                    </apex:commandButton>
-					<apex:commandButton value="Cancel" id="CancelButton"
-						rerender="CreateDefectSector" status="empty"
-						action="{!cancelForm}" onClick="disableCancelButton()">
-                      	<script type="text/javascript">
-	                        function disableCancelButton() {
-	                            disableElement(document.getElementById('{!$Component.CancelButton}'));
-	                        }
-                       	</script>
-					</apex:commandButton>
                 </apex:pageBlockSectionItem>
 
             </apex:pageBlockSection>
@@ -149,7 +184,17 @@
 				</apex:pageBlockSectionItem>
 			</apex:pageBlockSection>
 
-		    <apex:pageMessages id="messages" />
+		    <apex:pageMessages id="errorMessages"/>
+
+		    <apex:outputPanel id="areThereErrorsBlock">
+			<apex:inputHidden value="{!areThereErrors}" id="areThereErrors">
+				<script type="text/javascript">
+					function areThereAnyErrors() {
+					    return document.getElementById('{!$Component.areThereErrors}').value == "true";
+					}
+				</script>
+			</apex:inputHidden>
+			</apex:outputPanel>
         </apex:pageBlock>
 	</apex:form>
 
