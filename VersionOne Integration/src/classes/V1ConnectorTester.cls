@@ -292,6 +292,7 @@ private class V1ConnectorTester {
         caseData = [SELECT CaseNumber, Subject, Description, OwnerId FROM Case WHERE Id = :caseData.Id];
 
         // case 1
+        Defect defectData = new Defect(caseName, caseDescription);
         String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/1699/4596" id="Defect:1699:4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
         String sourceName = 'TestSource';
         String sourceId = '1010';
@@ -309,15 +310,18 @@ private class V1ConnectorTester {
                         '</Asset>';
         Settings testSettings = Settings.getTestSettings();
         testSettings.setSourceId(sourceId);
+        testSettings.setProjectId(productId);
         RequestorMock requestor = new RequestorMock(body, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        String workitemId = connector.createWorkitemInV1(caseData, productId);
+        String workitemId = connector.createWorkitemInV1(caseData, defectData);
 
         System.assertEquals(expectedSendBody, requestor.getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
 
         //case 2
+        caseName = 'Case from SalesForce';
+        defectData = new Defect(caseName, '');
         sourceName = 'TestSource';
         sourceId = '1010';
         productId = '123';
@@ -325,7 +329,7 @@ private class V1ConnectorTester {
                             '<Relation act="set" name="Scope">' +
                                 '<Asset idref="Scope:' + productId + '"/>' +
                             '</Relation>' +
-                            '<Attribute act="set" name="Name">Case from SalesForce</Attribute>' +
+                            '<Attribute act="set" name="Name">' + caseName + '</Attribute>' +
                             '<Attribute act="set" name="Reference">' + caseData.CaseNumber +'</Attribute>' +
                             '<Attribute act="set" name="Description"></Attribute>' +
                             '<Relation act="set" name="Source">' +
@@ -337,7 +341,7 @@ private class V1ConnectorTester {
         caseData.Subject = '';
         caseData.Description = '';
 
-        workitemId = connector.createWorkitemInV1(caseData, productId);
+        workitemId = connector.createWorkitemInV1(caseData, defectData);
         System.assertEquals(expectedSendBody, requestor.getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
     }
@@ -347,6 +351,7 @@ private class V1ConnectorTester {
         String sourceId = '1010';
         String productId = '123';
         String caseDescription = 'Case for testing';
+        Defect defectData = new Defect(caseName, caseDescription);
         Case caseData = new Case(Subject = caseName, Description = caseDescription);
         insert caseData;
 
@@ -357,7 +362,7 @@ private class V1ConnectorTester {
 
         try {
             Test.startTest();
-            String id = connector.createWorkitemInV1(caseData, productId);
+            String id = connector.createWorkitemInV1(caseData, defectData);
             Test.stopTest();
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (V1RequestException ex) {}
@@ -371,6 +376,7 @@ private class V1ConnectorTester {
         String productId = '123';
         String body = '<?xml version="1.0" encoding="UTF-8"?><Asset href="/VersionOne/rest-1.v1/Data/Defect/1699/4596" id="Defect:1699:4596"><Attribute name="Description">Case for testing</Attribute><Attribute name="Name">Test case</Attribute><Relation name="Source"><Asset href="/VersionOne/rest-1.v1/Data/StorySource/1010" idref="StorySource:1010" /></Relation><Attribute name="Reference">00001227</Attribute><Relation name="Scope"><Asset href="/VersionOne/rest-1.v1/Data/Scope/123" idref="Scope:123" /></Relation></Asset>';
         String caseDescription = 'Case for testing';
+        Defect defectData = new Defect(caseName, caseDescription);
         Case caseData = new Case(Subject = caseName, Description = caseDescription);
         Settings testSettings = Settings.getTestSettings();
         testSettings.setSourceId(sourceId);
@@ -378,7 +384,7 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         try {
-            String id = connector.createWorkitemInV1(caseData, productId);
+            String id = connector.createWorkitemInV1(caseData, defectData);
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (V1RequestException ex) {}
 
@@ -388,7 +394,7 @@ private class V1ConnectorTester {
         connector = new V1Connector(testSettings, requestor);
 
         try {
-            String Id = connector.createWorkitemInV1(caseData, productId);
+            String Id = connector.createWorkitemInV1(caseData, defectData);
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (NullPointerException ex) {}
 
@@ -397,7 +403,7 @@ private class V1ConnectorTester {
         requestor = new RequestorMock(body, 200, new Exception[]{null, new V1RequestException('test error')});
         connector = new V1Connector(testSettings, requestor);
 
-        String workitemId = connector.createWorkitemInV1(caseData, productId);
+        String workitemId = connector.createWorkitemInV1(caseData, defectData);
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
 
         System.debug('exceptionsCreateDefectInVersionOne: 4');
@@ -405,7 +411,7 @@ private class V1ConnectorTester {
         requestor = new RequestorMock(body, 200, new Exception[]{null, new NullPointerException()});
         connector = new V1Connector(testSettings, requestor);
 
-        workitemId = connector.createWorkitemInV1(caseData, productId);
+        workitemId = connector.createWorkitemInV1(caseData, defectData);
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
     }
 

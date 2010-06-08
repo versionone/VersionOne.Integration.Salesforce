@@ -65,6 +65,10 @@ public class V1ConnectorMock implements IV1Connector {
         return createdWorkitemId;
     }
 
+    public void setCreatedWorkitemId(String defectId) {
+    	createdWorkitemId = defectId;
+    }
+
     public void setExceptionForCreationWorkitemInV1(Exception ex) {
 		creationWorkitemException = ex;
     }

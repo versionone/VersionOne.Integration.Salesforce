@@ -258,9 +258,6 @@ public class V1Connector implements IV1Connector {
      * throws:  V1RequestException, Exception
      */
     public String createWorkitemInV1(Case caseData, Defect defectData) {
-    	System.debug('**** settings:' + settings);
-    	System.debug('**** requestor:' + requestor);
-
         String body = '<Asset>'
             + relationNode('Scope', 'Scope:' + settings.getProjectId())
             + attributeNode('Name', (defectData.title != null ? defectData.title : DEFAULT_DEFECT_NAME))
