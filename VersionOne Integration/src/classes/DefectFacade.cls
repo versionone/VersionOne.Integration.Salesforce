@@ -10,8 +10,14 @@ public class DefectFacade implements IDefectFacade {
         id = connector.createWorkitemInV1(caseData, defectData);
 
         if (id != null) {
-        	connector.createLinkV1ToSF(id, caseData);
-        	assignDefectToCase(caseData, id);
+        	try {
+        		connector.createLinkV1ToSF(id, caseData);
+        	} catch (Exception ex) {
+        		throw new V1RequestException('Defect was created in the VersionOne but link was not created in the VersionOne.');
+        	} finally {
+				assignDefectToCase(caseData, id);
+        	}
+
         }
 
         return id;

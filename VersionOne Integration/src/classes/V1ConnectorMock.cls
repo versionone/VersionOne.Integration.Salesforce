@@ -26,6 +26,10 @@ public class V1ConnectorMock implements IV1Connector {
 		return defectData;
 	}
 
+	public void removeLinkFromDefect(String defectId) {
+
+	}
+
     public String getSourceId() {
         throwException();
         return sourceId;

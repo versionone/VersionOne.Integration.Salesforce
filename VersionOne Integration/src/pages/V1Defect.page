@@ -11,12 +11,26 @@
             ele.className = 'btn';
         }
 
-        function refreshWindow() {
+        function refreshWindowIfNoErrors() {
         	if (!areThereAnyErrors()) {
-				parent.location.href="/{!Case.Id}";
+				refreshWindow();
 			} else {
 				enableCreateDefectButton();
 			}
+		}
+
+        function refreshWindowIfThrereAreAnyErrors() {
+        	var areErrors = areThereAnyErrors();
+        	if (areErrors) {
+				refreshWindow();
+			} else {
+				enableCreateDefectButton();
+			}
+			return areErrors;
+		}
+
+		function refreshWindow(){
+			parent.location.href="/{!Case.Id}";
 		}
 		//]]>
     </script>
@@ -26,7 +40,7 @@
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
         	<!-- Buttons secton -->
-			<apex:pageBlockButtons location="top" >
+			<apex:pageBlockButtons location="top" id="buttons">
 				<!-- Create Defect button -->
 				<apex:commandButton value="Create" id="createFormDefectButton"
 					rerender="CreateDefectSector" status="createForm"
@@ -41,10 +55,18 @@
 
                 <!-- Operations during defect creation -->
 				<apex:commandButton value="Create Defect" id="CreateDefectButton"
-					rerender="errorMessages, areThereErrorsBlock" status="defectCreate"
-					action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableCreateDefectButton();" oncomplete="refreshWindow()"
-					rendered="{!isEditForm}">
+					rerender="errorMessages, areThereErrorsBlock, CreateDefectSector"  status="defectCreate"
+					action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableFromButtons();" oncomplete="refreshWindowIfNoErrors()"
+					rendered="{!isEditForm && areThereErrors=='false'}">
                      	<script type="text/javascript">
+                     	function disableFromButtons() {
+                     		if (disableCreateDefectButton) {
+		                     	disableCreateDefectButton();
+							}
+							if (disableCancelButton) {
+		                     	disableCancelButton();
+							}
+                     	}
                         function disableCreateDefectButton() {
                             disableElement(document.getElementById('{!$Component.CreateDefectButton}'));
                         }
@@ -53,14 +75,24 @@
                             enableElement(document.getElementById('{!$Component.CreateDefectButton}'));
                         }
                       	</script>
-                   </apex:commandButton>
+				</apex:commandButton>
 				<apex:commandButton value="Cancel" id="CancelButton"
 					rerender="CreateDefectSector" status="empty"
-					action="{!cancelForm}" onClick="disableCancelButton()"
-					rendered="{!isEditForm}">
+					action="{!cancelForm}" onClick="disableCancelButton();"
+					rendered="{!isEditForm && areThereErrors=='false'}">
                      	<script type="text/javascript">
                         function disableCancelButton() {
                             disableElement(document.getElementById('{!$Component.CancelButton}'));
+                        }
+                      	</script>
+				</apex:commandButton>
+				<apex:commandButton value="Refresh" id="RefreshButton"
+					rerender="CreateDefectSector" status="empty"
+					action="{!cancelForm}" onClick="disableCancelButton();refreshWindow();"
+					rendered="{!isEditForm && areThereErrors=='true'}">
+                     	<script type="text/javascript">
+                        function disableCancelButton() {
+                            disableElement(document.getElementById('{!$Component.RefreshButton}'));
                         }
                       	</script>
 				</apex:commandButton>
@@ -110,7 +142,7 @@
 				}
                   //]]>
 			</script>
-            <apex:pageBlockSection columns="2" rendered="{!isEditForm}" id="createDefectForm">
+            <apex:pageBlockSection columns="2" rendered="{!isEditForm && areThereErrors=='false'}" id="createDefectForm">
                 <apex:pageBlockSectionItem >
 	                <apex:outputLabel value="Title" for="DefectTitle" />
 				    <apex:outputPanel layout="block" styleClass="requiredInput">
@@ -172,7 +204,8 @@
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">Is Closed</apex:facet>
-							<apex:inputCheckbox disabled="true" selected="{!d.isClosed}"/>
+							<apex:image value="/img/checkbox_checked.gif" alt="closed" rendered="{!d.isClosed}"/>
+							<apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(d.isClosed)}"/>
 						</apex:column>
 					</apex:pageBlockTable>
 				</apex:pageBlockSectionItem>

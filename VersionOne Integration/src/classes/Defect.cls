@@ -1,6 +1,6 @@
 public class Defect {
 
-	public static String ClosedAssetState = '128';
+	public static final String ClosedAssetState = '128';
 
 	public Defect() {
 		this('Title', 'Description');

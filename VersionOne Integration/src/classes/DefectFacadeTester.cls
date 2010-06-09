@@ -54,11 +54,11 @@ private class DefectFacadeTester {
 		try {
         	createdDefectId = defectFacade.createDefectInVersionOne(case1, defectData);
         	System.assert(false, 'Error! V1RequestException must be thrown.');
-        } catch (NullPointerException ex) {}
+        } catch (V1RequestException ex) {}
 
 		newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
 		System.assertEquals(null, createdDefectId, 'Incorrect defect id');
-		System.assertEquals(false, newCase1.V1Association__c, 'Incorrect defect id');
-		System.assertEquals(null, newCase1.V1DefectId__c, 'Incorrect defect id');
+		System.assertEquals(true, newCase1.V1Association__c, 'Incorrect defect id');
+		System.assertEquals(defectId, newCase1.V1DefectId__c, 'Incorrect defect id');
     }
 }
