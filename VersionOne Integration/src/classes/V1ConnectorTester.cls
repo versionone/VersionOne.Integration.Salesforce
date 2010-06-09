@@ -469,4 +469,45 @@ private class V1ConnectorTester {
 		System.assertEquals(true, defectData.isClosed, 'Defect is closed!');
 		System.assertEquals(expectedUrl, ((RequestorMock)requestor).getSentUrl(0), 'Incorrect requested URL.');
     }
+
+    static testMethod void removeLinkFromDefectTest() {
+    	String defectId = '2345';
+    	String linkId = '2346';
+        Settings testSettings = Settings.getTestSettings();
+        String expectedUrl1 = 'rest-1.v1/Data/Link?sel=Asset.AssetState&where=(Asset=\'Defect:' + defectId + '\')';
+        String expectedUrl2 = 'rest-1.v1/Data/Link/' + linkId + '?op=Delete';
+        String xml = '<Assets total="1" pageSize="2147483647" pageStart="0">' +
+						'<Asset href="/VersionOne/rest-1.v1/Data/Link/2346" id="Link:' + linkId + '">' +
+						'<Attribute name="Asset.AssetState">64</Attribute>' +
+						'</Asset>' +
+					 '</Assets>';
+		RequestorMock requestor = new RequestorMock(xml, 200);
+        V1Connector connector = new V1Connector(testSettings, requestor);
+
+        connector.removeLinkFromDefect(defectId);
+        System.assertEquals(expectedUrl1, requestor.getSentUrl(0), 'Incorrect requested URL for link.');
+        System.assertEquals(expectedUrl2, requestor.getSentUrl(1), 'Incorrect requested URL for deleting link.');
+    }
+
+    static testMethod void removeLinkFromDefectWithoutDRemovingLinkTest() {
+    	String defectId = '2345';
+    	String linkId = '2346';
+        Settings testSettings = Settings.getTestSettings();
+        String expectedUrl1 = 'rest-1.v1/Data/Link?sel=Asset.AssetState&where=(Asset=\'Defect:' + defectId + '\')';
+        String expectedUrl2 = 'rest-1.v1/Data/Link/' + linkId + '?op=Delete';
+        String xml = '<Assets total="1" pageSize="2147483647" pageStart="0">' +
+						'<Asset href="/VersionOne/rest-1.v1/Data/Link/2346" id="Link:' + linkId + '">' +
+						'<Attribute name="Asset.AssetState">128</Attribute>' +
+						'</Asset>' +
+					 '</Assets>';
+		RequestorMock requestor = new RequestorMock(xml, 200);
+        V1Connector connector = new V1Connector(testSettings, requestor);
+
+        connector.removeLinkFromDefect(defectId);
+        System.assertEquals(expectedUrl1, requestor.getSentUrl(0), 'Incorrect requested URL for link.');
+        try {
+        	System.assertEquals(expectedUrl2, requestor.getSentUrl(1));
+        	System.assert(false, 'This cannot be reached.');
+        } catch (Exception ex){}
+    }
 }

@@ -55,6 +55,7 @@ public class DefectController {
     }
 
     public PageReference showForm() {
+    	areThereErrors = 'false';
     	isEditForm = true;
     	return null;
     }
@@ -68,13 +69,14 @@ public class DefectController {
     public PageReference createDefect() {
     	String id;
     	PageReference currentPage = ApexPages.currentPage();
-    	isEditForm = false;
+
     	areThereErrors = 'false';
     	try {
     		id = defectFacade.createDefectInVersionOne(caseData, defect);
 			defect.project = settings.getProjectName();
 			defect.isClosed = false;
 			defect.id = id;
+			isEditForm = false;
     	} catch (Exception ex) {
     		System.debug('ex=' + ex);
 			addErrorMessage('Error:' + ex.getMessage());
@@ -88,7 +90,7 @@ public class DefectController {
 	public Boolean getIsDefectAssigned() {
 		System.debug('caseData.V1DefectId__c=' + caseData.V1DefectId__c);
 		System.debug('caseData.V1Association__c=' + caseData.V1Association__c);
-		return (caseData.V1DefectId__c != '' && caseData.V1DefectId__c != null) && caseData.V1Association__c;
+		return (caseData.V1DefectId__c != '' && caseData.V1DefectId__c != null) && caseData.V1Association__c && areThereErrors=='false';
 	}
 
 	public Defect getCreatingDefect() {

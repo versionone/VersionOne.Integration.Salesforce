@@ -13,6 +13,12 @@ public interface IV1Connector {
     Defect getDefectById(String defectId);
 
     /**
+    * Removes link from defect in VersionOne if defect is not closed
+    * defectId  - defect id in the VersionOne
+    **/
+	void removeLinkFromDefect(String defectId);
+
+    /**
     * Returns: find and return id of current source(from Settings).
     **/
     String getSourceId();
