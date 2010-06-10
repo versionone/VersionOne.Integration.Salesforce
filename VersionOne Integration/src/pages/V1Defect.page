@@ -22,6 +22,24 @@
 		function refreshWindow(){
 			parent.location.href="/{!Case.Id}";
 		}
+
+		function disableFormButtons() {
+			if (disableCreateDefectButton) {
+				disableCreateDefectButton();
+			}
+			if (disableCancelButton) {
+				disableCancelButton();
+			}
+		}
+
+		function disableOperationOnAssigedDefect() {
+			if (disablePublishStatusButton) {
+				disablePublishStatusButton();
+			}
+			if (disableUnassignButton) {
+				disableUnassignButton();
+			}
+		}
 		//]]>
     </script>
     <apex:actionStatus startText="" id="empty" />
@@ -48,17 +66,9 @@
                 <!-- Operations during defect creation -->
 				<apex:commandButton value="Create Defect" id="CreateDefectButton"
 					rerender="errorMessages, areThereErrorsBlock, CreateDefectSector"  status="defectCreate"
-					action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableFromButtons();" oncomplete="refreshWindowIfNoErrors()"
+					action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableFormButtons();" oncomplete="refreshWindowIfNoErrors()"
 					rendered="{!isEditForm && not(areThereErrors)}">
                      	<script type="text/javascript">
-                     	function disableFromButtons() {
-                     		if (disableCreateDefectButton) {
-		                     	disableCreateDefectButton();
-							}
-							if (disableCancelButton) {
-		                     	disableCancelButton();
-							}
-                     	}
                         function disableCreateDefectButton() {
                             disableElement(document.getElementById('{!$Component.CreateDefectButton}'));
                         }
@@ -70,7 +80,7 @@
 				</apex:commandButton>
 				<apex:commandButton value="Cancel" id="CancelButton"
 					rerender="CreateDefectSector" status="empty"
-					action="{!cancelForm}" onClick="disableCancelButton();"
+					action="{!cancelForm}" onClick="disableFormButtons();"
 					rendered="{!isEditForm && not(areThereErrors)}">
                      	<script type="text/javascript">
                         function disableCancelButton() {
@@ -91,7 +101,7 @@
 
                 <!-- Operations with assiged defect -->
 			    <apex:commandButton value="Unassign" id="unussignButton" status="empty"
-			        rendered="{!isDefectAssigned}" action="{!unassignDefect}" onclick="disableUnassignButton()"
+			        rendered="{!isDefectAssigned}" action="{!unassignDefect}" onclick="disableOperationOnAssigedDefect()"
 			        oncomplete="refreshWindowIfNoErrors()" status="unassigning"
 			        rerender="errorMessages, areThereErrorsBlock, CreateDefectSector">
 			        <script type="text/javascript">
