@@ -107,20 +107,26 @@ public class DefectController {
 		if (!getIsDefectAssigned()) {
 			return null;
 		}
-
+		Defect assignedDefect;
 
 		System.debug('****defect=' + defect);
 		System.debug('****defectId=' + caseData.V1DefectId__c);
 
 		if (defect != null && defect.id == caseData.V1DefectId__c) {
-			return defect;
+			assignedDefect = defect;
 		} else {
-			return connector.getDefectById(caseData.V1DefectId__c.split(':')[1]);
+			try {
+				assignedDefect = connector.getDefectById(caseData.V1DefectId__c.split(':')[1]);
+			} catch(Exception ex) {
+				addWarningMessage(ex.getMessage());
+				//addErrorMessage(ex.getMessage());
+			}
 		}
-
+		return assignedDefect;
 	}
 
 	public PageReference unassignDefect() {
+		System.debug('**************unassignDefect');
 		areThereErrors = false;
 		try {
 			defectFacade.unassignDefectFromCase(caseData);
@@ -134,6 +140,11 @@ public class DefectController {
     	areThereErrors = true;
         ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, text));
     }
+
+    private void addWarningMessage(String text) {
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.WARNING, text));
+    }
+
 
     private Defect getDefeaultDefectData() {
     	return new Defect(caseData.Subject, caseData.Description);

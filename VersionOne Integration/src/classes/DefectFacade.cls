@@ -68,7 +68,7 @@ public class DefectFacade implements IDefectFacade {
 			if (notRemovedData != '') {
 				notRemovedData += ', ';
 			}
-			notRemovedData = 'Link';
+			notRemovedData += 'Link';
 		}
 		return notRemovedData;
 	}
