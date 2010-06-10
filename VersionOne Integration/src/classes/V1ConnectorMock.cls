@@ -7,6 +7,8 @@ public class V1ConnectorMock implements IV1Connector {
     public String createdWorkitemId;
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
     private List<String> closedDefects = new List<String>();
+    private Exception removeLinkFromDefectException;
+    private Exception updateReferenceForDefectException;
 
     public static String defaultProjectId = '1010';
 
@@ -27,7 +29,25 @@ public class V1ConnectorMock implements IV1Connector {
 	}
 
 	public void removeLinkFromDefect(String defectId) {
+		throwException();
+		if (removeLinkFromDefectException != null) {
+			throw removeLinkFromDefectException;
+		}
+	}
 
+	public void setRemoveLinkFromDefectException(Exception ex) {
+		removeLinkFromDefectException = ex;
+	}
+
+	public void updateReferenceForDefect(String defectId) {
+		throwException();
+		if (updateReferenceForDefectException != null) {
+			throw updateReferenceForDefectException;
+		}
+	}
+
+	public void setUpdateReferenceForDefectException(Exception ex) {
+		updateReferenceForDefectException = ex;
 	}
 
     public String getSourceId() {
