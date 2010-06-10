@@ -19,16 +19,6 @@
 			}
 		}
 
-        function refreshWindowIfThrereAreAnyErrors() {
-        	var areErrors = areThereAnyErrors();
-        	if (areErrors) {
-				refreshWindow();
-			} else {
-				enableCreateDefectButton();
-			}
-			return areErrors;
-		}
-
 		function refreshWindow(){
 			parent.location.href="/{!Case.Id}";
 		}
@@ -37,6 +27,8 @@
     <apex:actionStatus startText="" id="empty" />
     <apex:actionStatus startText="Generating form..." id="createForm" />
     <apex:actionStatus startText="Creating defect in the VersionOne..." id="defectCreate"/>
+	<apex:actionStatus startText="Un-assigning defect from the case..." id="unassigning"/>
+
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
         	<!-- Buttons secton -->
@@ -45,7 +37,7 @@
 				<apex:commandButton value="Create" id="createFormDefectButton"
 					rerender="CreateDefectSector" status="createForm"
 					action="{!showForm}" onClick="disableCreateFormDefectButton()"
-					rendered="{!not(isEditForm) && not(isDefectAssigned)}">
+					rendered="{!not(isEditForm) && not(isDefectAssigned) && not(areThereErrors)}">
                       	<script type="text/javascript">
 	                        function disableCreateFormDefectButton() {
 	                            disableElement(document.getElementById('{!$Component.createFormDefectButton}'));
@@ -57,7 +49,7 @@
 				<apex:commandButton value="Create Defect" id="CreateDefectButton"
 					rerender="errorMessages, areThereErrorsBlock, CreateDefectSector"  status="defectCreate"
 					action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableFromButtons();" oncomplete="refreshWindowIfNoErrors()"
-					rendered="{!isEditForm && areThereErrors=='false'}">
+					rendered="{!isEditForm && not(areThereErrors)}">
                      	<script type="text/javascript">
                      	function disableFromButtons() {
                      		if (disableCreateDefectButton) {
@@ -79,17 +71,17 @@
 				<apex:commandButton value="Cancel" id="CancelButton"
 					rerender="CreateDefectSector" status="empty"
 					action="{!cancelForm}" onClick="disableCancelButton();"
-					rendered="{!isEditForm && areThereErrors=='false'}">
+					rendered="{!isEditForm && not(areThereErrors)}">
                      	<script type="text/javascript">
                         function disableCancelButton() {
                             disableElement(document.getElementById('{!$Component.CancelButton}'));
                         }
                       	</script>
 				</apex:commandButton>
-				<apex:commandButton value="Refresh" id="RefreshButton"
+				<apex:commandButton value="Refresh Window" id="RefreshButton"
 					rerender="CreateDefectSector" status="empty"
-					action="{!cancelForm}" onClick="disableCancelButton();refreshWindow();"
-					rendered="{!isEditForm && areThereErrors=='true'}">
+					action="{!refreshWidow}" onClick="disableCancelButton();"
+					oncomplete="refreshWindow();" rendered="{!areThereErrors}">
                      	<script type="text/javascript">
                         function disableCancelButton() {
                             disableElement(document.getElementById('{!$Component.RefreshButton}'));
@@ -99,9 +91,11 @@
 
                 <!-- Operations with assiged defect -->
 			    <apex:commandButton value="Unassign" id="unussignButton" status="empty"
-			        rendered="{!isDefectAssigned}">
+			        rendered="{!isDefectAssigned}" action="{!unassignDefect}" onclick="disableUnassignButton()"
+			        oncomplete="refreshWindowIfNoErrors()" status="unassigning"
+			        rerender="errorMessages, areThereErrorsBlock, CreateDefectSector">
 			        <script type="text/javascript">
-			            function disableSaveButton1() {
+			            function disableUnassignButton() {
 			             disableElement(document.getElementById('{!$Component.unussignButton}'));
 			         }
 			    	</script>
@@ -109,7 +103,7 @@
 			    <apex:commandButton value="Publish Status" status="empty" id="updateStatusButton"
 			        rendered="{!isDefectAssigned}">
 			        <script type="text/javascript">
-			            function disableTestButton1() {
+			            function disablePublishStatusButton() {
 			                disableElement(document.getElementById('{!$Component.updateStatusButton}'));
 			            }
 			    	</script>
@@ -142,7 +136,7 @@
 				}
                   //]]>
 			</script>
-            <apex:pageBlockSection columns="2" rendered="{!isEditForm && areThereErrors=='false'}" id="createDefectForm">
+            <apex:pageBlockSection columns="2" rendered="{!isEditForm && not(areThereErrors)}" id="createDefectForm">
                 <apex:pageBlockSectionItem >
 	                <apex:outputLabel value="Title" for="DefectTitle" />
 				    <apex:outputPanel layout="block" styleClass="requiredInput">

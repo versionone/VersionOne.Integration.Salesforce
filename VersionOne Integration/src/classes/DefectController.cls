@@ -2,7 +2,7 @@ public class DefectController {
 	private Case caseData;
 	private Defect defect;
 	public Boolean isEditForm {set;get; }
-	public String areThereErrors {set;get;}
+	public Boolean areThereErrors {set;get;}
 
 	private transient Settings innerSettings;
     public Settings settings {
@@ -48,14 +48,14 @@ public class DefectController {
 		defect = getDefeaultDefectData();
 		System.debug(caseData);
 		isEditForm = false;
-		areThereErrors = 'false';
+		areThereErrors = false;
 	}
 
     public void init() {
     }
 
     public PageReference showForm() {
-    	areThereErrors = 'false';
+    	areThereErrors = false;
     	isEditForm = true;
     	return null;
     }
@@ -66,20 +66,26 @@ public class DefectController {
     	return null;
     }
 
+    public PageReference refreshWidow() {
+    	isEditForm = false;
+    	areThereErrors = false;
+    	return null;
+    }
+
     public PageReference createDefect() {
     	String id;
     	PageReference currentPage = ApexPages.currentPage();
 
-    	areThereErrors = 'false';
+    	areThereErrors = false;
     	try {
     		id = defectFacade.createDefectInVersionOne(caseData, defect);
 			defect.project = settings.getProjectName();
 			defect.isClosed = false;
 			defect.id = id;
 			isEditForm = false;
-    	} catch (Exception ex) {
+    	} catch (IntegrationException ex) {
     		System.debug('ex=' + ex);
-			addErrorMessage('Error:' + ex.getMessage());
+			addErrorMessage(ex.getMessage());
 			return null;
     	}
     	//addInfoMessage(defect.title + ' // ' + defect.description);
@@ -90,7 +96,7 @@ public class DefectController {
 	public Boolean getIsDefectAssigned() {
 		System.debug('caseData.V1DefectId__c=' + caseData.V1DefectId__c);
 		System.debug('caseData.V1Association__c=' + caseData.V1Association__c);
-		return (caseData.V1DefectId__c != '' && caseData.V1DefectId__c != null) && caseData.V1Association__c && areThereErrors=='false';
+		return (caseData.V1DefectId__c != '' && caseData.V1DefectId__c != null) && caseData.V1Association__c && !areThereErrors;
 	}
 
 	public Defect getCreatingDefect() {
@@ -114,8 +120,18 @@ public class DefectController {
 
 	}
 
+	public PageReference unassignDefect() {
+		areThereErrors = false;
+		try {
+			defectFacade.unassignDefectFromCase(caseData);
+		} catch (Exception ex) {
+			addErrorMessage(ex.getMessage());
+		}
+		return null;
+	}
+
     private void addErrorMessage(String text) {
-    	areThereErrors = 'true';
+    	areThereErrors = true;
         ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, text));
     }
 

@@ -36,7 +36,7 @@ private class DefectFacadeTester {
 		try {
         	createdDefectId = defectFacade.createDefectInVersionOne(case1, defectData);
         	System.assert(false, 'Error! V1RequestException must be thrown.');
-        } catch (NullPointerException ex) {}
+        } catch (IntegrationException ex) {}
 
 		Case newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
 		System.assertEquals(null, createdDefectId, 'Incorrect defect id');
@@ -53,12 +53,43 @@ private class DefectFacadeTester {
 		createdDefectId = null;
 		try {
         	createdDefectId = defectFacade.createDefectInVersionOne(case1, defectData);
-        	System.assert(false, 'Error! V1RequestException must be thrown.');
-        } catch (V1RequestException ex) {}
+        	System.assert(false, 'Error! IntegrationException must be thrown.');
+        } catch (IntegrationException ex) {}
 
 		newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
 		System.assertEquals(null, createdDefectId, 'Incorrect defect id');
 		System.assertEquals(true, newCase1.V1Association__c, 'Incorrect defect id');
 		System.assertEquals(defectId, newCase1.V1DefectId__c, 'Incorrect defect id');
+    }
+
+    static testMethod void unassignDefectFromCaseTest() {
+        Case case1 = new Case(Subject = 'case1', Description = 'desc', V1DefectId__c = 'Defect:2345', V1Association__c = true);
+        insert case1;
+        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+
+        V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        defectFacade.unassignDefectFromCase(case1);
+        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+
+        System.assertEquals(null, case1.V1DefectId__c, 'Assigned defect has to be empty.');
+        System.assertEquals(false, case1.V1Association__c, 'Case hasn\'t not have association.');
+    }
+
+    static testMethod void unassignDefectFromCaseWithExceptionsTest() {
+        Case case1 = new Case(Subject = 'case1', Description = 'desc', V1DefectId__c = 'Defect:2345', V1Association__c = true);
+        insert case1;
+        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+
+        V1ConnectorMock connector = new V1ConnectorMock();
+        connector.setRemoveLinkFromDefectException(new NullPointerException());
+        connector.setUpdateReferenceForDefectException(new NullPointerException());
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        try {
+        	defectFacade.unassignDefectFromCase(case1);
+        	System.assert(false, 'Error! IntegrationException must be thrown.');
+        } catch(IntegrationException ex) {}
+        System.assertEquals(null, case1.V1DefectId__c, 'Assigned defect has to be empty.');
+        System.assertEquals(false, case1.V1Association__c, 'Case hasn\'t not have association.');
     }
 }
