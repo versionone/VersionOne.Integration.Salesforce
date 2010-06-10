@@ -48,7 +48,7 @@ public class DefectFacade implements IDefectFacade {
 
 		V1CaseCollector.updateCase(caseData, '', false);
 
-		if (notRemovedData != '') {
+		if (notRemovedData != null) {
 			throw new IntegrationException('Some information about association was not removed from the defect. (' + notRemovedData + ')');
 		}
 	}
