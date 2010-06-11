@@ -1,7 +1,9 @@
 public class DefectFacade implements IDefectFacade {
 	private IV1Connector connector;
+	private Map<String, Defect> defectData;
 
 	public DefectFacade(IV1Connector connector) {
+		defectData = new Map<String, Defect>();
 		this.connector = connector;
 	}
 
@@ -19,7 +21,7 @@ public class DefectFacade implements IDefectFacade {
         	} catch (Exception ex) {
         		throw new IntegrationException('Defect was created in the VersionOne but link was not created in the VersionOne.');
         	} finally {
-				assignDefectToCase(caseData, id);
+				assignDefectToCase(caseData, id, null);
         	}
 
         }
@@ -35,8 +37,8 @@ public class DefectFacade implements IDefectFacade {
 		}
 	}
 
-	public void assignDefectToCase(Case caseData, String defectId) {
-    	V1CaseCollector.updateCase(caseData, defectId, true);
+	public void assignDefectToCase(Case caseData, String defectId, String devStatus) {
+    	V1CaseCollector.updateCase(caseData, defectId, true, devStatus);
 	}
 
 	public void unassignDefectFromCase(Case caseData) {
@@ -46,15 +48,35 @@ public class DefectFacade implements IDefectFacade {
 		String id = getDefectFromToken(caseData.V1DefectId__c);
 		String notRemovedData = removeInfoAboutAssociationFromDefect(id);
 
-		V1CaseCollector.updateCase(caseData, '', false);
+		V1CaseCollector.updateCase(caseData, '', false, null);
 
-		if (notRemovedData != null) {
+		if (notRemovedData != '') {
 			throw new IntegrationException('Some information about association was not removed from the defect. (' + notRemovedData + ')');
 		}
 	}
 
+	public void publishStatus(Case caseData) {
+		if (caseData.V1DefectId__c == null || caseData.V1DefectId__c == '') {
+			throw new IntegrationException('There is no assigned defect to the case.');
+		}
+		//String id = getDefectFromToken(caseData.V1DefectId__c);
+
+		Defect defectData = getDefectById(caseData.V1DefectId__c);
+		V1CaseCollector.updateDeveloperStatus(caseData, defectData.status);
+	}
+
+	public Defect getDefectById(String defectId) {
+		//defectData.put(defectId, null);
+		if (defectData.get(defectId) == null) {
+			String id = getDefectFromToken(defectId);
+			defectData.put(defectId, connector.getDefectById(id));
+		}
+
+		return defectData.get(defectId);
+	}
+
 	private String removeInfoAboutAssociationFromDefect(String id) {
-		String notRemovedData;
+		String notRemovedData = '';
 
 		try {
 			connector.updateReferenceForDefect(id);
@@ -72,6 +94,7 @@ public class DefectFacade implements IDefectFacade {
 		}
 		return notRemovedData;
 	}
+
 
 	private String getDefectFromToken(String token) {
 		return token.split(':')[1];

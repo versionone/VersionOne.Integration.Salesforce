@@ -92,4 +92,17 @@ private class DefectFacadeTester {
         System.assertEquals(null, case1.V1DefectId__c, 'Assigned defect has to be empty.');
         System.assertEquals(false, case1.V1Association__c, 'Case hasn\'t not have association.');
     }
+
+    static testMethod void publishStatusTest() {
+        Case case1 = new Case(Subject = 'case1', Description = 'desc', V1DefectId__c = 'Defect:2345', V1Association__c = true);
+        insert case1;
+        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
+
+		V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        defectFacade.publishStatus(case1);
+
+        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
+        System.assertEquals(V1ConnectorMock.Developer_Status, case1.V1DevelopmentStatus__c, 'Incorrect developer status.');
+    }
 }

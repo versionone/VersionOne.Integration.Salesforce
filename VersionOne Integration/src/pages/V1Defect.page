@@ -1,4 +1,4 @@
-<apex:page extensions="DefectController" standardController="Case" action="{!init}" tabStyle="Case">
+<apex:page extensions="DefectController" standardController="Case" tabStyle="Case">
 	<script type="text/javascript">
 		////<![CDATA[
         function disableElement(ele) {
@@ -24,19 +24,20 @@
 		}
 
 		function disableFormButtons() {
-			if (disableCreateDefectButton) {
+			if (window.disableCreateDefectButton) {
 				disableCreateDefectButton();
 			}
-			if (disableCancelButton) {
+			if (window.disableCancelButton) {
 				disableCancelButton();
 			}
 		}
 
 		function disableOperationOnAssigedDefect() {
-			if (disablePublishStatusButton) {
+			if (window.disablePublishStatusButton) {
 				disablePublishStatusButton();
 			}
-			if (disableUnassignButton) {
+
+			if (window.disableUnassignButton) {
 				disableUnassignButton();
 			}
 		}
@@ -46,6 +47,7 @@
     <apex:actionStatus startText="Generating form..." id="createForm" />
     <apex:actionStatus startText="Creating defect in the VersionOne..." id="defectCreate"/>
 	<apex:actionStatus startText="Un-assigning defect from the case..." id="unassigning"/>
+	<apex:actionStatus startText="Publishing status..." id="publishing_status"/>
 
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
@@ -88,8 +90,7 @@
                         }
                       	</script>
 				</apex:commandButton>
-				<apex:commandButton value="Refresh Window" id="RefreshButton"
-					rerender="CreateDefectSector" status="empty"
+				<apex:commandButton value="Refresh Window" id="RefreshButton" status="empty"
 					action="{!refreshWidow}" onClick="disableCancelButton();"
 					oncomplete="refreshWindow();" rendered="{!areThereErrors}">
                      	<script type="text/javascript">
@@ -100,7 +101,7 @@
 				</apex:commandButton>
 
                 <!-- Operations with assiged defect -->
-			    <apex:commandButton value="Unassign" id="unussignButton" status="empty"
+			    <apex:commandButton value="Unassign" id="unussignButton"
 			        rendered="{!isDefectAssigned}" action="{!unassignDefect}" onclick="disableOperationOnAssigedDefect()"
 			        oncomplete="refreshWindowIfNoErrors()" status="unassigning"
 			        rerender="errorMessages, areThereErrorsBlock, CreateDefectSector">
@@ -110,17 +111,17 @@
 			         }
 			    	</script>
 			    </apex:commandButton>
-			    <apex:commandButton value="Publish Status" status="empty" id="updateStatusButton"
-			        rendered="{!isDefectAssigned}">
+			    <apex:commandButton value="Publish Status" id="updateStatusButton"
+			        rendered="{!isDefectAssigned}" action="{!publishStatus}" onclick="disableOperationOnAssigedDefect()"
+					oncomplete="refreshWindowIfNoErrors()" status="publishing_status"
+			        rerender="errorMessages, areThereErrorsBlock">
 			        <script type="text/javascript">
 			            function disablePublishStatusButton() {
 			                disableElement(document.getElementById('{!$Component.updateStatusButton}'));
 			            }
 			    	</script>
 			    </apex:commandButton>
-
 			</apex:pageBlockButtons>
-
 			<!--  Defect creation form -->
 			<script type="text/javascript">
           		////<![CDATA[
@@ -177,7 +178,6 @@
 
             </apex:pageBlockSection>
 
-
             <!-- Detail defect information  -->
             <apex:pageBlockSection rendered="{!isDefectAssigned}" id="assignedDefect" columns="1">
 				<apex:pageBlockSectionItem >
@@ -219,6 +219,7 @@
 						<apex:outputText value="{!AssignedDefect.description}"/>
 					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
+
 			</apex:pageBlockSection>
 
 		    <apex:pageMessages id="errorMessages"/>

@@ -12,8 +12,9 @@ public interface IDefectFacade {
 	* Assign defect in the VersionOne to case in the SalesForce
 	* caseData 		- case for assign
 	* defecId 		- defect id for assign
+	* devStatus		- development status of defect
 	**/
-	void assignDefectToCase(Case caseData, String defectId);
+	void assignDefectToCase(Case caseData, String defectId, String devStatus);
 
 	/**
 	* Unsaaign a defect from the case. Also removes data from defect in the VersionOne
@@ -21,5 +22,17 @@ public interface IDefectFacade {
 	* caseData - case for removing assigned defect
 	**/
 	void unassignDefectFromCase(Case caseData);
+
+	/**
+	* Get status from the assigned defect and put it to the case
+	* caseData 		- case for processing
+	**/
+	void publishStatus(Case caseData);
+
+	/**
+	* Get defect from the VersionOne by defect id
+	* defectToken 	- defect token (for example Defect:1234)
+	**/
+	Defect getDefectById(String defectToken);
 
 }

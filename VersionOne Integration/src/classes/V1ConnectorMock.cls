@@ -10,7 +10,8 @@ public class V1ConnectorMock implements IV1Connector {
     private Exception removeLinkFromDefectException;
     private Exception updateReferenceForDefectException;
 
-    public static String defaultProjectId = '1010';
+    public static final String defaultProjectId = '1010';
+    public static final String Developer_Status = 'In Progress';
 
     public List<String> getClosedWorkitems() {
         throwException();
@@ -24,6 +25,7 @@ public class V1ConnectorMock implements IV1Connector {
 	public Defect getDefectById(String id) {
 		Defect defectData = new Defect();
 		defectData.id = id;
+		defectData.status = Developer_Status;
 
 		return defectData;
 	}
