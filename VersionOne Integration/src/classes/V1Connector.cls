@@ -274,6 +274,7 @@ public class V1Connector implements IV1Connector {
     * Creates link to the corresponding case in the SalesForce
     **/
     public void createLinkV1ToSF(String workitemId, Case caseData) {
+    	//throw new V1RequestException('Problem to create link to case');
     	if (workitemId == null) {
     		return;
     	}

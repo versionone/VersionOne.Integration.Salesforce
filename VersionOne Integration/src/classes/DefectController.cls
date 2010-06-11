@@ -17,24 +17,11 @@ public class DefectController {
         }
 	}
 
-    private transient IV1Connector innerConnector;
-    public IV1Connector connector {
-        get {
-            if (innerConnector == null) {
-                innerConnector = new V1Connector(settings, new Requestor(settings));
-            }
-            return innerConnector;
-        }
-        set {
-            innerConnector = value;
-        }
-	}
-
 	private transient IDefectFacade innerDefectFacade;
 	public IDefectFacade defectFacade {
         get {
             if (innerDefectFacade == null) {
-                innerDefectFacade = new DefectFacade(connector);
+                innerDefectFacade = new DefectFacade(new V1Connector(settings, new Requestor(settings)));
             }
             return innerDefectFacade;
         }
@@ -43,15 +30,20 @@ public class DefectController {
         }
 	}
 
+    public DefectController(Case c) {
+		init(c.ID);
+    }
+
+
 	public DefectController(ApexPages.StandardController stdController) {
-		caseData = V1CaseCollector.getCaseByCaseId(stdController.getRecord().ID);
-		defect = getDefeaultDefectData();
-		System.debug(caseData);
-		isEditForm = false;
-		areThereErrors = false;
+		init(stdController.getRecord().ID);
 	}
 
-    public void init() {
+    public void init(String id) {
+		caseData = V1CaseCollector.getCaseByCaseId(id);
+		defect = getDefeaultDefectData();
+		isEditForm = false;
+		areThereErrors = false;
     }
 
     public PageReference showForm() {
@@ -74,7 +66,7 @@ public class DefectController {
 
     public PageReference createDefect() {
     	String id;
-    	PageReference currentPage = ApexPages.currentPage();
+    	//PageReference currentPage = ApexPages.currentPage();
 
     	areThereErrors = false;
     	try {
@@ -86,11 +78,12 @@ public class DefectController {
     	} catch (IntegrationException ex) {
     		System.debug('ex=' + ex);
 			addErrorMessage(ex.getMessage());
-			return null;
+
     	}
     	//addInfoMessage(defect.title + ' // ' + defect.description);
 
-		return currentPage;
+		//return currentPage;
+		return null;
     }
 
 	public Boolean getIsDefectAssigned() {
@@ -116,7 +109,7 @@ public class DefectController {
 			assignedDefect = defect;
 		} else {
 			try {
-				assignedDefect = connector.getDefectById(caseData.V1DefectId__c.split(':')[1]);
+				assignedDefect = defectFacade.getDefectById(caseData.V1DefectId__c);
 			} catch(Exception ex) {
 				addWarningMessage(ex.getMessage());
 				//addErrorMessage(ex.getMessage());
@@ -133,6 +126,11 @@ public class DefectController {
 		} catch (Exception ex) {
 			addErrorMessage(ex.getMessage());
 		}
+		return null;
+	}
+
+	public PageReference publishStatus() {
+		defectFacade.publishStatus(caseData);
 		return null;
 	}
 
