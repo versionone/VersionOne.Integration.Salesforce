@@ -1,6 +1,6 @@
 public class DefectFacade implements IDefectFacade {
-    private IV1Connector connector;
-    private Map<String, Defect> defectData;
+    private final IV1Connector connector;
+    private final Map<String, Defect> defectData;
 
     public DefectFacade(IV1Connector connector) {
         defectData = new Map<String, Defect>();
@@ -23,7 +23,6 @@ public class DefectFacade implements IDefectFacade {
             } finally {
                 assignDefectToCase(caseData, id, null);
             }
-
         }
 
         return id;
@@ -59,19 +58,15 @@ public class DefectFacade implements IDefectFacade {
         if (caseData.V1DefectId__c == null || caseData.V1DefectId__c == '') {
             throw new IntegrationException('There is no assigned defect to the case.');
         }
-        //String id = getDefectFromToken(caseData.V1DefectId__c);
-
         Defect defectData = getDefectById(caseData.V1DefectId__c);
         V1CaseCollector.updateDeveloperStatus(caseData, defectData.status);
     }
 
     public Defect getDefectById(String defectId) {
-        //defectData.put(defectId, null);
         if (defectData.get(defectId) == null) {
             String id = getDefectFromToken(defectId);
             defectData.put(defectId, connector.getDefectById(id));
         }
-
         return defectData.get(defectId);
     }
 
@@ -94,7 +89,6 @@ public class DefectFacade implements IDefectFacade {
         }
         return notRemovedData;
     }
-
 
     private String getDefectFromToken(String token) {
         return token.split(':')[1];

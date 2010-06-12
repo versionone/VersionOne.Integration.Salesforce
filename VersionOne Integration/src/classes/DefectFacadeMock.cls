@@ -4,7 +4,6 @@ public class DefectFacadeMock implements IDefectFacade {
     public static final String DefectTitle = 'Defect Title';
     public static final String DefectDescription = 'Defect Description';
     private static Exception createDefectInVersionOneException;
-    private static Exception assignDefectToCaseException;
     private static Exception defectByIdException;
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
@@ -19,23 +18,11 @@ public class DefectFacadeMock implements IDefectFacade {
         createDefectInVersionOneException = ex;
     }
 
-    public void assignDefectToCase(Case caseData, String defectId, String devStatus) {
-        if (assignDefectToCaseException != null) {
-            throw assignDefectToCaseException;
-        }
-    }
+    public void assignDefectToCase(Case caseData, String defectId, String devStatus) {}
 
-    public void setAssignDefectToCaseExceptionException(Exception ex) {
-        assignDefectToCaseException = ex;
-    }
+    public void unassignDefectFromCase(Case caseData) {}
 
-    public void unassignDefectFromCase(Case caseData) {
-
-    }
-
-    public void publishStatus(Case caseData) {
-
-    }
+    public void publishStatus(Case caseData) {}
 
 
     public Defect getDefectById(String defectToken){

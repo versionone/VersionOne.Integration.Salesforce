@@ -122,12 +122,9 @@ public class V1Connector implements IV1Connector {
         //Send the request, and get a response
         HttpRequest req = requestor.createRequest('', String.format(SOURCE_URL, new String[]{escapedSourceName}), 'GET');
         requestor.request(req);
-        System.debug('Responce code = ' + requestor.getStatusCode());
-        System.debug('Responce body = ' + requestor.getBody());
         validateResponse();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
-        System.debug('assetTag = ' + assetTag);
         if (assetTag != null) {
             return assetTag.getAttribute('id').split(':')[1];
         }
@@ -221,8 +218,6 @@ public class V1Connector implements IV1Connector {
         }
         defaultProjectId = String.valueof(testId);
 
-        System.debug('findProjectId respond = ' + xmlParser.toXmlString());
-        System.debug('findProjectId size = ' + assetTags.size());
         return projects;
     }
 
@@ -237,7 +232,7 @@ public class V1Connector implements IV1Connector {
     }
 
     /**
-     * Were defect already created in the VersionOne
+     * Were defects already created in the VersionOne
      *
      * Returns - List<Integer> Already ported cases
      */
@@ -274,7 +269,6 @@ public class V1Connector implements IV1Connector {
     * Creates link to the corresponding case in the SalesForce
     **/
     public void createLinkV1ToSF(String workitemId, Case caseData) {
-        //throw new V1RequestException('Problem to create link to case');
         if (workitemId == null) {
             return;
         }
