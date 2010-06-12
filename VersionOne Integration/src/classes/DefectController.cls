@@ -66,29 +66,21 @@ public class DefectController {
 
     public PageReference createDefect() {
         String id;
-        //PageReference currentPage = ApexPages.currentPage();
-
         areThereErrors = false;
         try {
             id = defectFacade.createDefectInVersionOne(caseData, defect);
-            defect.project = settings.getProjectName();
-            defect.isClosed = false;
-            defect.id = id;
-            isEditForm = false;
         } catch (IntegrationException ex) {
             System.debug('ex=' + ex);
             addErrorMessage(ex.getMessage());
-
         }
-        //addInfoMessage(defect.title + ' // ' + defect.description);
-
-        //return currentPage;
+        defect.project = settings.getProjectName();
+        defect.isClosed = false;
+        defect.id = id;
+        isEditForm = false;
         return null;
     }
 
     public Boolean getIsDefectAssigned() {
-        System.debug('caseData.V1DefectId__c=' + caseData.V1DefectId__c);
-        System.debug('caseData.V1Association__c=' + caseData.V1Association__c);
         return (caseData.V1DefectId__c != '' && caseData.V1DefectId__c != null) && caseData.V1Association__c && !areThereErrors;
     }
 
@@ -102,9 +94,6 @@ public class DefectController {
         }
         Defect assignedDefect;
 
-        System.debug('****defect=' + defect);
-        System.debug('****defectId=' + caseData.V1DefectId__c);
-
         if (defect != null && defect.id == caseData.V1DefectId__c) {
             assignedDefect = defect;
         } else {
@@ -112,14 +101,12 @@ public class DefectController {
                 assignedDefect = defectFacade.getDefectById(caseData.V1DefectId__c);
             } catch(Exception ex) {
                 addWarningMessage(ex.getMessage());
-                //addErrorMessage(ex.getMessage());
             }
         }
         return assignedDefect;
     }
 
     public PageReference unassignDefect() {
-        System.debug('**************unassignDefect');
         areThereErrors = false;
         try {
             defectFacade.unassignDefectFromCase(caseData);
@@ -142,7 +129,6 @@ public class DefectController {
     private void addWarningMessage(String text) {
         ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.WARNING, text));
     }
-
 
     private Defect getDefeaultDefectData() {
         return new Defect(caseData.Subject, caseData.Description);
