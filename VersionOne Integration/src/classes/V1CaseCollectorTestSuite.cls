@@ -11,7 +11,7 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
     }
 
-	static testMethod void getCaseByCaseIdTest() {
+    static testMethod void getCaseByCaseIdTest() {
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
@@ -19,11 +19,11 @@ private class V1CaseCollectorTestSuite {
         Case newCase = V1CaseCollector.getCaseByCaseId(case1.Id);
         System.assertEquals(case1.CaseNumber, newCase.CaseNumber, 'Incorrect case numbers.');
         System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
-	}
+    }
 
-	static testMethod void updateCaseTest() {
-		String defectId = '123';
-		String devStatus = 'In Progress';
+    static testMethod void updateCaseTest() {
+        String defectId = '123';
+        String devStatus = 'In Progress';
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
@@ -35,10 +35,10 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
         System.assertEquals(true, newCase.V1Association__c, 'Case has to be associated with defect from Versionone.');
         System.assertEquals(defectId, newCase.V1DefectId__c, 'Incorrect associated defect id from VersionOne.');
-	}
+    }
 
-	static testMethod void updateDeveloperStatusTest() {
-		String status = 'In Progress';
+    static testMethod void updateDeveloperStatusTest() {
+        String status = 'In Progress';
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};
         case1 = [SELECT V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
@@ -46,5 +46,5 @@ private class V1CaseCollectorTestSuite {
         V1CaseCollector.updateDeveloperStatus(case1, status);
         case1 = [SELECT V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
         System.assertEquals(status, case1.V1DevelopmentStatus__c, 'Incorrect case numbers.');
-	}
+    }
 }

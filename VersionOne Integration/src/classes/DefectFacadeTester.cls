@@ -13,10 +13,10 @@ private class DefectFacadeTester {
 
         String createdDefectId = defectFacade.createDefectInVersionOne(case1, defectData);
 
-		Case newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
-		System.assertEquals(defectId, createdDefectId, 'Incorrect defect id');
-		System.assertEquals(true, newCase1.V1Association__c, 'Incorrect defect id');
-		System.assertEquals(defectId, newCase1.V1DefectId__c, 'Incorrect defect id');
+        Case newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        System.assertEquals(defectId, createdDefectId, 'Incorrect defect id');
+        System.assertEquals(true, newCase1.V1Association__c, 'Incorrect defect id');
+        System.assertEquals(defectId, newCase1.V1DefectId__c, 'Incorrect defect id');
     }
 
     static testMethod void createDefectInVersionOneWithExceptionsTest() {
@@ -32,34 +32,34 @@ private class DefectFacadeTester {
         insert case1;
         case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
 
-		String createdDefectId;
-		try {
-        	createdDefectId = defectFacade.createDefectInVersionOne(case1, defectData);
-        	System.assert(false, 'Error! V1RequestException must be thrown.');
+        String createdDefectId;
+        try {
+            createdDefectId = defectFacade.createDefectInVersionOne(case1, defectData);
+            System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (IntegrationException ex) {}
 
-		Case newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
-		System.assertEquals(null, createdDefectId, 'Incorrect defect id');
-		System.assertEquals(false, newCase1.V1Association__c, 'Incorrect defect id');
-		System.assertEquals(null, newCase1.V1DefectId__c, 'Incorrect defect id');
+        Case newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        System.assertEquals(null, createdDefectId, 'Incorrect defect id');
+        System.assertEquals(false, newCase1.V1Association__c, 'Incorrect defect id');
+        System.assertEquals(null, newCase1.V1DefectId__c, 'Incorrect defect id');
 
-		//Exception duing link creation
-		connector.setExceptionForCreationWorkitemInV1(null);
-		connector.setExceptionForLinkCreationInV1(new NullPointerException());
+        //Exception duing link creation
+        connector.setExceptionForCreationWorkitemInV1(null);
+        connector.setExceptionForLinkCreationInV1(new NullPointerException());
         case1 = new Case(Subject = 'case1', Description = 'desc');
         insert case1;
         case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
 
-		createdDefectId = null;
-		try {
-        	createdDefectId = defectFacade.createDefectInVersionOne(case1, defectData);
-        	System.assert(false, 'Error! IntegrationException must be thrown.');
+        createdDefectId = null;
+        try {
+            createdDefectId = defectFacade.createDefectInVersionOne(case1, defectData);
+            System.assert(false, 'Error! IntegrationException must be thrown.');
         } catch (IntegrationException ex) {}
 
-		newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
-		System.assertEquals(null, createdDefectId, 'Incorrect defect id');
-		System.assertEquals(true, newCase1.V1Association__c, 'Incorrect defect id');
-		System.assertEquals(defectId, newCase1.V1DefectId__c, 'Incorrect defect id');
+        newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        System.assertEquals(null, createdDefectId, 'Incorrect defect id');
+        System.assertEquals(true, newCase1.V1Association__c, 'Incorrect defect id');
+        System.assertEquals(defectId, newCase1.V1DefectId__c, 'Incorrect defect id');
     }
 
     static testMethod void unassignDefectFromCaseTest() {
@@ -86,8 +86,8 @@ private class DefectFacadeTester {
         connector.setUpdateReferenceForDefectException(new NullPointerException());
         IDefectFacade defectFacade = new DefectFacade(connector);
         try {
-        	defectFacade.unassignDefectFromCase(case1);
-        	System.assert(false, 'Error! IntegrationException must be thrown.');
+            defectFacade.unassignDefectFromCase(case1);
+            System.assert(false, 'Error! IntegrationException must be thrown.');
         } catch(IntegrationException ex) {}
         System.assertEquals(null, case1.V1DefectId__c, 'Assigned defect has to be empty.');
         System.assertEquals(false, case1.V1Association__c, 'Case hasn\'t not have association.');
@@ -98,7 +98,7 @@ private class DefectFacadeTester {
         insert case1;
         case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
 
-		V1ConnectorMock connector = new V1ConnectorMock();
+        V1ConnectorMock connector = new V1ConnectorMock();
         IDefectFacade defectFacade = new DefectFacade(connector);
         defectFacade.publishStatus(case1);
 

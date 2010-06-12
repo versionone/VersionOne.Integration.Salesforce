@@ -9,8 +9,8 @@ public class SettingsController {
     public Boolean isSaved {get; set;}
     public Boolean isGotProjects {get; set;}
 
-	private transient Settings innerSettings;
-	//private Map<String, String> projects;
+    private transient Settings innerSettings;
+    //private Map<String, String> projects;
     public Settings settings {
         get {
             if (innerSettings == null) {
@@ -19,9 +19,9 @@ public class SettingsController {
             return innerSettings;
         }
         set {
-        	innerSettings = value;
+            innerSettings = value;
         }
-	}
+    }
 
     private transient IV1Connector innerConnector;
     public IV1Connector connector {
@@ -34,39 +34,39 @@ public class SettingsController {
         set {
             innerConnector = value;
         }
-	}
+    }
 
     private String innerCurrentProjectId;
     public String CurrentProjectId {
-    	get {
-    		return settings.getProjectId();
-    	}
-    	set {
-    		innerCurrentProjectId = value;
-    	}
+        get {
+            return settings.getProjectId();
+        }
+        set {
+            innerCurrentProjectId = value;
+        }
     }
 
     private Map<String, String> innerProjects;
     public Map<String, String> projects {
         get {
             if (innerProjects == null || innerProjects.keySet().size() == 0) {
-				refreshProjectsList();
+                refreshProjectsList();
             }
             return innerProjects;
         }
         set {}
-	}
+    }
 
-	private void refreshProjectsList() {
-		try {
-        	innerProjects = connector.findAllProjects();
-        	isGotProjects = true;
+    private void refreshProjectsList() {
+        try {
+            innerProjects = connector.findAllProjects();
+            isGotProjects = true;
         } catch (Exception ex) {
-        	innerProjects = new Map<String, String>();
-        	System.debug('Exception was thrown.' + ex);
-        	isGotProjects = false;
+            innerProjects = new Map<String, String>();
+            System.debug('Exception was thrown.' + ex);
+            isGotProjects = false;
         }
-	}
+    }
 
     /** Must be called before usage of any other method. */
     public void initSettings() {
@@ -78,37 +78,37 @@ public class SettingsController {
         isGotProjects = false;
         refreshProjectsList();
         if (updateProjectData()) {
-        	settings.updateSettings();
+            settings.updateSettings();
         }
     }
 
     public boolean updateProjectData() {
-    	boolean isUpdated = false;
+        boolean isUpdated = false;
 
-		if (settings.validate().size() == 0 &&
-			(settings.getProjectId() == '' || settings.getProjectId() == null ||
-		     settings.getProjectName() == '' || settings.getProjectName() == null)) {
-			updateProjectSettings(connector.getDefaultProjectId());
-			isUpdated = true;
-		}
+        if (settings.validate().size() == 0 &&
+            (settings.getProjectId() == '' || settings.getProjectId() == null ||
+             settings.getProjectName() == '' || settings.getProjectName() == null)) {
+            updateProjectSettings(connector.getDefaultProjectId());
+            isUpdated = true;
+        }
 
         return isUpdated;
     }
 
     public void updateProjectSettings(String id) {
-		settings.setProjectId(id);
-		settings.setProjectName(projects.get(id));
+        settings.setProjectId(id);
+        settings.setProjectName(projects.get(id));
     }
 
 
     public PageReference saveSettings() {
-    	isSettingsCorrect = validateSettings();
-    	String sourceId;
-    	try {
-    		sourceId = connector.getSourceId();
-    	} catch (Exception ex) {}
+        isSettingsCorrect = validateSettings();
+        String sourceId;
+        try {
+            sourceId = connector.getSourceId();
+        } catch (Exception ex) {}
         if (!isSettingsCorrect || sourceId == null) {
-        	isSettingsCorrect = false;
+            isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
             isSaved = false;
@@ -124,7 +124,7 @@ public class SettingsController {
         isSettingsValidated = false;
         isSaved = true;
         if(!updateProjectData()) {
-			refreshProjectsList();
+            refreshProjectsList();
         }
         try {
             settings.updateSettings();
@@ -202,34 +202,34 @@ public class SettingsController {
     }
 
     public List<Mapping> getMappings() {
-		List<Mapping> mappings = new List<Mapping>();
-		System.debug('isGotProjects:' + isGotProjects);
-		Mapping mapping = new Mapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()));
-		mappings.add(mapping);
+        List<Mapping> mappings = new List<Mapping>();
+        System.debug('isGotProjects:' + isGotProjects);
+        Mapping mapping = new Mapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()));
+        mappings.add(mapping);
 
-    	return mappings;
+        return mappings;
     }
 
     public void updateProject() {
-		updateProjectSettings(innerCurrentProjectId);
-		settings.updateSettings();
+        updateProjectSettings(innerCurrentProjectId);
+        settings.updateSettings();
     }
 
-	public class Mapping {
-		private String projectName;
-		private Boolean isVisible;
+    public class Mapping {
+        private String projectName;
+        private Boolean isVisible;
 
-		public Mapping(String projectName, Boolean isVisible) {
-			this.projectName = projectName;
-			this.isVisible = isVisible;
-		}
+        public Mapping(String projectName, Boolean isVisible) {
+            this.projectName = projectName;
+            this.isVisible = isVisible;
+        }
 
-		public String getProjectName() {
-			return projectName;
-		}
+        public String getProjectName() {
+            return projectName;
+        }
 
-		public Boolean getIsVisible() {
-			return isVisible;
-		}
-	}
+        public Boolean getIsVisible() {
+            return isVisible;
+        }
+    }
 }

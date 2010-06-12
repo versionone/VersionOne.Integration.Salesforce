@@ -121,19 +121,19 @@ global with sharing class Settings {
     }
 
     public void setProjectId(String id) {
-    	projectId = id;
+        projectId = id;
     }
 
     public String getProjectId() {
-    	return projectId;
+        return projectId;
     }
 
     public void setProjectName(String name) {
-    	projectName = name;
+        projectName = name;
     }
 
     public String getProjectName() {
-    	return projectName;
+        return projectName;
     }
 
     public void setLastDateChangeAsset(DateTime changeDateUTC) {
