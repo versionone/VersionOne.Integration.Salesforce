@@ -22,35 +22,35 @@ public class V1ConnectorMock implements IV1Connector {
         this.closedDefects = closedDefects;
     }
 
-	public Defect getDefectById(String id) {
-		Defect defectData = new Defect();
-		defectData.id = id;
-		defectData.status = Developer_Status;
+    public Defect getDefectById(String id) {
+        Defect defectData = new Defect();
+        defectData.id = id;
+        defectData.status = Developer_Status;
 
-		return defectData;
-	}
+        return defectData;
+    }
 
-	public void removeLinkFromDefect(String defectId) {
-		throwException();
-		if (removeLinkFromDefectException != null) {
-			throw removeLinkFromDefectException;
-		}
-	}
+    public void removeLinkFromDefect(String defectId) {
+        throwException();
+        if (removeLinkFromDefectException != null) {
+            throw removeLinkFromDefectException;
+        }
+    }
 
-	public void setRemoveLinkFromDefectException(Exception ex) {
-		removeLinkFromDefectException = ex;
-	}
+    public void setRemoveLinkFromDefectException(Exception ex) {
+        removeLinkFromDefectException = ex;
+    }
 
-	public void updateReferenceForDefect(String defectId) {
-		throwException();
-		if (updateReferenceForDefectException != null) {
-			throw updateReferenceForDefectException;
-		}
-	}
+    public void updateReferenceForDefect(String defectId) {
+        throwException();
+        if (updateReferenceForDefectException != null) {
+            throw updateReferenceForDefectException;
+        }
+    }
 
-	public void setUpdateReferenceForDefectException(Exception ex) {
-		updateReferenceForDefectException = ex;
-	}
+    public void setUpdateReferenceForDefectException(Exception ex) {
+        updateReferenceForDefectException = ex;
+    }
 
     public String getSourceId() {
         throwException();
@@ -75,28 +75,28 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     public void createLinkV1ToSF(String defectId, Case caseData) {
-		if (createLinkException != null) {
-			throw createLinkException;
-		}
+        if (createLinkException != null) {
+            throw createLinkException;
+        }
     }
 
     public void setExceptionForLinkCreationInV1(Exception ex) {
-    	createLinkException = ex;
+        createLinkException = ex;
     }
 
     public String createWorkitemInV1(Case caseData, Defect defectData) {
-    	if (creationWorkitemException != null) {
-    		throw creationWorkitemException;
-    	}
+        if (creationWorkitemException != null) {
+            throw creationWorkitemException;
+        }
         return createdWorkitemId;
     }
 
     public void setCreatedWorkitemId(String defectId) {
-    	createdWorkitemId = defectId;
+        createdWorkitemId = defectId;
     }
 
     public void setExceptionForCreationWorkitemInV1(Exception ex) {
-		creationWorkitemException = ex;
+        creationWorkitemException = ex;
     }
 
     public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {

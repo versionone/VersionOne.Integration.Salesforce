@@ -18,27 +18,27 @@ public class V1CaseCollector {
                           FROM Case WHERE id = :caseID];
     }
 
-	/**
-	 * Update case.
-	 * caseData 	- case which need to be updated.
-	 * defectId 	- id of defect which was assigned for this case.
-	 * assicuation	- was defect from VersionOne associated.
-	 **/
+    /**
+     * Update case.
+     * caseData 	- case which need to be updated.
+     * defectId 	- id of defect which was assigned for this case.
+     * assicuation	- was defect from VersionOne associated.
+     **/
     public static void updateCase(Case caseData, String defectId, Boolean association, String devStatus) {
-    	caseData.V1DefectId__c = defectId;
-    	caseData.V1Association__c = association;
-    	caseData.V1DevelopmentStatus__c = devStatus;
-    	update caseData;
-	}
+        caseData.V1DefectId__c = defectId;
+        caseData.V1Association__c = association;
+        caseData.V1DevelopmentStatus__c = devStatus;
+        update caseData;
+    }
 
-	/**
-	 * Update developer status.
-	 * caseData 	- case which need to be updated.
-	 * status		- developer status.
-	 **/
-	public static void updateDeveloperStatus(Case caseData, String status) {
-		caseData.V1DevelopmentStatus__c = status;
-		update caseData;
-	}
+    /**
+     * Update developer status.
+     * caseData 	- case which need to be updated.
+     * status		- developer status.
+     **/
+    public static void updateDeveloperStatus(Case caseData, String status) {
+        caseData.V1DevelopmentStatus__c = status;
+        update caseData;
+    }
 
 }

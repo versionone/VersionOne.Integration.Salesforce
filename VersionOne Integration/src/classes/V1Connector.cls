@@ -7,8 +7,8 @@ public class V1Connector implements IV1Connector {
     public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'\'{1}\'\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
     public static final String DEFECT_REQUEST_URL = 'rest-1.v1/Data/Defect/{0}?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState';
     public static final String LINK_BY_DEFECT_ID_URL = 'rest-1.v1/Data/Link?sel=Name&where=(Asset=\'\'Defect:{0}\'\')';//'Defect:2345'
-   	public static final String DELETE_LINK_URL = 'rest-1.v1/Data/Link/{0}?op=Delete';
-   	public static final String UPDATE_REFERENCE_URL = 'rest-1.v1/Data/Defect/{0}';
+    public static final String DELETE_LINK_URL = 'rest-1.v1/Data/Link/{0}?op=Delete';
+    public static final String UPDATE_REFERENCE_URL = 'rest-1.v1/Data/Defect/{0}';
 
 
     public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
@@ -56,42 +56,42 @@ public class V1Connector implements IV1Connector {
     }
 
     public void removeLinkFromDefect(String defectId) {
-    	String url = String.format(LINK_BY_DEFECT_ID_URL, new String[]{defectId});
+        String url = String.format(LINK_BY_DEFECT_ID_URL, new String[]{defectId});
         requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
         XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element[] assets = xmlParser.getElementsByTagName('Asset');
         if (assets == null || assets.size() == 0) {
-        	throw new V1RequestException('There is no link for this defect.');
+            throw new V1RequestException('There is no link for this defect.');
         }
         for (XMLDom.Element asset : assets) {
-        	String name = getValue('Name', asset.childNodes);
-			String linkId = asset.getAttribute('id').split(':')[1];
-	        if (linkId != '' && name == LINK_NAME_TO_CASE) {
-	        	url = String.format(DELETE_LINK_URL, new String[]{linkId});
-		        requestor.request(requestor.createRequest('', url, 'POST'));
-		        validateResponse();
-	        }
+            String name = getValue('Name', asset.childNodes);
+            String linkId = asset.getAttribute('id').split(':')[1];
+            if (linkId != '' && name == LINK_NAME_TO_CASE) {
+                url = String.format(DELETE_LINK_URL, new String[]{linkId});
+                requestor.request(requestor.createRequest('', url, 'POST'));
+                validateResponse();
+            }
         }
     }
 
     public void updateReferenceForDefect(String defectId) {
-    	Defect defectData = getDefectById(defectId);
-    	if (defectData.isClosed) {
-    		return;
-    	}
-    	String url = String.format(UPDATE_REFERENCE_URL, new String[]{defectId});
+        Defect defectData = getDefectById(defectId);
+        if (defectData.isClosed) {
+            return;
+        }
+        String url = String.format(UPDATE_REFERENCE_URL, new String[]{defectId});
 
         String body = '<Asset id="Defect:' + defectId + '">' +
                         attributeNode('Reference', '') +
                       '</Asset>';
-		requestor.request(requestor.createRequest(body, url, 'POST'));
-		validateResponse();
+        requestor.request(requestor.createRequest(body, url, 'POST'));
+        validateResponse();
     }
 
     public Defect getDefectById(String defectId) {
-    	Defect defectData = new Defect();
+        Defect defectData = new Defect();
         String url = String.format(DEFECT_REQUEST_URL, new String[]{defectId});
         requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
@@ -274,10 +274,10 @@ public class V1Connector implements IV1Connector {
     * Creates link to the corresponding case in the SalesForce
     **/
     public void createLinkV1ToSF(String workitemId, Case caseData) {
-    	//throw new V1RequestException('Problem to create link to case');
-    	if (workitemId == null) {
-    		return;
-    	}
+        //throw new V1RequestException('Problem to create link to case');
+        if (workitemId == null) {
+            return;
+        }
         String body = '<Asset>' +
                         attributeNode('OnMenu', 'true') +
                         attributeNode('URL', 'https://na7.salesforce.com/' + caseData.Id) +

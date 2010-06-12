@@ -206,7 +206,7 @@ private class SettingsControllerTester {
     }
 
     static testMethod void getMappingsTester() {
-    	String projectName = 'Project name';
+        String projectName = 'Project name';
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
         settingsData.setProjectId(V1ConnectorMock.defaultProjectId);
@@ -225,7 +225,7 @@ private class SettingsControllerTester {
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
-		controller.initSettings();
+        controller.initSettings();
         List<SelectOption> options = controller.getVersionOneProjectsList();
         assertContainsOption('CI', options, 'Wrong option');
     }

@@ -435,53 +435,53 @@ private class V1ConnectorTester {
     }
 
     static testMethod void getDefectByIdTest() {
-    	String defectId = '2345';
-    	String resolution = 'Duplicate';
-    	String project = 'SalesForce test';
-    	String description = 'q2312313132';
-    	String token = 'D-01398';
-    	String name = 'for paging testing 1';
-    	String priority = 'Medium';
-    	String status = 'In Progress';
-    	String expectedUrl = 'rest-1.v1/Data/Defect/' + defectId + '?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState';
+        String defectId = '2345';
+        String resolution = 'Duplicate';
+        String project = 'SalesForce test';
+        String description = 'q2312313132';
+        String token = 'D-01398';
+        String name = 'for paging testing 1';
+        String priority = 'Medium';
+        String status = 'In Progress';
+        String expectedUrl = 'rest-1.v1/Data/Defect/' + defectId + '?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState';
         Settings testSettings = Settings.getTestSettings();
         String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="Defect:' + defectId + '">' +
-						'<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
-						'<Attribute name="Scope.Name">' + project + '</Attribute>' +
-						'<Attribute name="Description">' + description + '</Attribute>' +
-						'<Attribute name="Number">' + token + '</Attribute>' +
-						'<Attribute name="AssetState">128</Attribute>' +
-						'<Attribute name="Status.Name">' + status + '</Attribute>' +
-						'<Attribute name="Name">' + name + '</Attribute>' +
-						'<Attribute name="Priority.Name">' + priority + '</Attribute>' +
-					  '</Asset>';
+                        '<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
+                        '<Attribute name="Scope.Name">' + project + '</Attribute>' +
+                        '<Attribute name="Description">' + description + '</Attribute>' +
+                        '<Attribute name="Number">' + token + '</Attribute>' +
+                        '<Attribute name="AssetState">128</Attribute>' +
+                        '<Attribute name="Status.Name">' + status + '</Attribute>' +
+                        '<Attribute name="Name">' + name + '</Attribute>' +
+                        '<Attribute name="Priority.Name">' + priority + '</Attribute>' +
+                      '</Asset>';
         IRequestor requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
-		Defect defectData = connector.getDefectById(defectId);
+        Defect defectData = connector.getDefectById(defectId);
 
-		System.assertEquals(token, defectData.token, 'Incorrect id.');
-		System.assertEquals(defectId, defectData.id, 'Incorrect id.');
-		System.assertEquals(resolution, defectData.resolution, 'Incorrect resolution.');
-		System.assertEquals(project, defectData.project, 'Incorrect project name.');
-		System.assertEquals(description, defectData.description, 'Incorrect defect description.');
-		System.assertEquals(name, defectData.title, 'Incorrect defect name.');
-		System.assertEquals(priority, defectData.priority, 'Incorrect defect priority.');
-		System.assertEquals(true, defectData.isClosed, 'Defect is closed!');
-		System.assertEquals(expectedUrl, ((RequestorMock)requestor).getSentUrl(0), 'Incorrect requested URL.');
+        System.assertEquals(token, defectData.token, 'Incorrect id.');
+        System.assertEquals(defectId, defectData.id, 'Incorrect id.');
+        System.assertEquals(resolution, defectData.resolution, 'Incorrect resolution.');
+        System.assertEquals(project, defectData.project, 'Incorrect project name.');
+        System.assertEquals(description, defectData.description, 'Incorrect defect description.');
+        System.assertEquals(name, defectData.title, 'Incorrect defect name.');
+        System.assertEquals(priority, defectData.priority, 'Incorrect defect priority.');
+        System.assertEquals(true, defectData.isClosed, 'Defect is closed!');
+        System.assertEquals(expectedUrl, ((RequestorMock)requestor).getSentUrl(0), 'Incorrect requested URL.');
     }
 
     static testMethod void removeLinkFromDefectTest() {
-    	String defectId = '2345';
-    	String linkId = '2346';
+        String defectId = '2345';
+        String linkId = '2346';
         Settings testSettings = Settings.getTestSettings();
         String expectedUrl1 = 'rest-1.v1/Data/Link?sel=Name&where=(Asset=\'Defect:' + defectId + '\')';
         String expectedUrl2 = 'rest-1.v1/Data/Link/' + linkId + '?op=Delete';
         String xml = '<Assets total="1" pageSize="2147483647" pageStart="0">' +
-						'<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId + '" id="Link:' + linkId + '">' +
-						'<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
-						'</Asset>' +
-					 '</Assets>';
-		RequestorMock requestor = new RequestorMock(xml, 200);
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId + '" id="Link:' + linkId + '">' +
+                        '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
+                        '</Asset>' +
+                     '</Assets>';
+        RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         connector.removeLinkFromDefect(defectId);
@@ -490,22 +490,22 @@ private class V1ConnectorTester {
     }
 
     static testMethod void removeLinkFromDefectWithMultipleLinksTest() {
-    	String defectId = '2345';
-    	String linkId = '2346';
-    	String linkId2 = '2347';
+        String defectId = '2345';
+        String linkId = '2346';
+        String linkId2 = '2347';
         Settings testSettings = Settings.getTestSettings();
         String expectedUrl1 = 'rest-1.v1/Data/Link?sel=Name&where=(Asset=\'Defect:' + defectId + '\')';
         String expectedUrl2 = 'rest-1.v1/Data/Link/' + linkId + '?op=Delete';
         String expectedUrl3 = 'rest-1.v1/Data/Link/' + linkId2 + '?op=Delete';
         String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
-						'<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId + '" id="Link:' + linkId + '">' +
-							'<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
-						'</Asset>' +
-						'<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId2 + '" id="Link:' + linkId2 + '">' +
-							'<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
-						'</Asset>' +
-					  '</Assets>';
-		RequestorMock requestor = new RequestorMock(xml, 200);
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId + '" id="Link:' + linkId + '">' +
+                            '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
+                        '</Asset>' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId2 + '" id="Link:' + linkId2 + '">' +
+                            '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
+                        '</Asset>' +
+                      '</Assets>';
+        RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         connector.removeLinkFromDefect(defectId);
@@ -515,104 +515,104 @@ private class V1ConnectorTester {
     }
 
     static testMethod void removeLinkFromDefectWithMultipleLinksButRemoveOnlyOneTest() {
-    	String defectId = '2345';
-    	String linkId = '2346';
+        String defectId = '2345';
+        String linkId = '2346';
         Settings testSettings = Settings.getTestSettings();
         String expectedUrl1 = 'rest-1.v1/Data/Link?sel=Name&where=(Asset=\'Defect:' + defectId + '\')';
         String expectedUrl2 = 'rest-1.v1/Data/Link/' + linkId + '?op=Delete';
         String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
-						'<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId + '" id="Link:' + linkId + '">' +
-							'<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
-						'</Asset>' +
-						'<Asset href="/VersionOne/rest-1.v1/Data/Link/2415" id="Link:2415">' +
-							'<Attribute name="Name">test2</Attribute>' +
-						'</Asset>' +
-					  '</Assets>';
-		RequestorMock requestor = new RequestorMock(xml, 200);
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId + '" id="Link:' + linkId + '">' +
+                            '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
+                        '</Asset>' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Link/2415" id="Link:2415">' +
+                            '<Attribute name="Name">test2</Attribute>' +
+                        '</Asset>' +
+                      '</Assets>';
+        RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         connector.removeLinkFromDefect(defectId);
         System.assertEquals(expectedUrl1, requestor.getSentUrl(0), 'Incorrect requested URL for link.');
         System.assertEquals(expectedUrl2, requestor.getSentUrl(1), 'Incorrect requested URL for link.');
         try {
-        	System.assertEquals(null, requestor.getSentUrl(2));
-        	System.assert(false, 'This cannot be reached. Have to be only 2 requests');
+            System.assertEquals(null, requestor.getSentUrl(2));
+            System.assert(false, 'This cannot be reached. Have to be only 2 requests');
         } catch (Exception ex){}
     }
 
     static testMethod void removeLinkFromDefectButNoLinkTest() {
-    	String defectId = '2345';
-    	String linkId = '2346';
+        String defectId = '2345';
+        String linkId = '2346';
         Settings testSettings = Settings.getTestSettings();
         String expectedUrl1 = 'rest-1.v1/Data/Link?sel=Name&where=(Asset=\'Defect:' + defectId + '\')';
         String expectedUrl2 = 'rest-1.v1/Data/Link/' + linkId + '?op=Delete';
         String xml = '<Assets total="0" pageSize="2147483647" pageStart="0"/>';
-		RequestorMock requestor = new RequestorMock(xml, 200);
+        RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         try {
-        	connector.removeLinkFromDefect(defectId);
-        	System.assert(false, 'This cannot be reached.');
+            connector.removeLinkFromDefect(defectId);
+            System.assert(false, 'This cannot be reached.');
         } catch (V1RequestException ex){}
     }
 
     static testMethod void updateReferenceForDefectTest() {
-    	String defectId = '2345';
-    	String resolution = 'Duplicate';
-    	String project = 'SalesForce test';
-    	String description = 'q2312313132';
-    	String token = 'D-01398';
-    	String name = 'for paging testing 1';
-    	String priority = 'Medium';
-    	String status = 'In Progress';
+        String defectId = '2345';
+        String resolution = 'Duplicate';
+        String project = 'SalesForce test';
+        String description = 'q2312313132';
+        String token = 'D-01398';
+        String name = 'for paging testing 1';
+        String priority = 'Medium';
+        String status = 'In Progress';
         String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="Defect:' + defectId + '">' +
-						'<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
-						'<Attribute name="Scope.Name">' + project + '</Attribute>' +
-						'<Attribute name="Description">' + description + '</Attribute>' +
-						'<Attribute name="Number">' + token + '</Attribute>' +
-						'<Attribute name="AssetState">64</Attribute>' +
-						'<Attribute name="Status.Name">' + status + '</Attribute>' +
-						'<Attribute name="Name">' + name + '</Attribute>' +
-						'<Attribute name="Priority.Name">' + priority + '</Attribute>' +
-					  '</Asset>';
-    	Settings testSettings = Settings.getTestSettings();
-		RequestorMock requestor = new RequestorMock(xml, 200);
+                        '<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
+                        '<Attribute name="Scope.Name">' + project + '</Attribute>' +
+                        '<Attribute name="Description">' + description + '</Attribute>' +
+                        '<Attribute name="Number">' + token + '</Attribute>' +
+                        '<Attribute name="AssetState">64</Attribute>' +
+                        '<Attribute name="Status.Name">' + status + '</Attribute>' +
+                        '<Attribute name="Name">' + name + '</Attribute>' +
+                        '<Attribute name="Priority.Name">' + priority + '</Attribute>' +
+                      '</Asset>';
+        Settings testSettings = Settings.getTestSettings();
+        RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
         String expectionBody = '<Asset id="Defect:' + defectId + '"><Attribute act="set" name="Reference"></Attribute></Asset>';
         String expectionUrl = 'rest-1.v1/Data/Defect/' + defectId;
 
-    	connector.updateReferenceForDefect(defectId);
-    	System.assertEquals(expectionBody, requestor.getSentBody(1));
-    	System.assertEquals(expectionUrl, requestor.getSentUrl(1));
+        connector.updateReferenceForDefect(defectId);
+        System.assertEquals(expectionBody, requestor.getSentBody(1));
+        System.assertEquals(expectionUrl, requestor.getSentUrl(1));
     }
 
     static testMethod void updateReferenceForDefectButWithoutUpdateTest() {
-    	String defectId = '2345';
-    	String resolution = 'Duplicate';
-    	String project = 'SalesForce test';
-    	String description = 'q2312313132';
-    	String token = 'D-01398';
-    	String name = 'for paging testing 1';
-    	String priority = 'Medium';
-    	String status = 'In Progress';
+        String defectId = '2345';
+        String resolution = 'Duplicate';
+        String project = 'SalesForce test';
+        String description = 'q2312313132';
+        String token = 'D-01398';
+        String name = 'for paging testing 1';
+        String priority = 'Medium';
+        String status = 'In Progress';
         String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="Defect:' + defectId + '">' +
-						'<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
-						'<Attribute name="Scope.Name">' + project + '</Attribute>' +
-						'<Attribute name="Description">' + description + '</Attribute>' +
-						'<Attribute name="Number">' + token + '</Attribute>' +
-						'<Attribute name="AssetState">' + Defect.ClosedAssetState + '</Attribute>' +
-						'<Attribute name="Status.Name">' + status + '</Attribute>' +
-						'<Attribute name="Name">' + name + '</Attribute>' +
-						'<Attribute name="Priority.Name">' + priority + '</Attribute>' +
-					  '</Asset>';
-    	Settings testSettings = Settings.getTestSettings();
-		RequestorMock requestor = new RequestorMock(xml, 200);
+                        '<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
+                        '<Attribute name="Scope.Name">' + project + '</Attribute>' +
+                        '<Attribute name="Description">' + description + '</Attribute>' +
+                        '<Attribute name="Number">' + token + '</Attribute>' +
+                        '<Attribute name="AssetState">' + Defect.ClosedAssetState + '</Attribute>' +
+                        '<Attribute name="Status.Name">' + status + '</Attribute>' +
+                        '<Attribute name="Name">' + name + '</Attribute>' +
+                        '<Attribute name="Priority.Name">' + priority + '</Attribute>' +
+                      '</Asset>';
+        Settings testSettings = Settings.getTestSettings();
+        RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-    	connector.updateReferenceForDefect(defectId);
+        connector.updateReferenceForDefect(defectId);
         try {
-        	System.assertEquals(null, requestor.getSentUrl(1));
-        	System.assert(false, 'This cannot be reached. Have to be only 1 request');
+            System.assertEquals(null, requestor.getSentUrl(1));
+            System.assert(false, 'This cannot be reached. Have to be only 1 request');
         } catch (Exception ex){}
     }
 }
