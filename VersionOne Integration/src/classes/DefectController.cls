@@ -117,7 +117,11 @@ public class DefectController {
     }
 
     public PageReference publishStatus() {
-        defectFacade.publishStatus(caseData);
+    	try {
+        	defectFacade.publishStatus(caseData);
+    	} catch(Exception ex) {
+			addWarningMessage(ex.getMessage());
+        }
         return null;
     }
 

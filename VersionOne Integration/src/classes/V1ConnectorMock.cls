@@ -13,15 +13,6 @@ public class V1ConnectorMock implements IV1Connector {
     public static final String defaultProjectId = '1010';
     public static final String Developer_Status = 'In Progress';
 
-    public List<String> getClosedWorkitems() {
-        throwException();
-        return closedDefects;
-    }
-
-    public void setClosedDefects(List<String> closedDefects) {
-        this.closedDefects = closedDefects;
-    }
-
     public Defect getDefectById(String id) {
         Defect defectData = new Defect();
         defectData.id = id;
@@ -97,15 +88,6 @@ public class V1ConnectorMock implements IV1Connector {
 
     public void setExceptionForCreationWorkitemInV1(Exception ex) {
         creationWorkitemException = ex;
-    }
-
-    public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
-        throwException();
-        return alreadyExistedDefects;
-    }
-
-    public void setTestAlreadyExistedDefects(Map<String, Boolean> defects) {
-        alreadyExistedDefects = defects;
     }
 
     public Settings getSettings() {
