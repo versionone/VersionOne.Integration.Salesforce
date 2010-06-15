@@ -5,6 +5,8 @@ public class DefectFacadeMock implements IDefectFacade {
     public static final String DefectDescription = 'Defect Description';
     private static Exception createDefectInVersionOneException;
     private static Exception defectByIdException;
+    private static Exception unassignDefectFromCaseException;
+    private static Exception publishStatusException;
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
         System.debug('createDefectInVersionOneException=' + createDefectInVersionOneException);
@@ -20,9 +22,25 @@ public class DefectFacadeMock implements IDefectFacade {
 
     public void assignDefectToCase(Case caseData, String defectId, String devStatus) {}
 
-    public void unassignDefectFromCase(Case caseData) {}
+    public void unassignDefectFromCase(Case caseData) {
+    	if (unassignDefectFromCaseException != null) {
+    		throw unassignDefectFromCaseException;
+    	}
+    }
 
-    public void publishStatus(Case caseData) {}
+    public void setUnassignDefectFromCaseException(Exception ex) {
+		unassignDefectFromCaseException = ex;
+    }
+
+    public void publishStatus(Case caseData) {
+    	if (publishStatusException != null) {
+    		throw publishStatusException;
+    	}
+    }
+
+    public void setPublishStatusException(Exception ex) {
+    	publishStatusException = ex;
+    }
 
 
     public Defect getDefectById(String defectToken){

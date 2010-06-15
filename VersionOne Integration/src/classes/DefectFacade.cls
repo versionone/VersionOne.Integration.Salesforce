@@ -65,7 +65,11 @@ public class DefectFacade implements IDefectFacade {
     public Defect getDefectById(String defectId) {
         if (defectData.get(defectId) == null) {
             String id = getDefectFromToken(defectId);
-            defectData.put(defectId, connector.getDefectById(id));
+            try {
+            	defectData.put(defectId, connector.getDefectById(id));
+            } catch (Exception ex) {
+            	throw new IntegrationException('Status was not published. Problem with getting defect status.');
+        	}
         }
         return defectData.get(defectId);
     }

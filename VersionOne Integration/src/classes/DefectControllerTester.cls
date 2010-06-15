@@ -72,6 +72,75 @@ private class DefectControllerTester {
         System.assertEquals(caseSubject, defectData.title);
         System.assertEquals(caseDescription, defectData.description);
         System.assertEquals(assignedDefectId, defectData.id);
+        System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
+    }
+
+    static testMethod void getAssignedDefectWhenDefectIsNotAssignedTest() {
+        DefectController controller = getControllerWithoutAssignedDefect();
+
+        Defect defectData = controller.getAssignedDefect();
+        System.assertEquals(null, defectData);
+        System.assertEquals(false, controller.areThereErrors);
+        System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
+    }
+
+    static testMethod void unassignDefectTest() {
+        DefectController controller = getControllerWithAssignedDefect();
+
+        controller.unassignDefect();
+        System.assertEquals(false, controller.areThereErrors);
+        System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
+    }
+
+    static testMethod void unassignDefectWithExeptionTest() {
+        DefectController controller = getControllerWithAssignedDefect();
+        IDefectFacade facade = controller.defectFacade;
+        ((DefectFacadeMock)facade).setUnassignDefectFromCaseException(new IntegrationException('test exception'));
+        controller.defectFacade = facade;
+
+        controller.unassignDefect();
+        System.assertEquals(true, controller.areThereErrors);
+        System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
+    }
+
+    static testMethod void publishStatusTest() {
+        DefectController controller = getControllerWithAssignedDefect();
+
+        controller.publishStatus();
+        System.assertEquals(false, controller.areThereErrors);
+        System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
+    }
+
+    static testMethod void publishStatusWithExceptionTest() {
+        DefectController controller = getControllerWithAssignedDefect();
+        IDefectFacade facade = controller.defectFacade;
+        ((DefectFacadeMock)facade).setPublishStatusException(new IntegrationException('test exception'));
+        controller.defectFacade = facade;
+
+        controller.publishStatus();
+        System.assertEquals(false, controller.areThereErrors);
+        System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
+    }
+
+    static testMethod void cancelFormTest() {
+        String newTitle = 'new title';
+        String newDescription = 'new description';
+        DefectController controller = getControllerWithoutAssignedDefect();
+
+        controller.getCreatingDefect().title = newTitle;
+        controller.getCreatingDefect().description = newDescription;
+        Defect defect = controller.getCreatingDefect();
+        controller.isEditForm = true;
+
+        System.assertEquals(newTitle, defect.title, 'Incorrect title');
+        System.assertEquals(newDescription, defect.description, 'Incorrect description');
+        System.assertEquals(true, controller.isEditForm, 'Incorrect description');
+
+        controller.cancelForm();
+        defect = controller.getCreatingDefect();
+        System.assertEquals(caseSubject, defect.title, 'Incorrect title');
+        System.assertEquals(caseDescription, defect.description, 'Incorrect description');
+        System.assertEquals(false, controller.isEditForm, 'Incorrect description');
     }
 
     private static DefectController getControllerWithoutAssignedDefect() {
