@@ -58,8 +58,12 @@ public class DefectFacade implements IDefectFacade {
         if (caseData.V1DefectId__c == null || caseData.V1DefectId__c == '') {
             throw new IntegrationException('There is no assigned defect to the case.');
         }
-        Defect defectData = getDefectById(caseData.V1DefectId__c);
-        V1CaseCollector.updateDeveloperStatus(caseData, defectData.status);
+        try {
+        	Defect defectData = getDefectById(caseData.V1DefectId__c);
+        	V1CaseCollector.updateDeveloperStatus(caseData, defectData.status);
+        } catch(Exception ex) {
+        	throw new IntegrationException('Status was not published. Problem with getting information about defect.');
+        }
     }
 
     public Defect getDefectById(String defectId) {
@@ -68,7 +72,7 @@ public class DefectFacade implements IDefectFacade {
             try {
             	defectData.put(defectId, connector.getDefectById(id));
             } catch (Exception ex) {
-            	throw new IntegrationException('Status was not published. Problem with getting defect status.');
+            	throw new IntegrationException('Problem with getting defect.');
         	}
         }
         return defectData.get(defectId);
