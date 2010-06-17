@@ -1,7 +1,38 @@
 <apex:page extensions="DefectSearchController" standardController="Case" tabStyle="Case">
-    TODO Create Search
+    <apex:actionStatus startText="Searching for VersionOne defects..." id="searchForDefects"/>
+    <!-- 
+    <apex:actionStatus startText="Generating form..." id="" />
+	<apex:actionStatus startText="Assigning defect to the case..." id="assigningDefect"/>
+	<apex:actionStatus startText="Unassigning defect from the case..." id="unassigningDefect"/>
+    -->
+    
     <apex:form >
-        <!-- TODO -->
+        <apex:pageBlock id="searchFormBlock">
+            <apex:outputLabel value="Find" for="queryText" />
+            <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255">
+                <script type="text/javascript">
+	            function getTitle() {
+	                return document.getElementById('{!$Component.queryText}').value;
+	            }
+                </script>
+			</apex:inputText>
+            <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2" />
+            <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>
+            <apex:commandButton value="Search" id="searchButton"
+			    rerender="foundDefectTable, errorMessageBlock" status="searchForDefects"
+				action="{!searchForDefects}" onClick="disableSearchButton()">
+                    <script type="text/javascript">
+	                function disableSearchButton() {
+	                    disableElement(document.getElementById('{!$Component.searchButton}'));
+	                }
+                    </script>
+            </apex:commandButton>
+        </apex:pageBlock>
+        <apex:pageBlock id="foundDefectTable">
+            found defects - table
+        </apex:pageBlock>
+        <apex:pageBlock id="errorMessageBlock">
+            error messages
+        </apex:pageBlock>
 	</apex:form>
-
 </apex:page>
