@@ -14,12 +14,16 @@ public class V1ConnectorMock implements IV1Connector {
     public static final String Developer_Status = 'In Progress';
 
     public Defect getDefectById(String id) {
-        Defect defectData = new Defect();
+        Defect defectData = new Defect('title', 'description');
         defectData.id = id;
         defectData.status = Developer_Status;
 
         return defectData;
     }
+
+	public List<Defect> searchDefects(String find, Boolean isLookingInClosed) {
+		return null;
+	}
 
     public void removeLinkFromDefect(String defectId) {
         throwException();

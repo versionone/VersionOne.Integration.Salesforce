@@ -9,7 +9,8 @@ public class V1Connector implements IV1Connector {
     public static final String LINK_BY_DEFECT_ID_URL = 'rest-1.v1/Data/Link?sel=Name&where=(Asset=\'\'Defect:{0}\'\')';//'Defect:2345'
     public static final String DELETE_LINK_URL = 'rest-1.v1/Data/Link/{0}?op=Delete';
     public static final String UPDATE_REFERENCE_URL = 'rest-1.v1/Data/Defect/{0}';
-
+    public static final String SEARCH_DEFECT_URL = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name{0}&sort=-CreateDateUTC&find={1}';
+    public static final String SEARCH_PART_FOR_CLOSED_DEFECT_URL = '&where=(Scope.AssetState!=\'Closed\')';
 
     public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
     public static final String LINK_NAME_TO_CASE = 'SalesForce Case';
@@ -91,24 +92,50 @@ public class V1Connector implements IV1Connector {
     }
 
     public Defect getDefectById(String defectId) {
-        Defect defectData = new Defect();
         String url = String.format(DEFECT_REQUEST_URL, new String[]{defectId});
         requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
         XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element asset = xmlParser.getElementByTagName('Asset');
-        defectData.title = getValue('Name', asset.childNodes);
+		Defect defectData = getDefect(asset);
+
+        return defectData;
+    }
+
+    public List<Defect> searchDefects(String find, Boolean isLookingInClosed) {
+    	List<Defect> defects = new List<Defect>();
+    	String[] params = new String[2];
+    	if (isLookingInClosed) {
+    		params[0] = SEARCH_PART_FOR_CLOSED_DEFECT_URL;
+    	} else {
+    		params[0] = '';
+    	}
+    	params[1] = find;
+    	String url = String.format(SEARCH_DEFECT_URL, params);
+
+        requestor.request(requestor.createRequest('', url, 'GET'));
+        validateResponse();
+        XMLDom xmlParser = new XMLDom();
+        xmlParser.parseFromString(requestor.getBody());
+        List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
+        for (XMLDom.Element assetTag : assetTags) {
+        	defects.add(getDefect(assetTag));
+        }
+        return defects;
+    }
+
+    private Defect getDefect(XMLDom.Element asset) {
+    	Defect defectData = new Defect(getValue('Name', asset.childNodes), getValue('Description', asset.childNodes));
         defectData.resolution = getValue('ResolutionReason.Name', asset.childNodes);
         defectData.project = getValue('Scope.Name', asset.childNodes);
-        defectData.description = getValue('Description', asset.childNodes);
         defectData.token = getValue('Number', asset.childNodes);
-        defectData.id = defectId;
+        defectData.id = asset.getAttribute('id').split(':')[1];
         defectData.isClosed = getValue('AssetState', asset.childNodes) == Defect.ClosedAssetState;
         defectData.priority = getValue('Priority.Name', asset.childNodes);
         defectData.status = getValue('Status.Name', asset.childNodes);
 
-        return defectData;
+    	return defectData;
     }
 
     public String getSourceId() {
@@ -269,6 +296,7 @@ public class V1Connector implements IV1Connector {
     * Creates link to the corresponding case in the SalesForce
     **/
     public void createLinkV1ToSF(String workitemId, Case caseData) {
+    	//throw new V1RequestException('Problem to create link to case');
         if (workitemId == null) {
             return;
         }

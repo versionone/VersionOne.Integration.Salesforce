@@ -7,6 +7,13 @@ public interface IV1Connector {
     Defect getDefectById(String defectId);
 
     /**
+    * Searches defects in the VersionOne by specify string
+    * find 					- string for searching
+    * isLookingInClosed 	- need to include closed defects in result
+    **/
+    List<Defect> searchDefects(String find, Boolean isLookingInClosed);
+
+    /**
     * Removes link from defect in VersionOne if defect is not closed.
     * defectId  - defect id in the VersionOne.
     **/
