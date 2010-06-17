@@ -1,41 +1,29 @@
 [Settings]----------------------------------------------------------------------------
-[15.01.2010]
+[17.06.2010]
 Create Custom Settings(Setup>Develop>Custom Settings) with "V1Settings" name.
-add the following fileds:
+Settings type should be set to List.
+
+Add the following fields:
   Path 		- URL maxlength 255		
   UserName 	- Text maxlength=20
   Password 	- Text maxlength=20
   Source 		- Text maxlength=30
-  EscalateQueueId 	- Text(18)		remove
-  AssignedQueueId 	- Text(18)		remove
-  StoryQueueId 	- Text(18)			remove
-  commentBody 	- Text Area(255)		remove
-  CommentOnClosing - Text Area(255)		remove
   V1SourceId	- Text(10)			
-  ScheduleId	- Text(18) 			remove
   DateLastClosedAsset - Date/Time
-  BatchId	- Text(25)			remove
   V1ProjectId   - Text(10)
   V1ProjectName - Text(100)
 ----------------------
-Create queue(Setup>Manage Users>Queues) with "Escalate to VersionOne" name.			remove
-----------------------
-Create queue with "Assigned to VersionOne" name.						remove
 
 Allow access to V1 Server (Setup>Administration Setup>Security Controls>Remote Site Settings)
 ----------------------
-Add new field(type is URL) to case Setup>Customize>Cases>Fields with field name VersionOneUrl	remove
-Add new custom field with name VersionOneProject (PickList) and add projects names as values.	remove
-Add new custom field with name V1Processing(CheckBox)						remove
 
 Add new custom field with name V1Association (CheckBox)
 Add new custom field with name V1DevelopmentStatus (Text, size 20)
 Add new custom field with name V1DefectId (Text, size 40)
 ----------------------
+
 Add new tab(Setup>Create>Tabs>Visualforce Tabs) and assign V1Settings page
 
-[Scheduling]-------------------------------------------------------------------
-  To manualy create schrduled jobs one should use SyncSchedule class.				remove
 
 [Authentication]---------------------------------------------------------------
-  Integrated auth in V1 wasn't tested and likly don't works.
+  Integrated auth in V1 was not tested and probably does not work.
