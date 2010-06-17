@@ -1,0 +1,7 @@
+<apex:page extensions="DefectSearchController" standardController="Case" tabStyle="Case">
+    TODO Create Search
+    <apex:form >
+        <!-- TODO -->
+	</apex:form>
+
+</apex:page>
