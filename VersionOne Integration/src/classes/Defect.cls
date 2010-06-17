@@ -2,10 +2,6 @@ public class Defect {
 
     public static final String ClosedAssetState = '128';
 
-    public Defect() {
-        this('Title', 'Description');
-    }
-
     public Defect(String title, String description) {
         this.title = title;
         this.description = description;

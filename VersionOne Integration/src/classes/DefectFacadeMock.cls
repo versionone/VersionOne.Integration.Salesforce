@@ -47,7 +47,7 @@ public class DefectFacadeMock implements IDefectFacade {
         if (defectByIdException != null) {
             throw defectByIdException;
         }
-        Defect defectData = new Defect();
+        Defect defectData = new Defect('title', 'description');
         defectData.id = CreatedDefectId;
         defectData.title = DefectTitle;
         defectData.description = DefectDescription;

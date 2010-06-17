@@ -615,4 +615,121 @@ private class V1ConnectorTester {
             System.assert(false, 'This cannot be reached. Have to be only 1 request');
         } catch (Exception ex){}
     }
+
+    static testMethod void searchDefectsTest() {
+    	Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
+    	expectedDefect1.status = 'In Progress';
+    	expectedDefect1.id = '2469';
+    	expectedDefect1.token = 'D-01470';
+    	expectedDefect1.isClosed = false;
+    	expectedDefect1.project = 'SalesForce test';
+    	expectedDefect1.priority = 'Low';
+    	expectedDefect1.resolution = '';
+		Defect expectedDefect2 = new Defect('testing new functionality', null);
+		expectedDefect2.id = '2473';
+		expectedDefect2.status = '';
+		expectedDefect2.token = 'D-01472';
+		expectedDefect2.isClosed = false;
+		expectedDefect2.project = 'SalesForce test';
+		expectedDefect2.priority = '';
+		expectedDefect2.resolution = 'Fixed';
+    	String searchPhrase = 'testing new functionality';
+    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&sort=-CreateDateUTC&find='+searchPhrase;
+    	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
+						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
+							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
+							'<Attribute name="ResolutionReason.Name"/>' +
+							'<Attribute name="Name">' + expectedDefect1.title + '</Attribute>' +
+							'<Attribute name="Priority.Name">' + expectedDefect1.priority + '</Attribute>' +
+							'<Attribute name="AssetState">64</Attribute>' +
+							'<Attribute name="Scope.Name">' + expectedDefect1.project + '</Attribute>' +
+							'<Attribute name="Number">' + expectedDefect1.token + '</Attribute>' +
+						'</Asset>' +
+						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect2.id + '" id="Defect:' + expectedDefect2.id + '">' +
+							'<Attribute name="Status.Name"/>' +
+							'<Attribute name="ResolutionReason.Name">' + expectedDefect2.resolution + '</Attribute>' +
+							'<Attribute name="Name">' + expectedDefect2.title + '</Attribute>' +
+							'<Attribute name="Priority.Name"/>' +
+							'<Attribute name="AssetState">64</Attribute>' +
+							'<Attribute name="Scope.Name">' + expectedDefect2.project + '</Attribute>' +
+							'<Attribute name="Number">' + expectedDefect2.token + '</Attribute>' +
+						'</Asset>' +
+					  '</Assets>';
+		Settings testSettings = Settings.getTestSettings();
+        RequestorMock testRequestor = new RequestorMock(xml, 200);
+        V1Connector connector = new V1Connector(testSettings, testRequestor);
+
+        List<Defect> defects = connector.searchDefects(searchPhrase, false);
+
+        System.assertEquals(2, defects.size());
+		System.assertEquals(expectedUrl, testRequestor.getSentUrl(0),'Incorrect request url.');
+        System.assert(defectEquals(expectedDefect1, defects.get(0)), 'Incorrect data for defect 1');
+        System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
+    }
+
+    static testMethod void searchDefectsWithClosedDefectsTest() {
+    	Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
+    	expectedDefect1.status = 'In Progress';
+    	expectedDefect1.id = '2469';
+    	expectedDefect1.token = 'D-01470';
+    	expectedDefect1.isClosed = true;
+    	expectedDefect1.project = 'SalesForce test';
+    	expectedDefect1.priority = 'Low';
+    	expectedDefect1.resolution = '';
+		Defect expectedDefect2 = new Defect('testing new functionality', null);
+		expectedDefect2.id = '2473';
+		expectedDefect2.status = '';
+		expectedDefect2.token = 'D-01472';
+		expectedDefect2.isClosed = false;
+		expectedDefect2.project = 'SalesForce test';
+		expectedDefect2.priority = '';
+		expectedDefect2.resolution = 'Fixed';
+    	String searchPhrase = 'testing new functionality';
+    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&where=(Scope.AssetState!=\'Closed\')&sort=-CreateDateUTC&find='+searchPhrase;
+    	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
+						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
+							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
+							'<Attribute name="ResolutionReason.Name"/>' +
+							'<Attribute name="Name">' + expectedDefect1.title + '</Attribute>' +
+							'<Attribute name="Priority.Name">' + expectedDefect1.priority + '</Attribute>' +
+							'<Attribute name="AssetState">128</Attribute>' +
+							'<Attribute name="Scope.Name">' + expectedDefect1.project + '</Attribute>' +
+							'<Attribute name="Number">' + expectedDefect1.token + '</Attribute>' +
+						'</Asset>' +
+						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect2.id + '" id="Defect:' + expectedDefect2.id + '">' +
+							'<Attribute name="Status.Name"/>' +
+							'<Attribute name="ResolutionReason.Name">' + expectedDefect2.resolution + '</Attribute>' +
+							'<Attribute name="Name">' + expectedDefect2.title + '</Attribute>' +
+							'<Attribute name="Priority.Name"/>' +
+							'<Attribute name="AssetState">64</Attribute>' +
+							'<Attribute name="Scope.Name">' + expectedDefect2.project + '</Attribute>' +
+							'<Attribute name="Number">' + expectedDefect2.token + '</Attribute>' +
+						'</Asset>' +
+					  '</Assets>';
+		Settings testSettings = Settings.getTestSettings();
+        RequestorMock testRequestor = new RequestorMock(xml, 200);
+        V1Connector connector = new V1Connector(testSettings, testRequestor);
+
+        List<Defect> defects = connector.searchDefects(searchPhrase, true);
+
+        System.assertEquals(2, defects.size());
+		System.assertEquals(expectedUrl, testRequestor.getSentUrl(0),'Incorrect request url.');
+        System.assert(defectEquals(expectedDefect1, defects.get(0)), 'Incorrect data for defect 1');
+        System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
+    }
+
+    private static Boolean defectEquals(Defect defect1, Defect defect2) {
+    	Boolean result = true;
+    	result = defect1.title == defect2.title;
+    	result = result && defect1.description == defect2.description;
+    	result = result && defect1.token == defect2.token;
+    	result = result && defect1.id == defect2.id;
+    	result = result && defect1.project == defect2.project;
+    	result = result && defect1.priority == defect2.priority;
+    	result = result && defect1.status == defect2.status;
+    	result = result && defect1.resolution == defect2.resolution;
+    	result = result && defect1.isClosed == defect2.isClosed;
+
+    	return result;
+    }
 }
