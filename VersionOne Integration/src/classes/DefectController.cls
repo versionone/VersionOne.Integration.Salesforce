@@ -31,15 +31,14 @@ public class DefectController {
     }
 
     public DefectController(Case c) {
-        init(c.ID);
+        this(c.ID);
     }
-
 
     public DefectController(ApexPages.StandardController stdController) {
-        init(stdController.getRecord().ID);
+        this(stdController.getRecord().ID);
     }
 
-    public void init(String id) {
+    private DefectController(String id) {
         caseData = V1CaseCollector.getCaseByCaseId(id);
         defect = getDefeaultDefectData();
         isEditForm = false;
