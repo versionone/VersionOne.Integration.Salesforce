@@ -7,6 +7,8 @@ public class DefectFacadeMock implements IDefectFacade {
     private static Exception defectByIdException;
     private static Exception unassignDefectFromCaseException;
     private static Exception publishStatusException;
+    
+    public List<Defect> foundDefects { get; set; }
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
         System.debug('createDefectInVersionOneException=' + createDefectInVersionOneException);
@@ -14,6 +16,10 @@ public class DefectFacadeMock implements IDefectFacade {
             throw createDefectInVersionOneException;
         }
         return CreatedDefectId;
+    }
+    
+    public List<Defect> searchForDefects(String queryString, Boolean includeClosedItems) {
+    	return foundDefects;
     }
 
     public void setCreateDefectInVersionOneException(Exception ex) {
@@ -57,6 +63,5 @@ public class DefectFacadeMock implements IDefectFacade {
 
     public void setGetDefectByIdException(Exception ex) {
         defectByIdException = ex;
-    }
-
-}
+    }   
+ }

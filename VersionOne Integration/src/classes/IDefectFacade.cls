@@ -34,5 +34,11 @@ public interface IDefectFacade {
     * defectToken 	- defect token (for example Defect:1234)
     **/
     Defect getDefectById(String defectToken);
-
+    
+    /**
+    * Lookup VersionOne defects
+    * queryString         - string to look for (see VersionOne REST API)
+    * includeClosedItems  - flag determining whether to include closed defects in search result or not
+    **/
+    List<Defect> searchForDefects(String queryString, Boolean includeClosedItems);
 }

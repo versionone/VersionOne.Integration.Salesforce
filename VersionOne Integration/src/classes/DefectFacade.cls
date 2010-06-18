@@ -77,6 +77,14 @@ public class DefectFacade implements IDefectFacade {
         }
         return defectData.get(defectId);
     }
+    
+    public List<Defect> searchForDefects(String queryString, Boolean includeClosedItems) {
+    	try {
+    		return connector.searchDefects(queryString, includeClosedItems);
+    	} catch(Exception ex) {
+    		throw new IntegrationException('Failed to lookup defects in VersionOne.');
+    	}
+    } 
 
     private String removeInfoAboutAssociationFromDefect(String id) {
         String notRemovedData = '';

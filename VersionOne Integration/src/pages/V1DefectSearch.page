@@ -9,18 +9,19 @@
     <apex:form >
         <apex:pageBlock id="searchFormBlock">
             <apex:outputLabel value="Find" for="queryText" />
-            <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255">
+            <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255" value="{!SearchCriteria.queryString}">
                 <script type="text/javascript">
 	            function getTitle() {
 	                return document.getElementById('{!$Component.queryText}').value;
 	            }
                 </script>
 			</apex:inputText>
-            <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2" />
+            <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2" 
+                value="{!SearchCriteria.includeClosedDefects}" />
             <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>
             <apex:commandButton value="Search" id="searchButton"
-			    rerender="foundDefectTable, errorMessageBlock" status="searchForDefects"
-				action="{!searchForDefects}" onClick="disableSearchButton()">
+			    rerender="foundDefectTable, searchFormBlock, errorMessages"
+				action="{!searchForDefects}">
                     <script type="text/javascript">
 	                function disableSearchButton() {
 	                    disableElement(document.getElementById('{!$Component.searchButton}'));
@@ -28,11 +29,47 @@
                     </script>
             </apex:commandButton>
         </apex:pageBlock>
-        <apex:pageBlock id="foundDefectTable">
-            found defects - table
+        <apex:pageBlock id="foundDefectTable" rendered="true">
+          <apex:pageBlockSection id="foundDefects" columns="1" rendered="{!not(errorsExist) && defectsFound}">
+            <apex:pageBlockSectionItem >
+			    <apex:pageBlockTable value="{!Defects}" var="defect" rendered="{!not(foundDefectsCount == 0)}">
+			        <apex:column >
+			            Assign/unassign
+			        </apex:column>
+				    <apex:column >
+					    <apex:facet name="header">ID</apex:facet>
+						<apex:outputLink value="{!settings.path}assetdetail.v1?oid=Defect:{!defect.Id}" target="_blank">{!defect.token}</apex:outputLink>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Title</apex:facet>
+						<apex:outputText value="{!defect.title}"/>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Project</apex:facet>
+						<apex:outputText value="{!defect.project}"/>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Priority</apex:facet>
+						<apex:outputText value="{!defect.priority}"/>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Status</apex:facet>
+						<apex:outputText value="{!defect.status}"/>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Resolution</apex:facet>
+						<apex:outputText value="{!defect.resolution}"/>
+					</apex:column>
+					<apex:column >
+						<apex:facet name="header">Is Closed</apex:facet>
+						<apex:image value="/img/checkbox_checked.gif" alt="closed" rendered="{!defect.isClosed}"/>
+						<apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(defect.isClosed)}"/>
+					</apex:column>
+				</apex:pageBlockTable>
+				<apex:outputLabel value="VersionOne server returned empty result" rendered="{!foundDefectsCount == 0}"/>
+			</apex:pageBlockSectionItem>
+		  </apex:pageBlockSection>
         </apex:pageBlock>
-        <apex:pageBlock id="errorMessageBlock">
-            error messages
-        </apex:pageBlock>
+        <apex:pageMessages id="errorMessages"/>
 	</apex:form>
 </apex:page>
