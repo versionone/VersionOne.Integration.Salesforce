@@ -2,7 +2,9 @@ public class DefectSearchController {
     private transient Settings innerSettings;
     private transient IDefectFacade innerDefectFacade;
     
-    public Settings settings {
+    private DefectSearchCriteria searchCriteria;
+    
+    public Settings Settings {
         get {
             if (innerSettings == null) {
                 innerSettings = new Settings();
@@ -12,7 +14,7 @@ public class DefectSearchController {
         set { innerSettings = value; }
     }
     
-    public IDefectFacade defectFacade {
+    public IDefectFacade DefectFacade {
         get {
             if (innerDefectFacade == null) {
                 innerDefectFacade = new DefectFacade(new V1Connector(settings, new Requestor(settings)));
@@ -22,13 +24,25 @@ public class DefectSearchController {
         set { innerDefectFacade = value; }
     }
     
-    public DefectSearchController() {}
+    public DefectSearchController() {
+        searchCriteria = new DefectSearchCriteria();
+    }
     
     public DefectSearchController(ApexPages.StandardController controller) {
-    	//
+    	this();
+    }
+    
+    public DefectSearchCriteria getSearchCriteria() {
+    	return searchCriteria;
     }
     
     public PageReference searchForDefects() {
+    	System.debug('searching for ' + searchCriteria.queryString + ', closed=' + searchCriteria.includeClosedDefects);
     	return null;
+    }
+    
+    public class DefectSearchCriteria {
+    	public String queryString { get; set; }
+    	public String includeClosedDefects { get; set; } 
     }
 }
