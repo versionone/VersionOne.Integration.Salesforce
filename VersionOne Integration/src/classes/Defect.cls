@@ -1,12 +1,7 @@
 public class Defect {
 
     public static final String ClosedAssetState = '128';
-
-    public Defect(String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
+    
     public String title {get; set;}
     public String description {get; set;}
     public String token {get; set;}
@@ -16,4 +11,13 @@ public class Defect {
     public String status {get; set;}
     public String resolution {get; set;}
     public Boolean isClosed{get; set;}
+
+    public Defect(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
+    
+    public Boolean isAssignedToCase(Case caseToCheck) {
+    	return caseToCheck.V1Association__c && caseToCheck.V1DefectId__c.equals(id);
+    } 
 }
