@@ -6,9 +6,6 @@ public class DefectSearchController {
     
     private DefectSearchCriteria searchCriteria = new DefectSearchCriteria();
     private List<DefectWrapper> foundDefects;
-    private List<String> errors = new List<String>();
-    
-    public Boolean searchFailed { get; private set; } 
     
     public Settings Settings {
         get {
@@ -30,16 +27,13 @@ public class DefectSearchController {
         set { innerDefectFacade = value; }
     }
     
-    public Boolean errorsExist {
-    	get { return errors.size() > 0; }
-    }
-    
-    public Boolean defectsFound {
-    	get { return foundDefects != null && foundDefects.size() > 0; }
+    public Boolean displayDefectTable {
+    	 get { 
+    	 	return foundDefects != null && foundDefects.size() > 0; 
+    	 } 
     }
     
     public String assignedDefectId { get; set; }
-    public String unassignedDefectId { get; set; }
     
     public DefectSearchController(Case caseEntity) {
     	this(caseEntity.ID);
@@ -62,19 +56,12 @@ public class DefectSearchController {
     	return foundDefects;
     }
     
-    public Boolean isAssignedToCurrentCase(Defect defect) {
-    	return defect.isAssignedToCase(currentCase);
-    }
-    
     public PageReference searchForDefects() {
-    	System.debug('searching for ' + searchCriteria.queryString + ', closed=' + searchCriteria.includeClosedDefects);
-    	errors.clear();
-    	searchFailed = false;
+    	System.debug('////////searching for ' + searchCriteria.queryString + ', closed=' + searchCriteria.includeClosedDefects);
     	foundDefects = null;
     	
-    	if(searchCriteria == null || searchCriteria.queryString.trim().length() == 0) {
-    		searchFailed = true;
-    		addError('Please provide non-empty search criteria');
+    	if(searchCriteria == null || searchCriteria.queryString == null || searchCriteria.queryString.trim().length() == 0) {
+    		addPageMessage(ApexPages.Severity.ERROR, 'Please provide non-empty search criteria');
     		return null;
     	}
     	
@@ -87,14 +74,11 @@ public class DefectSearchController {
     		}
     		
     		if(foundDefects.size() == 0) {
-    			ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'VersionOne search returned no matching defects')); 
+    			addPageMessage(ApexPages.Severity.INFO, 'VersionOne search returned no matching defects'); 
     		}
-    		
-    		System.debug('********** FOUND DEFECTS: ' + defects.size());
     	} catch(IntegrationException ex) {
     		System.debug(ex.getMessage());
-    		searchFailed = true;
-    		addError(ex.getMessage());
+    		addPageMessage(ApexPages.Severity.ERROR, ex.getMessage());
     	}
     	
     	return null;
@@ -102,9 +86,11 @@ public class DefectSearchController {
     
     public PageReference assignDefectToCase() {
     	try {
-    		// assign
+    		Defect matchingDefect = findDefectById(assignedDefectId);
+    		System.debug('/////' + matchingDefect);
+    		DefectFacade.assignDefectToCase(currentCase, matchingDefect.id, matchingDefect.status);
     	} catch(IntegrationException ex) {
-    		addError('Failed to associate current Case and selected VersionOne defect: ' + ex.getMessage());
+    		addPageMessage(ApexPages.Severity.ERROR, 'Failed to associate current Case and selected VersionOne defect: ' + ex.getMessage());
     	}
     	
     	return null;
@@ -112,37 +98,37 @@ public class DefectSearchController {
     
     public PageReference unassignDefectFromCase() {
     	try {
-    		// unassign
+    		DefectFacade.unassignDefectFromCase(currentCase);
     	} catch(IntegrationException ex) {
-    		addError('Failed to detach selected VersionOne defect from current Case: ' + ex.getMessage());
+    		addPageMessage(ApexPages.Severity.ERROR, 'Failed to detach selected VersionOne defect from current Case: ' + ex.getMessage());
     	}
     	
     	return null;
     }
     
-    private void addError(String text) {
-    	errors.add(text);
-    	ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, text));
+    private Defect findDefectById(String defectId) {
+    	if(foundDefects == null) {
+    		return null;
+    	}
+    	
+    	for(DefectWrapper item : foundDefects) {
+    		if(item.defectPart.id.equals(defectId)) {
+    			return item.defectPart;
+    		}
+    	}
+
+    	return null;
     }
     
+    private void addPageMessage(ApexPages.Severity severity, String text) {
+    	ApexPages.addMessage(new ApexPages.Message(severity, text));
+    }
+    
+    /**
+     * TODO implement field list here when the second Search story is started
+     */ 
     public class DefectSearchCriteria {
     	public String queryString { get; set; }
     	public Boolean includeClosedDefects { get; set; } 
-    }
-    
-    public class DefectWrapper {
-    	public Case casePart { get; private set; }
-    	public Defect defectPart { get; private set; }
-    	
-    	public Boolean isAssignedToCurrentCase {
-    		get { 
-    			return defectPart.isAssignedToCase(casePart); 
-    	    }
-    	}
-    	
-    	public DefectWrapper(Case casePart, Defect defectPart) {
-    		this.casePart = casePart;
-    		this.defectPart = defectPart;
-    	}
     }
 }
