@@ -18,6 +18,6 @@ public class Defect {
     }
     
     public Boolean isAssignedToCase(Case caseToCheck) {
-    	return caseToCheck.V1Association__c && id.equals(caseToCheck.V1DefectId__c);
+    	return caseToCheck.V1Association__c && token.equals(caseToCheck.V1DefectId__c); 
     } 
 }

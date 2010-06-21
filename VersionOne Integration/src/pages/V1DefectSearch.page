@@ -31,7 +31,7 @@
 								  <apex:param id="assignParam" value="{!item.defectPart.token}" name="defectToAssign" assignTo="{!assignedDefectToken}" />
 						    </apex:commandButton>
 						    <apex:commandButton value="Unassign" id="unassignButton"
-				    			rerender="searchResults errorMessages" status="unassigningDefect"
+				    			rerender="searchResults, errorMessages" status="unassigningDefect"
 								action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}" />
 				        </apex:column>
 					    <apex:column >
