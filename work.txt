@@ -23,7 +23,14 @@ Add new custom field with name V1DefectId (Text, size 40)
 ----------------------
 
 Add new tab(Setup>Create>Tabs>Visualforce Tabs) and assign V1Settings page
+----------------------
 
+Add  new object(Create->Object) with ObjectName = MappingV1ProjectsToSFProducts
+add new fileds there:
+SFProductId 	- Text(100)
+SFProductName	- Text(100)
+V1ProjectId	- Text(100)
+V1ProjectName	- Text(100)
 
 [Authentication]---------------------------------------------------------------
   Integrated auth in V1 was not tested and probably does not work.
