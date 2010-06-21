@@ -52,6 +52,7 @@ private class DefectSearchControllerTester {
     	DefectSearchController controller = getControllerWithoutAssignedDefect();
     	defectFacadeMockValue.foundDefects = new List<Defect>();
     	Defect foundDefect = new Defect('test defect name', 'test defect description');
+    	foundDefect.token = 'Defect:1234';
     	defectFacadeMockValue.foundDefects.add(foundDefect);
     	
     	controller.getSearchCriteria().queryString = 'test';
