@@ -1,5 +1,7 @@
 public class SettingsController {
 
+    private static String DEFAULT_PRODUCT = 'Not in this list';
+
     public String testSeverity{get; set;}
     public String saveSeverity{get; set;}
     public String testMessage{get; set;}
@@ -8,6 +10,7 @@ public class SettingsController {
     public Boolean isSettingsCorrect {get; set;}
     public Boolean isSaved {get; set;}
     public Boolean isGotProjects {get; set;}
+    public ProjectProductMapping currectMapping{ get; set;}
 
     private transient Settings innerSettings;
     //private Map<String, String> projects;
@@ -36,16 +39,6 @@ public class SettingsController {
         }
     }
 
-    private String innerCurrentProjectId;
-    public String CurrentProjectId {
-        get {
-            return settings.getProjectId();
-        }
-        set {
-            innerCurrentProjectId = value;
-        }
-    }
-
     private Map<String, String> innerProjects;
     public Map<String, String> projects {
         get {
@@ -70,6 +63,7 @@ public class SettingsController {
 
     /** Must be called before usage of any other method. */
     public void initSettings() {
+    	currectMapping = new ProjectProductMapping(null, null, null);
         testMessage = '';
         saveMessage = '';
         isSettingsValidated = false;
@@ -88,14 +82,14 @@ public class SettingsController {
         if (settings.validate().size() == 0 &&
             (settings.getProjectId() == '' || settings.getProjectId() == null ||
              settings.getProjectName() == '' || settings.getProjectName() == null)) {
-            updateProjectSettings(connector.getDefaultProjectId());
+            updateDefaultProjectSettings(connector.getDefaultProjectId());
             isUpdated = true;
         }
 
         return isUpdated;
     }
 
-    public void updateProjectSettings(String id) {
+    public void updateDefaultProjectSettings(String id) {
         settings.setProjectId(id);
         settings.setProjectName(projects.get(id));
     }
@@ -201,35 +195,30 @@ public class SettingsController {
         return options;
     }
 
-    public List<Mapping> getMappings() {
-        List<Mapping> mappings = new List<Mapping>();
-        System.debug('isGotProjects:' + isGotProjects);
-        Mapping mapping = new Mapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()));
+    public List<Selectoption> getProductList() {
+        List<SelectOption> options = new List<SelectOption>();
+        options.add(new SelectOption('default', DEFAULT_PRODUCT));
+        Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.Product__c;
+        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+        for(Schema.PicklistEntry f : ple) {
+            options.add(new SelectOption(f.getLabel(), f.getValue()));
+        }
+
+        return options;
+    }
+
+    public List<ProjectProductMapping> getMappings() {
+        List<ProjectProductMapping> mappings = new List<ProjectProductMapping>();
+        ProjectProductMapping mapping = new ProjectProductMapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()), DEFAULT_PRODUCT);
+        mapping.productId = settings.getProjectId();
         mappings.add(mapping);
 
         return mappings;
     }
 
-    public void updateProject() {
-        updateProjectSettings(innerCurrentProjectId);
+
+    public void updateDefaultProject() {
+        updateDefaultProjectSettings(currectMapping.projectId);
         settings.updateSettings();
-    }
-
-    public class Mapping {
-        private String projectName;
-        private Boolean isVisible;
-
-        public Mapping(String projectName, Boolean isVisible) {
-            this.projectName = projectName;
-            this.isVisible = isVisible;
-        }
-
-        public String getProjectName() {
-            return projectName;
-        }
-
-        public Boolean getIsVisible() {
-            return isVisible;
-        }
     }
 }

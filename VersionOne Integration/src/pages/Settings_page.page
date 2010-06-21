@@ -102,11 +102,19 @@
         <apex:pageBlock title="VersionOne Project for Defect Creation" id="ProjectMapping">
             <apex:pageBlockSection rendered="{!isGotProjects}" columns="1">
                 <apex:pageBlockSectionItem >
-                    <apex:outputPanel layout="block">
-                        <apex:outputPanel layout="block"/>
-                        <apex:selectList value="{!CurrentProjectId}" size="1" required="false" id="ProjectId">
-                            <apex:selectOptions value="{!VersionOneProjectsList}"/>
-                        </apex:selectList>
+	                <apex:outputLabel value="SalesForce product" for="ProductId" />
+                    <apex:selectList size="1" required="false" id="ProductId" value="{!currectMapping.productId}">
+                        <apex:selectOptions value="{!ProductList}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+	                <apex:outputLabel value="VersionOne project" for="ProjectId" />
+					<apex:outputPanel layout="block">
+						<apex:selectList value="{!currectMapping.projectId}" size="1" required="false" id="ProjectId">
+						    <apex:selectOptions value="{!VersionOneProjectsList}"/>
+						</apex:selectList>
+						&nbsp;&nbsp;&nbsp;
+						<apex:commandButton value="Add" />
                     </apex:outputPanel>
                 </apex:pageBlockSectionItem>
 			    <apex:pageBlockSectionItem >
@@ -120,7 +128,11 @@
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">VersionOne Project</apex:facet>
-							<apex:outputText value="{!mapping.ProjectName}"/>
+							<apex:outputText value="{!mapping.projectName}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">SalesForce Product</apex:facet>
+							<apex:outputText value="{!mapping.productName}"/>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">Visible</apex:facet>
@@ -132,7 +144,7 @@
             </apex:pageBlockSection>
         </apex:pageBlock>
 
-		<apex:actionFunction name="UpdateProject" action="{!updateProject}" status="update_project" rerender="ProjectMapping"/>
+		<apex:actionFunction name="UpdateProject" action="{!updateDefaultProject}" status="update_project" rerender="ProjectMapping"/>
     </apex:form>
 
     <apex:outputPanel id="out_testing">

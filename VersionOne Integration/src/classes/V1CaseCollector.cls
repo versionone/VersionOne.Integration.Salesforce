@@ -41,4 +41,20 @@ public class V1CaseCollector {
         update caseData;
     }
 
+	/**
+	 * Get all mapping VersionOne projects to the SalesForce products
+	 **/
+    public static List<MappingV1ProjectsToSFProducts__c> getMappingList() {
+		return [SELECT SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
+	}
+
+    public static void addNewMapping(ProjectProductMapping mapping) {
+    	MappingV1ProjectsToSFProducts__c mappingData = new MappingV1ProjectsToSFProducts__c();
+    	mappingData.SFProductId__c = mapping.productId;
+    	mappingData.SFProductName__c = mapping.productName;
+    	mappingData.V1ProjectId__c = mapping.projectId;
+    	mappingData.V1ProjectName__c = mapping.productId;
+    	insert mappingData;
+	}
+
 }
