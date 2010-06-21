@@ -634,7 +634,7 @@ private class V1ConnectorTester {
 		expectedDefect2.priority = '';
 		expectedDefect2.resolution = 'Fixed';
     	String searchPhrase = 'testing new functionality';
-    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&sort=-CreateDateUTC&find='+searchPhrase;
+    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&where=(Defect.AssetState!=\'Closed\')&sort=-CreateDateUTC&find='+searchPhrase;
     	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
 						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
 							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
@@ -685,7 +685,7 @@ private class V1ConnectorTester {
 		expectedDefect2.priority = '';
 		expectedDefect2.resolution = 'Fixed';
     	String searchPhrase = 'testing new functionality';
-    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&where=(Scope.AssetState=\'Closed\')&sort=-CreateDateUTC&find='+searchPhrase;
+    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&sort=-CreateDateUTC&find='+searchPhrase;
     	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
 						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
 							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
