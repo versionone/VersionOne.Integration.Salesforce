@@ -59,18 +59,18 @@ public class DefectFacade implements IDefectFacade {
             throw new IntegrationException('There is no assigned defect to the case.');
         }
         try {
-        	Defect defectData = getDefectById(caseData.V1DefectId__c);
+        	Defect defectData = getDefectByToken(caseData.V1DefectId__c);
         	V1CaseCollector.updateDeveloperStatus(caseData, defectData.status);
         } catch(Exception ex) {
         	throw new IntegrationException('Status was not published. Problem with getting information about defect.');
         }
     }
 
-    public Defect getDefectById(String defectToken) {
+    public Defect getDefectByToken(String defectToken) {
         if (defectData.get(defectToken) == null) {
             String id = getDefectFromToken(defectToken);
             try {
-            	defectData.put(defectToken, connector.getDefectById(id));
+            	defectData.put(defectToken, connector.getDefectById(id)); 
             } catch (Exception ex) {
             	throw new IntegrationException('Problem with getting defect.');
         	}

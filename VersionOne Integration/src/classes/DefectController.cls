@@ -40,7 +40,7 @@ public class DefectController {
 
     private DefectController(String id) {
         caseData = V1CaseCollector.getCaseByCaseId(id);
-        defect = getDefeaultDefectData();
+        defect = getDefaultDefectData();
         isEditForm = false;
         areThereErrors = false;
     }
@@ -53,7 +53,7 @@ public class DefectController {
 
     public PageReference cancelForm() {
         isEditForm = false;
-        defect = getDefeaultDefectData();
+        defect = getDefaultDefectData();
         return null;
     }
 
@@ -64,17 +64,20 @@ public class DefectController {
     }
 
     public PageReference createDefect() {
-        String id;
+        String token;
         areThereErrors = false;
         try {
-            id = defectFacade.createDefectInVersionOne(caseData, defect);
+            token = defectFacade.createDefectInVersionOne(caseData, defect);
         } catch (IntegrationException ex) {
             System.debug('ex=' + ex);
             addErrorMessage(ex.getMessage());
         }
         defect.project = settings.getProjectName();
         defect.isClosed = false;
-        defect.id = id;
+        defect.token = token;
+        if (token != null) {
+        	defect.id = token.split(':')[1];
+        } 
         isEditForm = false;
         return null;
     }
@@ -93,11 +96,11 @@ public class DefectController {
         }
         Defect assignedDefect;
 
-        if (defect != null && defect.id == caseData.V1DefectId__c) {
+        if (defect != null && defect.token == caseData.V1DefectId__c) {
             assignedDefect = defect;
         } else {
             try {
-                assignedDefect = defectFacade.getDefectById(caseData.V1DefectId__c);
+                assignedDefect = defectFacade.getDefectByToken(caseData.V1DefectId__c);
             } catch(Exception ex) {
                 addWarningMessage(ex.getMessage());
             }
@@ -133,7 +136,7 @@ public class DefectController {
         ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.WARNING, text));
     }
 
-    private Defect getDefeaultDefectData() {
+    private Defect getDefaultDefectData() {
         return new Defect(caseData.Subject, caseData.Description);
     }
 }

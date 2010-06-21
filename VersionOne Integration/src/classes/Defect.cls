@@ -6,6 +6,7 @@ public class Defect {
     public String description {get; set;}
     public String token {get; set;}
     public String id {get; set;}
+    public String assetNumber { get; set; }
     public String project {get; set;}
     public String priority {get; set;}
     public String status {get; set;}

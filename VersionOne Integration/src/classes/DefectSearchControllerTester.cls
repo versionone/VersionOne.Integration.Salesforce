@@ -3,7 +3,7 @@ private class DefectSearchControllerTester {
 	private static final String caseSubject = 'TestCase1';
     private static final String caseDescription = 'Case description';
     private static final String projectName = 'Call Center';
-    private static final String assignedDefectId = DefectFacadeMock.CreatedDefectId;
+    private static final String assignedDefectToken = DefectFacadeMock.CreatedDefectToken;
     
     private static DefectFacadeMock defectFacadeMockValue;
     private static Settings settingsValue;
@@ -12,7 +12,7 @@ private class DefectSearchControllerTester {
     static testMethod void emptyCriteriaSearchTest() {
     	DefectSearchController controller = getControllerWithoutAssignedDefect();
     	System.assertEquals(controller.DefectFacade, defectFacadeMockValue);
-    	System.assertEquals(controller.Settings, settingsValue);
+    	System.assertEquals(controller.Settings, settingsValue); 
     	
     	controller.searchForDefects();
     	
@@ -71,21 +71,21 @@ private class DefectSearchControllerTester {
     	System.assertEquals(message.getSeverity(), severity);
     } 
     
-    private static DefectSearchController getControllerWithoutAssignedDefect() {
+    private static DefectSearchController getControllerWithoutAssignedDefect() { 
         caseData = new Case(Subject = caseSubject, Description = caseDescription);
         insert new Case[] {caseData};
         return getController();
     }
 
     private static DefectSearchController getControllerWithAssignedDefect() {
-        caseData = new Case(Subject = caseSubject, Description = caseDescription, V1Association__c = true, V1DefectId__c = assignedDefectId);
+        caseData = new Case(Subject = caseSubject, Description = caseDescription, V1Association__c = true, V1DefectId__c = assignedDefectToken);
         insert new Case[] { caseData };
         return getController();
     }
 
     private static DefectSearchController getController() {
         defectFacadeMockValue = new DefectFacadeMock();
-        settingsValue = Settings.getTestSettings();
+        settingsValue = Settings.getTestSettings(); 
         settingsValue.setProjectName(ProjectName);
         DefectSearchController controller = new DefectSearchController(caseData);
         controller.DefectFacade = defectFacadeMockValue;

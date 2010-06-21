@@ -1,6 +1,6 @@
 public class DefectFacadeMock implements IDefectFacade {
 
-    public static final String CreatedDefectId = 'Defect:2345';
+    public static final String CreatedDefectToken = 'Defect:2345';
     public static final String DefectTitle = 'Defect Title';
     public static final String DefectDescription = 'Defect Description';
     private static Exception createDefectInVersionOneException;
@@ -16,7 +16,7 @@ public class DefectFacadeMock implements IDefectFacade {
         if (createDefectInVersionOneException != null) {
             throw createDefectInVersionOneException;
         }
-        return CreatedDefectId;
+        return CreatedDefectToken;
     }
     
     public List<Defect> searchForDefects(String queryString, Boolean includeClosedItems) {
@@ -58,13 +58,14 @@ public class DefectFacadeMock implements IDefectFacade {
     }
 
 
-    public Defect getDefectById(String defectToken){
+    public Defect getDefectByToken(String defectToken){
         if (defectByIdException != null) {
             throw defectByIdException;
         }
         Defect defectData = new Defect('title', 'description');
-        defectData.id = CreatedDefectId;
+        defectData.id = CreatedDefectToken;
         defectData.title = DefectTitle;
+        defectData.token = defectToken;
         defectData.description = DefectDescription;
 
         return defectData;

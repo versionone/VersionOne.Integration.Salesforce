@@ -36,7 +36,7 @@
 				        </apex:column>
 					    <apex:column >
 						    <apex:facet name="header">ID</apex:facet>
-							<apex:outputLink value="{!settings.path}assetdetail.v1?oid=Defect:{!item.defectPart.Id}" target="_blank">{!item.defectPart.token}</apex:outputLink>
+							<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank">{!item.defectPart.assetNumber}</apex:outputLink>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">Title</apex:facet>

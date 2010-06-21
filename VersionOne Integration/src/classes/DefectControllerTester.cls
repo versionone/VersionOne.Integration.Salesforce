@@ -3,7 +3,7 @@ private class DefectControllerTester {
     private static final String caseSubject = 'TestCase1';
     private static final String caseDescription = 'Description 123';
     private static final String projectName = 'project name';
-    private static final String assignedDefectId = DefectFacadeMock.CreatedDefectId;
+    private static final String assignedDefectToken = DefectFacadeMock.CreatedDefectToken;
 
     static testMethod void mainTest() {
         DefectController controller = getControllerWithoutAssignedDefect();
@@ -29,7 +29,7 @@ private class DefectControllerTester {
         System.assertEquals(false, controller.areThereErrors);
         System.assertEquals(false, defect.isClosed);
         System.assertEquals(ProjectName, defect.project);
-        System.assertEquals(DefectFacadeMock.CreatedDefectId, defect.id);
+        System.assertEquals(DefectFacadeMock.CreatedDefectToken, defect.token);
     }
 
     static testMethod void createDefectWithExceptionTest() {
@@ -49,7 +49,7 @@ private class DefectControllerTester {
         Defect defectData = controller.getAssignedDefect();
         System.assertEquals(DefectFacadeMock.DefectTitle, defectData.title);
         System.assertEquals(DefectFacadeMock.DefectDescription, defectData.description);
-        System.assertEquals(DefectFacadeMock.CreatedDefectId, defectData.id);
+        System.assertEquals(DefectFacadeMock.CreatedDefectToken, defectData.token);
     }
 
     static testMethod void getAssignedDefectWithExceptionTest() {
@@ -71,7 +71,7 @@ private class DefectControllerTester {
         Defect defectData = controller.getAssignedDefect();
         System.assertEquals(caseSubject, defectData.title);
         System.assertEquals(caseDescription, defectData.description);
-        System.assertEquals(assignedDefectId, defectData.id);
+        System.assertEquals(assignedDefectToken, defectData.token);
         System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
     }
 
@@ -150,7 +150,7 @@ private class DefectControllerTester {
     }
 
     private static DefectController getControllerWithAssignedDefect() {
-        Case caseData = new Case(Subject = caseSubject, Description = caseDescription, V1Association__c = true, V1DefectId__c = assignedDefectId);
+        Case caseData = new Case(Subject = caseSubject, Description = caseDescription, V1Association__c = true, V1DefectId__c = assignedDefectToken);
         insert new Case[] {caseData};
         return getController(caseData);
     }
