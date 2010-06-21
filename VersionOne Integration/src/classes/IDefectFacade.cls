@@ -14,7 +14,7 @@ public interface IDefectFacade {
     * defecId 		- defect id for assign
     * devStatus		- development status of defect
     **/
-    void assignDefectToCase(Case caseData, String defectId, String devStatus);
+    void assignDefectToCase(Case caseData, String defectToken, String devStatus);
 
     /**
     * Unsaaign a defect from the case. Also removes data from defect in the VersionOne
@@ -34,7 +34,7 @@ public interface IDefectFacade {
     * defectToken 	- defect token (for example Defect:1234)
     **/
     Defect getDefectById(String defectToken);
-    
+
     /**
     * Lookup VersionOne defects
     * queryString         - string to look for (see VersionOne REST API)
