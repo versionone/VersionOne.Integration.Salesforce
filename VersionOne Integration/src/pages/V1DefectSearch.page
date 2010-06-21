@@ -28,7 +28,7 @@
 				            <apex:commandButton value="Assign" id="assignButton"
 				    			rerender="searchResults, errorMessages" status="assigningDefect"
 								action="{!assignDefectToCase}" rendered="{!not(item.isAssignedToCurrentCase)}">
-								  <apex:param id="assignParam" value="{!item.defectPart.id}" name="defectToAssign" assignTo="{!assignedDefectId}" />
+								  <apex:param id="assignParam" value="{!item.defectPart.token}" name="defectToAssign" assignTo="{!assignedDefectToken}" />
 						    </apex:commandButton>
 						    <apex:commandButton value="Unassign" id="unassignButton"
 				    			rerender="searchResults errorMessages" status="unassigningDefect"

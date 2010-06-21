@@ -33,7 +33,7 @@ public class DefectSearchController {
     	 } 
     }
     
-    public String assignedDefectId { get; set; }
+    public String assignedDefectToken { get; set; }
     
     public DefectSearchController(Case caseEntity) {
     	this(caseEntity.ID);
@@ -86,9 +86,9 @@ public class DefectSearchController {
     
     public PageReference assignDefectToCase() {
     	try {
-    		Defect matchingDefect = findDefectById(assignedDefectId);
+    		Defect matchingDefect = findDefectByToken(assignedDefectToken);
     		System.debug('/////' + matchingDefect);
-    		DefectFacade.assignDefectToCase(currentCase, matchingDefect.id, matchingDefect.status);
+    		DefectFacade.assignDefectToCase(currentCase, matchingDefect.token, matchingDefect.status);
     	} catch(IntegrationException ex) {
     		addPageMessage(ApexPages.Severity.ERROR, 'Failed to associate current Case and selected VersionOne defect: ' + ex.getMessage());
     	}
@@ -106,13 +106,13 @@ public class DefectSearchController {
     	return null;
     }
     
-    private Defect findDefectById(String defectId) {
+    private Defect findDefectByToken(String token) {
     	if(foundDefects == null) {
     		return null;
     	}
     	
     	for(DefectWrapper item : foundDefects) {
-    		if(item.defectPart.id.equals(defectId)) {
+    		if(item.defectPart.token.equals(token)) {
     			return item.defectPart;
     		}
     	}
