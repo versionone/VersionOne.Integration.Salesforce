@@ -7,6 +7,7 @@ public class DefectFacadeMock implements IDefectFacade {
     private static Exception defectByIdException;
     private static Exception unassignDefectFromCaseException;
     private static Exception publishStatusException;
+    private static Exception searchException;
     
     public List<Defect> foundDefects { get; set; }
 
@@ -19,7 +20,15 @@ public class DefectFacadeMock implements IDefectFacade {
     }
     
     public List<Defect> searchForDefects(String queryString, Boolean includeClosedItems) {
+    	if(searchException != null) {
+    		throw searchException;
+    	}
+    	
     	return foundDefects;
+    }
+    
+    public void setSearchException(Exception ex) {
+    	searchException = ex;
     }
 
     public void setCreateDefectInVersionOneException(Exception ex) {
