@@ -10,7 +10,7 @@ public class V1Connector implements IV1Connector {
     public static final String DELETE_LINK_URL = 'rest-1.v1/Data/Link/{0}?op=Delete';
     public static final String UPDATE_REFERENCE_URL = 'rest-1.v1/Data/Defect/{0}';
     public static final String SEARCH_DEFECT_URL = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name{0}&sort=-CreateDateUTC&find={1}';
-    public static final String SEARCH_PART_FOR_CLOSED_DEFECT_URL = '&where=(Scope.AssetState!=\'Closed\')';
+    public static final String SEARCH_PART_FOR_CLOSED_DEFECT_URL = '&where=(Scope.AssetState=\'Closed\')';
 
     public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
     public static final String LINK_NAME_TO_CASE = 'SalesForce Case';
