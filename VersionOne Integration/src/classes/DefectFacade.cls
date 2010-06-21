@@ -66,25 +66,25 @@ public class DefectFacade implements IDefectFacade {
         }
     }
 
-    public Defect getDefectById(String defectId) {
-        if (defectData.get(defectId) == null) {
-            String id = getDefectFromToken(defectId);
+    public Defect getDefectById(String defectToken) {
+        if (defectData.get(defectToken) == null) {
+            String id = getDefectFromToken(defectToken);
             try {
-            	defectData.put(defectId, connector.getDefectById(id));
+            	defectData.put(defectToken, connector.getDefectById(id));
             } catch (Exception ex) {
             	throw new IntegrationException('Problem with getting defect.');
         	}
         }
-        return defectData.get(defectId);
+        return defectData.get(defectToken);
     }
-    
+
     public List<Defect> searchForDefects(String queryString, Boolean includeClosedItems) {
     	try {
     		return connector.searchDefects(queryString, includeClosedItems);
     	} catch(Exception ex) {
     		throw new IntegrationException('Failed to lookup defects in VersionOne.');
     	}
-    } 
+    }
 
     private String removeInfoAboutAssociationFromDefect(String id) {
         String notRemovedData = '';
