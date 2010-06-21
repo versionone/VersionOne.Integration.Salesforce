@@ -4,7 +4,7 @@ public class V1ConnectorMock implements IV1Connector {
     private Exception ex;
     private Exception creationWorkitemException;
     private Exception createLinkException;
-    public String createdWorkitemId;
+    public String createdWorkitemToken;
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
     private List<String> closedDefects = new List<String>();
     private Exception removeLinkFromDefectException;
@@ -83,11 +83,11 @@ public class V1ConnectorMock implements IV1Connector {
         if (creationWorkitemException != null) {
             throw creationWorkitemException;
         }
-        return createdWorkitemId;
+        return createdWorkitemToken;
     }
 
-    public void setCreatedWorkitemId(String defectId) {
-        createdWorkitemId = defectId;
+    public void setCreatedWorkitemToken(String token) {
+        createdWorkitemToken = token;
     }
 
     public void setExceptionForCreationWorkitemInV1(Exception ex) {

@@ -129,8 +129,9 @@ public class V1Connector implements IV1Connector {
     	Defect defectData = new Defect(getValue('Name', asset.childNodes), getValue('Description', asset.childNodes));
         defectData.resolution = getValue('ResolutionReason.Name', asset.childNodes);
         defectData.project = getValue('Scope.Name', asset.childNodes);
-        defectData.token = getValue('Number', asset.childNodes);
+        defectData.assetNumber = getValue('Number', asset.childNodes);
         defectData.id = asset.getAttribute('id').split(':')[1];
+        defectData.token = asset.getAttribute('id');
         defectData.isClosed = getValue('AssetState', asset.childNodes) == Defect.ClosedAssetState;
         defectData.priority = getValue('Priority.Name', asset.childNodes);
         defectData.status = getValue('Status.Name', asset.childNodes);

@@ -87,7 +87,6 @@ public class DefectSearchController {
     public PageReference assignDefectToCase() {
     	try {
     		Defect matchingDefect = findDefectByToken(assignedDefectToken);
-    		System.debug('/////' + matchingDefect);
     		DefectFacade.assignDefectToCase(currentCase, matchingDefect.token, matchingDefect.status);
     	} catch(IntegrationException ex) {
     		addPageMessage(ApexPages.Severity.ERROR, 'Failed to associate current Case and selected VersionOne defect: ' + ex.getMessage());

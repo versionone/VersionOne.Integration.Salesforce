@@ -33,7 +33,7 @@ public interface IDefectFacade {
     * Get defect from the VersionOne by defect id
     * defectToken 	- defect token (for example Defect:1234)
     **/
-    Defect getDefectById(String defectToken);
+    Defect getDefectByToken(String defectToken);
 
     /**
     * Lookup VersionOne defects

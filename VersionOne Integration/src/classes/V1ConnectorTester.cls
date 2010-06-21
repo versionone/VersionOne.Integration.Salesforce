@@ -42,40 +42,7 @@ private class V1ConnectorTester {
         System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');
     }
 
-    static testMethod void getClosedWorkitemsTest() {
-        String reference1 = '33';
-        String reference2 = '4354304350893';
-        String queueId = '12345667';
-        String sourceId = '1010';
-        String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
-                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="Defect:1077">' +
-                            '<Attribute name="Number">D-01032</Attribute>' +
-                            '<Attribute name="ChangeDateUTC">2009-10-21T08:57:50.493</Attribute>' +
-                            '<Attribute name="Reference">' + reference1 + '</Attribute>' +
-                        '</Asset>' +
-                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="Defect:1077">' +
-                            '<Attribute name="Number">D-01032</Attribute>' +
-                            '<Attribute name="ChangeDateUTC">2009-10-21T08:57:30.493</Attribute>' +
-                            '<Attribute name="Reference">' + reference2 + '</Attribute>' +
-                        '</Asset>' +
-                      '</Assets>';
-        Settings testSettings = Settings.getTestSettings();
-        RequestorMock testRequestor = new RequestorMock(xml, 200);
-        testSettings.setSourceId(sourceId);
-        String expectedDate = '2009-10-20T09:57:33';
-        testSettings.setLastDateChangeAsset(Datetime.newInstance(2009, 10, 20, 9, 57, 33));
-        V1Connector connector = new V1Connector(testSettings, testRequestor);
-        List<String> references = connector.getClosedWorkitems();
-        System.assertEquals(2, references.size(), 'Incorrect number of assets.');
-        assertContains(reference1, references, 'Can\'t find ' + references + ' reference');
-        assertContains(reference2, references, 'Can\'t find ' + references + ' reference');
-        System.assertEquals('2009-10-21 08:57:50', testSettings.getLastDateChangeAsset().format('yyyy-MM-dd HH:mm:ss'), 'Incorrect latest datetime of chaned asset.');
-        System.assertEquals(1, testRequestor.numberRequest, 'Wrong requests count.');
-        System.assert(testRequestor.getSentUrl(0).contains('Source=\'StorySource:' + sourceId), 'Incorrect request url: ' + testRequestor.getSentUrl(0));
-        System.assert(testRequestor.getSentUrl(0).contains(expectedDate), 'Incorrect request url.');
-    }
-
-    static testMethod void correctGetSourceIdTester() {
+    static testMethod void correctGetSourceTokenTester() {
         String sourceName = 'TestSource';
         String sourceIdExpected = '1010';
         Settings testSettings = Settings.getTestSettings();
@@ -436,20 +403,21 @@ private class V1ConnectorTester {
 
     static testMethod void getDefectByIdTest() {
         String defectId = '2345';
+        String defectToken = 'Defect:2345';
         String resolution = 'Duplicate';
         String project = 'SalesForce test';
         String description = 'q2312313132';
-        String token = 'D-01398';
+        String assetNumber = 'D-01398';
         String name = 'for paging testing 1';
         String priority = 'Medium';
         String status = 'In Progress';
         String expectedUrl = 'rest-1.v1/Data/Defect/' + defectId + '?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState';
         Settings testSettings = Settings.getTestSettings();
-        String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="Defect:' + defectId + '">' +
+        String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="' + defectToken + '">' +
                         '<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
                         '<Attribute name="Scope.Name">' + project + '</Attribute>' +
                         '<Attribute name="Description">' + description + '</Attribute>' +
-                        '<Attribute name="Number">' + token + '</Attribute>' +
+                        '<Attribute name="Number">' + assetNumber + '</Attribute>' +
                         '<Attribute name="AssetState">128</Attribute>' +
                         '<Attribute name="Status.Name">' + status + '</Attribute>' +
                         '<Attribute name="Name">' + name + '</Attribute>' +
@@ -459,8 +427,9 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
         Defect defectData = connector.getDefectById(defectId);
 
-        System.assertEquals(token, defectData.token, 'Incorrect id.');
+        System.assertEquals(defectToken, defectData.token, 'Incorrect token.');
         System.assertEquals(defectId, defectData.id, 'Incorrect id.');
+        System.assertEquals(assetNumber, defectData.assetNumber, 'Incorrect Number.');
         System.assertEquals(resolution, defectData.resolution, 'Incorrect resolution.');
         System.assertEquals(project, defectData.project, 'Incorrect project name.');
         System.assertEquals(description, defectData.description, 'Incorrect defect description.');
@@ -620,15 +589,17 @@ private class V1ConnectorTester {
     	Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
     	expectedDefect1.status = 'In Progress';
     	expectedDefect1.id = '2469';
-    	expectedDefect1.token = 'D-01470';
+    	expectedDefect1.token = 'Defect:2469';
+    	expectedDefect1.assetNumber = 'D-01470';
     	expectedDefect1.isClosed = false;
     	expectedDefect1.project = 'SalesForce test';
     	expectedDefect1.priority = 'Low';
     	expectedDefect1.resolution = '';
 		Defect expectedDefect2 = new Defect('testing new functionality', null);
 		expectedDefect2.id = '2473';
+		expectedDefect2.token = 'Defect:2473';
 		expectedDefect2.status = '';
-		expectedDefect2.token = 'D-01472';
+		expectedDefect2.assetNumber = 'D-01472';
 		expectedDefect2.isClosed = false;
 		expectedDefect2.project = 'SalesForce test';
 		expectedDefect2.priority = '';
@@ -643,7 +614,7 @@ private class V1ConnectorTester {
 							'<Attribute name="Priority.Name">' + expectedDefect1.priority + '</Attribute>' +
 							'<Attribute name="AssetState">64</Attribute>' +
 							'<Attribute name="Scope.Name">' + expectedDefect1.project + '</Attribute>' +
-							'<Attribute name="Number">' + expectedDefect1.token + '</Attribute>' +
+							'<Attribute name="Number">' + expectedDefect1.assetNumber + '</Attribute>' +
 						'</Asset>' +
 						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect2.id + '" id="Defect:' + expectedDefect2.id + '">' +
 							'<Attribute name="Status.Name"/>' +
@@ -652,7 +623,7 @@ private class V1ConnectorTester {
 							'<Attribute name="Priority.Name"/>' +
 							'<Attribute name="AssetState">64</Attribute>' +
 							'<Attribute name="Scope.Name">' + expectedDefect2.project + '</Attribute>' +
-							'<Attribute name="Number">' + expectedDefect2.token + '</Attribute>' +
+							'<Attribute name="Number">' + expectedDefect2.assetNumber + '</Attribute>' +
 						'</Asset>' +
 					  '</Assets>';
 		Settings testSettings = Settings.getTestSettings();
@@ -671,15 +642,17 @@ private class V1ConnectorTester {
     	Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
     	expectedDefect1.status = 'In Progress';
     	expectedDefect1.id = '2469';
-    	expectedDefect1.token = 'D-01470';
+    	expectedDefect1.token = 'Defect:2469';
+    	expectedDefect1.assetNumber = 'D-01470';
     	expectedDefect1.isClosed = true;
     	expectedDefect1.project = 'SalesForce test';
     	expectedDefect1.priority = 'Low';
     	expectedDefect1.resolution = '';
 		Defect expectedDefect2 = new Defect('testing new functionality', null);
 		expectedDefect2.id = '2473';
+		expectedDefect2.token = 'Defect:2473';
 		expectedDefect2.status = '';
-		expectedDefect2.token = 'D-01472';
+		expectedDefect2.assetNumber = 'D-01472';
 		expectedDefect2.isClosed = false;
 		expectedDefect2.project = 'SalesForce test';
 		expectedDefect2.priority = '';
@@ -694,7 +667,7 @@ private class V1ConnectorTester {
 							'<Attribute name="Priority.Name">' + expectedDefect1.priority + '</Attribute>' +
 							'<Attribute name="AssetState">128</Attribute>' +
 							'<Attribute name="Scope.Name">' + expectedDefect1.project + '</Attribute>' +
-							'<Attribute name="Number">' + expectedDefect1.token + '</Attribute>' +
+							'<Attribute name="Number">' + expectedDefect1.assetNumber + '</Attribute>' +
 						'</Asset>' +
 						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect2.id + '" id="Defect:' + expectedDefect2.id + '">' +
 							'<Attribute name="Status.Name"/>' +
@@ -703,7 +676,7 @@ private class V1ConnectorTester {
 							'<Attribute name="Priority.Name"/>' +
 							'<Attribute name="AssetState">64</Attribute>' +
 							'<Attribute name="Scope.Name">' + expectedDefect2.project + '</Attribute>' +
-							'<Attribute name="Number">' + expectedDefect2.token + '</Attribute>' +
+							'<Attribute name="Number">' + expectedDefect2.assetNumber + '</Attribute>' +
 						'</Asset>' +
 					  '</Assets>';
 		Settings testSettings = Settings.getTestSettings();
@@ -724,6 +697,7 @@ private class V1ConnectorTester {
     	result = result && defect1.description == defect2.description;
     	result = result && defect1.token == defect2.token;
     	result = result && defect1.id == defect2.id;
+    	result = result && defect1.assetNumber == defect2.assetNumber;
     	result = result && defect1.project == defect2.project;
     	result = result && defect1.priority == defect2.priority;
     	result = result && defect1.status == defect2.status;
