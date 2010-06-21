@@ -4,77 +4,68 @@
 	<apex:actionStatus startText="Unassigning defect from the case..." id="unassigningDefect"/>
     
     <apex:form >
-        <apex:pageBlock id="searchFormBlock">
-            <apex:outputLabel value="Find" for="queryText" />
-            <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255" 
-             value="{!SearchCriteria.queryString}"/>
-            <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2" 
-                value="{!SearchCriteria.includeClosedDefects}" />
-            <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>
-            <apex:commandButton value="Search" id="searchButton"
-			    rerender="foundDefectTable, searchFormBlock, errorMessages"
-				action="{!searchForDefects}" onclick="if(checkQueryString()) return false;">
-				<script type="text/javascript">
-	            function checkQueryString() {
-	                var value = document.getElementById('{!$Component.queryText}').value;
-	                if(value.trim().length == 0) {
-	                    alert('Please provide non-empty query');
-	                    return false;
-	                }
-	                return true;
-	            }
-                </script>
-			</apex:commandButton>
-        </apex:pageBlock>
-        <apex:pageBlock id="foundDefectTable" rendered="{!not(searchFailed) && defectsFound}">
-          <apex:pageBlockSection id="foundDefects" columns="1">
-            <apex:pageBlockSectionItem >
-			    <apex:pageBlockTable value="{!Defects}" var="item">
-			        <apex:column >
-			        	<apex:facet name="header">Action</apex:facet>
-			            <apex:commandButton value="Assign" id="assignButton"
-			    			rerender="foundDefectTable, errorMessages" status="assigningDefect"
-							action="{!assignDefectToCase}" rendered="{!item.isAssignedToCurrentCase}">
-							<apex:param id="assignParam" value="{!item.defectPart.id}" name="defectToAssign" assignTo="{!assignedDefectId}" />
-					    </apex:commandButton>
-					    <apex:commandButton value="Unassign" id="unassignButton"
-			    			rerender="foundDefectTable, errorMessages" status="unassigningDefect"
-							action="{!unassignDefectFromCase}" rendered="{!not(item.isAssignedToCurrentCase)}">
-							<apex:param id="unassignParam" value="{!item.defectPart.id}" name="defectToUnassign" assignTo="{!unassignedDefectId}" />
-					    </apex:commandButton>
-			        </apex:column>
-				    <apex:column >
-					    <apex:facet name="header">ID</apex:facet>
-						<apex:outputLink value="{!settings.path}assetdetail.v1?oid=Defect:{!item.defectPart.Id}" target="_blank">{!item.defectPart.token}</apex:outputLink>
-					</apex:column>
-					<apex:column >
-						<apex:facet name="header">Title</apex:facet>
-						<apex:outputText value="{!item.defectPart.title}"/>
-					</apex:column>
-					<apex:column >
-						<apex:facet name="header">Project</apex:facet>
-						<apex:outputText value="{!item.defectPart.project}"/>
-					</apex:column>
-					<apex:column >
-						<apex:facet name="header">Priority</apex:facet>
-						<apex:outputText value="{!item.defectPart.priority}"/>
-					</apex:column>
-					<apex:column >
-						<apex:facet name="header">Status</apex:facet>
-						<apex:outputText value="{!item.defectPart.status}"/>
-					</apex:column>
-					<apex:column >
-						<apex:facet name="header">Resolution</apex:facet>
-						<apex:outputText value="{!item.defectPart.resolution}"/>
-					</apex:column>
-					<apex:column >
-						<apex:facet name="header">Is Closed</apex:facet>
-						<apex:image value="/img/checkbox_checked.gif" alt="closed" rendered="{!item.defectPart.isClosed}"/>
-						<apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(item.defectPart.isClosed)}"/>
-					</apex:column>
-				</apex:pageBlockTable>
-			</apex:pageBlockSectionItem>
-		  </apex:pageBlockSection>
+        <apex:pageBlock >
+            <apex:pageBlockSection columns="1" id="searchForm">
+                <apex:pageBlockSectionItem > 
+                    <apex:outputPanel >
+			            <apex:outputLabel value="Find" for="queryText" />
+			            <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255" 
+			             value="{!SearchCriteria.queryString}"/>
+			            <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2" 
+			                value="{!SearchCriteria.includeClosedDefects}" />
+			            <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>
+			            <apex:commandButton value="Search" id="searchButton" status="searchForDefects"
+						    rerender="searchResults, errorMessages" action="{!searchForDefects}" />
+				    </apex:outputPanel>
+				</apex:pageBlockSectionItem>
+		    </apex:pageBlockSection>
+		    <br/>
+		    <apex:pageBlockSection columns="1" id="searchResults">
+		        <apex:pageBlockSectionItem >
+				    <apex:pageBlockTable value="{!Defects}" var="item" rendered="{!displayDefectTable}">
+				        <apex:column >
+				        	<apex:facet name="header">Action</apex:facet>
+				            <apex:commandButton value="Assign" id="assignButton"
+				    			rerender="searchResults, errorMessages" status="assigningDefect"
+								action="{!assignDefectToCase}" rendered="{!not(item.isAssignedToCurrentCase)}">
+								  <apex:param id="assignParam" value="{!item.defectPart.id}" name="defectToAssign" assignTo="{!assignedDefectId}" />
+						    </apex:commandButton>
+						    <apex:commandButton value="Unassign" id="unassignButton"
+				    			rerender="searchResults errorMessages" status="unassigningDefect"
+								action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}" />
+				        </apex:column>
+					    <apex:column >
+						    <apex:facet name="header">ID</apex:facet>
+							<apex:outputLink value="{!settings.path}assetdetail.v1?oid=Defect:{!item.defectPart.Id}" target="_blank">{!item.defectPart.token}</apex:outputLink>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Title</apex:facet>
+							<apex:outputText value="{!item.defectPart.title}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Project</apex:facet>
+							<apex:outputText value="{!item.defectPart.project}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Priority</apex:facet>
+							<apex:outputText value="{!item.defectPart.priority}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Status</apex:facet>
+							<apex:outputText value="{!item.defectPart.status}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Resolution</apex:facet>
+							<apex:outputText value="{!item.defectPart.resolution}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Is Closed</apex:facet>
+							<apex:image value="/img/checkbox_checked.gif" alt="closed" rendered="{!item.defectPart.isClosed}"/>
+							<apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(item.defectPart.isClosed)}"/>
+						</apex:column>
+					</apex:pageBlockTable>
+				</apex:pageBlockSectionItem>
+		    </apex:pageBlockSection>
         </apex:pageBlock>
         <apex:pageMessages id="errorMessages"/>
 	</apex:form>
