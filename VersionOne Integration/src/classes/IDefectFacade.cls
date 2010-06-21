@@ -10,8 +10,8 @@ public interface IDefectFacade {
 
     /**
     * Assign defect in the VersionOne to case in the SalesForce
-    * caseData 		- case for assign
-    * defecId 		- defect id for assign
+    * caseData 		- case for assignment
+    * defectToken   - defect token for assignment
     * devStatus		- development status of defect
     **/
     void assignDefectToCase(Case caseData, String defectToken, String devStatus);
