@@ -214,10 +214,10 @@ private class SettingsControllerTester {
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
 
-        List<SettingsController.Mapping> mappings = controller.getMappings();
+        List<ProjectProductMapping> mappings = controller.getMappings();
         System.assertEquals(1, mappings.size(), 'Incorrect numbers of mapped projects.');
-        System.assertEquals(projectName, mappings.get(0).getProjectName(), 'Incorrect mapped project.');
-        System.assert(mappings.get(0).getIsVisible(), 'Incorrect "visible" status');
+        System.assertEquals(projectName, mappings.get(0).projectName, 'Incorrect mapped project.');
+        System.assert(mappings.get(0).IsVisible, 'Incorrect "visible" status');
     }
 
     static testMethod void getVersionOneProjectsListTester() {
