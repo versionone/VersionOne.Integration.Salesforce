@@ -25,37 +25,6 @@ public class V1Connector implements IV1Connector {
         this.requestor = requestor;
     }
 
-    public List<String> getClosedWorkitems() {
-        List<String> references = new List<String>();
-        String dateRestriction = '';
-        if (settings.getLastDateChangeAsset() != null) {
-            dateRestriction = ';ChangeDateUTC>\'' +settings.getLastDateChangeAsset().format('yyyy-MM-dd\'T\'HH:mm:ss') + '\'';
-        }
-        //Send the request, and get a response
-        String url = String.format(CLOSED_WORKITEMS_URL, new String[]{settings.getSourceId(), dateRestriction});
-        requestor.request(requestor.createRequest('', url, 'GET'));
-        validateResponse();
-        XMLDom xmlParser = new XMLDom();
-        xmlParser.parseFromString(requestor.getBody());
-        XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
-        DateTime latestDate = settings.getLastDateChangeAsset();
-        for (XMLDom.Element asset : assetTags) {
-            String reference = getValue('Reference', asset.childNodes);
-            String changeDateUTC = getValue('ChangeDateUTC', asset.childNodes);
-            references.add(reference);
-            DateTime testDate = convertToDateTime(changeDateUTC);
-            if (latestDate == null || testDate > latestDate) {
-                latestDate = testDate;
-            }
-        }
-        if (latestDate != settings.getLastDateChangeAsset()) {
-            // here we set date
-            // settings will be stored in the Syncronizer class, if no one case has to be updated
-            settings.setLastDateChangeAsset(latestDate);
-        }
-        return references;
-    }
-
     public void removeLinkFromDefect(String defectId) {
         String url = String.format(LINK_BY_DEFECT_ID_URL, new String[]{defectId});
         requestor.request(requestor.createRequest('', url, 'GET'));

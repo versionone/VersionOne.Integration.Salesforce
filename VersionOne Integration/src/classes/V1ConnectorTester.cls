@@ -390,17 +390,6 @@ private class V1ConnectorTester {
         System.assertEquals(testSettings, connector.getSettings(), 'Incorrect settings.');
     }
 
-    static void assertContains (String expect, List<String> actuals, String msg) {
-        Boolean contains = false;
-        for (String o : actuals) {
-            if (o.equals(expect)) {
-                contains = true;
-                break;
-            }
-        }
-        System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
-    }
-
     static testMethod void getDefectByIdTest() {
         String defectId = '2345';
         String defectToken = 'Defect:2345';

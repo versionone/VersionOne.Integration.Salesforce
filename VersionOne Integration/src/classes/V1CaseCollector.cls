@@ -45,15 +45,16 @@ public class V1CaseCollector {
 	 * Get all mapping VersionOne projects to the SalesForce products
 	 **/
     public static List<MappingV1ProjectsToSFProducts__c> getMappingList() {
-		return [SELECT SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
+		//return [SELECT SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
+		return null;
 	}
 
     public static void addNewMapping(ProjectProductMapping mapping) {
     	MappingV1ProjectsToSFProducts__c mappingData = new MappingV1ProjectsToSFProducts__c();
     	mappingData.SFProductId__c = mapping.productId;
     	mappingData.SFProductName__c = mapping.productName;
-    	mappingData.V1ProjectId__c = mapping.projectId;
-    	mappingData.V1ProjectName__c = mapping.productId;
+    	//mappingData.V1ProjectToken__c = mapping.projectToken;
+    	mappingData.V1ProjectName__c = mapping.projectName;
     	insert mappingData;
 	}
 
