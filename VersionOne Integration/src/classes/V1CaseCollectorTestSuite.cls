@@ -56,7 +56,7 @@ private class V1CaseCollectorTestSuite {
     	MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
     	mappingData1.SFProductId__c = productId1;
     	mappingData1.SFProductName__c = productName1;
-    	//mappingData1.V1ProjectToken__c = projectToken1;
+    	mappingData1.V1ProjectToken__c = projectToken1;
     	mappingData1.V1ProjectName__c = projectName1;
     	String projectName2 = 'Project Name 2';
     	String productName2 = 'Product Name 2';
@@ -65,23 +65,20 @@ private class V1CaseCollectorTestSuite {
     	MappingV1ProjectsToSFProducts__c mappingData2 = new MappingV1ProjectsToSFProducts__c();
     	mappingData2.SFProductId__c = productId2;
     	mappingData2.SFProductName__c = productName2;
-    	//mappingData2.V1ProjectToken__c = projectToken2;
+    	mappingData2.V1ProjectToken__c = projectToken2;
     	mappingData2.V1ProjectName__c = projectName2;
     	insert new MappingV1ProjectsToSFProducts__c[]{mappingData1, mappingData2};
 
-    	//List<MappingV1ProjectsToSFProducts__c> mappings = V1CaseCollector.getMappingList();
-    	List<MappingV1ProjectsToSFProducts__c> mappings = new List<MappingV1ProjectsToSFProducts__c>();
-    	/*
+    	List<MappingV1ProjectsToSFProducts__c> mappings = V1CaseCollector.getMappingList();
     	System.assertEquals(2, mappings.size(), 'Incorrect number of mappings.');
     	System.assertEquals(productId1, mappings.get(0).SFProductId__c, 'Incorrect product id for first mapping.');
     	System.assertEquals(productName1, mappings.get(0).SFProductName__c, 'Incorrect product name for first mapping.');
-    	//System.assertEquals(projectToken1, mappings.get(0).V1ProjectToken__c, 'Incorrect project token for first mapping.');
+    	System.assertEquals(projectToken1, mappings.get(0).V1ProjectToken__c, 'Incorrect project token for first mapping.');
     	System.assertEquals(projectName1, mappings.get(0).V1ProjectName__c, 'Incorrect project name for first mapping.');
     	System.assertEquals(productId2, mappings.get(1).SFProductId__c, 'Incorrect product id for second mapping.');
     	System.assertEquals(productName2, mappings.get(1).SFProductName__c, 'Incorrect product name for second mapping.');
-    	//System.assertEquals(projectToken2, mappings.get(1).V1ProjectToken__c, 'Incorrect project token for second mapping.');
+    	System.assertEquals(projectToken2, mappings.get(1).V1ProjectToken__c, 'Incorrect project token for second mapping.');
     	System.assertEquals(projectName2, mappings.get(1).V1ProjectName__c, 'Incorrect project name for second mapping.');
-    	*/
 	}
 
     static testMethod void addNewMappingTest() {
@@ -94,8 +91,7 @@ private class V1CaseCollectorTestSuite {
     	mapping.productId = productId;
     	V1CaseCollector.addNewMapping(mapping);
 
-		//MappingV1ProjectsToSFProducts__c newMapping = [SELECT ID FROM MappingV1ProjectsToSFProducts__c WHERE SFProductId__c =: productId and SFProductName__c =: productName and V1ProjectToken__c =: projectToken and V1ProjectName__c =: projectName];
-		MappingV1ProjectsToSFProducts__c newMapping = new MappingV1ProjectsToSFProducts__c();
+		MappingV1ProjectsToSFProducts__c newMapping = [SELECT ID FROM MappingV1ProjectsToSFProducts__c WHERE SFProductId__c =: productId and SFProductName__c =: productName and V1ProjectToken__c =: projectToken and V1ProjectName__c =: projectName];
     	System.assertNotEquals(null, newMapping, 'Incorrect mapping data from the base.');
 	}
 }
