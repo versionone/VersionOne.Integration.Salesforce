@@ -1,11 +1,16 @@
 public class DefectSearchController {
-	private Case currentCase;
+	private Case currentCaseValue;
 	
     private transient Settings innerSettings;
     private transient IDefectFacade innerDefectFacade;
     
     private DefectSearchCriteria searchCriteria = new DefectSearchCriteria();
     private List<DefectWrapper> foundDefects;
+    
+    public Case currentCase {
+    	get { return currentCaseValue; }
+    	private set { currentCaseValue = value; }
+    }
     
     public Settings Settings {
         get {
@@ -33,6 +38,8 @@ public class DefectSearchController {
     	 } 
     }
     
+    public Boolean refreshWindow { get; private set; }
+    
     public String assignedDefectToken { get; set; }
     
     public DefectSearchController(Case caseEntity) {
@@ -57,7 +64,6 @@ public class DefectSearchController {
     }
     
     public PageReference searchForDefects() {
-    	System.debug('////////searching for ' + searchCriteria.queryString + ', closed=' + searchCriteria.includeClosedDefects);
     	foundDefects = null;
     	
     	if(searchCriteria == null || searchCriteria.queryString == null || searchCriteria.queryString.trim().length() == 0) {
@@ -86,9 +92,11 @@ public class DefectSearchController {
     
     public PageReference assignDefectToCase() {
     	try {
+    		refreshWindow = true;
     		Defect matchingDefect = findDefectByToken(assignedDefectToken);
     		DefectFacade.assignDefectToCase(currentCase, matchingDefect.token, matchingDefect.status);
     	} catch(IntegrationException ex) {
+    		refreshWindow = false;
     		addPageMessage(ApexPages.Severity.ERROR, 'Failed to associate current Case and selected VersionOne defect: ' + ex.getMessage());
     	}
     	
@@ -97,8 +105,10 @@ public class DefectSearchController {
     
     public PageReference unassignDefectFromCase() {
     	try {
+    		refreshWindow = true;
     		DefectFacade.unassignDefectFromCase(currentCase);
     	} catch(IntegrationException ex) {
+    		refreshWindow = false;
     		addPageMessage(ApexPages.Severity.ERROR, 'Failed to detach selected VersionOne defect from current Case: ' + ex.getMessage());
     	}
     	
