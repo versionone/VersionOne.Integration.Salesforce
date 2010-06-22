@@ -22,17 +22,27 @@
 		    <br/>
 		    <apex:pageBlockSection columns="1" id="searchResults">
 		        <apex:pageBlockSectionItem >
+		          <apex:outputPanel >
+		            <script type="text/javascript">
+                    function maybeRefreshWindow() {
+                        if({!refreshWindow}) {
+                            parent.location.href = "/{!currentCase.Id}";
+                        }
+                    }
+                    </script>
 				    <apex:pageBlockTable value="{!Defects}" var="item" rendered="{!displayDefectTable}">
 				        <apex:column >
 				        	<apex:facet name="header">Action</apex:facet>
 				            <apex:commandButton value="Assign" id="assignButton"
 				    			rerender="searchResults, errorMessages" status="assigningDefect"
-								action="{!assignDefectToCase}" rendered="{!not(item.isAssignedToCurrentCase)}">
+								action="{!assignDefectToCase}" rendered="{!not(item.isAssignedToCurrentCase)}"
+								oncomplete="maybeRefreshWindow()">
 								  <apex:param id="assignParam" value="{!item.defectPart.token}" name="defectToAssign" assignTo="{!assignedDefectToken}" />
 						    </apex:commandButton>
 						    <apex:commandButton value="Unassign" id="unassignButton"
 				    			rerender="searchResults, errorMessages" status="unassigningDefect"
-								action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}" />
+								action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}" 
+								oncomplete="maybeRefreshWindow()" />
 				        </apex:column>
 					    <apex:column >
 						    <apex:facet name="header">ID</apex:facet>
@@ -64,6 +74,7 @@
 							<apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(item.defectPart.isClosed)}"/>
 						</apex:column>
 					</apex:pageBlockTable>
+				  </apex:outputPanel>
 				</apex:pageBlockSectionItem>
 		    </apex:pageBlockSection>
         </apex:pageBlock>
