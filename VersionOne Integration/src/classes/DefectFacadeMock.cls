@@ -5,9 +5,12 @@ public class DefectFacadeMock implements IDefectFacade {
     public static final String DefectDescription = 'Defect Description';
     private static Exception createDefectInVersionOneException;
     private static Exception defectByIdException;
+    private static Exception assignDefectToCaseException;
     private static Exception unassignDefectFromCaseException;
     private static Exception publishStatusException;
     private static Exception searchException;
+    
+    public AssignDefectPassedData assignDefectResultValue { get; private set; }
     
     public List<Defect> foundDefects { get; set; }
 
@@ -35,12 +38,24 @@ public class DefectFacadeMock implements IDefectFacade {
         createDefectInVersionOneException = ex;
     }
 
-    public void assignDefectToCase(Case caseData, String defectId, String devStatus) {}
+    public void assignDefectToCase(Case caseData, String defectId, String devStatus) {
+        assignDefectResultValue = new AssignDefectPassedData(caseData, defectId, devStatus);
+        
+        if(assignDefectToCaseException != null) {
+        	throw assignDefectToCaseException;
+        }
+    }
 
     public void unassignDefectFromCase(Case caseData) {
+    	assignDefectResultValue = new AssignDefectPassedData(caseData, null, null);
+    	
     	if (unassignDefectFromCaseException != null) {
     		throw unassignDefectFromCaseException;
     	}
+    }
+    
+    public void setAssignDefectToCaseException(Exception ex) {
+		assignDefectToCaseException = ex;
     }
 
     public void setUnassignDefectFromCaseException(Exception ex) {
@@ -74,4 +89,16 @@ public class DefectFacadeMock implements IDefectFacade {
     public void setGetDefectByIdException(Exception ex) {
         defectByIdException = ex;
     }   
+    
+    public class AssignDefectPassedData {
+    	public Case caseValue { get; private set; }
+    	public String token { get; private set; }
+    	public String status { get; private set; }
+    	
+    	public AssignDefectPassedData(Case caseValue, String token, String status) {
+    		this.caseValue = caseValue;
+    		this.token = token;
+    		this.status = status;
+    	}
+    }
  }
