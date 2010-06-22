@@ -29,7 +29,7 @@ Add  new object(Create->Object) with ObjectName = MappingV1ProjectsToSFProducts
 add new fileds there:
 SFProductId 	- Text(100)
 SFProductName	- Text(100)
-V1ProjectId	- Text(100)
+V1ProjectId	- Text(100) -> Update to V1ProjectToken
 V1ProjectName	- Text(100)
 
 [Authentication]---------------------------------------------------------------

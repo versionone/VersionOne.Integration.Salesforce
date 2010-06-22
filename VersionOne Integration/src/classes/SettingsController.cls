@@ -218,7 +218,7 @@ public class SettingsController {
 
 
     public void updateDefaultProject() {
-        updateDefaultProjectSettings(currectMapping.projectId);
+        updateDefaultProjectSettings(currectMapping.projectToken);
         settings.updateSettings();
     }
 }
