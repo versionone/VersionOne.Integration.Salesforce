@@ -1,30 +1,27 @@
-public class TablePaginator {
-
-    private List<Case> cases;
-    private List<Case> pageCases;
+public class DefectTablePaginator {
+    private List<Defect> defects;
+    private List<Defect> pageDefects;
     private Integer pageNumber;
     private Integer pageSize;
     private Integer totalPageNumber;
 
-    public TablePaginator(List<Case> cases) {
-        this.cases = cases;
+    public DefectTablePaginator(List<Defect> defects) {
+        this.defects = defects;
         pageNumber = 0;
         totalPageNumber = 0;
         pageSize = 20;
         isNoData = false;
-    }
-
-    public void init() {
         bindData(1);
     }
 
     // ------------- Common for tables --------------
-    private List<Case> fillCasesForCurrentPage(Integer newPageIndex, List<Case> cases) {
-        Transient Integer counter = 0;
-        Transient Integer min = 0;
-        Transient Integer max = 0;
+    private List<Defect> fillDefectsForCurrentPage(Integer newPageIndex, List<Defect> cases) {
+        transient Integer counter = 0;
+        transient Integer min = 0;
+        transient Integer max = 0;
         Integer pageNumber = getTotalPageNumber();
         Integer pageSize = getPageSize();
+        
         if (newPageIndex > pageNumber) {
             min = pageNumber * pageSize;
             max = newPageIndex * pageSize;
@@ -32,24 +29,22 @@ public class TablePaginator {
             max = newPageIndex * pageSize;
             min = max - pageSize;
         }
-        List<Case> currentCases = new List<Case>();
-        for(Case c : cases) {
+        
+        List<Defect> currentDefects = new List<Defect>();
+        for(Defect defect : defects) {
             counter++;
+            
             if (counter > min && counter <= max) {
-                currentCases.add(c);
+                currentDefects.add(defect);
             }
         }
-        return currentCases;
+        return currentDefects;
     }
 
     public Boolean isNoData {get; set;}
 
     public Integer getRecordsNumber() {
-        if (cases == null){
-            return 0;
-        } else {
-            return cases.size();
-        }
+        return defects == null ? 0 : defects.size();
     }
 
     public void goToPage(Integer pageNumber) {
@@ -60,9 +55,11 @@ public class TablePaginator {
     public List<Integer> getPagesList() {
         List<Integer> pagesNumbers = new List<Integer>();
         Integer amountPages = getTotalPageNumber();
-        for (Integer i=0; i<amountPages; i++) {
+        
+        for (Integer i = 0; i<amountPages; i++) {
             pagesNumbers.add(i);
         }
+        
         return pagesNumbers;
     }
 
@@ -70,8 +67,8 @@ public class TablePaginator {
         return pageNumber;
     }
 
-    public List<Case> getCases() {
-        return pageCases;
+    public List<Defect> getDefects() {
+        return pageDefects;
     }
 
     public Integer getPageSize() {
@@ -83,32 +80,34 @@ public class TablePaginator {
     }
 
     public Boolean getNextButtonDisabled() {
-        if (cases == null){
+        if (defects == null){
             return true;
         } else {
-            return ((pageNumber * pageSize) >= cases.size());
+            return ((pageNumber * pageSize) >= defects.size());
         }
     }
 
     public Integer getTotalPageNumber() {
-        if (totalPageNumber == 0 && cases != null) {
-            totalPageNumber = cases.size() / pageSize;
-            Integer mod = cases.size() - (totalPageNumber * pageSize);
+        if (totalPageNumber == 0 && defects != null) {
+            totalPageNumber = defects.size() / pageSize;
+            Integer mod = defects.size() - (totalPageNumber * pageSize);
             if (mod > 0) {
                 totalPageNumber++;
             }
         }
+        
         return totalPageNumber;
     }
 
 
     private void bindData(Integer newPageIndex) {
         if (newPageIndex <= getTotalPageNumber() && newPageIndex > 0) {
-            pageCases = fillCasesForCurrentPage(newPageIndex, cases);
+            pageDefects = fillDefectsForCurrentPage(newPageIndex, defects);
             pageNumber = newPageIndex;
             isNoData = false;
         }
-        if (pageCases == null || pageCases.size() == 0) {
+        
+        if (pageDefects == null || pageDefects.size() == 0) {
             isNoData = true;
         }
     }
