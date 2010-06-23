@@ -71,7 +71,7 @@ public class DefectSearchController {
     	foundDefects = null;
     	paginator = new DefectTablePaginator(new List<DefectWrapper>());
     	
-    	if(searchCriteria == null || searchCriteria.queryString == null || searchCriteria.queryString.trim().length() == 0) {
+    	if(searchCriteria == null || searchCriteria.isEmpty()) {
     		addPageMessage(ApexPages.Severity.ERROR, 'Please provide non-empty search criteria');
     		return null;
     	}
@@ -150,5 +150,9 @@ public class DefectSearchController {
     public class DefectSearchCriteria {
     	public String queryString { get; set; }
     	public Boolean includeClosedDefects { get; set; } 
+    	
+    	public Boolean isEmpty() {
+    		return queryString == null || queryString.trim().length() == 0;
+    	}
     }
 }

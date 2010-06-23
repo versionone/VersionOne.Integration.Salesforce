@@ -13,10 +13,10 @@
 			            <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255" 
 			             value="{!SearchCriteria.queryString}"/>
 			            <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2" 
-			                value="{!SearchCriteria.includeClosedDefects}" />
+			             value="{!SearchCriteria.includeClosedDefects}" />
 			            <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>
 			            <apex:commandButton value="Search" id="searchButton" status="searchForDefects"
-						    rerender="searchResults, errorMessages" action="{!searchForDefects}" />
+						 rerender="searchResults, errorMessages" action="{!searchForDefects}" />
 				    </apex:outputPanel>
 				</apex:pageBlockSectionItem>
 		    </apex:pageBlockSection>
@@ -25,35 +25,50 @@
 		        <apex:pageBlockSectionItem >
 		          <apex:outputPanel >
 		            <script type="text/javascript">
-                    function maybeRefreshWindow() {
-                        if({!refreshWindow}) {
-                            parent.location.href = "/{!currentCase.Id}";
-                        }
-                    }
+		                <![CDATA[
+                        function maybeRefreshWindow() {
+                            if({!refreshWindow}) {
+                                parent.location.href = "/{!currentCase.Id}";
+                            }
+                        }    
+                        ]]>
                     </script>
-                    <apex:outputPanel rendered="{!paginator.hasData}" style="text-align: right;" > 
-		                <font size="x-small">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
-		                 out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/> 
-		                 in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/> results &nbsp;&nbsp;</font>
+                    <apex:outputPanel style="text-align: right;" rendered="{!paginator.hasData}">
+					    <br/>
+					    <apex:repeat value="{!paginator.pagesList}" var="pageNumber"  rendered="{!paginator.totalPageNumber > 1}">
+	                        <apex:outputPanel rendered="{!(pageNumber + 1) != paginator.pageNumber}">
+	                            <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
+	                             value="javascript:return false;">{!pageNumber + 1} </apex:outputLink>
+	                        </apex:outputPanel>
+	                        <apex:outputPanel rendered="{!(pageNumber + 1) == paginator.pageNumber}">
+	                            <apex:outputText value="{!pageNumber + 1}"/>
+	                        </apex:outputPanel>
+	                        &nbsp;&nbsp;
+	                    </apex:repeat>
+                        <apex:actionFunction name="goToPage" action="{!goToPage}" rerender="searchResults" status="updatingDefectsTable">
+                            <apex:param name="pageNumber" value="" assignTo="{!pageNumber}" />
+                        </apex:actionFunction>
+			            <span style="font-size: x-small;">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
+			             out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/> 
+			             in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/>&nbsp;results &nbsp;&nbsp;</span>
 			            <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}" 
-			             disabled="{!paginator.previousButtonDisabled}" rerender="searchResults"/>
-			            <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" 
-			             rerender="searchResults" disabled="{!paginator.nextButtonDisabled}" />
-		                <br/><br/>
-		            </apex:outputPanel>
+			             disabled="{!paginator.previousButtonDisabled}" rerender="searchResults" status="updatingDefectsTable"/>
+			            <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" rerender="searchResults" 
+			             disabled="{!paginator.nextButtonDisabled}" status="updatingDefectsTable" />    
+					</apex:outputPanel>
 				    <apex:pageBlockTable value="{!paginator.defects}" var="item" rendered="{!displayDefectTable}" id="defectTable">
 				        <apex:column >
 				        	<apex:facet name="header">Action</apex:facet>
 				            <apex:commandButton value="Assign" id="assignButton"
-				    			rerender="searchResults, errorMessages" status="assigningDefect"
-								action="{!assignDefectToCase}" rendered="{!not(item.isAssignedToCurrentCase)}"
-								oncomplete="maybeRefreshWindow()">
-								  <apex:param id="assignParam" value="{!item.defectPart.token}" name="defectToAssign" assignTo="{!assignedDefectToken}" />
+				    		 rerender="searchResults, errorMessages" status="assigningDefect"
+							 action="{!assignDefectToCase}" rendered="{!not(item.isAssignedToCurrentCase)}"
+							 oncomplete="maybeRefreshWindow()">
+							    <apex:param id="assignParam" value="{!item.defectPart.token}" name="defectToAssign" assignTo="{!assignedDefectToken}" />
 						    </apex:commandButton>
 						    <apex:commandButton value="Unassign" id="unassignButton"
-				    			rerender="searchResults, errorMessages" status="unassigningDefect"
-								action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}" 
-								oncomplete="maybeRefreshWindow()" />
+				    		 rerender="searchResults, errorMessages" status="unassigningDefect"
+							 action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}" 
+							 oncomplete="maybeRefreshWindow()" style="color: #000000" />
 				        </apex:column>
 					    <apex:column >
 						    <apex:facet name="header">ID</apex:facet>
@@ -85,29 +100,6 @@
 							<apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(item.defectPart.isClosed)}"/>
 						</apex:column>
 					</apex:pageBlockTable>
-					<apex:outputPanel style="text-align: right;" rendered="{!paginator.hasData}">
-					    <br/>
-					    <apex:repeat value="{!paginator.pagesList}" var="pageNumber"  rendered="{!paginator.totalPageNumber > 1}">
-	                        <apex:outputPanel rendered="{!(pageNumber + 1) != paginator.pageNumber}">
-	                            <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
-	                             value="javascript:return false;">{!pageNumber + 1} </apex:outputLink>
-	                        </apex:outputPanel>
-	                        <apex:outputPanel rendered="{!(pageNumber + 1) == paginator.pageNumber}">
-	                            <apex:outputText value="{!pageNumber + 1}"/>
-	                        </apex:outputPanel>
-	                        &nbsp;&nbsp;
-	                    </apex:repeat>
-                        <apex:actionFunction name="goToPage" action="{!goToPage}" rerender="searchResults" status="updatingDefectsTable">
-                            <apex:param name="pageNumber" value="" assignTo="{!pageNumber}" />
-                        </apex:actionFunction>
-			            <font size="x-small">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
-			             out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/> 
-			             in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/>&nbsp;results &nbsp;&nbsp;</font>
-			                <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}" 
-			                 disabled="{!paginator.previousButtonDisabled}" rerender="searchResults" status="updatingDefectsTable"/>
-			                <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" rerender="searchResults" 
-			                 disabled="{!paginator.nextButtonDisabled}" status="updatingDefectsTable" />    
-					</apex:outputPanel>
 				  </apex:outputPanel>
 				</apex:pageBlockSectionItem>
 		    </apex:pageBlockSection>
