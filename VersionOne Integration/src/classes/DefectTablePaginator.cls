@@ -2,14 +2,14 @@ public class DefectTablePaginator {
     private List<DefectWrapper> defects;
     private List<DefectWrapper> pageDefects;
     private Integer pageNumber;
-    private Integer pageSize;
+    private Integer pageSizeValue;
     private Integer totalPageNumber;
 
     public DefectTablePaginator(List<DefectWrapper> defects) {
         this.defects = defects;
         pageNumber = 0;
         totalPageNumber = 0;
-        pageSize = 20;
+        pageSizeValue = 10;
         hasData = true;
         bindData(1);
     }
@@ -19,7 +19,6 @@ public class DefectTablePaginator {
         transient Integer min = 0;
         transient Integer max = 0;
         Integer pageNumber = getTotalPageNumber();
-        Integer pageSize = getPageSize();
         
         if (newPageIndex > pageNumber) {
             min = pageNumber * pageSize;
@@ -38,6 +37,16 @@ public class DefectTablePaginator {
             }
         }
         return currentDefects;
+    }
+    
+    public Integer pageSize {
+    	get { return pageSizeValue; }
+    	set { 
+    		if(value < 1) {
+    			throw new IntegrationException('Page size must be positive number, at least 1');
+    		}
+    		pageSize = value;
+    	}
     }
 
     public Boolean hasData {get; set;}
@@ -68,10 +77,6 @@ public class DefectTablePaginator {
 
     public List<DefectWrapper> getDefects() {
         return pageDefects;
-    }
-
-    public Integer getPageSize() {
-        return pageSize;
     }
 
     public Boolean getPreviousButtonDisabled() {

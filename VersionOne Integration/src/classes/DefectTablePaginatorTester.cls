@@ -10,7 +10,8 @@ private class DefectTablePaginatorTester {
             defects.add(new DefectWrapper(caseData, defectData));
         }
 
-        DefectTablePaginator paginator = new DefectTablePaginator(defects);
+        DefectTablePaginator paginator = new DefectTablePaginator(defects); 
+        paginator.pageSize = 20;
 
         List<Integer> pagesList = paginator.getPagesList();
         System.assertEquals(3, pagesList.size(), 'Incorrect number of defects');
@@ -24,12 +25,12 @@ private class DefectTablePaginatorTester {
         System.assertEquals(numberOfDefects, paginator.getRecordCount(), 'Incorrect number of defects');
         System.assertEquals(3, paginator.getTotalPageNumber(), 'Incorrect number of pages');
         System.assertEquals(1, paginator.getPageNumber(), 'Incorrect number of current page');
-        System.assertEquals(paginator.getPageSize(), paginator.getDefects().size(), 'Incorrect number of defects on the first page');
+        System.assertEquals(paginator.pageSize, paginator.getDefects().size(), 'Incorrect number of defects on the first page');
         System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
         System.assertEquals(false, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
         paginator.nextBtnClick();
         System.assertEquals(2, paginator.getPageNumber(), 'Incorrect number of current page');
-        System.assertEquals(paginator.getPageSize(), paginator.getDefects().size(), 'Incorrect number of defects on the second page');
+        System.assertEquals(paginator.pageSize, paginator.getDefects().size(), 'Incorrect number of defects on the second page');
         System.assertEquals(false, paginator.getPreviousButtonDisabled(), 'The Previous button has to be enabled.');
         System.assertEquals(false, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
         paginator.nextBtnClick();
@@ -40,12 +41,12 @@ private class DefectTablePaginatorTester {
         System.assertEquals(true, paginator.getNextButtonDisabled(), 'The Next button has to be disabled.');
         paginator.previousBtnClick();
         System.assertEquals(2, paginator.getPageNumber(), 'Incorrect number of current page');
-        System.assertEquals(paginator.getPageSize(), paginator.getDefects().size(), 'Incorrect number of defects on the second page');
+        System.assertEquals(paginator.pageSize, paginator.getDefects().size(), 'Incorrect number of defects on the second page');
         System.assertEquals(false, paginator.getPreviousButtonDisabled(), 'The Previous button has to be enabled.');
         System.assertEquals(false, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
         paginator.previousBtnClick();
         System.assertEquals(1, paginator.getPageNumber(), 'Incorrect number of current page');
-        System.assertEquals(paginator.getPageSize(), paginator.getDefects().size(), 'Incorrect number of defects on the first page');
+        System.assertEquals(paginator.pageSize, paginator.getDefects().size(), 'Incorrect number of defects on the first page');
         System.assertEquals(true, paginator.getPreviousButtonDisabled(), 'The Previous button has to be disabled.');
         System.assertEquals(false, paginator.getNextButtonDisabled(), 'The Next button has to be enabled.');
         paginator.goToPage(3);
@@ -57,6 +58,7 @@ private class DefectTablePaginatorTester {
 
     static testMethod void emptyPaginatorTest() {
         DefectTablePaginator paginator = new DefectTablePaginator(new List<DefectWrapper>());
+        paginator.pageSize = 20;
 
         List<Integer> pagesList = paginator.getPagesList();
         System.assertEquals(0, pagesList.size(), 'Incorrect number of cases');
