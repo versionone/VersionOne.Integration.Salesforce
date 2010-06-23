@@ -23,7 +23,7 @@ public interface IV1Connector {
 	* Updates reference for the defect.
 	* defectId - defect id for updating.
 	**/
-	void updateReferenceForDefect(String defectId);
+	void updateReferenceForDefect(String defectId, String referenceValue);
 
     /**
     * Returns: find and return id of current source(from Settings).

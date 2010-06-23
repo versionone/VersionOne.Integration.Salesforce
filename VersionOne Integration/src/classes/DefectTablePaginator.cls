@@ -1,21 +1,20 @@
 public class DefectTablePaginator {
-    private List<Defect> defects;
-    private List<Defect> pageDefects;
+    private List<DefectWrapper> defects;
+    private List<DefectWrapper> pageDefects;
     private Integer pageNumber;
     private Integer pageSize;
     private Integer totalPageNumber;
 
-    public DefectTablePaginator(List<Defect> defects) {
+    public DefectTablePaginator(List<DefectWrapper> defects) {
         this.defects = defects;
         pageNumber = 0;
         totalPageNumber = 0;
         pageSize = 20;
-        isNoData = false;
+        hasData = true;
         bindData(1);
     }
 
-    // ------------- Common for tables --------------
-    private List<Defect> fillDefectsForCurrentPage(Integer newPageIndex, List<Defect> cases) {
+    private List<DefectWrapper> fillDefectsForCurrentPage(Integer newPageIndex, List<DefectWrapper> defects) {
         transient Integer counter = 0;
         transient Integer min = 0;
         transient Integer max = 0;
@@ -30,8 +29,8 @@ public class DefectTablePaginator {
             min = max - pageSize;
         }
         
-        List<Defect> currentDefects = new List<Defect>();
-        for(Defect defect : defects) {
+        List<DefectWrapper> currentDefects = new List<DefectWrapper>();
+        for(DefectWrapper defect : defects) {
             counter++;
             
             if (counter > min && counter <= max) {
@@ -41,9 +40,9 @@ public class DefectTablePaginator {
         return currentDefects;
     }
 
-    public Boolean isNoData {get; set;}
+    public Boolean hasData {get; set;}
 
-    public Integer getRecordsNumber() {
+    public Integer getRecordCount() {
         return defects == null ? 0 : defects.size();
     }
 
@@ -56,7 +55,7 @@ public class DefectTablePaginator {
         List<Integer> pagesNumbers = new List<Integer>();
         Integer amountPages = getTotalPageNumber();
         
-        for (Integer i = 0; i<amountPages; i++) {
+        for (Integer i = 0; i < amountPages; i++) {
             pagesNumbers.add(i);
         }
         
@@ -67,7 +66,7 @@ public class DefectTablePaginator {
         return pageNumber;
     }
 
-    public List<Defect> getDefects() {
+    public List<DefectWrapper> getDefects() {
         return pageDefects;
     }
 
@@ -99,16 +98,15 @@ public class DefectTablePaginator {
         return totalPageNumber;
     }
 
-
     private void bindData(Integer newPageIndex) {
         if (newPageIndex <= getTotalPageNumber() && newPageIndex > 0) {
             pageDefects = fillDefectsForCurrentPage(newPageIndex, defects);
             pageNumber = newPageIndex;
-            isNoData = false;
+            hasData = true;
         }
         
         if (pageDefects == null || pageDefects.size() == 0) {
-            isNoData = true;
+            hasData = false;
         }
     }
 
@@ -119,5 +117,4 @@ public class DefectTablePaginator {
     public void previousBtnClick() {
         bindData(pageNumber - 1);
     }
-
 }
