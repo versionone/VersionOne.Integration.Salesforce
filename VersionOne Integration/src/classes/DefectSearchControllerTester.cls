@@ -106,8 +106,8 @@ private class DefectSearchControllerTester {
     
     	System.assertEquals(ApexPages.getMessages().size(), 0);
     	System.assertEquals(caseData.Id, defectFacadeMockValue.assignDefectResultValue.caseValue.Id); 
-    	System.assertEquals(assignedDefectToken, defectFacadeMockValue.assignDefectResultValue.token);
-    	System.assertEquals(defectStatus, defectFacadeMockValue.assignDefectResultValue.status);
+    	System.assertEquals(assignedDefectToken, defectFacadeMockValue.assignDefectResultValue.defectValue.token);
+    	System.assertEquals(defectStatus, defectFacadeMockValue.assignDefectResultValue.defectValue.status);
     }
     
     static testMethod void unassignDefectFailureTest() {
@@ -125,8 +125,7 @@ private class DefectSearchControllerTester {
     	controller.unassignDefectFromCase();
     
         System.assertEquals(caseData.Id, defectFacadeMockValue.assignDefectResultValue.caseValue.Id); 
-    	System.assertEquals(null, defectFacadeMockValue.assignDefectResultValue.token);
-    	System.assertEquals(null, defectFacadeMockValue.assignDefectResultValue.status);
+    	System.assertEquals(null, defectFacadeMockValue.assignDefectResultValue.defectValue);
     	System.assertEquals(ApexPages.getMessages().size(), 0);
     }
     
