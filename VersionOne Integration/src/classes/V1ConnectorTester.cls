@@ -539,7 +539,7 @@ private class V1ConnectorTester {
         String expectionBody = '<Asset id="Defect:' + defectId + '"><Attribute act="set" name="Reference"></Attribute></Asset>';
         String expectionUrl = 'rest-1.v1/Data/Defect/' + defectId;
 
-        connector.updateReferenceForDefect(defectId);
+        connector.updateReferenceForDefect(defectId, '');
         System.assertEquals(expectionBody, requestor.getSentBody(1));
         System.assertEquals(expectionUrl, requestor.getSentUrl(1));
     }
@@ -567,7 +567,7 @@ private class V1ConnectorTester {
         RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        connector.updateReferenceForDefect(defectId);
+        connector.updateReferenceForDefect(defectId, '');
         try {
             System.assertEquals(null, requestor.getSentUrl(1));
             System.assert(false, 'This cannot be reached. Have to be only 1 request');

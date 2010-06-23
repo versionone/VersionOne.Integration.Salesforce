@@ -46,7 +46,7 @@ public class V1Connector implements IV1Connector {
         }
     }
 
-    public void updateReferenceForDefect(String defectId) {
+    public void updateReferenceForDefect(String defectId, String referenceValue) {
         Defect defectData = getDefectById(defectId);
         if (defectData.isClosed) {
             return;
@@ -54,7 +54,7 @@ public class V1Connector implements IV1Connector {
         String url = String.format(UPDATE_REFERENCE_URL, new String[]{defectId});
 
         String body = '<Asset id="Defect:' + defectId + '">' +
-                        attributeNode('Reference', '') +
+                        attributeNode('Reference', referenceValue) +
                       '</Asset>';
         requestor.request(requestor.createRequest(body, url, 'POST'));
         validateResponse();

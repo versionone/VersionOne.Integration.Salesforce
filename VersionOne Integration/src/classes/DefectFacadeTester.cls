@@ -103,6 +103,6 @@ private class DefectFacadeTester {
         defectFacade.publishStatus(case1);
 
         case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
-        System.assertEquals(V1ConnectorMock.Developer_Status, case1.V1DevelopmentStatus__c, 'Incorrect developer status.');
+        System.assertEquals(V1ConnectorMock.developmentStatus, case1.V1DevelopmentStatus__c, 'Incorrect developer status.');
     }
 }

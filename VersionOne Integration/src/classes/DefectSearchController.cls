@@ -7,6 +7,8 @@ public class DefectSearchController {
     private DefectSearchCriteria searchCriteria = new DefectSearchCriteria();
     private List<DefectWrapper> foundDefects;
     
+    public DefectTablePaginator paginator { get; private set; }
+    
     public Case currentCase {
     	get { return currentCaseValue; }
     	private set { currentCaseValue = value; }
@@ -42,6 +44,8 @@ public class DefectSearchController {
     
     public String assignedDefectToken { get; set; }
     
+    public Integer pageNumber { get; set; }
+    
     public DefectSearchController(Case caseEntity) {
     	this(caseEntity.ID);
         searchCriteria = new DefectSearchCriteria();
@@ -65,6 +69,7 @@ public class DefectSearchController {
     
     public PageReference searchForDefects() {
     	foundDefects = null;
+    	paginator = new DefectTablePaginator(new List<DefectWrapper>());
     	
     	if(searchCriteria == null || searchCriteria.queryString == null || searchCriteria.queryString.trim().length() == 0) {
     		addPageMessage(ApexPages.Severity.ERROR, 'Please provide non-empty search criteria');
@@ -82,12 +87,18 @@ public class DefectSearchController {
     		if(foundDefects.size() == 0) {
     			addPageMessage(ApexPages.Severity.INFO, 'VersionOne search returned no matching defects'); 
     		}
+    		
+    		paginator = new DefectTablePaginator(foundDefects);
     	} catch(IntegrationException ex) {
     		System.debug(ex.getMessage());
     		addPageMessage(ApexPages.Severity.ERROR, ex.getMessage());
     	}
     	
     	return null;
+    }
+    
+    public void goToPage() {
+    	paginator.goToPage(pageNumber);
     }
     
     public PageReference assignDefectToCase() {

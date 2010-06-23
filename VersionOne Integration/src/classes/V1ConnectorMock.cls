@@ -11,12 +11,12 @@ public class V1ConnectorMock implements IV1Connector {
     private Exception updateReferenceForDefectException;
 
     public static final String defaultProjectId = '1010';
-    public static final String Developer_Status = 'In Progress';
+    public static final String developmentStatus = 'In Progress';
 
     public Defect getDefectById(String id) {
         Defect defectData = new Defect('title', 'description');
         defectData.id = id;
-        defectData.status = Developer_Status;
+        defectData.status = developmentStatus;
 
         return defectData;
     }
@@ -36,7 +36,7 @@ public class V1ConnectorMock implements IV1Connector {
         removeLinkFromDefectException = ex;
     }
 
-    public void updateReferenceForDefect(String defectId) {
+    public void updateReferenceForDefect(String defectId, String referenceValue) {
         throwException();
         if (updateReferenceForDefectException != null) {
             throw updateReferenceForDefectException;
