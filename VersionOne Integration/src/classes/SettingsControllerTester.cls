@@ -127,7 +127,7 @@ private class SettingsControllerTester {
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
     }
 
-    static testMethod void saveSettingsTester() {
+    static testMethod void saveSettingsTest() {
         // normal way
         String userName = 'UserName';
         String source = 'Source';
@@ -182,7 +182,7 @@ private class SettingsControllerTester {
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
     }
 
-    static testMethod void updateProjectDataTester() {
+    static testMethod void updateProjectDataTest() {
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
@@ -205,7 +205,7 @@ private class SettingsControllerTester {
         System.assertEquals('Main project', settingsData.getProjectName());
     }
 
-    static testMethod void getMappingsTester() {
+    static testMethod void getMappingsTest() {
 		for (MappingV1ProjectsToSFProducts__c obj :
 		    [select Id from MappingV1ProjectsToSFProducts__c]) {
 		    delete obj;
@@ -230,10 +230,7 @@ private class SettingsControllerTester {
         settingsData.setProjectName(projectName);
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
-        Test.setFixedSearchResults(new Id[]{mappingData1.id});
         List<ProjectProductMapping> mappings = controller.getMappings();
-        System.debug('----mappings' + mappings);
-        System.debug('----V1CaseCollector.getMappingList():' + [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c]);
         System.assertEquals(2, mappings.size(), 'Incorrect numbers of mapped projects.');
         System.assertEquals(projectName, mappings.get(0).projectName, 'Incorrect mapped project.');
         System.assert(mappings.get(0).IsVisible, 'Incorrect "visible" status');
@@ -241,7 +238,38 @@ private class SettingsControllerTester {
         System.assert(!mappings.get(1).IsVisible, 'Incorrect "visible" status');
     }
 
-    static testMethod void getVersionOneProjectsListTester() {
+    static testMethod void getMappingsWithOnlyDefaultTest() {
+		for (MappingV1ProjectsToSFProducts__c obj :
+		    [select Id from MappingV1ProjectsToSFProducts__c]) {
+		    delete obj;
+		}
+
+        String projectName = 'Project name';
+        SettingsController controller = new SettingsController();
+        Settings settingsData = Settings.getTestSettings();
+        settingsData.setProjectId(V1ConnectorMock.defaultProjectId);
+        settingsData.setProjectName(projectName);
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+        List<ProjectProductMapping> mappings = controller.getMappings();
+        System.assertEquals(1, mappings.size(), 'Incorrect numbers of mapped projects.');
+        System.assertEquals(projectName, mappings.get(0).projectName, 'Incorrect mapped project.');
+        System.assert(mappings.get(0).IsVisible, 'Incorrect "visible" status');
+    }
+
+    static testMethod void getProductListTest() {
+        Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.Product__c;
+        List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+
+        SettingsController controller = new SettingsController();
+        Settings settingsData = Settings.getTestSettings();
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+        List<Selectoption> options = controller.getProductList();
+        System.assertEquals(ple.size() + 1, options.size(), 'Incorrect amount of products options');
+    }
+
+    static testMethod void getVersionOneProjectsListTest() {
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
@@ -249,5 +277,34 @@ private class SettingsControllerTester {
         controller.initSettings();
         List<SelectOption> options = controller.getVersionOneProjectsList();
         assertContainsOption('CI', options, 'Wrong option');
+    }
+
+    static testMethod void updateProjectMappingWithErrorTest() {
+		for (MappingV1ProjectsToSFProducts__c obj :
+		    [select Id from MappingV1ProjectsToSFProducts__c]) {
+		    delete obj;
+		}
+
+    	String projectName1 = 'Project Name 1';
+    	String productName1 = 'Product Name 1';
+    	String projectToken1 = 'Scope:1234';
+    	String productId1 = 'GDS';
+    	MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
+    	mappingData1.SFProductId__c = productId1;
+    	mappingData1.SFProductName__c = productName1;
+    	mappingData1.V1ProjectToken__c = projectToken1;
+    	mappingData1.V1ProjectName__c = projectName1;
+    	insert mappingData1;
+
+        SettingsController controller = new SettingsController();
+        Settings settingsData = Settings.getTestSettings();
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+        ApexPages.currentPage().getParameters().put('mappingId', '123456');
+        controller.currectMapping = new ProjectProductMapping(projectName1, true, productName1);
+        controller.currectMapping.projectToken = projectToken1;
+        controller.currectMapping.productId = productId1;
+        controller.updateProjectMapping();
+        System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when product id already used.');
     }
 }
