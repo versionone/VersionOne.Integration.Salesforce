@@ -158,6 +158,14 @@ public class SettingsController {
         return null;
     }
 
+    public PageReference addMapping() {
+    	currectMapping.projectName = projects.get(currectMapping.projectToken);
+    	currectMapping.productName = currectMapping.productId;
+    	V1CaseCollector.addNewMapping(currectMapping);
+
+    	return null;
+    }
+
     /**
      * Validates settings and adds errors messages on page if any.
      *
@@ -211,7 +219,16 @@ public class SettingsController {
         List<ProjectProductMapping> mappings = new List<ProjectProductMapping>();
         ProjectProductMapping mapping = new ProjectProductMapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()), DEFAULT_PRODUCT);
         mapping.productId = settings.getProjectId();
+        mapping.isDeletable = false;
         mappings.add(mapping);
+        List<MappingV1ProjectsToSFProducts__c> baseMappingData = V1CaseCollector.getMappingList();
+        for (MappingV1ProjectsToSFProducts__c mapData : baseMappingData) {
+	        mapping = new ProjectProductMapping(mapData.V1ProjectName__c, projects.containsKey(mapData.V1ProjectToken__c), mapData.SFProductName__c);
+        	mapping.productId = mapData.SFProductId__c;
+        	mapping.isDeletable = true;
+        	mapping.mappingId = mapData.id;
+        	mappings.add(mapping);
+        }
 
         return mappings;
     }

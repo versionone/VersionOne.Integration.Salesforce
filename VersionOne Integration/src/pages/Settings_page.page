@@ -24,6 +24,7 @@
     <apex:actionStatus startText="Testing settings..." id="test_status" />
     <apex:actionStatus startText="Saving settings..." id="save_status" />
     <apex:actionStatus startText="Updating project..." id="update_project" />
+    <apex:actionStatus startText="Additing mapping ..." id="addMapping" />
     <apex:form >
         <apex:pageBlock title="Connection settings" mode="edit">
             <apex:pageBlockSection columns="1">
@@ -108,23 +109,24 @@
                     </apex:selectList>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
-	                <apex:outputLabel value="VersionOne project" for="ProjectId" />
+	                <apex:outputLabel value="VersionOne project" for="ProjectToken" />
 					<apex:outputPanel layout="block">
-						<apex:selectList value="{!currectMapping.projectId}" size="1" required="false" id="ProjectId">
+						<apex:selectList value="{!currectMapping.projectToken}" size="1" required="false" id="ProjectToken">
 						    <apex:selectOptions value="{!VersionOneProjectsList}"/>
 						</apex:selectList>
 						&nbsp;&nbsp;&nbsp;
-						<apex:commandButton value="Add" />
+						<apex:commandButton value="Add" action="{!addMapping}" rerender="ProjectMapping" status="addMapping"/>
                     </apex:outputPanel>
                 </apex:pageBlockSectionItem>
 			    <apex:pageBlockSectionItem >
 			        <apex:pageBlockTable value="{!mappings}" var="mapping">
 						<apex:column >
 							<apex:facet name="header">Actions</apex:facet>
+			                <apex:outputLink onclick="javascript: UpdateProject('{!mapping.mappingId}');"
+		 		                   value="javascript:return false;">Update</apex:outputLink>
+	            		    &nbsp;&nbsp;
 			                <apex:outputLink onclick="javascript: UpdateProject();"
-		 		                   value="javascript:return false;">
-		 		                   Update
-	            		    </apex:outputLink>
+		 		                   value="javascript:return false;" rendered="{!mapping.isDeletable}">Remove</apex:outputLink>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">VersionOne Project</apex:facet>
@@ -144,7 +146,9 @@
             </apex:pageBlockSection>
         </apex:pageBlock>
 
-		<apex:actionFunction name="UpdateProject" action="{!updateDefaultProject}" status="update_project" rerender="ProjectMapping"/>
+		<apex:actionFunction name="UpdateProject" action="{!updateDefaultProject}" status="update_project" rerender="ProjectMapping">
+			<apex:param name="mappingId" value=""/>
+		</apex:actionFunction>
     </apex:form>
 
     <apex:outputPanel id="out_testing">
