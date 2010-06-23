@@ -1,4 +1,6 @@
 public class DefectSearchController {
+	private final Integer ITEMS_PER_PAGE = 10;
+	
 	private Case currentCaseValue;
 	
     private transient Settings innerSettings;
@@ -69,7 +71,7 @@ public class DefectSearchController {
     
     public PageReference searchForDefects() {
     	foundDefects = null;
-    	paginator = new DefectTablePaginator(new List<DefectWrapper>());
+    	paginator = new DefectTablePaginator(ITEMS_PER_PAGE, new List<DefectWrapper>());
     	
     	if(searchCriteria == null || searchCriteria.isEmpty()) {
     		addPageMessage(ApexPages.Severity.ERROR, 'Please provide non-empty search criteria');
@@ -88,7 +90,7 @@ public class DefectSearchController {
     			addPageMessage(ApexPages.Severity.INFO, 'VersionOne search returned no matching defects'); 
     		}
     		
-    		paginator = new DefectTablePaginator(foundDefects);
+    		paginator = new DefectTablePaginator(ITEMS_PER_PAGE, foundDefects);
     	} catch(IntegrationException ex) {
     		System.debug(ex.getMessage());
     		addPageMessage(ApexPages.Severity.ERROR, ex.getMessage());

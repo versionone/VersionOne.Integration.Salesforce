@@ -5,11 +5,11 @@ public class DefectTablePaginator {
     private Integer pageSizeValue;
     private Integer totalPageNumber;
 
-    public DefectTablePaginator(List<DefectWrapper> defects) {
+    public DefectTablePaginator(Integer pageSizeToUse, List<DefectWrapper> defects) {
         this.defects = defects;
+        pageSize = pageSizeToUse;
         pageNumber = 0;
         totalPageNumber = 0;
-        pageSizeValue = 10;
         hasData = true;
         bindData(1);
     }
@@ -40,12 +40,14 @@ public class DefectTablePaginator {
     }
     
     public Integer pageSize {
-    	get { return pageSizeValue; }
-    	set { 
+    	get {
+    		return pageSizeValue; 
+    	}
+    	private set { 
     		if(value < 1) {
     			throw new IntegrationException('Page size must be positive number, at least 1');
     		}
-    		pageSize = value;
+    		pageSizeValue = value;
     	}
     }
 
