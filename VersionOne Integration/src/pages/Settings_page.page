@@ -1,6 +1,8 @@
 <!-- Page -->
 <apex:page controller="SettingsController" action="{!initSettings}" title="VersionOne Integration Settings">
     <script type="text/javascript">
+	////<![CDATA[
+		var SFUserProductList = [];
         function disableAllButtons() {
             disableSaveButtons();
             disableTestButtons();
@@ -17,8 +19,26 @@
             ele.disabled = true;
             ele.className = 'btnDisabled';
         }
-
+        function isMappingDataValide() {
+        	var product = getSelectedProdcut();
+        	var result = true;
+        	SFUserProductList.forEach(
+        		function (x, idx) {
+        			if (x == product.value) {
+        				alert ('Product already used in mapping');
+	        			result = false;
+    	    			return;
+        			}
+				});
+        	return result;
+        }
+    //]]>
     </script>
+	<apex:repeat value="{!mappings}" var="mapping">
+	  <!-- Pushing item into Javascript array -->
+	  <script>SFUserProductList.push("{!mapping.productId}");</script>
+	</apex:repeat>
+
     <apex:sectionHeader title="Settings for VersionOne integration." />
 
     <apex:actionStatus startText="Testing settings..." id="test_status" />
@@ -61,9 +81,11 @@
                     onclick="disableAllButtons();" status="save_status"
                     rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
                     <script type="text/javascript">
+	                    ////<![CDATA[
                         function disableSaveButton1() {
 	                        disableElement(document.getElementById('{!$Component.save_button1}'));
     	                }
+					    //]]>
                 	</script>
                 </apex:commandButton>
                 <apex:commandButton value="Test settings" action="{!testSettings}"
@@ -71,9 +93,11 @@
                     onclick="disableAllButtons()"
                     status="test_status" id="test_button1">
                     <script type="text/javascript">
+	                    ////<![CDATA[
                         function disableTestButton1() {
                             disableElement(document.getElementById('{!$Component.test_button1}'));
                         }
+					    //]]>
                 	</script>
                 </apex:commandButton>
             </apex:pageBlockButtons>
@@ -83,9 +107,11 @@
                     onclick="disableAllButtons();" status="save_status"
                     rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
                     <script type="text/javascript">
-                    function disableSaveButton2() {
-                        disableElement(document.getElementById('{!$Component.save_button2}'));
-                    }
+	                    ////<![CDATA[
+	                    function disableSaveButton2() {
+    	                    disableElement(document.getElementById('{!$Component.save_button2}'));
+        	            }
+					    //]]>
                 	</script>
                 </apex:commandButton>
                 <apex:commandButton value="Test settings" action="{!testSettings}"
@@ -93,9 +119,11 @@
                     onclick="disableAllButtons()"
                     status="test_status" id="test_button2">
                     <script type="text/javascript">
+	                    ////<![CDATA[
                         function disableTestButton2() {
-                        disableElement(document.getElementById('{!$Component.test_button2}'));
-                    }
+							disableElement(document.getElementById('{!$Component.test_button2}'));
+						}
+					    //]]>
                 	</script>
                 </apex:commandButton>
             </apex:pageBlockButtons>
@@ -106,6 +134,13 @@
 	                <apex:outputLabel value="SalesForce product" for="ProductId" />
                     <apex:selectList size="1" required="false" id="ProductId" value="{!currectMapping.productId}">
                         <apex:selectOptions value="{!ProductList}"/>
+	                    <script type="text/javascript">
+		                    ////<![CDATA[
+	                        function getSelectedProdcut() {
+								return document.getElementById('{!$Component.ProductId}');
+							}
+						    //]]>
+	                	</script>
                     </apex:selectList>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
@@ -115,18 +150,17 @@
 						    <apex:selectOptions value="{!VersionOneProjectsList}"/>
 						</apex:selectList>
 						&nbsp;&nbsp;&nbsp;
-						<apex:commandButton value="Add" action="{!addMapping}" rerender="ProjectMapping" status="addMapping"/>
+						<apex:commandButton value="Add" action="{!addMapping}" rerender="ProjectMapping,messages" status="addMapping" onClick="if (!isMappingDataValide()){return;}"/>
                     </apex:outputPanel>
                 </apex:pageBlockSectionItem>
 			    <apex:pageBlockSectionItem >
 			        <apex:pageBlockTable value="{!mappings}" var="mapping">
 						<apex:column >
 							<apex:facet name="header">Actions</apex:facet>
-			                <apex:outputLink onclick="javascript: UpdateProject('{!mapping.mappingId}');"
-		 		                   value="javascript:return false;">Update</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);" onclick="if ({!not(mapping.isDeletable)} || isMappingDataValide()){UpdateProject('{!mapping.mappingId}');}">Update</apex:outputLink>
 	            		    &nbsp;&nbsp;
 			                <apex:outputLink onclick="javascript: UpdateProject();"
-		 		                   value="javascript:return false;" rendered="{!mapping.isDeletable}">Remove</apex:outputLink>
+		 		                   value="javascript:void(0);" rendered="{!mapping.isDeletable}">Remove</apex:outputLink>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">VersionOne Project</apex:facet>
@@ -146,7 +180,7 @@
             </apex:pageBlockSection>
         </apex:pageBlock>
 
-		<apex:actionFunction name="UpdateProject" action="{!updateDefaultProject}" status="update_project" rerender="ProjectMapping">
+		<apex:actionFunction name="UpdateProject" action="{!updateProjectMapping}" status="update_project" rerender="ProjectMapping,messages">
 			<apex:param name="mappingId" value=""/>
 		</apex:actionFunction>
     </apex:form>

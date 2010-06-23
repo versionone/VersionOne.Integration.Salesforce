@@ -1,6 +1,7 @@
 public class SettingsController {
 
     private static String DEFAULT_PRODUCT = 'Not in this list';
+    private static String DEFAULT_PRODUCT_ID = '0';
 
     public String testSeverity{get; set;}
     public String saveSeverity{get; set;}
@@ -61,6 +62,14 @@ public class SettingsController {
         }
     }
 
+    private List<MappingV1ProjectsToSFProducts__c> baseMappingData;
+    private List<MappingV1ProjectsToSFProducts__c> getMappingData() {
+    	if (baseMappingData == null) {
+    		baseMappingData = V1CaseCollector.getMappingList();
+    	}
+    	return baseMappingData;
+    }
+
     /** Must be called before usage of any other method. */
     public void initSettings() {
     	currectMapping = new ProjectProductMapping(null, null, null);
@@ -76,6 +85,10 @@ public class SettingsController {
         }
     }
 
+	/*
+	* Is there is no settings for default mapping sets it.
+	* Return: true - if settings was updated, false - if setting wasn't updated
+	*/
     public boolean updateProjectData() {
         boolean isUpdated = false;
 
@@ -88,12 +101,6 @@ public class SettingsController {
 
         return isUpdated;
     }
-
-    public void updateDefaultProjectSettings(String id) {
-        settings.setProjectId(id);
-        settings.setProjectName(projects.get(id));
-    }
-
 
     public PageReference saveSettings() {
         isSettingsCorrect = validateSettings();
@@ -205,7 +212,7 @@ public class SettingsController {
 
     public List<Selectoption> getProductList() {
         List<SelectOption> options = new List<SelectOption>();
-        options.add(new SelectOption('default', DEFAULT_PRODUCT));
+        options.add(new SelectOption(DEFAULT_PRODUCT_ID, DEFAULT_PRODUCT));
         Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.Product__c;
         List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
         for(Schema.PicklistEntry f : ple) {
@@ -218,10 +225,10 @@ public class SettingsController {
     public List<ProjectProductMapping> getMappings() {
         List<ProjectProductMapping> mappings = new List<ProjectProductMapping>();
         ProjectProductMapping mapping = new ProjectProductMapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()), DEFAULT_PRODUCT);
-        mapping.productId = settings.getProjectId();
+        mapping.productId = DEFAULT_PRODUCT_ID;
         mapping.isDeletable = false;
         mappings.add(mapping);
-        List<MappingV1ProjectsToSFProducts__c> baseMappingData = V1CaseCollector.getMappingList();
+        List<MappingV1ProjectsToSFProducts__c> baseMappingData = getMappingData();
         for (MappingV1ProjectsToSFProducts__c mapData : baseMappingData) {
 	        mapping = new ProjectProductMapping(mapData.V1ProjectName__c, projects.containsKey(mapData.V1ProjectToken__c), mapData.SFProductName__c);
         	mapping.productId = mapData.SFProductId__c;
@@ -234,8 +241,34 @@ public class SettingsController {
     }
 
 
-    public void updateDefaultProject() {
-        updateDefaultProjectSettings(currectMapping.projectToken);
-        settings.updateSettings();
+    public void updateProjectMapping() {
+    	String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
+    	if (mappingId == '') {
+        	updateDefaultProjectSettings(currectMapping.projectToken);
+        	settings.updateSettings();
+    	} else {
+    		System.debug('-----currectMapping:' + currectMapping);
+    		if (isProductAlreadyUsed(currectMapping.productId)) {
+    			addErrorMessage('Mapping for this product already exist');
+    		}
+    	}
+    }
+
+    private boolean isProductAlreadyUsed(String productId) {
+        List<MappingV1ProjectsToSFProducts__c> baseMappingData = getMappingData();
+        for (MappingV1ProjectsToSFProducts__c mapData : baseMappingData) {
+        	System.debug('!!!!!!!mapData.SFProductId__c = ' + mapData.SFProductId__c);
+        	System.debug('!!!!!!!productId = ' + productId);
+        	if (mapData.SFProductId__c == productId) {
+        		return true;
+        	}
+        }
+
+        return false;
+    }
+
+    public void updateDefaultProjectSettings(String id) {
+        settings.setProjectId(id);
+        settings.setProjectName(projects.get(id));
     }
 }
