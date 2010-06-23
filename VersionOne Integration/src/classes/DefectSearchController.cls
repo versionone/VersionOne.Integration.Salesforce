@@ -107,10 +107,15 @@ public class DefectSearchController {
     	try {
     		refreshWindow = true;
     		Defect matchingDefect = findDefectByToken(assignedDefectToken);
-    		DefectFacade.assignDefectToCase(currentCase, matchingDefect.token, matchingDefect.status);
+    		DefectFacade.assignDefectToCase(currentCase, matchingDefect);
     	} catch(IntegrationException ex) {
     		refreshWindow = false;
-    		addPageMessage(ApexPages.Severity.ERROR, 'Failed to associate current Case and selected VersionOne defect: ' + ex.getMessage());
+    		
+    		if(ex.getSeverity() == Severity.WARNING) {
+    			addPageMessage(ApexPages.Severity.WARNING, ex.getMessage());
+    		} else {
+    		    addPageMessage(ApexPages.Severity.ERROR, 'Failed to associate current Case and selected VersionOne defect: ' + ex.getMessage());
+    		}
     	}
     	
     	return null;

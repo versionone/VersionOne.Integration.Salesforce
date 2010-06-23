@@ -38,8 +38,8 @@ public class DefectFacadeMock implements IDefectFacade {
         createDefectInVersionOneException = ex;
     }
 
-    public void assignDefectToCase(Case caseData, String defectId, String devStatus) {
-        assignDefectResultValue = new AssignDefectPassedData(caseData, defectId, devStatus);
+    public void assignDefectToCase(Case caseData, Defect defectData) {
+        assignDefectResultValue = new AssignDefectPassedData(caseData, defectData.id, defectData.status);
         
         if(assignDefectToCaseException != null) {
         	throw assignDefectToCaseException;

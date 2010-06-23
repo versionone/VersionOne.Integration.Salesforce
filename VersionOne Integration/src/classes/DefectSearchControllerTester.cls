@@ -80,6 +80,20 @@ private class DefectSearchControllerTester {
     	pageMessageAssert(ApexPages.Severity.ERROR);
     }
     
+    static testMethod void assignDefectWarningTest() {
+    	DefectSearchController controller = getControllerWithoutAssignedDefect();
+    	defectFacadeMockValue.setAssignDefectToCaseException(new IntegrationException('', Severity.WARNING));
+    	controller.assignedDefectToken = assignedDefectToken;
+    	setupFoundDefect();
+    	
+    	controller.getSearchCriteria().queryString = caseSubject;
+    	controller.getSearchCriteria().includeClosedDefects = false;
+    	controller.searchForDefects();
+    	controller.assignDefectToCase();
+    
+    	pageMessageAssert(ApexPages.Severity.WARNING);
+    }
+    
     static testmethod void assignDefectTest() {
     	DefectSearchController controller = getControllerWithoutAssignedDefect();
     	controller.assignedDefectToken = assignedDefectToken;

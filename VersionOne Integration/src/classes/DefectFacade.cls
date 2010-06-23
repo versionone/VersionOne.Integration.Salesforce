@@ -21,7 +21,7 @@ public class DefectFacade implements IDefectFacade {
             } catch (Exception ex) {
                 throw new IntegrationException('Defect was created in the VersionOne but link was not created in the VersionOne.');
             } finally {
-                assignDefectToCase(caseData, id, null);
+                updateCaseOnAssignment(caseData, id, null);
             }
         }
 
@@ -32,17 +32,29 @@ public class DefectFacade implements IDefectFacade {
         try {
             connector.createLinkV1ToSF(id, caseData);
         } catch (Exception ex) {
-            throw new IntegrationException('Link to the case was not created.');
+            throw new IntegrationException('Link to the case was not created in VersionOne.', Severity.WARNING);
         }
     }
+    
+    public void assignDefectToCase(Case caseData, Defect defectData) {
+    	updateCaseOnAssignment(caseData, defectData.id, defectData.status);
+    	
+    	try {
+    	    connector.updateReferenceForDefect(defectData.id, caseData.id);
+    	} catch(Exception ex) {
+    		throw new IntegrationException('Failed to update VersionOne defect Reference field.');
+    	}
+    	
+        createLinkInVersionOne(caseData, defectData.id);
+    }
 
-    public void assignDefectToCase(Case caseData, String defectId, String devStatus) {
+    private void updateCaseOnAssignment(Case caseData, String defectId, String devStatus) {
         V1CaseCollector.updateCase(caseData, defectId, true, devStatus);
     }
 
     public void unassignDefectFromCase(Case caseData) {
         if (caseData.V1DefectId__c == null || caseData.V1DefectId__c == '') {
-            throw new IntegrationException('There is no assigned defect to the case.');
+            throw new IntegrationException('There is no defect assigned to the case.');
         }
         String id = getDefectFromToken(caseData.V1DefectId__c);
         String notRemovedData = removeInfoAboutAssociationFromDefect(id);
