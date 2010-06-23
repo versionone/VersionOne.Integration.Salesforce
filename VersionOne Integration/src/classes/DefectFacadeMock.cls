@@ -39,7 +39,7 @@ public class DefectFacadeMock implements IDefectFacade {
     }
 
     public void assignDefectToCase(Case caseData, Defect defectData) {
-        assignDefectResultValue = new AssignDefectPassedData(caseData, defectData.id, defectData.status);
+        assignDefectResultValue = new AssignDefectPassedData(caseData, defectData);
         
         if(assignDefectToCaseException != null) {
         	throw assignDefectToCaseException;
@@ -47,7 +47,7 @@ public class DefectFacadeMock implements IDefectFacade {
     }
 
     public void unassignDefectFromCase(Case caseData) {
-    	assignDefectResultValue = new AssignDefectPassedData(caseData, null, null);
+    	assignDefectResultValue = new AssignDefectPassedData(caseData, null);
     	
     	if (unassignDefectFromCaseException != null) {
     		throw unassignDefectFromCaseException;
@@ -92,13 +92,11 @@ public class DefectFacadeMock implements IDefectFacade {
     
     public class AssignDefectPassedData {
     	public Case caseValue { get; private set; }
-    	public String token { get; private set; }
-    	public String status { get; private set; }
+    	public Defect defectValue { get; private set; }
     	
-    	public AssignDefectPassedData(Case caseValue, String token, String status) {
+    	public AssignDefectPassedData(Case caseValue, Defect defectValue) {
     		this.caseValue = caseValue;
-    		this.token = token;
-    		this.status = status;
+    		this.defectValue = defectValue;
     	}
     }
  }
