@@ -10,8 +10,7 @@ private class DefectTablePaginatorTester {
             defects.add(new DefectWrapper(caseData, defectData));
         }
 
-        DefectTablePaginator paginator = new DefectTablePaginator(defects); 
-        paginator.pageSize = 20;
+        DefectTablePaginator paginator = new DefectTablePaginator(20, defects);
 
         List<Integer> pagesList = paginator.getPagesList();
         System.assertEquals(3, pagesList.size(), 'Incorrect number of defects');
@@ -57,8 +56,7 @@ private class DefectTablePaginatorTester {
     }
 
     static testMethod void emptyPaginatorTest() {
-        DefectTablePaginator paginator = new DefectTablePaginator(new List<DefectWrapper>());
-        paginator.pageSize = 20;
+        DefectTablePaginator paginator = new DefectTablePaginator(20, new List<DefectWrapper>());
 
         List<Integer> pagesList = paginator.getPagesList();
         System.assertEquals(0, pagesList.size(), 'Incorrect number of cases');
