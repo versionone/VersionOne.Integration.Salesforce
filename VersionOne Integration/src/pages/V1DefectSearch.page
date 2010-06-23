@@ -34,7 +34,7 @@
                     <apex:outputPanel rendered="{!paginator.hasData}" style="text-align: right;" > 
 		                <font size="x-small">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
 		                 out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/> 
-		                 in&nbsp;<apex:outputLabel value="{!paginator.recordsNumber}"/> results &nbsp;&nbsp;</font>
+		                 in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/> results &nbsp;&nbsp;</font>
 			            <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}" 
 			             disabled="{!paginator.previousButtonDisabled}" rerender="searchResults"/>
 			            <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" 
@@ -102,7 +102,7 @@
                         </apex:actionFunction>
 			            <font size="x-small">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
 			             out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/> 
-			             in&nbsp;<apex:outputLabel value="{!paginator.recordsNumber}"/>&nbsp;results &nbsp;&nbsp;</font>
+			             in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/>&nbsp;results &nbsp;&nbsp;</font>
 			                <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}" 
 			                 disabled="{!paginator.previousButtonDisabled}" rerender="searchResults" status="updatingDefectsTable"/>
 			                <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" rerender="searchResults" 
