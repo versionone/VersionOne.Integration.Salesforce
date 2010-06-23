@@ -206,6 +206,23 @@ private class SettingsControllerTester {
     }
 
     static testMethod void getMappingsTester() {
+		for (MappingV1ProjectsToSFProducts__c obj :
+		    [select Id from MappingV1ProjectsToSFProducts__c]) {
+		    delete obj;
+		}
+
+    	String projectName1 = 'Project Name 1';
+    	String productName1 = 'Product Name 1';
+    	String projectToken1 = 'Scope:1234';
+    	String productId1 = 'GDS';
+    	MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
+    	mappingData1.SFProductId__c = productId1;
+    	mappingData1.SFProductName__c = productName1;
+    	mappingData1.V1ProjectToken__c = projectToken1;
+    	mappingData1.V1ProjectName__c = projectName1;
+    	insert mappingData1;
+    	System.debug('----mappingData1.id' + mappingData1.id);
+
         String projectName = 'Project name';
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
@@ -213,11 +230,15 @@ private class SettingsControllerTester {
         settingsData.setProjectName(projectName);
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
-
+        Test.setFixedSearchResults(new Id[]{mappingData1.id});
         List<ProjectProductMapping> mappings = controller.getMappings();
-        System.assertEquals(1, mappings.size(), 'Incorrect numbers of mapped projects.');
+        System.debug('----mappings' + mappings);
+        System.debug('----V1CaseCollector.getMappingList():' + [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c]);
+        System.assertEquals(2, mappings.size(), 'Incorrect numbers of mapped projects.');
         System.assertEquals(projectName, mappings.get(0).projectName, 'Incorrect mapped project.');
         System.assert(mappings.get(0).IsVisible, 'Incorrect "visible" status');
+        System.assertEquals(projectName1, mappings.get(1).projectName, 'Incorrect mapped project.');
+        System.assert(!mappings.get(1).IsVisible, 'Incorrect "visible" status');
     }
 
     static testMethod void getVersionOneProjectsListTester() {

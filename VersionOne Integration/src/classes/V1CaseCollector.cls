@@ -45,7 +45,7 @@ public class V1CaseCollector {
 	 * Get all mapping VersionOne projects to the SalesForce products
 	 **/
     public static List<MappingV1ProjectsToSFProducts__c> getMappingList() {
-		return [SELECT SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
+		return [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
 	}
 
     public static void addNewMapping(ProjectProductMapping mapping) {

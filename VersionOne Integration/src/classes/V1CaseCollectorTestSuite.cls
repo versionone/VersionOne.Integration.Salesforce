@@ -49,6 +49,10 @@ private class V1CaseCollectorTestSuite {
 	}
 
     static testMethod void getMappingListTest() {
+		for (MappingV1ProjectsToSFProducts__c obj :
+		    [select Id from MappingV1ProjectsToSFProducts__c]) {
+		    delete obj;
+		}
     	String projectName1 = 'Project Name';
     	String productName1 = 'Product Name';
     	String projectToken1 = 'Scope:1234';
