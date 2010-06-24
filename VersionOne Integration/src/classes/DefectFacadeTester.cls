@@ -1,36 +1,31 @@
 @isTest
 private class DefectFacadeTester {
+    private static final String DEFECT_TOKEN = 'Defect:2345';
 
     static testMethod void createDefectInVersionOneTest() {
-        String defectToken = 'defect:1234';
         V1ConnectorMock connector = new V1ConnectorMock();
-        connector.setCreatedWorkitemToken(defectToken);
+        connector.setCreatedWorkitemToken(DEFECT_TOKEN);
         IDefectFacade defectFacade = new DefectFacade(connector);
         Defect defectData = new Defect('defect name', 'defect description');
-        Case case1 = new Case(Subject = 'case1', Description = 'desc');
-        insert case1;
-        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        Case case1 = createCase('case1', 'desc', false); 
 
         String createdDefectToken = defectFacade.createDefectInVersionOne(case1, defectData);
 
         Case newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
-        System.assertEquals(defectToken, createdDefectToken, 'Incorrect defect token');
+        System.assertEquals(DEFECT_TOKEN, createdDefectToken, 'Incorrect defect token');
         System.assertEquals(true, newCase1.V1Association__c, 'Incorrect defect association flag');
-        System.assertEquals(defectToken, newCase1.V1DefectId__c, 'Incorrect defect token');
+        System.assertEquals(DEFECT_TOKEN, newCase1.V1DefectId__c, 'Incorrect defect token');
     }
 
     static testMethod void createDefectInVersionOneWithExceptionsTest() {
-        String defectToken = 'defect:1234'; 
         V1ConnectorMock connector = new V1ConnectorMock();
-        connector.setCreatedWorkitemToken(defectToken);
+        connector.setCreatedWorkitemToken(DEFECT_TOKEN);
         IDefectFacade defectFacade = new DefectFacade(connector);
         Defect defectData = new Defect('defect name', 'defect description');
 
         // Exception during defect creation
         connector.setExceptionForCreationWorkitemInV1(new NullPointerException());
-        Case case1 = new Case(Subject = 'case1', Description = 'desc');
-        insert case1;
-        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        Case case1 = createCase('case1', 'desc', false);
 
         String createdDefectToken;
         try {
@@ -59,13 +54,11 @@ private class DefectFacadeTester {
         newCase1 = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
         System.assertEquals(null, createdDefectToken, 'Incorrect defect token');
         System.assertEquals(true, newCase1.V1Association__c, 'Incorrect defect association flag');
-        System.assertEquals(defectToken, newCase1.V1DefectId__c, 'Incorrect defect token');
+        System.assertEquals(DEFECT_TOKEN, newCase1.V1DefectId__c, 'Incorrect defect token');
     }
 
     static testMethod void unassignDefectFromCaseTest() {
-        Case case1 = new Case(Subject = 'case1', Description = 'desc', V1DefectId__c = 'Defect:2345', V1Association__c = true);
-        insert case1;
-        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        Case case1 = createCase('case1', 'desc', true);
 
         V1ConnectorMock connector = new V1ConnectorMock();
         IDefectFacade defectFacade = new DefectFacade(connector);
@@ -75,11 +68,77 @@ private class DefectFacadeTester {
         System.assertEquals(null, case1.V1DefectId__c, 'Assigned defect has to be empty.');
         System.assertEquals(false, case1.V1Association__c, 'Case does not have association.');
     }
+    
+    static testMethod void assignDefectSetReferenceFailureTest() {
+    	Case caseValue = createCase('case1', 'desc', true);
+    	Defect defectValue = createDefect('defect', 'description', false);
+
+        V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        
+        connector.setUpdateReferenceForDefectException(new IntegrationException());
+        
+        try {
+        	defectFacade.assignDefectToCase(caseValue, defectValue);
+        	System.assertEquals(true, false, 'This line should not be reached - we\'re awaiting an exception');
+        } catch(IntegrationException ex) { }
+    }
+    
+    static testMethod void assignDefectCreateLinkFailureTest() {
+    	Case caseValue = createCase('case1', 'desc', true);
+    	Defect defectValue = createDefect('defect', 'description', false);
+
+        V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        
+        connector.setExceptionForLinkCreationInV1(new IntegrationException());
+        
+        try {
+        	defectFacade.assignDefectToCase(caseValue, defectValue);
+        	System.assertEquals(true, false, 'This line should not be reached - we\'re awaiting an exception');
+        } catch(IntegrationException ex) { 
+            System.assertEquals(ex.getSeverity(), Severity.WARNING);
+        }
+        
+        caseValue = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :caseValue.Id];
+        
+        // link creation failures are never considered critical, so we check that Case is updated
+        System.assertEquals(caseValue.V1Association__c, true, 'Association field should be set');
+        System.assertEquals(caseValue.V1DefectId__c, DEFECT_TOKEN, 'Defect token does not match expectations');
+    }
+    
+    static testMethod void assignClosedDefectSuccessTest() {
+    	Case caseValue = createCase('case1', 'desc', true);
+    	Defect defectValue = createDefect('defect', 'description', true);
+
+        V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        
+        connector.setUpdateReferenceForDefectException(new IntegrationException());
+        
+        defectFacade.assignDefectToCase(caseValue, defectValue);
+        caseValue = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :caseValue.Id];
+        
+        System.assertEquals(caseValue.V1Association__c, true, 'Association field should be set');
+        System.assertEquals(caseValue.V1DefectId__c, DEFECT_TOKEN, 'Defect token does not match expectations');
+    }
+    
+    static testMethod void assignNonClosedDefectSuccessTest() {
+    	Case caseValue = createCase('case1', 'desc', true);
+    	Defect defectValue = createDefect('defect', 'description', true);
+
+        V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        
+        defectFacade.assignDefectToCase(caseValue, defectValue);
+        caseValue = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :caseValue.Id];
+        
+        System.assertEquals(caseValue.V1Association__c, true, 'Association field should be set');
+        System.assertEquals(caseValue.V1DefectId__c, DEFECT_TOKEN, 'Defect token does not match expectations');
+    }
 
     static testMethod void unassignDefectFromCaseWithExceptionsTest() {
-        Case case1 = new Case(Subject = 'case1', Description = 'desc', V1DefectId__c = 'Defect:2345', V1Association__c = true);
-        insert case1;
-        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        Case case1 = createCase('case1', 'desc', true);
 
         V1ConnectorMock connector = new V1ConnectorMock();
         connector.setRemoveLinkFromDefectException(new NullPointerException());
@@ -94,9 +153,7 @@ private class DefectFacadeTester {
     }
 
     static testMethod void publishStatusTest() {
-        Case case1 = new Case(Subject = 'case1', Description = 'desc', V1DefectId__c = 'Defect:2345', V1Association__c = true);
-        insert case1;
-        case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
+        Case case1 = createCase('case1', 'desc', true);
 
         V1ConnectorMock connector = new V1ConnectorMock();
         IDefectFacade defectFacade = new DefectFacade(connector);
@@ -104,5 +161,24 @@ private class DefectFacadeTester {
 
         case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
         System.assertEquals(V1ConnectorMock.developmentStatus, case1.V1DevelopmentStatus__c, 'Incorrect developer status.');
+    }
+    
+    private static Case createCase(String caseSubject, String caseDescription, Boolean isAssigned) {
+    	Case caseValue = new Case(
+    	    Subject = 'case1', 
+    	    Description = 'desc',
+    	    V1Association__c = isAssigned,
+    	    V1DefectId__c = isAssigned ? DEFECT_TOKEN : null
+    	);
+        insert caseValue;
+        caseValue = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :caseValue.Id];
+        return caseValue;
+    }
+    
+    private static Defect createDefect(String title, String description, Boolean isClosed) {
+    	Defect defectValue = new Defect(title, description);
+    	defectValue.token = DEFECT_TOKEN;
+    	defectValue.isClosed = isClosed;
+    	return defectValue;
     }
 }
