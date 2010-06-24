@@ -8,48 +8,66 @@ public class DefectFacade implements IDefectFacade {
     }
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
-        String id;
+        String token;
         try {
-            id = connector.createWorkitemInV1(caseData, defectData);
+            token = connector.createWorkitemInV1(caseData, defectData);
         } catch (Exception ex) {
             throw new IntegrationException(ex.getMessage());
         }
 
-        if (id != null) {
+        if (token != null) {
             try {
-                createLinkInVersionOne(caseData, id);
+                createLinkInVersionOne(caseData, token);
             } catch (Exception ex) {
                 throw new IntegrationException('Defect was created in the VersionOne but link was not created in the VersionOne.');
             } finally {
-                updateCaseOnAssignment(caseData, id, null);
+                updateCaseOnAssignment(caseData, token, null);
             }
         }
 
-        return id;
+        return token;
     }
 
-    public void createLinkInVersionOne(Case caseData, String id) {
+    public void createLinkInVersionOne(Case caseData, String token) {
         try {
-            connector.createLinkV1ToSF(id, caseData);
+            connector.createLinkV1ToSF(token, caseData);
         } catch (Exception ex) {
             throw new IntegrationException('Link to the case was not created in VersionOne.', Severity.WARNING);
         }
     }
     
+    /**
+     * Assign defect to case: fill Case association fields, fill Defect reference and create V1 link. 
+     * Note that we have to do callouts first, and link creation failure is not critical and should not 
+     * break method execution.
+     */
+    // TODO refactor 
     public void assignDefectToCase(Case caseData, Defect defectData) {
-    	updateCaseOnAssignment(caseData, defectData.id, defectData.status);
-    	
     	try {
-    	    connector.updateReferenceForDefect(defectData.id, caseData.id);
+    		if(!defectData.isClosed) {
+    	        connector.updateReferenceForDefect(defectData.id, caseData.id);
+    		}
     	} catch(Exception ex) {
     		throw new IntegrationException('Failed to update VersionOne defect Reference field.');
     	}
     	
-        createLinkInVersionOne(caseData, defectData.id);
+    	IntegrationException linkException = null;
+    	
+    	try {
+    		createLinkInVersionOne(caseData, defectData.token);
+    	} catch(IntegrationException ex) {
+    		linkException = ex;
+    	}
+    	
+    	updateCaseOnAssignment(caseData, defectData.token, defectData.status);
+    	
+    	if(linkException != null) {
+    		throw linkException;
+    	}
     }
 
-    private void updateCaseOnAssignment(Case caseData, String defectId, String devStatus) {
-        V1CaseCollector.updateCase(caseData, defectId, true, devStatus);
+    private void updateCaseOnAssignment(Case caseData, String defectToken, String devStatus) {
+        V1CaseCollector.updateCase(caseData, defectToken, true, devStatus);
     }
 
     public void unassignDefectFromCase(Case caseData) {
