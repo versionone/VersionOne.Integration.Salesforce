@@ -266,7 +266,7 @@ private class SettingsControllerTester {
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
         List<Selectoption> options = controller.getProductList();
-        System.assertEquals(ple.size() + 1, options.size(), 'Incorrect amount of products options');
+        System.assertEquals(ple.size(), options.size(), 'Incorrect amount of products options');
     }
 
     static testMethod void getVersionOneProjectsListTest() {
@@ -300,11 +300,44 @@ private class SettingsControllerTester {
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
-        ApexPages.currentPage().getParameters().put('mappingId', '123456');
-        controller.currectMapping = new ProjectProductMapping(projectName1, true, productName1);
-        controller.currectMapping.projectToken = projectToken1;
-        controller.currectMapping.productId = productId1;
+        ApexPages.currentPage().getParameters().put('mappingId', 'a03A00000014Nt9IAE');
+        controller.currentMapping = new ProjectProductMapping(projectName1, true, productName1);
+        controller.currentMapping.projectToken = projectToken1;
+        controller.currentMapping.productId = productId1;
         controller.updateProjectMapping();
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when product id already used.');
+    }
+
+    static testMethod void updateProjectMappingWithSameMappingIdTest() {
+		for (MappingV1ProjectsToSFProducts__c obj :
+		    [select Id from MappingV1ProjectsToSFProducts__c]) {
+		    delete obj;
+		}
+
+    	String projectName1 = 'CI';
+    	String productName1 = 'GDS';
+    	String projectToken1 = 'Scope:1081';
+    	String productId1 = 'GDS';
+    	MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
+    	mappingData1.SFProductId__c = productId1;
+    	mappingData1.SFProductName__c = productName1;
+    	mappingData1.V1ProjectToken__c = projectToken1;
+    	mappingData1.V1ProjectName__c = projectName1;
+    	insert mappingData1;
+
+        SettingsController controller = new SettingsController();
+        Settings settingsData = Settings.getTestSettings();
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+        ApexPages.currentPage().getParameters().put('mappingId', mappingData1.Id);
+        controller.currentMapping = new ProjectProductMapping(projectName1 + 'up', true, productName1 + 'up');
+        controller.currentMapping.projectToken = projectToken1;
+        controller.currentMapping.productId = productId1+ 'up';
+        controller.updateProjectMapping();
+        MappingV1ProjectsToSFProducts__c resultMapping = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
+        System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of errors when product id already used.');
+        System.assertEquals(projectName1, resultMapping.V1ProjectName__c, 'Incorrect project name for updated mapping.');
+        System.assertEquals(projectToken1, resultMapping.V1ProjectToken__c, 'Incorrect project token for updated mapping.');
+        System.assertEquals(productName1 + 'up', resultMapping.SFProductName__c, 'Incorrect project token for updated mapping.');
     }
 }
