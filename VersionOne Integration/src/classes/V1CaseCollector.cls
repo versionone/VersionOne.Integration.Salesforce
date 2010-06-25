@@ -41,20 +41,46 @@ public class V1CaseCollector {
         update caseData;
     }
 
-	/**
-	 * Get all mapping VersionOne projects to the SalesForce products
-	 **/
+    /**
+     * Returns all mapping VersionOne projects to the SalesForce products.
+     **/
     public static List<MappingV1ProjectsToSFProducts__c> getMappingList() {
-		return [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
-	}
+        return [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
+    }
 
+    /**
+     * Adds new mapping to the SalesForce store(custom object).
+     * mapping - information about mapping.
+     **/
     public static void addNewMapping(ProjectProductMapping mapping) {
-    	MappingV1ProjectsToSFProducts__c mappingData = new MappingV1ProjectsToSFProducts__c();
-    	mappingData.SFProductId__c = mapping.productId;
-    	mappingData.SFProductName__c = mapping.productName;
-    	mappingData.V1ProjectToken__c = mapping.projectToken;
-    	mappingData.V1ProjectName__c = mapping.projectName;
-    	insert mappingData;
-	}
+        MappingV1ProjectsToSFProducts__c mappingData = new MappingV1ProjectsToSFProducts__c();
+        mappingData.SFProductId__c = mapping.productId;
+        mappingData.SFProductName__c = mapping.productName;
+        mappingData.V1ProjectToken__c = mapping.projectToken;
+        mappingData.V1ProjectName__c = mapping.projectName;
+        insert mappingData;
+    }
 
+    /**
+     * Removes infoemation about mapping.
+     * mappingId - mapping id which need to delete.
+     **/
+    public static void deleteMapping(String mappingId) {
+        List<MappingV1ProjectsToSFProducts__c> mappings = [select Id from MappingV1ProjectsToSFProducts__c where id=:mappingId];
+        delete mappings;
+    }
+
+    /**
+     * Updates mapping data.
+     * mappingId 	- mapping id which need to update.
+     * mapping 		- data about mapping for updating
+     **/
+    public static void updateMapping(String mappingId, ProjectProductMapping mapping) {
+        MappingV1ProjectsToSFProducts__c mappingData = [select Id from MappingV1ProjectsToSFProducts__c where id=:mappingId];
+        mappingData.SFProductId__c = mapping.productId;
+        mappingData.SFProductName__c = mapping.productName;
+        mappingData.V1ProjectToken__c = mapping.projectToken;
+        mappingData.V1ProjectName__c = mapping.projectName;
+        update mappingData;
+    }
 }

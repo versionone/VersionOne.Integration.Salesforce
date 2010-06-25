@@ -74,7 +74,7 @@ public class V1ConnectorMock implements IV1Connector {
     public Map<String, String> findAllProjects() {
         throwException();
         Map<String, String> result = new Map<String, String>();
-        result.put('1081', 'CI');
+        result.put('Scope:1081', 'CI');
         result.put(defaultProjectId, 'Main project');
 
         return result;

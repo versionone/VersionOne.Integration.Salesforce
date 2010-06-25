@@ -11,7 +11,7 @@ public class SettingsController {
     public Boolean isSettingsCorrect {get; set;}
     public Boolean isSaved {get; set;}
     public Boolean isGotProjects {get; set;}
-    public ProjectProductMapping currectMapping{ get; set;}
+    public ProjectProductMapping currentMapping{ get; set;}
 
     private transient Settings innerSettings;
     //private Map<String, String> projects;
@@ -63,6 +63,10 @@ public class SettingsController {
     }
 
     private List<MappingV1ProjectsToSFProducts__c> baseMappingData;
+    private void resetMappingData() {
+    	baseMappingData = null;
+    }
+
     private List<MappingV1ProjectsToSFProducts__c> getMappingData() {
     	if (baseMappingData == null) {
     		baseMappingData = V1CaseCollector.getMappingList();
@@ -72,7 +76,7 @@ public class SettingsController {
 
     /** Must be called before usage of any other method. */
     public void initSettings() {
-    	currectMapping = new ProjectProductMapping(null, null, null);
+    	currentMapping = new ProjectProductMapping(null, null, null);
         testMessage = '';
         saveMessage = '';
         isSettingsValidated = false;
@@ -166,9 +170,14 @@ public class SettingsController {
     }
 
     public PageReference addMapping() {
-    	currectMapping.projectName = projects.get(currectMapping.projectToken);
-    	currectMapping.productName = currectMapping.productId;
-    	V1CaseCollector.addNewMapping(currectMapping);
+    	if (!isProductAlreadyUsed(currentMapping.productId, '0')) {
+    		currentMapping.projectName = projects.get(currentMapping.projectToken);
+    		currentMapping.productName = currentMapping.productId;
+    		V1CaseCollector.addNewMapping(currentMapping);
+    	} else {
+    		addErrorMessage('Mapping for this product already exist');
+    	}
+    	resetMappingData();
 
     	return null;
     }
@@ -212,7 +221,7 @@ public class SettingsController {
 
     public List<Selectoption> getProductList() {
         List<SelectOption> options = new List<SelectOption>();
-        options.add(new SelectOption(DEFAULT_PRODUCT_ID, DEFAULT_PRODUCT));
+        //options.add(new SelectOption(DEFAULT_PRODUCT_ID, DEFAULT_PRODUCT));
         Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.Product__c;
         List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
         for(Schema.PicklistEntry f : ple) {
@@ -244,22 +253,29 @@ public class SettingsController {
     public void updateProjectMapping() {
     	String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
     	if (mappingId == '') {
-        	updateDefaultProjectSettings(currectMapping.projectToken);
+        	updateDefaultProjectSettings(currentMapping.projectToken);
         	settings.updateSettings();
     	} else {
-    		System.debug('-----currectMapping:' + currectMapping);
-    		if (isProductAlreadyUsed(currectMapping.productId)) {
+    		System.debug('-----currentMapping:' + currentMapping);
+    		if (!isProductAlreadyUsed(currentMapping.productId, mappingId)) {
+	    		currentMapping.projectName = projects.get(currentMapping.projectToken);
+	    		currentMapping.productName = currentMapping.productId;
+	    		System.debug('--------currentMapping='+ currentMapping);
+    			V1CaseCollector.updateMapping(mappingId, currentMapping);
+    			resetMappingData();
+    		} else {
     			addErrorMessage('Mapping for this product already exist');
     		}
+
     	}
     }
 
-    private boolean isProductAlreadyUsed(String productId) {
+    private boolean isProductAlreadyUsed(String productId, String mappingId) {
         List<MappingV1ProjectsToSFProducts__c> baseMappingData = getMappingData();
         for (MappingV1ProjectsToSFProducts__c mapData : baseMappingData) {
         	System.debug('!!!!!!!mapData.SFProductId__c = ' + mapData.SFProductId__c);
         	System.debug('!!!!!!!productId = ' + productId);
-        	if (mapData.SFProductId__c == productId) {
+        	if (mapData.SFProductId__c == productId && mapData.id != mappingId) {
         		return true;
         	}
         }

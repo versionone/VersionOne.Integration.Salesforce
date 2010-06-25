@@ -19,12 +19,24 @@
             ele.disabled = true;
             ele.className = 'btnDisabled';
         }
-        function isMappingDataValide() {
+        function isMappingDataValide(mappingId) {
         	var product = getSelectedProdcut();
         	var result = true;
+        	/*
+        	for (var mappingId in SFUserProductList) {
+       			alert(mappingId + " != " + mappingId + "|||" + SFUserProductList[mappingId]);
+       			if (SFUserProductList[mappingId] == product.value && mappingId != mappingId) {
+       				alert ('Product already used in mapping');
+        			result = false;
+   	    			break;
+       			}
+        	}
+        	*/
+
         	SFUserProductList.forEach(
         		function (x, idx) {
-        			if (x == product.value) {
+        			var mappingData = x.split("|||");
+        			if (mappingData[0] == product.value && mappingId != mappingData[1] && result) {
         				alert ('Product already used in mapping');
 	        			result = false;
     	    			return;
@@ -34,10 +46,12 @@
         }
     //]]>
     </script>
+    <apex:outputPanel id="JSMappingData">
 	<apex:repeat value="{!mappings}" var="mapping">
 	  <!-- Pushing item into Javascript array -->
-	  <script>SFUserProductList.push("{!mapping.productId}");</script>
+	  <script>SFUserProductList.push("{!mapping.productId}|||{!mapping.mappingId}");</script>
 	</apex:repeat>
+	</apex:outputPanel>
 
     <apex:sectionHeader title="Settings for VersionOne integration." />
 
@@ -132,7 +146,7 @@
             <apex:pageBlockSection rendered="{!isGotProjects}" columns="1">
                 <apex:pageBlockSectionItem >
 	                <apex:outputLabel value="SalesForce product" for="ProductId" />
-                    <apex:selectList size="1" required="false" id="ProductId" value="{!currectMapping.productId}">
+                    <apex:selectList size="1" required="false" id="ProductId" value="{!currentMapping.productId}">
                         <apex:selectOptions value="{!ProductList}"/>
 	                    <script type="text/javascript">
 		                    ////<![CDATA[
@@ -146,18 +160,19 @@
                 <apex:pageBlockSectionItem >
 	                <apex:outputLabel value="VersionOne project" for="ProjectToken" />
 					<apex:outputPanel layout="block">
-						<apex:selectList value="{!currectMapping.projectToken}" size="1" required="false" id="ProjectToken">
+						<apex:selectList value="{!currentMapping.projectToken}" size="1" required="false" id="ProjectToken">
 						    <apex:selectOptions value="{!VersionOneProjectsList}"/>
 						</apex:selectList>
 						&nbsp;&nbsp;&nbsp;
-						<apex:commandButton value="Add" action="{!addMapping}" rerender="ProjectMapping,messages" status="addMapping" onClick="if (!isMappingDataValide()){return;}"/>
+						<apex:commandButton value="Add" action="{!addMapping}" rerender="mappingTable,messages,JSMappingData" status="addMapping" onClick="if (!isMappingDataValide('0')){return;}"/>
                     </apex:outputPanel>
                 </apex:pageBlockSectionItem>
 			    <apex:pageBlockSectionItem >
-			        <apex:pageBlockTable value="{!mappings}" var="mapping">
+			        <apex:pageBlockTable value="{!mappings}" var="mapping" id="mappingTable">
 						<apex:column >
 							<apex:facet name="header">Actions</apex:facet>
-			                <apex:outputLink value="javascript:void(0);" onclick="if ({!not(mapping.isDeletable)} || isMappingDataValide()){UpdateProject('{!mapping.mappingId}');}">Update</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);" onclick="UpdateProject('{!mapping.mappingId}');" rendered="{!not(mapping.isDeletable)}">Update VersionOne Project</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);" onclick="if (isMappingDataValide('{!mapping.mappingId}')){UpdateProject('{!mapping.mappingId}');}" rendered="{!mapping.isDeletable}">Update</apex:outputLink>
 	            		    &nbsp;&nbsp;
 			                <apex:outputLink onclick="javascript: UpdateProject();"
 		 		                   value="javascript:void(0);" rendered="{!mapping.isDeletable}">Remove</apex:outputLink>
@@ -180,7 +195,7 @@
             </apex:pageBlockSection>
         </apex:pageBlock>
 
-		<apex:actionFunction name="UpdateProject" action="{!updateProjectMapping}" status="update_project" rerender="ProjectMapping,messages">
+		<apex:actionFunction name="UpdateProject" action="{!updateProjectMapping}" status="update_project" rerender="mappingTable,messages, JSMappingData">
 			<apex:param name="mappingId" value=""/>
 		</apex:actionFunction>
     </apex:form>
