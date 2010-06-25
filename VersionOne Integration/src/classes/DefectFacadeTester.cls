@@ -69,6 +69,17 @@ private class DefectFacadeTester {
         System.assertEquals(false, case1.V1Association__c, 'Case does not have association.');
     }
     
+    static testMethod void unassignNotAssignedDefectTest() {
+    	Case caseValue = createCase('case1', 'desc', false);
+    	V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        
+        try {
+            defectFacade.unassignDefectFromCase(caseValue);
+            System.assert(false, 'We\'re awaiting unassignment failure and should never hit this line');
+        } catch(IntegrationException ex) { }
+    }
+    
     static testMethod void assignDefectSetReferenceFailureTest() {
     	Case caseValue = createCase('case1', 'desc', true);
     	Defect defectValue = createDefect('defect', 'description', false);
@@ -80,7 +91,7 @@ private class DefectFacadeTester {
         
         try {
         	defectFacade.assignDefectToCase(caseValue, defectValue);
-        	System.assertEquals(true, false, 'This line should not be reached - we\'re awaiting an exception');
+        	System.assert(false, 'This line should not be reached - we\'re awaiting an exception');
         } catch(IntegrationException ex) { }
     }
     
@@ -95,7 +106,7 @@ private class DefectFacadeTester {
         
         try {
         	defectFacade.assignDefectToCase(caseValue, defectValue);
-        	System.assertEquals(true, false, 'This line should not be reached - we\'re awaiting an exception');
+        	System.assert(false, 'This line should not be reached - we\'re awaiting an exception');
         } catch(IntegrationException ex) { 
             System.assertEquals(ex.getSeverity(), Severity.WARNING);
         }
@@ -161,6 +172,28 @@ private class DefectFacadeTester {
 
         case1 = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :case1.Id];
         System.assertEquals(V1ConnectorMock.developmentStatus, case1.V1DevelopmentStatus__c, 'Incorrect developer status.');
+    }
+    
+    static testMethod void searchForDefectsFailureTest() {
+    	V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        connector.setSearchForDefectsException(new IntegrationException());
+        
+        try {
+            defectFacade.searchForDefects('test', true);
+            System.assert(false, 'This line should not be reached - we\'re awaiting an exception');
+        } catch(IntegrationException ex) { }
+    }
+    
+    static testMethod void searchForDefectsTest() {
+    	V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector);
+        
+        try {
+            defectFacade.searchForDefects('test', true);
+        } catch(IntegrationException ex) { 
+            System.assert(false, 'We\'re not expecting connector to fail this time');
+        }
     }
     
     private static Case createCase(String caseSubject, String caseDescription, Boolean isAssigned) {
