@@ -150,16 +150,4 @@ public class DefectSearchController {
     private void addPageMessage(ApexPages.Severity severity, String text) {
     	ApexPages.addMessage(new ApexPages.Message(severity, text));
     }
-    
-    /**
-     * TODO implement field list here when the second Search story is started
-     */ 
-    public class DefectSearchCriteria {
-    	public String queryString { get; set; }
-    	public Boolean includeClosedDefects { get; set; } 
-    	
-    	public Boolean isEmpty() {
-    		return queryString == null || queryString.trim().length() == 0;
-    	}
-    }
 }
