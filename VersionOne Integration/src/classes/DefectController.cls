@@ -21,7 +21,7 @@ public class DefectController {
     public IDefectFacade defectFacade {
         get {
             if (innerDefectFacade == null) {
-                innerDefectFacade = new DefectFacade(new V1Connector(settings, new Requestor(settings)));
+                innerDefectFacade = new DefectFacade(new V1Connector(settings, new Requestor(settings)), settings);
             }
             return innerDefectFacade;
         }

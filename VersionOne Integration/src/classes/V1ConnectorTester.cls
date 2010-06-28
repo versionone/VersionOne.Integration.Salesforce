@@ -281,7 +281,7 @@ private class V1ConnectorTester {
         RequestorMock requestor = new RequestorMock(body, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        String workitemId = connector.createWorkitemInV1(caseData, defectData);
+        String workitemId = connector.createWorkitemInV1(caseData, defectData, testSettings.getProjectId());
 
         System.assertEquals(expectedSendBody, requestor.getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
@@ -308,7 +308,7 @@ private class V1ConnectorTester {
         caseData.Subject = '';
         caseData.Description = '';
 
-        workitemId = connector.createWorkitemInV1(caseData, defectData);
+        workitemId = connector.createWorkitemInV1(caseData, defectData, productId);
         System.assertEquals(expectedSendBody, requestor.getSentBody(0), 'Error! Incorrect xml for creating defect in the VersionOne');
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
     }
@@ -329,7 +329,7 @@ private class V1ConnectorTester {
 
         try {
             Test.startTest();
-            String id = connector.createWorkitemInV1(caseData, defectData);
+            String id = connector.createWorkitemInV1(caseData, defectData, cfg.getProjectId());
             Test.stopTest();
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (V1RequestException ex) {}
@@ -351,7 +351,7 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         try {
-            String id = connector.createWorkitemInV1(caseData, defectData);
+            String id = connector.createWorkitemInV1(caseData, defectData, testSettings.getProjectId());
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (V1RequestException ex) {}
 
@@ -361,7 +361,7 @@ private class V1ConnectorTester {
         connector = new V1Connector(testSettings, requestor);
 
         try {
-            String Id = connector.createWorkitemInV1(caseData, defectData);
+            String Id = connector.createWorkitemInV1(caseData, defectData, testSettings.getProjectId());
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (NullPointerException ex) {}
 
@@ -370,7 +370,7 @@ private class V1ConnectorTester {
         requestor = new RequestorMock(body, 200, new Exception[]{null, new V1RequestException('test error')});
         connector = new V1Connector(testSettings, requestor);
 
-        String workitemId = connector.createWorkitemInV1(caseData, defectData);
+        String workitemId = connector.createWorkitemInV1(caseData, defectData, testSettings.getProjectId());
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
 
         System.debug('exceptionsCreateDefectInVersionOne: 4');
@@ -378,7 +378,7 @@ private class V1ConnectorTester {
         requestor = new RequestorMock(body, 200, new Exception[]{null, new NullPointerException()});
         connector = new V1Connector(testSettings, requestor);
 
-        workitemId = connector.createWorkitemInV1(caseData, defectData);
+        workitemId = connector.createWorkitemInV1(caseData, defectData, testSettings.getProjectId());
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
     }
 

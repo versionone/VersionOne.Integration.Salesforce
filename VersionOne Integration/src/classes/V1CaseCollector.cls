@@ -5,7 +5,7 @@ public class V1CaseCollector {
      * Return: found case.
      */
     public static Case getCaseByCaseNumber(String caseNumber) {
-        return [SELECT id, CaseNumber, Description, Subject
+        return [SELECT id, CaseNumber, Description, Subject, Product__c
                           FROM Case WHERE CaseNumber = :caseNumber];
     }
 
@@ -14,7 +14,7 @@ public class V1CaseCollector {
      * Return: found case.
      */
     public static Case getCaseByCaseId(String caseID) {
-        return [SELECT id, CaseNumber, Description, Subject, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c
+        return [SELECT id, CaseNumber, Description, Subject, Product__c, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c
                           FROM Case WHERE id = :caseID];
     }
 
@@ -46,6 +46,16 @@ public class V1CaseCollector {
      **/
     public static List<MappingV1ProjectsToSFProducts__c> getMappingList() {
         return [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
+    }
+    
+    /**
+     * Get mapping for the Case
+     */
+    public static MappingV1ProjectsToSFProducts__c getProductToProjectMappingForCase(Case caseValue) {   	
+    	List<MappingV1ProjectsToSFProducts__c> mappings = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, 
+    	                                                   V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c
+    	                                                   WHERE SFProductId__c = :caseValue.Product__c];
+    	return mappings.size() > 0 ? mappings[0] : null;
     }
 
     /**
