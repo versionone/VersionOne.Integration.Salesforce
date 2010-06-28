@@ -27,14 +27,7 @@ private class DefectControllerTester {
             [select Id from MappingV1ProjectsToSFProducts__c]) {
             delete obj;
         }
-        
-        MappingV1ProjectsToSFProducts__c mapping = new MappingV1ProjectsToSFProducts__c();
-        mapping.SFProductId__c = SF_PRODUCT_ID;
-        mapping.SFProductName__c = PROJECT_NAME;
-        mapping.V1ProjectToken__c = 'Scope:1000';
-        mapping.V1ProjectName__c = PROJECT_NAME;
-        insert mapping;
-        
+                
         DefectController controller = getControllerWithoutAssignedDefect();
         controller.createDefect();
         Defect defect = controller.getCreatingDefect();
