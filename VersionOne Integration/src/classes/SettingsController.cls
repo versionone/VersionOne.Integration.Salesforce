@@ -178,7 +178,6 @@ public class SettingsController {
     		currentMapping.projectName = projects.get(currentMapping.projectToken);
     		currentMapping.productName = currentMapping.productId;
     		V1CaseCollector.addNewMapping(currentMapping);
-    		addErrorMessage(currentMapping.projectToken + ' -- ' + projects);
     	} else {
     		addErrorMessage('Mapping for this product already exist');
     	}
@@ -262,11 +261,9 @@ public class SettingsController {
         	updateDefaultProjectSettings(currentMapping.projectToken);
         	settings.updateSettings();
     	} else {
-    		System.debug('-----currentMapping:' + currentMapping);
     		if (!isProductAlreadyUsed(currentMapping.productId, mappingId)) {
 	    		currentMapping.projectName = projects.get(currentMapping.projectToken);
 	    		currentMapping.productName = currentMapping.productId;
-	    		System.debug('--------currentMapping='+ currentMapping);
     			V1CaseCollector.updateMapping(mappingId, currentMapping);
     			resetMappingData();
     		} else {
@@ -294,8 +291,6 @@ public class SettingsController {
     private boolean isProductAlreadyUsed(String productId, String mappingId) {
         List<MappingV1ProjectsToSFProducts__c> baseMappingData = getMappingData();
         for (MappingV1ProjectsToSFProducts__c mapData : baseMappingData) {
-        	System.debug('!!!!!!!mapData.SFProductId__c = ' + mapData.SFProductId__c);
-        	System.debug('!!!!!!!productId = ' + productId);
         	if (mapData.SFProductId__c == productId && mapData.id != mappingId) {
         		return true;
         	}
