@@ -2,7 +2,6 @@
 <apex:page controller="SettingsController" action="{!initSettings}" title="VersionOne Integration Settings">
     <script type="text/javascript">
 	////<![CDATA[
-		var SFUserProductList = [];
         function disableAllButtons() {
             disableSaveButtons();
             disableTestButtons();
@@ -47,6 +46,7 @@
     //]]>
     </script>
     <apex:outputPanel id="JSMappingData">
+    <script>var SFUserProductList = [];</script>
 	<apex:repeat value="{!mappings}" var="mapping">
 	  <!-- Pushing item into Javascript array -->
 	  <script>SFUserProductList.push("{!mapping.productId}|||{!mapping.mappingId}");</script>
@@ -57,7 +57,8 @@
 
     <apex:actionStatus startText="Testing settings..." id="test_status" />
     <apex:actionStatus startText="Saving settings..." id="save_status" />
-    <apex:actionStatus startText="Updating project..." id="update_project" />
+    <apex:actionStatus startText="Updating mapping..." id="update_mapping" />
+    <apex:actionStatus startText="Deleting mapping..." id="remove_mapping" />
     <apex:actionStatus startText="Additing mapping ..." id="addMapping" />
     <apex:form >
         <apex:pageBlock title="Connection settings" mode="edit">
@@ -171,11 +172,10 @@
 			        <apex:pageBlockTable value="{!mappings}" var="mapping" id="mappingTable">
 						<apex:column >
 							<apex:facet name="header">Actions</apex:facet>
-			                <apex:outputLink value="javascript:void(0);" onclick="UpdateProject('{!mapping.mappingId}');" rendered="{!not(mapping.isDeletable)}">Update VersionOne Project</apex:outputLink>
-			                <apex:outputLink value="javascript:void(0);" onclick="if (isMappingDataValide('{!mapping.mappingId}')){UpdateProject('{!mapping.mappingId}');}" rendered="{!mapping.isDeletable}">Update</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);" onclick="updateProject('{!mapping.mappingId}');" rendered="{!not(mapping.isDeletable)}">Update VersionOne Project</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);" onclick="if (isMappingDataValide('{!mapping.mappingId}')){updateProject('{!mapping.mappingId}');}" rendered="{!mapping.isDeletable}">Update</apex:outputLink>
 	            		    &nbsp;&nbsp;
-			                <apex:outputLink onclick="javascript: UpdateProject();"
-		 		                   value="javascript:void(0);" rendered="{!mapping.isDeletable}">Remove</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);" rendered="{!mapping.isDeletable}" onclick="removeMapping('{!mapping.mappingId}');">Remove</apex:outputLink>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">VersionOne Project</apex:facet>
@@ -195,9 +195,13 @@
             </apex:pageBlockSection>
         </apex:pageBlock>
 
-		<apex:actionFunction name="UpdateProject" action="{!updateProjectMapping}" status="update_project" rerender="mappingTable,messages, JSMappingData">
+		<apex:actionFunction name="updateProject" action="{!updateProjectMapping}" status="update_mapping" rerender="mappingTable,messages,JSMappingData">
 			<apex:param name="mappingId" value=""/>
 		</apex:actionFunction>
+		<apex:actionFunction name="removeMapping" action="{!removeProjectMapping}" status="remove_mapping" rerender="mappingTable,messages,JSMappingData">
+			<apex:param name="mappingId" value=""/>
+		</apex:actionFunction>
+
     </apex:form>
 
     <apex:outputPanel id="out_testing">

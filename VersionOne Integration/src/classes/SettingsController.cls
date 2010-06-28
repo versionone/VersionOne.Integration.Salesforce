@@ -77,16 +77,20 @@ public class SettingsController {
     /** Must be called before usage of any other method. */
     public void initSettings() {
     	currentMapping = new ProjectProductMapping(null, null, null);
-        testMessage = '';
-        saveMessage = '';
-        isSettingsValidated = false;
-        isSettingsCorrect = false;
-        isSaved = false;
+    	resetConnectionFormSettings();
         isGotProjects = false;
         refreshProjectsList();
         if (updateProjectData()) {
             settings.updateSettings();
         }
+    }
+
+    private void resetConnectionFormSettings() {
+        testMessage = '';
+        saveMessage = '';
+        isSettingsValidated = false;
+        isSettingsCorrect = false;
+        isSaved = false;
     }
 
 	/*
@@ -174,6 +178,7 @@ public class SettingsController {
     		currentMapping.projectName = projects.get(currentMapping.projectToken);
     		currentMapping.productName = currentMapping.productId;
     		V1CaseCollector.addNewMapping(currentMapping);
+    		addErrorMessage(currentMapping.projectToken + ' -- ' + projects);
     	} else {
     		addErrorMessage('Mapping for this product already exist');
     	}
@@ -233,7 +238,7 @@ public class SettingsController {
 
     public List<ProjectProductMapping> getMappings() {
         List<ProjectProductMapping> mappings = new List<ProjectProductMapping>();
-        ProjectProductMapping mapping = new ProjectProductMapping(settings.getProjectName(), projects.containsKey(settings.getProjectId()), DEFAULT_PRODUCT);
+        ProjectProductMapping mapping = new ProjectProductMapping(settings.getProjectName(), projects.containsKey('Scope:' + settings.getProjectId()), DEFAULT_PRODUCT);
         mapping.productId = DEFAULT_PRODUCT_ID;
         mapping.isDeletable = false;
         mappings.add(mapping);
@@ -250,7 +255,8 @@ public class SettingsController {
     }
 
 
-    public void updateProjectMapping() {
+    public PageReference updateProjectMapping() {
+    	resetConnectionFormSettings();
     	String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
     	if (mappingId == '') {
         	updateDefaultProjectSettings(currentMapping.projectToken);
@@ -266,8 +272,23 @@ public class SettingsController {
     		} else {
     			addErrorMessage('Mapping for this product already exist');
     		}
-
     	}
+
+    	return null;
+    }
+
+    public PageReference removeProjectMapping() {
+    	resetConnectionFormSettings();
+    	String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
+    	if (mappingId == null || mappingId == '') {
+    		addErrorMessage('Incorrect data for deletion.');
+    		return null;
+    	}
+
+    	V1CaseCollector.deleteMapping(mappingId);
+    	resetMappingData();
+
+    	return null;
     }
 
     private boolean isProductAlreadyUsed(String productId, String mappingId) {
@@ -285,6 +306,6 @@ public class SettingsController {
 
     public void updateDefaultProjectSettings(String id) {
         settings.setProjectId(id);
-        settings.setProjectName(projects.get(id));
+        settings.setProjectName(projects.get('Scope:'+id));
     }
 }
