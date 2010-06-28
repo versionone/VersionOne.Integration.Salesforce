@@ -594,7 +594,7 @@ private class V1ConnectorTester {
 		expectedDefect2.priority = '';
 		expectedDefect2.resolution = 'Fixed';
     	String searchPhrase = 'testing new functionality';
-    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&where=(Defect.AssetState!=\'Closed\')&sort=-CreateDateUTC&find='+searchPhrase;
+    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&where=(Defect.AssetState!=\'Closed\')&sort=-CreateDateUTC' + createSearchQuery(searchPhrase);
     	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
 						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
 							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
@@ -647,7 +647,7 @@ private class V1ConnectorTester {
 		expectedDefect2.priority = '';
 		expectedDefect2.resolution = 'Fixed';
     	String searchPhrase = 'testing new functionality';
-    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&sort=-CreateDateUTC&find='+searchPhrase;
+    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&sort=-CreateDateUTC' + createSearchQuery(searchPhrase);
     	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
 						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
 							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
@@ -678,6 +678,17 @@ private class V1ConnectorTester {
 		System.assertEquals(expectedUrl, testRequestor.getSentUrl(0),'Incorrect request url.');
         System.assert(defectEquals(expectedDefect1, defects.get(0)), 'Incorrect data for defect 1');
         System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
+    }
+    
+    private static String createSearchQuery(string searchPhrase) {
+    	List<String> parts = searchPhrase.trim().split(' ');
+    	String query = '';
+    	
+    	for(String part : parts) {
+    		query += '&find=' + part;
+    	}
+    	
+    	return query;
     }
 
     private static Boolean defectEquals(Defect defect1, Defect defect2) {

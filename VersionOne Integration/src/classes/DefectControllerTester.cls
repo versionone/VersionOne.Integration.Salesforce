@@ -1,16 +1,17 @@
 @isTest
 private class DefectControllerTester {
-    private static final String caseSubject = 'TestCase1';
-    private static final String caseDescription = 'Description 123';
-    private static final String projectName = 'project name';
-    private static final String assignedDefectToken = DefectFacadeMock.CreatedDefectToken;
+    private static final String CASE_SUBJECT = 'TestCase1';
+    private static final String CASE_DESCRIPTION = 'Description 123';
+    private static final String PROJECT_NAME = 'project name';
+    private static final String DEFECT_TOKEN = DefectFacadeMock.CreatedDefectToken;
+    private static final String SF_PRODUCT_ID = 'GC1020';
 
     static testMethod void mainTest() {
         DefectController controller = getControllerWithoutAssignedDefect();
 
         Defect defect = controller.getCreatingDefect();
-        System.assertEquals(caseSubject, defect.title);
-        System.assertEquals(caseDescription, defect.description);
+        System.assertEquals(CASE_SUBJECT, defect.title);
+        System.assertEquals(CASE_DESCRIPTION, defect.description);
 
         controller.showForm();
         System.assertEquals(false, controller.areThereErrors);
@@ -22,14 +23,26 @@ private class DefectControllerTester {
     }
 
     static testMethod void createDefectTest() {
+    	for (MappingV1ProjectsToSFProducts__c obj :
+            [select Id from MappingV1ProjectsToSFProducts__c]) {
+            delete obj;
+        }
+        
+        MappingV1ProjectsToSFProducts__c mapping = new MappingV1ProjectsToSFProducts__c();
+        mapping.SFProductId__c = SF_PRODUCT_ID;
+        mapping.SFProductName__c = PROJECT_NAME;
+        mapping.V1ProjectToken__c = 'Scope:1000';
+        mapping.V1ProjectName__c = PROJECT_NAME;
+        insert mapping;
+        
         DefectController controller = getControllerWithoutAssignedDefect();
         controller.createDefect();
         Defect defect = controller.getCreatingDefect();
 
         System.assertEquals(false, controller.areThereErrors);
         System.assertEquals(false, defect.isClosed);
-        System.assertEquals(ProjectName, defect.project);
-        System.assertEquals(DefectFacadeMock.CreatedDefectToken, defect.token);
+        System.assertEquals(PROJECT_NAME, defect.project);
+        System.assertEquals(DEFECT_TOKEN, defect.token);
     }
 
     static testMethod void createDefectWithExceptionTest() {
@@ -69,9 +82,9 @@ private class DefectControllerTester {
         controller.createDefect();
         controller.defectFacade = null;
         Defect defectData = controller.getAssignedDefect();
-        System.assertEquals(caseSubject, defectData.title);
-        System.assertEquals(caseDescription, defectData.description);
-        System.assertEquals(assignedDefectToken, defectData.token);
+        System.assertEquals(CASE_SUBJECT, defectData.title);
+        System.assertEquals(CASE_DESCRIPTION, defectData.description);
+        System.assertEquals(DEFECT_TOKEN, defectData.token);
         System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
     }
 
@@ -138,19 +151,19 @@ private class DefectControllerTester {
 
         controller.cancelForm();
         defect = controller.getCreatingDefect();
-        System.assertEquals(caseSubject, defect.title, 'Incorrect title');
-        System.assertEquals(caseDescription, defect.description, 'Incorrect description');
+        System.assertEquals(CASE_SUBJECT, defect.title, 'Incorrect title');
+        System.assertEquals(CASE_DESCRIPTION, defect.description, 'Incorrect description');
         System.assertEquals(false, controller.isEditForm, 'Incorrect description');
     }
 
     private static DefectController getControllerWithoutAssignedDefect() {
-        Case caseData = new Case(Subject = caseSubject, Description = caseDescription);
+        Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, Product__c = SF_PRODUCT_ID);
         insert new Case[] {caseData};
         return getController(caseData);
     }
 
     private static DefectController getControllerWithAssignedDefect() {
-        Case caseData = new Case(Subject = caseSubject, Description = caseDescription, V1Association__c = true, V1DefectId__c = assignedDefectToken);
+        Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, V1Association__c = true, V1DefectId__c = DEFECT_TOKEN, Product__c = SF_PRODUCT_ID);
         insert new Case[] {caseData};
         return getController(caseData);
     }
@@ -158,7 +171,7 @@ private class DefectControllerTester {
     private static DefectController getController(Case caseData) {
         DefectFacadeMock facade = new DefectFacadeMock();
         Settings settingsData = Settings.getTestSettings();
-        settingsData.setProjectName(ProjectName);
+        settingsData.setProjectName(PROJECT_NAME);
         DefectController controller = new DefectController(caseData);
         controller.defectFacade = facade;
         controller.settings = settingsData;
