@@ -13,7 +13,7 @@ public class V1ConnectorMock implements IV1Connector {
 
     public static final String defaultProjectId = '1010';
     public static final String developmentStatus = 'In Progress';
-    
+
     public DefectSearchCriteria defectSearchCriteria { get; private set; }
 
     public Defect getDefectById(String id) {
@@ -28,14 +28,14 @@ public class V1ConnectorMock implements IV1Connector {
 		defectSearchCriteria = new DefectSearchCriteria();
 		defectSearchCriteria.queryString = find;
 		defectSearchCriteria.includeClosedDefects = isLookingInClosed;
-		
+
 		if(searchForDefectsException != null) {
 			throw searchForDefectsException;
-		} 
-		
+		}
+
 		return null;
 	}
-	
+
 	public void setSearchForDefectsException(Exception ex) {
 		searchForDefectsException = ex;
 	}
@@ -75,7 +75,7 @@ public class V1ConnectorMock implements IV1Connector {
         throwException();
         Map<String, String> result = new Map<String, String>();
         result.put('Scope:1081', 'CI');
-        result.put(defaultProjectId, 'Main project');
+        result.put('Scope:' + defaultProjectId, 'Main project');
 
         return result;
     }

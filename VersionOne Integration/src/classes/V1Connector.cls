@@ -210,7 +210,7 @@ public class V1Connector implements IV1Connector {
             }
             String projectName = assetTag.getValue('Attribute');
             if (!projects.containsKey(id)) {
-                projects.put(id, projectName);
+                projects.put('Scope:' + id, projectName);
             }
         }
         defaultProjectId = String.valueof(testId);
