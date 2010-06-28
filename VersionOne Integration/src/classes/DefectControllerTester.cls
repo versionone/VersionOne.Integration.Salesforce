@@ -34,7 +34,6 @@ private class DefectControllerTester {
 
         System.assertEquals(false, controller.areThereErrors);
         System.assertEquals(false, defect.isClosed);
-        System.assertEquals(PROJECT_NAME, defect.project);
         System.assertEquals(DEFECT_TOKEN, defect.token);
     }
 

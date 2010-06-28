@@ -64,19 +64,19 @@ public class DefectController {
     }
 
     public PageReference createDefect() {
-        String token;
         areThereErrors = false;
         try {
-            token = defectFacade.createDefectInVersionOne(caseData, defect);
+            String token = defectFacade.createDefectInVersionOne(caseData, defect);
+            defect.token = token;
+            if(token != null) {
+                defect.id = token.split(':')[1];	
+            }
         } catch (IntegrationException ex) {
             System.debug('ex=' + ex);
             addErrorMessage(ex.getMessage());
         }
+
         defect.isClosed = false;
-        defect.token = token;
-        if (token != null) {
-        	defect.id = token.split(':')[1];
-        }
         isEditForm = false;
         return null;
     }
