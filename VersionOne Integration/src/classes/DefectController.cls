@@ -72,12 +72,11 @@ public class DefectController {
             System.debug('ex=' + ex);
             addErrorMessage(ex.getMessage());
         }
-        defect.project = settings.getProjectName();
         defect.isClosed = false;
         defect.token = token;
         if (token != null) {
         	defect.id = token.split(':')[1];
-        } 
+        }
         isEditForm = false;
         return null;
     }
