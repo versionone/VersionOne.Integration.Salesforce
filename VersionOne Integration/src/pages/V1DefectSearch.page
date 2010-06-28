@@ -1,4 +1,20 @@
 <apex:page extensions="DefectSearchController" standardController="Case" tabStyle="Case">
+    <script type="text/javascript">
+        ////<![CDATA[
+        function enableButton(buttonId) {
+            var button = document.getElementById(buttonId);
+            button.disabled = false;
+            button.className = 'btn';
+        }
+        
+        function disableButton(buttonId) {
+            var button = document.getElementById(buttonId);
+            button.disabled = true;
+            button.className = 'btnDisabled';
+        }
+        //]]>
+    </script>
+    
     <apex:actionStatus startText="Searching for VersionOne defects..." id="searchForDefects"/>
 	<apex:actionStatus startText="Assigning defect to the case..." id="assigningDefect"/>
 	<apex:actionStatus startText="Unassigning defect from the case..." id="unassigningDefect"/>
@@ -16,7 +32,9 @@
 			             value="{!SearchCriteria.includeClosedDefects}" />
 			            <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>
 			            <apex:commandButton value="Search" id="searchButton" status="searchForDefects"
-						 rerender="searchResults, errorMessages" action="{!searchForDefects}" />
+						 rerender="searchResults, errorMessages" action="{!searchForDefects}"
+						 onclick="disableButton('{!$Component.searchButton}');"
+						 oncomplete="enableButton('{!$Component.searchButton}');" />
 				    </apex:outputPanel>
 				</apex:pageBlockSectionItem>
 		    </apex:pageBlockSection>
