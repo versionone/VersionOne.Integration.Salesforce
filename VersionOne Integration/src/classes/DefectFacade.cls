@@ -1,16 +1,19 @@
 public class DefectFacade implements IDefectFacade {
     private final IV1Connector connector;
+    private final Settings settings;
     private final Map<String, Defect> defectData;
 
-    public DefectFacade(IV1Connector connector) {
+    public DefectFacade(IV1Connector connector, Settings settings) {
         defectData = new Map<String, Defect>();
         this.connector = connector;
+        this.settings = settings;
     }
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
         String token;
         try {
-            token = connector.createWorkitemInV1(caseData, defectData);
+        	String projectId = resolveV1ProjectId(caseData);
+            token = connector.createWorkitemInV1(caseData, defectData, projectId);
         } catch (Exception ex) {
             throw new IntegrationException(ex.getMessage());
         }
@@ -19,13 +22,23 @@ public class DefectFacade implements IDefectFacade {
             try {
                 createLinkInVersionOne(caseData, token);
             } catch (Exception ex) {
-                throw new IntegrationException('Defect was created in the VersionOne but link was not created in the VersionOne.');
+                throw new IntegrationException('Defect was created successfully, but link was not created in VersionOne.');
             } finally {
                 updateCaseOnAssignment(caseData, token, null);
             }
         }
 
         return token;
+    }
+    
+    private String resolveV1ProjectId(Case caseValue) {
+    	MappingV1ProjectsToSFProducts__c mapping = V1CaseCollector.getProductToProjectMappingForCase(caseValue);
+    	
+    	if(mapping != null) {
+    		return mapping.V1ProjectToken__c.split(':')[1];
+    	}
+    	
+    	return settings.getProjectId();
     }
 
     public void createLinkInVersionOne(Case caseData, String token) {

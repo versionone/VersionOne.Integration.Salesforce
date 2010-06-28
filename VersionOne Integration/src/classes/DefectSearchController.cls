@@ -29,7 +29,7 @@ public class DefectSearchController {
     public IDefectFacade DefectFacade {
         get {
             if (innerDefectFacade == null) {
-                innerDefectFacade = new DefectFacade(new V1Connector(settings, new Requestor(settings)));
+                innerDefectFacade = new DefectFacade(new V1Connector(settings, new Requestor(settings)), settings);
             }
             return innerDefectFacade;
         }

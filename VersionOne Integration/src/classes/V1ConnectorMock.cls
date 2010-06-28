@@ -94,7 +94,7 @@ public class V1ConnectorMock implements IV1Connector {
         createLinkException = ex;
     }
 
-    public String createWorkitemInV1(Case caseData, Defect defectData) {
+    public String createWorkitemInV1(Case caseData, Defect defectData, String projectId) {
         if (creationWorkitemException != null) {
             throw creationWorkitemException;
         }
