@@ -340,4 +340,43 @@ private class SettingsControllerTester {
         System.assertEquals(projectToken1, resultMapping.V1ProjectToken__c, 'Incorrect project token for updated mapping.');
         System.assertEquals(productName1 + 'up', resultMapping.SFProductName__c, 'Incorrect project token for updated mapping.');
     }
+
+    static testMethod void removeProjectMappingTest() {
+		for (MappingV1ProjectsToSFProducts__c obj :
+		    [select Id from MappingV1ProjectsToSFProducts__c]) {
+		    delete obj;
+		}
+
+    	String projectName1 = 'Project Name 1';
+    	String productName1 = 'Product Name 1';
+    	String projectToken1 = 'Scope:1234';
+    	String productId1 = 'GDS';
+    	MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
+    	mappingData1.SFProductId__c = productId1;
+    	mappingData1.SFProductName__c = productName1;
+    	mappingData1.V1ProjectToken__c = projectToken1;
+    	mappingData1.V1ProjectName__c = projectName1;
+    	String projectName2 = 'Project Name 2';
+    	String productName2 = 'Product Name 2';
+    	String projectToken2 = 'Scope:2345';
+    	String productId2 = 'GDS 2';
+    	MappingV1ProjectsToSFProducts__c mappingData2 = new MappingV1ProjectsToSFProducts__c();
+    	mappingData2.SFProductId__c = productId2;
+    	mappingData2.SFProductName__c = productName2;
+    	mappingData2.V1ProjectToken__c = projectToken2;
+    	mappingData2.V1ProjectName__c = projectName2;
+    	insert new MappingV1ProjectsToSFProducts__c[] {mappingData1, mappingData2};
+
+    	ApexPages.currentPage().getParameters().put('mappingId', mappingData1.id);
+        SettingsController controller = new SettingsController();
+        Settings settingsData = Settings.getTestSettings();
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+        controller.removeProjectMapping();
+
+		List<MappingV1ProjectsToSFProducts__c> resultMappings1 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
+		MappingV1ProjectsToSFProducts__c resultMapping2 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData2.Id];
+		System.assertEquals(0, resultMappings1.size(), 'This mapping should be deleted');
+		System.assertNotEquals(null, resultMapping2, 'This mapping should be not deleted');
+    }
 }

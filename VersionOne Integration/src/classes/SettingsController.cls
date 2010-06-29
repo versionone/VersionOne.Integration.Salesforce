@@ -258,7 +258,7 @@ public class SettingsController {
     	resetConnectionFormSettings();
     	String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
     	if (mappingId == '') {
-        	updateDefaultProjectSettings(currentMapping.projectToken);
+        	updateDefaultProjectSettings(currentMapping.projectToken.split(':')[1]);
         	settings.updateSettings();
     	} else {
     		if (!isProductAlreadyUsed(currentMapping.productId, mappingId)) {
