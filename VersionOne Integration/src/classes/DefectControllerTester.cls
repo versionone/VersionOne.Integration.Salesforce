@@ -23,11 +23,6 @@ private class DefectControllerTester {
     }
 
     static testMethod void createDefectTest() {
-    	for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
-            delete obj;
-        }
-                
         DefectController controller = getControllerWithoutAssignedDefect();
         controller.createDefect();
         Defect defect = controller.getCreatingDefect();
