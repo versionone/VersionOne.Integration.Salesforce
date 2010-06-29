@@ -1,7 +1,7 @@
 <!-- Page -->
 <apex:page controller="SettingsController" action="{!initSettings}" title="VersionOne Integration Settings">
     <script type="text/javascript">
-	////<![CDATA[
+	//<![CDATA[
         function disableAllButtons() {
             disableSaveButtons();
             disableTestButtons();
@@ -18,19 +18,13 @@
             ele.disabled = true;
             ele.className = 'btnDisabled';
         }
+        function enableElement(ele) {
+            ele.disabled = false;
+            ele.className = 'btn';
+        }
         function isMappingDataValide(mappingId) {
         	var product = getSelectedProdcut();
         	var result = true;
-        	/*
-        	for (var mappingId in SFUserProductList) {
-       			alert(mappingId + " != " + mappingId + "|||" + SFUserProductList[mappingId]);
-       			if (SFUserProductList[mappingId] == product.value && mappingId != mappingId) {
-       				alert ('Product already used in mapping');
-        			result = false;
-   	    			break;
-       			}
-        	}
-        	*/
 
         	SFUserProductList.forEach(
         		function (x, idx) {
@@ -96,7 +90,7 @@
                     onclick="disableAllButtons();" status="save_status"
                     rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
                     <script type="text/javascript">
-	                    ////<![CDATA[
+	                    //<![CDATA[
                         function disableSaveButton1() {
 	                        disableElement(document.getElementById('{!$Component.save_button1}'));
     	                }
@@ -108,7 +102,7 @@
                     onclick="disableAllButtons()"
                     status="test_status" id="test_button1">
                     <script type="text/javascript">
-	                    ////<![CDATA[
+	                    //<![CDATA[
                         function disableTestButton1() {
                             disableElement(document.getElementById('{!$Component.test_button1}'));
                         }
@@ -122,7 +116,7 @@
                     onclick="disableAllButtons();" status="save_status"
                     rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
                     <script type="text/javascript">
-	                    ////<![CDATA[
+	                    //<![CDATA[
 	                    function disableSaveButton2() {
     	                    disableElement(document.getElementById('{!$Component.save_button2}'));
         	            }
@@ -134,7 +128,7 @@
                     onclick="disableAllButtons()"
                     status="test_status" id="test_button2">
                     <script type="text/javascript">
-	                    ////<![CDATA[
+	                    //<![CDATA[
                         function disableTestButton2() {
 							disableElement(document.getElementById('{!$Component.test_button2}'));
 						}
@@ -150,7 +144,7 @@
                     <apex:selectList size="1" required="false" id="ProductId" value="{!currentMapping.productId}">
                         <apex:selectOptions value="{!ProductList}"/>
 	                    <script type="text/javascript">
-		                    ////<![CDATA[
+		                    //<![CDATA[
 	                        function getSelectedProdcut() {
 								return document.getElementById('{!$Component.ProductId}');
 							}
@@ -165,7 +159,21 @@
 						    <apex:selectOptions value="{!VersionOneProjectsList}"/>
 						</apex:selectList>
 						&nbsp;&nbsp;&nbsp;
-						<apex:commandButton value="Add" action="{!addMapping}" rerender="mappingTable,messages,JSMappingData" status="addMapping" onClick="if (!isMappingDataValide('0')){return;}"/>
+						<apex:commandButton id="add_mapping_button" value="Add" action="{!addMapping}"
+							rerender="mappingTable,messages,JSMappingData" status="addMapping"
+							onClick="if (!isMappingDataValide('0')){return;}disableAddMappingButton();"
+							oncomplete="enableAddMappingButton()">
+		                    <script type="text/javascript">
+			                    //<![CDATA[
+		                        function disableAddMappingButton() {
+									disableElement(document.getElementById('{!$Component.add_mapping_button}'));
+								}
+								function enableAddMappingButton() {
+									enableElement(document.getElementById('{!$Component.add_mapping_button}'))
+								}
+							    //]]>
+		                	</script>
+		                </apex:commandButton>
                     </apex:outputPanel>
                 </apex:pageBlockSectionItem>
 			    <apex:pageBlockSectionItem >
@@ -176,10 +184,15 @@
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">Actions</apex:facet>
-			                <apex:outputLink value="javascript:void(0);" onclick="updateProject('{!mapping.mappingId}');" rendered="{!not(mapping.isDeletable)}">Update VersionOne Project</apex:outputLink>
-			                <apex:outputLink value="javascript:void(0);" onclick="if (isMappingDataValide('{!mapping.mappingId}')){updateProject('{!mapping.mappingId}');}" rendered="{!mapping.isDeletable}">Update</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);"
+			                	onclick="disableAddMappingButton();updateProject('{!mapping.mappingId}');"
+			                	rendered="{!not(mapping.isDeletable)}">Update VersionOne Project</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);"
+			                	onclick="if (isMappingDataValide('{!mapping.mappingId}')){disableAddMappingButton();updateProject('{!mapping.mappingId}');}"
+			                	rendered="{!mapping.isDeletable}">Update</apex:outputLink>
 	            		    &nbsp;&nbsp;
-			                <apex:outputLink value="javascript:void(0);" rendered="{!mapping.isDeletable}" onclick="removeMapping('{!mapping.mappingId}');">Remove</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);" rendered="{!mapping.isDeletable}"
+			                	onclick="disableAddMappingButton();removeMapping('{!mapping.mappingId}');">Remove</apex:outputLink>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">VersionOne Project</apex:facet>
@@ -195,10 +208,14 @@
             </apex:pageBlockSection>
         </apex:pageBlock>
 
-		<apex:actionFunction name="updateProject" action="{!updateProjectMapping}" status="update_mapping" rerender="mappingTable,messages,JSMappingData">
+		<apex:actionFunction name="updateProject" action="{!updateProjectMapping}"
+			status="update_mapping" rerender="mappingTable,messages,JSMappingData"
+			oncomplete="enableAddMappingButton()">
 			<apex:param name="mappingId" value=""/>
 		</apex:actionFunction>
-		<apex:actionFunction name="removeMapping" action="{!removeProjectMapping}" status="remove_mapping" rerender="mappingTable,messages,JSMappingData">
+		<apex:actionFunction name="removeMapping" action="{!removeProjectMapping}"
+			status="remove_mapping" rerender="mappingTable,messages,JSMappingData"
+			oncomplete="enableAddMappingButton()">
 			<apex:param name="mappingId" value=""/>
 		</apex:actionFunction>
 
