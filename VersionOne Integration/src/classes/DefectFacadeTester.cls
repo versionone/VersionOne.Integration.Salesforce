@@ -1,7 +1,10 @@
 @isTest
 private class DefectFacadeTester {
     private static final String DEFECT_TOKEN = 'Defect:2345';
+    private static final String PROJECT_TOKEN = 'Scope:1000';
+    private static final String PROJECT_NAME = 'V1 Project';
     private static final String PRODUCT_ID = 'DefaultProductId';
+    private static final String PRODUCT_NAME = 'DefaultProduct';
 
     static testMethod void createDefectInVersionOneTest() {
         V1ConnectorMock connector = new V1ConnectorMock();
@@ -16,6 +19,33 @@ private class DefectFacadeTester {
         System.assertEquals(DEFECT_TOKEN, createdDefectToken, 'Incorrect defect token');
         System.assertEquals(true, newCase1.V1Association__c, 'Incorrect defect association flag');
         System.assertEquals(DEFECT_TOKEN, newCase1.V1DefectId__c, 'Incorrect defect token');
+    }
+    
+    static testMethod void createDefectUsingMappingTest() {
+    	removeAllMappings();
+    	String projectId = PROJECT_TOKEN.split(':')[1];
+    	
+    	// we deliberately put Project ID to mapping Project Name field to be able to check later that mock receives correct parameter value
+    	MappingV1ProjectsToSFProducts__c mapping = new MappingV1ProjectsToSFProducts__c();
+    	mapping.SFProductId__c = PRODUCT_ID;
+        mapping.SFProductName__c = PRODUCT_NAME;
+        mapping.V1ProjectToken__c = PROJECT_TOKEN;
+        mapping.V1ProjectName__c = projectId;
+        insert mapping;
+        
+        V1ConnectorMock connector = new V1ConnectorMock();
+        connector.setCreatedWorkitemToken(DEFECT_TOKEN);
+        IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
+        Defect defectValue = new Defect('defect name', 'defect description');
+        Case caseValue = createCase('case1', 'desc', false); 
+
+        String createdDefectToken = defectFacade.createDefectInVersionOne(caseValue, defectValue);
+
+        Case updatedCase = [SELECT V1Association__c, V1DefectId__c FROM Case WHERE Id = :caseValue.Id];
+        System.assertEquals(DEFECT_TOKEN, createdDefectToken, 'Incorrect defect token');
+        System.assertEquals(true, updatedCase.V1Association__c, 'Incorrect defect association flag');
+        System.assertEquals(DEFECT_TOKEN, updatedCase.V1DefectId__c, 'Incorrect defect token');
+        System.assertEquals(defectValue.project, projectId);
     }
 
     static testMethod void createDefectInVersionOneWithExceptionsTest() {
@@ -208,6 +238,13 @@ private class DefectFacadeTester {
         insert caseValue;
         caseValue = [SELECT Subject, Id, Description, Product__c, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :caseValue.Id];
         return caseValue;
+    }
+    
+    private static void removeAllMappings() {
+    	for (MappingV1ProjectsToSFProducts__c obj :
+            [select Id from MappingV1ProjectsToSFProducts__c]) {
+            delete obj;
+        }
     }
     
     private static Defect createDefect(String title, String description, Boolean isClosed) {
