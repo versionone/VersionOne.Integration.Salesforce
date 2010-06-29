@@ -98,6 +98,8 @@ public class V1ConnectorMock implements IV1Connector {
         if (creationWorkitemException != null) {
             throw creationWorkitemException;
         }
+        
+        defectData.project = projectId;
         return createdWorkitemToken;
     }
 
