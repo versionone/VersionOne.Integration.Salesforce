@@ -44,5 +44,5 @@ public interface IDefectFacade {
     * queryString         - string to look for (see VersionOne REST API)
     * includeClosedItems  - flag determining whether to include closed defects in search result or not
     **/
-    List<Defect> searchForDefects(String queryString, Boolean includeClosedItems);
+    List<Defect> searchForDefects(DefectSearchCriteria searchCriteria);
 }
