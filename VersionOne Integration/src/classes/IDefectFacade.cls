@@ -1,5 +1,10 @@
 public interface IDefectFacade {
 
+	/**
+	* Return information about fields for defect searching.
+	**/
+	List<V1FieldData> getFieldsData();
+
     /**
     * Create defect in the VersionOne and assign it to a case in the SalesForce
     * caseData 		- case for assign

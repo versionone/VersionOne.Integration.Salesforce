@@ -2,17 +2,29 @@ public class DefectFacade implements IDefectFacade {
     private final IV1Connector connector;
     private final Settings settings;
     private final Map<String, Defect> defectData;
+    public final List<V1FieldData> fieldsData = new List<V1FieldData>();
 
     public DefectFacade(IV1Connector connector, Settings settings) {
         defectData = new Map<String, Defect>();
         this.connector = connector;
         this.settings = settings;
+
+        fieldsData.add(new V1FieldData('All', null));
+        fieldsData.add(new V1FieldData('ID', new String[]{'Number'}));
+        fieldsData.add(new V1FieldData('Title', new String[]{'Name'}));
+        fieldsData.add(new V1FieldData('Description', new String[]{'Description'}));
+        fieldsData.add(new V1FieldData('Title & Description', new String[]{'Name', 'Description'}));
+        fieldsData.add(new V1FieldData('Reference', new String[]{'Reference'}));
+    }
+
+    public List<V1FieldData> getFieldsData() {
+        return fieldsData;
     }
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
         String token;
         try {
-        	String projectId = resolveV1ProjectId(caseData);
+            String projectId = resolveV1ProjectId(caseData);
             token = connector.createWorkitemInV1(caseData, defectData, projectId);
         } catch (Exception ex) {
             throw new IntegrationException(ex.getMessage());
@@ -30,15 +42,24 @@ public class DefectFacade implements IDefectFacade {
 
         return token;
     }
-    
+
+    private String[] resolveSearchField(String id) {
+        for(V1FieldData field : fieldsData) {
+            if (id == field.id) {
+                return field.searchStrings;
+            }
+        }
+        return null;
+    }
+
     private String resolveV1ProjectId(Case caseValue) {
-    	MappingV1ProjectsToSFProducts__c mapping = V1CaseCollector.getProductToProjectMappingForCase(caseValue);
-    	
-    	if(mapping != null) {
-    		return mapping.V1ProjectToken__c.split(':')[1];
-    	}
-    	
-    	return settings.getProjectId();
+        MappingV1ProjectsToSFProducts__c mapping = V1CaseCollector.getProductToProjectMappingForCase(caseValue);
+
+        if(mapping != null) {
+            return mapping.V1ProjectToken__c.split(':')[1];
+        }
+
+        return settings.getProjectId();
     }
 
     public void createLinkInVersionOne(Case caseData, String token) {
@@ -48,35 +69,35 @@ public class DefectFacade implements IDefectFacade {
             throw new IntegrationException('Link to the case was not created in VersionOne.', Severity.WARNING);
         }
     }
-    
+
     /**
-     * Assign defect to case: fill Case association fields, fill Defect reference and create V1 link. 
-     * Note that we have to do callouts first, and link creation failure is not critical and should not 
+     * Assign defect to case: fill Case association fields, fill Defect reference and create V1 link.
+     * Note that we have to do callouts first, and link creation failure is not critical and should not
      * break method execution.
      */
-    // TODO refactor 
+    // TODO refactor
     public void assignDefectToCase(Case caseData, Defect defectData) {
-    	try {
-    		if(!defectData.isClosed) {
-    	        connector.updateReferenceForDefect(defectData.id, caseData.id);
-    		}
-    	} catch(Exception ex) {
-    		throw new IntegrationException('Failed to update VersionOne defect Reference field.');
-    	}
-    	
-    	IntegrationException linkException = null;
-    	
-    	try {
-    		createLinkInVersionOne(caseData, defectData.token);
-    	} catch(IntegrationException ex) {
-    		linkException = ex;
-    	}
-    	
-    	updateCaseOnAssignment(caseData, defectData.token, defectData.status);
-    	
-    	if(linkException != null) {
-    		throw linkException;
-    	}
+        try {
+            if(!defectData.isClosed) {
+                connector.updateReferenceForDefect(defectData.id, caseData.id);
+            }
+        } catch(Exception ex) {
+            throw new IntegrationException('Failed to update VersionOne defect Reference field.');
+        }
+
+        IntegrationException linkException = null;
+
+        try {
+            createLinkInVersionOne(caseData, defectData.token);
+        } catch(IntegrationException ex) {
+            linkException = ex;
+        }
+
+        updateCaseOnAssignment(caseData, defectData.token, defectData.status);
+
+        if(linkException != null) {
+            throw linkException;
+        }
     }
 
     private void updateCaseOnAssignment(Case caseData, String defectToken, String devStatus) {
@@ -102,10 +123,10 @@ public class DefectFacade implements IDefectFacade {
             throw new IntegrationException('There is no assigned defect to the case.');
         }
         try {
-        	Defect defectData = getDefectByToken(caseData.V1DefectId__c);
-        	V1CaseCollector.updateDeveloperStatus(caseData, defectData.status);
+            Defect defectData = getDefectByToken(caseData.V1DefectId__c);
+            V1CaseCollector.updateDeveloperStatus(caseData, defectData.status);
         } catch(Exception ex) {
-        	throw new IntegrationException('Status was not published. Problem with getting information about defect.');
+            throw new IntegrationException('Status was not published. Problem with getting information about defect.');
         }
     }
 
@@ -113,20 +134,20 @@ public class DefectFacade implements IDefectFacade {
         if (defectData.get(defectToken) == null) {
             String id = getDefectFromToken(defectToken);
             try {
-            	defectData.put(defectToken, connector.getDefectById(id)); 
+                defectData.put(defectToken, connector.getDefectById(id));
             } catch (Exception ex) {
-            	throw new IntegrationException('Problem with getting defect.');
-        	}
+                throw new IntegrationException('Problem with getting defect.');
+            }
         }
         return defectData.get(defectToken);
     }
 
     public List<Defect> searchForDefects(String queryString, Boolean includeClosedItems) {
-    	try {
-    		return connector.searchDefects(queryString, includeClosedItems);
-    	} catch(Exception ex) {
-    		throw new IntegrationException('Failed to lookup defects in VersionOne.');
-    	}
+        try {
+            return connector.searchDefects(queryString, includeClosedItems);
+        } catch(Exception ex) {
+            throw new IntegrationException('Failed to lookup defects in VersionOne.');
+        }
     }
 
     private String removeInfoAboutAssociationFromDefect(String id) {

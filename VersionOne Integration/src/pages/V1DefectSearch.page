@@ -6,7 +6,7 @@
             button.disabled = false;
             button.className = 'btn';
         }
-        
+
         function disableButton(buttonId) {
             var button = document.getElementById(buttonId);
             button.disabled = true;
@@ -14,23 +14,26 @@
         }
         //]]>
     </script>
-    
+
     <apex:actionStatus startText="Searching for VersionOne defects..." id="searchForDefects"/>
 	<apex:actionStatus startText="Assigning defect to the case..." id="assigningDefect"/>
 	<apex:actionStatus startText="Unassigning defect from the case..." id="unassigningDefect"/>
 	<apex:actionStatus startText="Updating found Defects table..." id="updatingDefectsTable" />
-    
+
     <apex:form >
         <apex:pageBlock >
             <apex:pageBlockSection columns="1" id="searchForm">
-                <apex:pageBlockSectionItem > 
+                <apex:pageBlockSectionItem >
                     <apex:outputPanel >
-			            <apex:outputLabel value="Find" for="queryText" />
-			            <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255" 
-			             value="{!SearchCriteria.queryString}"/>
-			            <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2" 
+			            <apex:outputLabel value="Find" for="queryText" />&nbsp;
+			            <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255"
+			             value="{!SearchCriteria.queryString}"/>&nbsp;in&nbsp;
+						<apex:selectList value="{!SearchCriteria.searchIn}" size="1" required="false" id="ProjectToken">
+						    <apex:selectOptions value="{!FieldsList}"/>
+						</apex:selectList>&nbsp;
+			            <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2"
 			             value="{!SearchCriteria.includeClosedDefects}" />
-			            <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>
+			            <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>&nbsp;
 			            <apex:commandButton value="Search" id="searchButton" status="searchForDefects"
 						 rerender="searchResults, errorMessages" action="{!searchForDefects}"
 						 onclick="disableButton('{!$Component.searchButton}');"
@@ -48,7 +51,7 @@
                             if({!refreshWindow}) {
                                 parent.location.href = "/{!currentCase.Id}";
                             }
-                        }    
+                        }
                         ]]>
                     </script>
                     <apex:outputPanel style="text-align: right;" rendered="{!paginator.hasData}">
@@ -67,12 +70,12 @@
                             <apex:param name="pageNumber" value="" assignTo="{!pageNumber}" />
                         </apex:actionFunction>
 			            <span style="font-size: x-small;">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
-			             out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/> 
+			             out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/>
 			             in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/>&nbsp;results &nbsp;&nbsp;</span>
-			            <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}" 
+			            <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}"
 			             disabled="{!paginator.previousButtonDisabled}" rerender="searchResults" status="updatingDefectsTable"/>
-			            <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" rerender="searchResults" 
-			             disabled="{!paginator.nextButtonDisabled}" status="updatingDefectsTable" />    
+			            <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" rerender="searchResults"
+			             disabled="{!paginator.nextButtonDisabled}" status="updatingDefectsTable" />
 					</apex:outputPanel>
 				    <apex:pageBlockTable value="{!paginator.defects}" var="item" rendered="{!displayDefectTable}" id="defectTable">
 				        <apex:column >
@@ -85,7 +88,7 @@
 						    </apex:commandButton>
 						    <apex:commandButton value="Unassign" id="unassignButton"
 				    		 rerender="searchResults, errorMessages" status="unassigningDefect"
-							 action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}" 
+							 action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}"
 							 oncomplete="maybeRefreshWindow()" style="color: #000000" />
 				        </apex:column>
 					    <apex:column >

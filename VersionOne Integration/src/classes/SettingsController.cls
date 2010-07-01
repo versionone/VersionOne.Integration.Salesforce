@@ -229,7 +229,7 @@ public class SettingsController {
         Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.Product__c;
         List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
         for(Schema.PicklistEntry f : ple) {
-            options.add(new SelectOption(f.getLabel(), f.getValue()));
+            options.add(new SelectOption(f.getValue(), f.getLabel()));
         }
 
         return options;

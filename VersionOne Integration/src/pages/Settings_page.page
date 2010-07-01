@@ -160,7 +160,7 @@
 						</apex:selectList>
 						&nbsp;&nbsp;&nbsp;
 						<apex:commandButton id="add_mapping_button" value="Add" action="{!addMapping}"
-							rerender="mappingTable,messages,JSMappingData" status="addMapping"
+							rerender="mappingTable,messages,JSMappingData,message_test,message_save" status="addMapping"
 							onClick="if (!isMappingDataValide('0')){return;}disableAddMappingButton();"
 							oncomplete="enableAddMappingButton()">
 		                    <script type="text/javascript">
@@ -209,12 +209,12 @@
         </apex:pageBlock>
 
 		<apex:actionFunction name="updateProject" action="{!updateProjectMapping}"
-			status="update_mapping" rerender="mappingTable,messages,JSMappingData"
+			status="update_mapping" rerender="mappingTable,messages,JSMappingData,message_test,message_save"
 			oncomplete="enableAddMappingButton()">
 			<apex:param name="mappingId" value=""/>
 		</apex:actionFunction>
 		<apex:actionFunction name="removeMapping" action="{!removeProjectMapping}"
-			status="remove_mapping" rerender="mappingTable,messages,JSMappingData"
+			status="remove_mapping" rerender="mappingTable,messages,JSMappingData,message_test,message_save"
 			oncomplete="enableAddMappingButton()">
 			<apex:param name="mappingId" value=""/>
 		</apex:actionFunction>
