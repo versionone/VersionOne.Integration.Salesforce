@@ -212,7 +212,7 @@ private class DefectFacadeTester {
         DefectSearchCriteria criteria = new DefectSearchCriteria();
         criteria.includeClosedDefects = true;
         criteria.queryString = 'test';
-        criteria.searchIn = 'Name';
+        criteria.searchIn = 'Title';
         try {
             defectFacade.searchForDefects(criteria);
             System.assert(false, 'This line should not be reached - we\'re awaiting an exception');
@@ -225,7 +225,7 @@ private class DefectFacadeTester {
         DefectSearchCriteria criteria = new DefectSearchCriteria();
         criteria.includeClosedDefects = true;
         criteria.queryString = 'test';
-        criteria.searchIn = 'Name';
+        criteria.searchIn = 'Title';
         try {
             defectFacade.searchForDefects(criteria);
         } catch(IntegrationException ex) {
