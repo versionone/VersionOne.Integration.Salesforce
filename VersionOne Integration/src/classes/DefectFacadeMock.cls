@@ -9,10 +9,14 @@ public class DefectFacadeMock implements IDefectFacade {
     private static Exception unassignDefectFromCaseException;
     private static Exception publishStatusException;
     private static Exception searchException;
-    
+
     public AssignDefectPassedData assignDefectResultValue { get; private set; }
-    
+
     public List<Defect> foundDefects { get; set; }
+
+    public List<V1FieldData> getFieldsData() {
+    	return new List<V1FieldData>();
+    }
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
         System.debug('createDefectInVersionOneException=' + createDefectInVersionOneException);
@@ -21,15 +25,15 @@ public class DefectFacadeMock implements IDefectFacade {
         }
         return CreatedDefectToken;
     }
-    
+
     public List<Defect> searchForDefects(String queryString, Boolean includeClosedItems) {
     	if(searchException != null) {
     		throw searchException;
     	}
-    	
+
     	return foundDefects;
     }
-    
+
     public void setSearchException(Exception ex) {
     	searchException = ex;
     }
@@ -40,7 +44,7 @@ public class DefectFacadeMock implements IDefectFacade {
 
     public void assignDefectToCase(Case caseData, Defect defectData) {
         assignDefectResultValue = new AssignDefectPassedData(caseData, defectData);
-        
+
         if(assignDefectToCaseException != null) {
         	throw assignDefectToCaseException;
         }
@@ -48,12 +52,12 @@ public class DefectFacadeMock implements IDefectFacade {
 
     public void unassignDefectFromCase(Case caseData) {
     	assignDefectResultValue = new AssignDefectPassedData(caseData, null);
-    	
+
     	if (unassignDefectFromCaseException != null) {
     		throw unassignDefectFromCaseException;
     	}
     }
-    
+
     public void setAssignDefectToCaseException(Exception ex) {
 		assignDefectToCaseException = ex;
     }
@@ -88,12 +92,12 @@ public class DefectFacadeMock implements IDefectFacade {
 
     public void setGetDefectByIdException(Exception ex) {
         defectByIdException = ex;
-    }   
-    
+    }
+
     public class AssignDefectPassedData {
     	public Case caseValue { get; private set; }
     	public Defect defectValue { get; private set; }
-    	
+
     	public AssignDefectPassedData(Case caseValue, Defect defectValue) {
     		this.caseValue = caseValue;
     		this.defectValue = defectValue;
