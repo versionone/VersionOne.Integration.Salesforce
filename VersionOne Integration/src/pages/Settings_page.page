@@ -179,10 +179,6 @@
 			    <apex:pageBlockSectionItem >
 			        <apex:pageBlockTable value="{!mappings}" var="mapping" id="mappingTable">
 						<apex:column >
-							<apex:facet name="header">SalesForce Product</apex:facet>
-							<apex:outputText value="{!mapping.productName}"/>
-						</apex:column>
-						<apex:column >
 							<apex:facet name="header">Actions</apex:facet>
 			                <apex:outputLink value="javascript:void(0);"
 			                	onclick="disableAddMappingButton();updateProject('{!mapping.mappingId}');"
@@ -193,6 +189,10 @@
 	            		    &nbsp;&nbsp;
 			                <apex:outputLink value="javascript:void(0);" rendered="{!mapping.isDeletable}"
 			                	onclick="disableAddMappingButton();removeMapping('{!mapping.mappingId}');">Remove</apex:outputLink>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">SalesForce Product</apex:facet>
+							<apex:outputText value="{!mapping.productName}"/>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">VersionOne Project</apex:facet>

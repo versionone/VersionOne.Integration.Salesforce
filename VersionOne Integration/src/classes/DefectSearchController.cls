@@ -76,7 +76,7 @@ public class DefectSearchController {
             options.add(new SelectOption(field.id, field.title));
         }
         return options;
-	}
+    }
 
     public PageReference searchForDefects() {
         foundDefects = null;
@@ -88,7 +88,7 @@ public class DefectSearchController {
         }
 
         try {
-            List<Defect> defects = defectFacade.searchForDefects(searchCriteria.queryString, searchCriteria.includeClosedDefects);
+            List<Defect> defects = defectFacade.searchForDefects(searchCriteria);
             foundDefects = new List<DefectWrapper>();
 
             for(Defect defect : defects) {

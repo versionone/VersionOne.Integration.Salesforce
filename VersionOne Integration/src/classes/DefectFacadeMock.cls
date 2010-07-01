@@ -15,7 +15,7 @@ public class DefectFacadeMock implements IDefectFacade {
     public List<Defect> foundDefects { get; set; }
 
     public List<V1FieldData> getFieldsData() {
-    	return new List<V1FieldData>();
+        return new List<V1FieldData>();
     }
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
@@ -26,16 +26,16 @@ public class DefectFacadeMock implements IDefectFacade {
         return CreatedDefectToken;
     }
 
-    public List<Defect> searchForDefects(String queryString, Boolean includeClosedItems) {
-    	if(searchException != null) {
-    		throw searchException;
-    	}
+    public List<Defect> searchForDefects(DefectSearchCriteria searchCriteria) {
+        if(searchException != null) {
+            throw searchException;
+        }
 
-    	return foundDefects;
+        return foundDefects;
     }
 
     public void setSearchException(Exception ex) {
-    	searchException = ex;
+        searchException = ex;
     }
 
     public void setCreateDefectInVersionOneException(Exception ex) {
@@ -46,34 +46,34 @@ public class DefectFacadeMock implements IDefectFacade {
         assignDefectResultValue = new AssignDefectPassedData(caseData, defectData);
 
         if(assignDefectToCaseException != null) {
-        	throw assignDefectToCaseException;
+            throw assignDefectToCaseException;
         }
     }
 
     public void unassignDefectFromCase(Case caseData) {
-    	assignDefectResultValue = new AssignDefectPassedData(caseData, null);
+        assignDefectResultValue = new AssignDefectPassedData(caseData, null);
 
-    	if (unassignDefectFromCaseException != null) {
-    		throw unassignDefectFromCaseException;
-    	}
+        if (unassignDefectFromCaseException != null) {
+            throw unassignDefectFromCaseException;
+        }
     }
 
     public void setAssignDefectToCaseException(Exception ex) {
-		assignDefectToCaseException = ex;
+        assignDefectToCaseException = ex;
     }
 
     public void setUnassignDefectFromCaseException(Exception ex) {
-		unassignDefectFromCaseException = ex;
+        unassignDefectFromCaseException = ex;
     }
 
     public void publishStatus(Case caseData) {
-    	if (publishStatusException != null) {
-    		throw publishStatusException;
-    	}
+        if (publishStatusException != null) {
+            throw publishStatusException;
+        }
     }
 
     public void setPublishStatusException(Exception ex) {
-    	publishStatusException = ex;
+        publishStatusException = ex;
     }
 
 
@@ -95,12 +95,12 @@ public class DefectFacadeMock implements IDefectFacade {
     }
 
     public class AssignDefectPassedData {
-    	public Case caseValue { get; private set; }
-    	public Defect defectValue { get; private set; }
+        public Case caseValue { get; private set; }
+        public Defect defectValue { get; private set; }
 
-    	public AssignDefectPassedData(Case caseValue, Defect defectValue) {
-    		this.caseValue = caseValue;
-    		this.defectValue = defectValue;
-    	}
+        public AssignDefectPassedData(Case caseValue, Defect defectValue) {
+            this.caseValue = caseValue;
+            this.defectValue = defectValue;
+        }
     }
  }

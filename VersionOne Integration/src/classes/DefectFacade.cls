@@ -9,7 +9,7 @@ public class DefectFacade implements IDefectFacade {
         this.connector = connector;
         this.settings = settings;
 
-        fieldsData.add(new V1FieldData('All', null));
+        fieldsData.add(new V1FieldData('All', new String[]{}));
         fieldsData.add(new V1FieldData('ID', new String[]{'Number'}));
         fieldsData.add(new V1FieldData('Title', new String[]{'Name'}));
         fieldsData.add(new V1FieldData('Description', new String[]{'Description'}));
@@ -142,9 +142,14 @@ public class DefectFacade implements IDefectFacade {
         return defectData.get(defectToken);
     }
 
-    public List<Defect> searchForDefects(String queryString, Boolean includeClosedItems) {
+    public List<Defect> searchForDefects(DefectSearchCriteria searchCriteria) {
+        String[] fields = resolveSearchField(searchCriteria.searchIn);
+        if (fields == null) {
+            throw new IntegrationException('There is no selected field for search.');
+        }
+
         try {
-            return connector.searchDefects(queryString, includeClosedItems);
+            return connector.searchDefects(searchCriteria.queryString, searchCriteria.includeClosedDefects);
         } catch(Exception ex) {
             throw new IntegrationException('Failed to lookup defects in VersionOne.');
         }
