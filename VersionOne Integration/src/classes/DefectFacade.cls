@@ -149,7 +149,7 @@ public class DefectFacade implements IDefectFacade {
         }
 
         try {
-            return connector.searchDefects(searchCriteria.queryString, searchCriteria.includeClosedDefects);
+            return connector.searchDefects(searchCriteria.queryString, searchCriteria.includeClosedDefects, fields);
         } catch(Exception ex) {
             throw new IntegrationException('Failed to lookup defects in VersionOne.');
         }
