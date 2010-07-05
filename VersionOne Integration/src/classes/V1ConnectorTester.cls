@@ -575,6 +575,7 @@ private class V1ConnectorTester {
     }
 
     static testMethod void searchDefectsTest() {
+    	String[] fields = new String[]{'Name', 'Number'};
     	Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
     	expectedDefect1.status = 'In Progress';
     	expectedDefect1.id = '2469';
@@ -594,7 +595,7 @@ private class V1ConnectorTester {
 		expectedDefect2.priority = '';
 		expectedDefect2.resolution = 'Fixed';
     	String searchPhrase = 'testing new functionality';
-    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&where=(Defect.AssetState!=\'Closed\')&sort=-CreateDateUTC' + createSearchQuery(searchPhrase);
+    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&where=(Defect.AssetState!=\'Closed\')&sort=-CreateDateUTC' + createSearchQuery(searchPhrase) + '&findin=Name,Number';
     	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
 						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
 							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
@@ -619,7 +620,7 @@ private class V1ConnectorTester {
         RequestorMock testRequestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, testRequestor);
 
-        List<Defect> defects = connector.searchDefects(searchPhrase, false);
+        List<Defect> defects = connector.searchDefects(searchPhrase, false, fields);
 
         System.assertEquals(2, defects.size());
 		System.assertEquals(expectedUrl, testRequestor.getSentUrl(0),'Incorrect request url.');
@@ -628,6 +629,7 @@ private class V1ConnectorTester {
     }
 
     static testMethod void searchDefectsWithClosedDefectsTest() {
+    	String[] fields = new String[0];
     	Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
     	expectedDefect1.status = 'In Progress';
     	expectedDefect1.id = '2469';
@@ -672,22 +674,22 @@ private class V1ConnectorTester {
         RequestorMock testRequestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, testRequestor);
 
-        List<Defect> defects = connector.searchDefects(searchPhrase, true);
+        List<Defect> defects = connector.searchDefects(searchPhrase, true, fields);
 
         System.assertEquals(2, defects.size());
 		System.assertEquals(expectedUrl, testRequestor.getSentUrl(0),'Incorrect request url.');
         System.assert(defectEquals(expectedDefect1, defects.get(0)), 'Incorrect data for defect 1');
         System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
     }
-    
+
     private static String createSearchQuery(string searchPhrase) {
     	List<String> parts = searchPhrase.trim().split(' ');
     	String query = '';
-    	
+
     	for(String part : parts) {
     		query += '&find=' + part;
     	}
-    	
+
     	return query;
     }
 

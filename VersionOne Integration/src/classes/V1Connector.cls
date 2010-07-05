@@ -11,6 +11,7 @@ public class V1Connector implements IV1Connector {
     public static final String UPDATE_REFERENCE_URL = 'rest-1.v1/Data/Defect/{0}';
     public static final String SEARCH_DEFECT_URL = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name{0}&sort=-CreateDateUTC{1}';
     public static final String SEARCH_WORD_TEMPLATE = '&find={0}';
+    public static final String FIELDS_LIST_FOR_SEARCH_TEMPLATE = '&findin={0}';
     public static final String SEARCH_PART_FOR_CLOSED_DEFECT_URL = '&where=(Defect.AssetState!=\'Closed\')';
 
     public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
@@ -73,16 +74,18 @@ public class V1Connector implements IV1Connector {
         return defectData;
     }
 
-    public List<Defect> searchDefects(String query, Boolean isLookingInClosed) {
+    public List<Defect> searchDefects(String query, Boolean isLookingInClosed, String[] fieldsForSearch) {
     	List<Defect> defects = new List<Defect>();
-    	
+
     	String closedItemsFilter = isLookingInClosed ? '' : SEARCH_PART_FOR_CLOSED_DEFECT_URL;
     	String lookupQuery = '';
     	List<String> queryParts = query.trim().split(' ');
     	for(String queryPart : queryParts) {
     		lookupQuery += String.format(SEARCH_WORD_TEMPLATE, new String[] { queryPart });
     	}
-    	
+
+    	lookupQuery += getFieldsForSearch(fieldsForSearch);
+
     	String url = String.format(SEARCH_DEFECT_URL, new String[] { closedItemsFilter, lookupQuery });
 
         requestor.request(requestor.createRequest('', url, 'GET'));
@@ -94,6 +97,21 @@ public class V1Connector implements IV1Connector {
         	defects.add(getDefect(assetTag));
         }
         return defects;
+    }
+
+    private String getFieldsForSearch(String[] fieldsForSearch) {
+    	String fieldsForUrl = '';
+    	if (fieldsForSearch != null && !fieldsForSearch.isEmpty()) {
+    		String fields = '';
+    		for(Integer i=0; i<fieldsForSearch.size(); i++) {
+    			if (i > 0) {
+    				fields += ',';
+    			}
+    			fields += fieldsForSearch[i];
+    		}
+			fieldsForUrl = String.format(FIELDS_LIST_FOR_SEARCH_TEMPLATE, new String[] { fields });
+    	}
+    	return fieldsForUrl;
     }
 
     private Defect getDefect(XMLDom.Element asset) {

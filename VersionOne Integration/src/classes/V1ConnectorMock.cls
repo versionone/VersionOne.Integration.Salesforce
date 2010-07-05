@@ -24,10 +24,11 @@ public class V1ConnectorMock implements IV1Connector {
         return defectData;
     }
 
-	public List<Defect> searchDefects(String find, Boolean isLookingInClosed) {
+	public List<Defect> searchDefects(String query, Boolean isLookingInClosed, String[] fieldsForSearch) {
 		defectSearchCriteria = new DefectSearchCriteria();
-		defectSearchCriteria.queryString = find;
+		defectSearchCriteria.queryString = query;
 		defectSearchCriteria.includeClosedDefects = isLookingInClosed;
+		//defectSearchCriteria.searchIn = fieldsForSearch;
 
 		if(searchForDefectsException != null) {
 			throw searchForDefectsException;
@@ -98,7 +99,7 @@ public class V1ConnectorMock implements IV1Connector {
         if (creationWorkitemException != null) {
             throw creationWorkitemException;
         }
-        
+
         defectData.project = projectId;
         return createdWorkitemToken;
     }
