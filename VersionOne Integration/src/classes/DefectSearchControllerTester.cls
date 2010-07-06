@@ -64,6 +64,7 @@ private class DefectSearchControllerTester {
 
     	System.assertNotEquals(controller.getDefects(), null);
     	System.assertEquals(controller.getDefects().size(), 1);
+    	System.assertEquals(controller.getDefects().get(0).isAssignedToCurrentCase, false);
     	System.assertEquals(controller.displayDefectTable, true);
     	System.assertEquals(controller.paginator.getRecordCount(), 1);
     	System.assertEquals(ApexPages.getMessages().size(), 0);
