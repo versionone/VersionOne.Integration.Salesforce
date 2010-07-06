@@ -231,6 +231,36 @@ private class DefectFacadeTester {
         } catch(IntegrationException ex) {
             System.assert(false, 'We\'re not expecting connector to fail this time');
         }
+        String[] fields = connector.getFieldsForSearch();
+        System.assertEquals(1, fields.size());
+        System.assertEquals('Name', fields.get(0));
+
+        criteria.searchIn = 'All';
+        try {
+            defectFacade.searchForDefects(criteria);
+        } catch(IntegrationException ex) {
+            System.assert(false, 'We\'re not expecting connector to fail this time');
+        }
+        fields = connector.getFieldsForSearch();
+        System.assertEquals(4, fields.size());//'Number', 'Name', 'Description', 'Reference'
+        System.assertEquals('Number', fields.get(0));
+        System.assertEquals('Name', fields.get(1));
+        System.assertEquals('Description', fields.get(2));
+        System.assertEquals('Reference', fields.get(3));
+    }
+
+    static testMethod void searchForDefectsWithIncorrectFieldDataTest() {
+        V1ConnectorMock connector = new V1ConnectorMock();
+        IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
+        DefectSearchCriteria criteria = new DefectSearchCriteria();
+        criteria.includeClosedDefects = true;
+        criteria.queryString = 'test';
+        criteria.searchIn = 'incorrect data';
+        try {
+            defectFacade.searchForDefects(criteria);
+            System.assert(false, 'This line should not be reached - we\'re awaiting an exception');
+        } catch(IntegrationException ex) {
+        }
     }
 
     private static Case createCase(String caseSubject, String caseDescription, Boolean isAssigned) {

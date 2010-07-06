@@ -10,6 +10,7 @@ public class V1ConnectorMock implements IV1Connector {
     private Exception removeLinkFromDefectException;
     private Exception updateReferenceForDefectException;
     private Exception searchForDefectsException;
+    private String[] fieldsForSearch;
 
     public static final String defaultProjectId = '1010';
     public static final String developmentStatus = 'In Progress';
@@ -28,6 +29,7 @@ public class V1ConnectorMock implements IV1Connector {
 		defectSearchCriteria = new DefectSearchCriteria();
 		defectSearchCriteria.queryString = query;
 		defectSearchCriteria.includeClosedDefects = isLookingInClosed;
+		this.fieldsForSearch = fieldsForSearch;
 		//defectSearchCriteria.searchIn = fieldsForSearch;
 
 		if(searchForDefectsException != null) {
@@ -35,6 +37,10 @@ public class V1ConnectorMock implements IV1Connector {
 		}
 
 		return null;
+	}
+
+	public String[] getFieldsForSearch() {
+		return fieldsForSearch;
 	}
 
 	public void setSearchForDefectsException(Exception ex) {

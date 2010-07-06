@@ -9,7 +9,7 @@ public class DefectFacade implements IDefectFacade {
         this.connector = connector;
         this.settings = settings;
 
-        fieldsData.add(new V1FieldData('All', new String[]{}));
+        fieldsData.add(new V1FieldData('All', new String[]{'Number', 'Name', 'Description', 'Reference'}));
         fieldsData.add(new V1FieldData('ID', new String[]{'Number'}));
         fieldsData.add(new V1FieldData('Title', new String[]{'Name'}));
         fieldsData.add(new V1FieldData('Description', new String[]{'Description'}));

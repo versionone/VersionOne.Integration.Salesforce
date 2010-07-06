@@ -629,7 +629,7 @@ private class V1ConnectorTester {
     }
 
     static testMethod void searchDefectsWithClosedDefectsTest() {
-    	String[] fields = new String[0];
+    	String[] fields = new String[]{'Number', 'Name', 'Description', 'Reference'};
     	Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
     	expectedDefect1.status = 'In Progress';
     	expectedDefect1.id = '2469';
@@ -649,7 +649,7 @@ private class V1ConnectorTester {
 		expectedDefect2.priority = '';
 		expectedDefect2.resolution = 'Fixed';
     	String searchPhrase = 'testing new functionality';
-    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&sort=-CreateDateUTC' + createSearchQuery(searchPhrase);
+    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&sort=-CreateDateUTC' + createSearchQuery(searchPhrase) + '&findin=Number,Name,Description,Reference';
     	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
 						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
 							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
