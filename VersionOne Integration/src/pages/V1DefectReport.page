@@ -1,0 +1,40 @@
+<apex:page controller="V1DefectReportController" title="Report">
+<script>
+	function disableElement(id) {
+		var ele = document.getElementById(id);
+	    ele.disabled = true;
+	    ele.className = 'btnDisabled';
+	}
+	function enableElement(id) {
+		var ele = document.getElementById(id);
+	    ele.disabled = false;
+	    ele.className = 'btn';
+	}
+</script>
+    <apex:actionStatus startText="Getting closed defects from VersionOne..." id="getDefectsFromVersionOne"/>
+    <apex:form >
+        <apex:pageBlock title="Closed Defects Report" mode="edit">
+            <apex:pageBlockSection columns="1" id="dateInput">
+                <apex:pageBlockSectionItem >
+					<apex:outputPanel >
+	                	<apex:outputLabel value="Show closed defects since:" for="date" />&nbsp;
+						<apex:inputText size="30" id="date" tabindex="1" maxlength="255" value="{!UserDate}"/>
+						<apex:commandButton value="Show" id="showButton" status="getDefectsFromVersionOne"
+							 action="{!findClosedDefects}"
+							 onclick="disableElement('{!$Component.showButton}');"
+							 oncomplete="enableElement('{!$Component.showButton}');" />
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+		    </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" id="tableOutput">
+	            <apex:pageBlockSectionItem >
+				    <apex:pageBlockTable value="{!ClosedDefectData}" var="item" id="defectTable">
+				        <apex:column >
+				        	<apex:facet name="header">Action</apex:facet>
+				        </apex:column>
+					</apex:pageBlockTable>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>
