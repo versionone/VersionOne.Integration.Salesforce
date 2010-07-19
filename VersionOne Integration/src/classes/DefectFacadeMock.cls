@@ -3,6 +3,7 @@ public class DefectFacadeMock implements IDefectFacade {
     public static final String CreatedDefectToken = 'Defect:2345';
     public static final String DefectTitle = 'Defect Title';
     public static final String DefectDescription = 'Defect Description';
+    private final List<ClosedDefect> closedDefects = new List<ClosedDefect>();
     private static Exception createDefectInVersionOneException;
     private static Exception defectByIdException;
     private static Exception assignDefectToCaseException;
@@ -94,6 +95,10 @@ public class DefectFacadeMock implements IDefectFacade {
         defectByIdException = ex;
     }
 
+	public List<ClosedDefect> getClosedDefects(String dateString) {
+		return closedDefects;
+	}
+
     public class AssignDefectPassedData {
         public Case caseValue { get; private set; }
         public Defect defectValue { get; private set; }
@@ -103,4 +108,5 @@ public class DefectFacadeMock implements IDefectFacade {
             this.defectValue = defectValue;
         }
     }
+
  }

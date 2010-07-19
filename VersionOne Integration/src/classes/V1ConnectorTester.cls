@@ -682,6 +682,54 @@ private class V1ConnectorTester {
         System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
     }
 
+    static testMethod void getClosedDefectsTest() {
+        String reference1 = '33';
+        ClosedDefect closedDefect1 = new ClosedDefect();
+		closedDefect1.changeDate = '2009-10-21T08:57:50.493';
+        closedDefect1.defectName = 'testing defect 1';
+        closedDefect1.casesId = reference1.split(';');
+        closedDefect1.defectNumber = 'D-01032';
+        closedDefect1.defectToken = 'Defect:1077';
+        String reference2 = '4354304350893';
+        ClosedDefect closedDefect2 = new ClosedDefect();
+		closedDefect2.changeDate = '2009-10-21T08:57:52.493';
+        closedDefect2.defectName = 'testing defect 2';
+        closedDefect2.casesId = reference2.split(';');
+        closedDefect2.defectNumber = 'D-01033';
+        closedDefect2.defectToken = 'Defect:1078';
+        String queueId = '12345667';
+        String sourceId = '1010';
+        String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect1.defectToken + '">' +
+                            '<Attribute name="Number">' + closedDefect1.defectNumber + '</Attribute>' +
+                            '<Attribute name="ChangeDateUTC">' + closedDefect1.changeDate + '</Attribute>' +
+							'<Attribute name="Name">' + closedDefect1.defectName + '</Attribute>' +
+                            '<Attribute name="Reference">' + reference1 + '</Attribute>' +
+                        '</Asset>' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect2.defectToken + '">' +
+                            '<Attribute name="Number">' + closedDefect2.defectNumber + '</Attribute>' +
+                            '<Attribute name="ChangeDateUTC">' + closedDefect2.changeDate + '</Attribute>' +
+							'<Attribute name="Name">' + closedDefect2.defectName + '</Attribute>' +
+                            '<Attribute name="Reference">' + reference2 + '</Attribute>' +
+                        '</Asset>' +
+                      '</Assets>';
+        Settings testSettings = Settings.getTestSettings();
+        RequestorMock testRequestor = new RequestorMock(xml, 200);
+        testSettings.setSourceId(sourceId);
+        String expectedDate = '2009-10-20T09:57:33';
+        V1Connector connector = new V1Connector(testSettings, testRequestor);
+
+        List<ClosedDefect> closedDefects = connector.getClosedDefects(Datetime.newInstance(2009, 10, 20, 9, 57, 33));
+
+        System.assertEquals(2, closedDefects.size(), 'Incorrect number of assets.');
+        assertContains(closedDefect1, closedDefects, 'Can\'t find closed defect');
+        assertContains(closedDefect2, closedDefects, 'Can\'t find closed defect');
+        //System.assertEquals('2009-10-21 08:57:50', testSettings.getLastDateChangeAsset().format('yyyy-MM-dd HH:mm:ss'), 'Incorrect latest datetime of chaned asset.');
+        System.assertEquals(1, testRequestor.numberRequest, 'Wrong requests count.');
+        System.assert(testRequestor.getSentUrl(0).contains('Source=\'StorySource:' + sourceId), 'Incorrect request url: ' + testRequestor.getSentUrl(0));
+        System.assert(testRequestor.getSentUrl(0).contains(expectedDate), 'Incorrect request url.');
+    }
+
     private static String createSearchQuery(string searchPhrase) {
     	List<String> parts = searchPhrase.trim().split(' ');
     	String query = '';
@@ -692,6 +740,7 @@ private class V1ConnectorTester {
 
     	return query;
     }
+
 
     private static Boolean defectEquals(Defect defect1, Defect defect2) {
     	Boolean result = true;
@@ -707,5 +756,29 @@ private class V1ConnectorTester {
     	result = result && defect1.isClosed == defect2.isClosed;
 
     	return result;
+    }
+
+    static void assertContains(ClosedDefect expect, List<ClosedDefect> actuals, String msg) {
+        Boolean contains = false;
+        for (ClosedDefect actual : actuals) {
+            if (actual.casesId == expect.casesId && expect.changeDate.equals(actual.changeDate) &&
+            	expect.defectName.equals(actual.defectName) && expect.defectNumber.equals(actual.defectNumber) &&
+            	expect.defectToken.equals(actual.defectToken)) {
+                contains = true;
+                break;
+            }
+        }
+        System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
+    }
+
+    static void assertContains (String expect, List<String> actuals, String msg) {
+        Boolean contains = false;
+        for (String o : actuals) {
+            if (o.equals(expect)) {
+                contains = true;
+                break;
+            }
+        }
+        System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
     }
 }

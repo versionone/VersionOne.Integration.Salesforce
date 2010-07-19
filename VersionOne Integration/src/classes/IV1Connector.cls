@@ -62,4 +62,11 @@ public interface IV1Connector {
     * Returns current settings for connector.
     **/
     Settings getSettings();
+
+    /**
+    * Request information about closed defects since specified date,
+    * dateData - since this date will be gathered all closed defects.
+    * Return: defects which were closed since the date.
+    **/
+    List<ClosedDefect> getClosedDefects(DateTime dateData);
 }

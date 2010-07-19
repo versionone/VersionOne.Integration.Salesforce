@@ -155,6 +155,10 @@ public class DefectFacade implements IDefectFacade {
         }
     }
 
+    public List<ClosedDefect> getClosedDefects(String dateString) {
+    	return connector.getClosedDefects(null);
+    }
+
     private String removeInfoAboutAssociationFromDefect(String id) {
         String notRemovedData = '';
 

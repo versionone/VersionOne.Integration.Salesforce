@@ -45,4 +45,10 @@ public interface IDefectFacade {
     * includeClosedItems  - flag determining whether to include closed defects in search result or not
     **/
     List<Defect> searchForDefects(DefectSearchCriteria searchCriteria);
+
+    /**
+    * Lookup closed VersionOne defects.
+    * dateString 	- date since will lookup closed defects.
+    **/
+    List<ClosedDefect> getClosedDefects(String dateString);
 }

@@ -1,7 +1,7 @@
 public class V1Connector implements IV1Connector {
 
     public static final String DATA_URL = 'rest-1.v1/Data/';
-    public static final String CLOSED_WORKITEMS_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Number,ChangeDateUTC,Reference&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'\'Closed\'\'{1})';
+    public static final String CLOSED_WORKITEMS_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Name,Number,ChangeDateUTC,Reference&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'\'Closed\'\'{1})';
     public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'\'{0}\'\'';
     public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
     public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'\'{1}\'\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
@@ -356,5 +356,46 @@ public class V1Connector implements IV1Connector {
     **/
     public Settings getSettings() {
         return settings;
+    }
+
+    public List<ClosedDefect> getClosedDefects(DateTime dateData) {
+
+        List<ClosedDefect> closedDefects = new List<ClosedDefect>();
+        String dateRestriction = '';
+        if (dateData != null) {
+            dateRestriction = ';ChangeDateUTC>\'' + dateData.format('yyyy-MM-dd\'T\'HH:mm:ss') + '\'';
+        }
+        //Send the request, and get a response
+        String url = String.format(CLOSED_WORKITEMS_URL, new String[]{settings.getSourceId(), dateRestriction});
+        requestor.request(requestor.createRequest('', url, 'GET'));
+        validateResponse();
+        XMLDom xmlParser = new XMLDom();
+        xmlParser.parseFromString(requestor.getBody());
+        XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
+        DateTime latestDate = settings.getLastDateChangeAsset();
+        for (XMLDom.Element asset : assetTags) {
+        	ClosedDefect closedDefectData = new ClosedDefect();
+			closedDefectData.changeDate = getValue('ChangeDateUTC', asset.childNodes);
+            closedDefectData.defectName = getValue('Name', asset.childNodes);
+            String reference = getValue('Reference', asset.childNodes);
+            closedDefectData.casesId = reference.split(';');
+            closedDefectData.defectNumber = getValue('Number', asset.childNodes);
+            closedDefectData.defectToken = asset.getAttribute('id');
+
+            closedDefects.add(closedDefectData);
+            /*
+            DateTime testDate = convertToDateTime(changeDateUTC);
+            if (latestDate == null || testDate > latestDate) {
+                latestDate = testDate;
+            }
+            */
+        }
+        /*
+        if (latestDate != settings.getLastDateChangeAsset()) {
+            // here we set date
+            // settings will be stored in the Syncronizer class, if no one case has to be updated
+            settings.setLastDateChangeAsset(latestDate);
+        }*/
+        return closedDefects;
     }
 }
