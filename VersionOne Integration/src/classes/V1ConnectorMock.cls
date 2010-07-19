@@ -6,7 +6,7 @@ public class V1ConnectorMock implements IV1Connector {
     private Exception createLinkException;
     public String createdWorkitemToken;
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
-    private List<String> closedDefects = new List<String>();
+    private List<ClosedDefect> closedDefects = new List<ClosedDefect>();
     private Exception removeLinkFromDefectException;
     private Exception updateReferenceForDefectException;
     private Exception searchForDefectsException;
@@ -120,6 +120,11 @@ public class V1ConnectorMock implements IV1Connector {
 
     public Settings getSettings() {
         return Settings.getTestSettings();
+    }
+
+    public List<ClosedDefect> getClosedDefects(DateTime dateData) {
+        throwException();
+        return closedDefects;
     }
 
     /**
