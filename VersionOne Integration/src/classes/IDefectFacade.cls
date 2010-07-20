@@ -50,5 +50,5 @@ public interface IDefectFacade {
     * Lookup closed VersionOne defects.
     * dateString 	- date since will lookup closed defects.
     **/
-    List<ClosedDefect> getClosedDefects(String dateString);
+    List<Defect> getClosedDefects(String dateString);
 }

@@ -684,33 +684,37 @@ private class V1ConnectorTester {
 
     static testMethod void getClosedDefectsTest() {
         String reference1 = '33';
-        ClosedDefect closedDefect1 = new ClosedDefect();
+        Defect closedDefect1 = new Defect('testing defect 1', null);
 		closedDefect1.changeDate = '2009-10-21T08:57:50.493';
-        closedDefect1.defectName = 'testing defect 1';
         closedDefect1.casesId = reference1.split(';');
-        closedDefect1.defectNumber = 'D-01032';
-        closedDefect1.defectToken = 'Defect:1077';
+        closedDefect1.assetNumber = 'D-01032';
+        closedDefect1.token = 'Defect:1077';
+        closedDefect1.id = '1077';
+        closedDefect1.isClosed = true;
         String reference2 = '4354304350893';
-        ClosedDefect closedDefect2 = new ClosedDefect();
+        Defect closedDefect2 = new Defect('testing defect 2', null);
 		closedDefect2.changeDate = '2009-10-21T08:57:52.493';
-        closedDefect2.defectName = 'testing defect 2';
         closedDefect2.casesId = reference2.split(';');
-        closedDefect2.defectNumber = 'D-01033';
-        closedDefect2.defectToken = 'Defect:1078';
+        closedDefect2.assetNumber = 'D-01033';
+        closedDefect2.token = 'Defect:1078';
+        closedDefect2.id = '1078';
+        closedDefect2.isClosed = true;
         String queueId = '12345667';
         String sourceId = '1010';
         String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
-                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect1.defectToken + '">' +
-                            '<Attribute name="Number">' + closedDefect1.defectNumber + '</Attribute>' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect1.token + '">' +
+                            '<Attribute name="Number">' + closedDefect1.assetNumber + '</Attribute>' +
                             '<Attribute name="ChangeDateUTC">' + closedDefect1.changeDate + '</Attribute>' +
-							'<Attribute name="Name">' + closedDefect1.defectName + '</Attribute>' +
+							'<Attribute name="Name">' + closedDefect1.title + '</Attribute>' +
                             '<Attribute name="Reference">' + reference1 + '</Attribute>' +
+                            '<Attribute name="AssetState">128</Attribute>' +
                         '</Asset>' +
-                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect2.defectToken + '">' +
-                            '<Attribute name="Number">' + closedDefect2.defectNumber + '</Attribute>' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect2.token + '">' +
+                            '<Attribute name="Number">' + closedDefect2.assetNumber + '</Attribute>' +
                             '<Attribute name="ChangeDateUTC">' + closedDefect2.changeDate + '</Attribute>' +
-							'<Attribute name="Name">' + closedDefect2.defectName + '</Attribute>' +
+							'<Attribute name="Name">' + closedDefect2.title + '</Attribute>' +
                             '<Attribute name="Reference">' + reference2 + '</Attribute>' +
+                            '<Attribute name="AssetState">128</Attribute>' +
                         '</Asset>' +
                       '</Assets>';
         Settings testSettings = Settings.getTestSettings();
@@ -719,7 +723,7 @@ private class V1ConnectorTester {
         String expectedDate = '2009-10-20T09:57:33';
         V1Connector connector = new V1Connector(testSettings, testRequestor);
 
-        List<ClosedDefect> closedDefects = connector.getClosedDefects(Datetime.newInstance(2009, 10, 20, 9, 57, 33));
+        List<Defect> closedDefects = connector.getClosedDefects(Datetime.newInstance(2009, 10, 20, 9, 57, 33));
 
         System.assertEquals(2, closedDefects.size(), 'Incorrect number of assets.');
         assertContains(closedDefect1, closedDefects, 'Can\'t find closed defect');
@@ -754,27 +758,17 @@ private class V1ConnectorTester {
     	result = result && defect1.status == defect2.status;
     	result = result && defect1.resolution == defect2.resolution;
     	result = result && defect1.isClosed == defect2.isClosed;
+    	result = result && defect1.isClosed == defect2.isClosed;
+    	result = result && defect1.casesId == defect2.casesId;
+    	result = result && defect1.changeDate == defect2.changeDate;
 
     	return result;
     }
 
-    static void assertContains(ClosedDefect expect, List<ClosedDefect> actuals, String msg) {
+    static void assertContains(Defect expect, List<Defect> actuals, String msg) {
         Boolean contains = false;
-        for (ClosedDefect actual : actuals) {
-            if (actual.casesId == expect.casesId && expect.changeDate.equals(actual.changeDate) &&
-            	expect.defectName.equals(actual.defectName) && expect.defectNumber.equals(actual.defectNumber) &&
-            	expect.defectToken.equals(actual.defectToken)) {
-                contains = true;
-                break;
-            }
-        }
-        System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
-    }
-
-    static void assertContains (String expect, List<String> actuals, String msg) {
-        Boolean contains = false;
-        for (String o : actuals) {
-            if (o.equals(expect)) {
+        for (Defect actual : actuals) {
+            if (defectEquals(expect, actual)) {
                 contains = true;
                 break;
             }

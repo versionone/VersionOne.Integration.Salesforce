@@ -155,8 +155,20 @@ public class DefectFacade implements IDefectFacade {
         }
     }
 
-    public List<ClosedDefect> getClosedDefects(String dateString) {
-    	return connector.getClosedDefects(null);
+    public List<Defect> getClosedDefects(String dateString) {
+    	return connector.getClosedDefects(getDateTime(dateString));
+    }
+
+    private DateTime getDateTime(String dateString) {
+    	if (dateString == null || dateString == '') {
+    		return null;
+    	}
+    	String[] dateTimeDate = dateString.split(' ');
+    	if (dateTimeDate.size() == 1) {
+    		dateString += ' 00:00:00';
+    	}
+
+    	return datetime.valueOf(dateString);
     }
 
     private String removeInfoAboutAssociationFromDefect(String id) {
