@@ -156,10 +156,14 @@ public class DefectFacade implements IDefectFacade {
     }
 
     public List<Defect> getClosedDefects(String dateString) {
-    	return connector.getClosedDefects(getDateTime(dateString));
+    	try {
+    		return connector.getClosedDefects(getDateTime(dateString));
+    	} catch(Exception ex) {
+            throw new IntegrationException('Failed to get closed defects.');
+        }
     }
 
-    private DateTime getDateTime(String dateString) {
+    public static DateTime getDateTime(String dateString) {
     	if (dateString == null || dateString == '') {
     		return null;
     	}
