@@ -19,7 +19,7 @@ public class DefectTablePaginator {
         transient Integer min = 0;
         transient Integer max = 0;
         Integer pageNumber = getTotalPageNumber();
-        
+
         if (newPageIndex > pageNumber) {
             min = pageNumber * pageSize;
             max = newPageIndex * pageSize;
@@ -27,23 +27,23 @@ public class DefectTablePaginator {
             max = newPageIndex * pageSize;
             min = max - pageSize;
         }
-        
+
         List<DefectWrapper> currentDefects = new List<DefectWrapper>();
         for(DefectWrapper defect : defects) {
             counter++;
-            
+
             if (counter > min && counter <= max) {
                 currentDefects.add(defect);
             }
         }
         return currentDefects;
     }
-    
+
     public Integer pageSize {
     	get {
-    		return pageSizeValue; 
+    		return pageSizeValue;
     	}
-    	private set { 
+    	private set {
     		if(value < 1) {
     			throw new IntegrationException('Page size must be positive number, at least 1');
     		}
@@ -65,11 +65,11 @@ public class DefectTablePaginator {
     public List<Integer> getPagesList() {
         List<Integer> pagesNumbers = new List<Integer>();
         Integer amountPages = getTotalPageNumber();
-        
+
         for (Integer i = 0; i < amountPages; i++) {
             pagesNumbers.add(i);
         }
-        
+
         return pagesNumbers;
     }
 
@@ -101,7 +101,7 @@ public class DefectTablePaginator {
                 totalPageNumber++;
             }
         }
-        
+
         return totalPageNumber;
     }
 
@@ -111,7 +111,7 @@ public class DefectTablePaginator {
             pageNumber = newPageIndex;
             hasData = true;
         }
-        
+
         if (pageDefects == null || pageDefects.size() == 0) {
             hasData = false;
         }

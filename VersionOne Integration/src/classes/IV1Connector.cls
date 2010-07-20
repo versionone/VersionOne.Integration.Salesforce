@@ -68,5 +68,5 @@ public interface IV1Connector {
     * dateData - since this date will be gathered all closed defects.
     * Return: defects which were closed since the date.
     **/
-    List<ClosedDefect> getClosedDefects(DateTime dateData);
+    List<Defect> getClosedDefects(DateTime dateData);
 }
