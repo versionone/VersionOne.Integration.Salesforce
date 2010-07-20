@@ -124,7 +124,10 @@ public class V1Connector implements IV1Connector {
         defectData.isClosed = getValue('AssetState', asset.childNodes) == Defect.ClosedAssetState;
         defectData.priority = getValue('Priority.Name', asset.childNodes);
         defectData.status = getValue('Status.Name', asset.childNodes);
-		defectData.changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes)).format('yyyy-MM-dd hh:mm:ss');
+        DateTime changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes));
+        if (changeDate != null) {
+			defectData.changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes)).format('yyyy-MM-dd hh:mm:ss');
+        }
         String reference = getValue('Reference', asset.childNodes);
         if (reference != null) {
         	defectData.casesId = reference.split(';');
@@ -193,6 +196,9 @@ public class V1Connector implements IV1Connector {
     * if millisecond equals 0 - convert to yyyy-MM-ddTHH:mm:ss-1
     **/
     public static DateTime convertToDateTime(String utcDate) {
+    	if (utcDate == null) {
+    		return null;
+    	}
         String[] dateTimeData = utcDate.split('T');
         String[] dateData = dateTimeData[0].split('-');
         String[] timeData = dateTimeData[1].split(':');

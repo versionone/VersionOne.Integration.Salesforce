@@ -685,7 +685,7 @@ private class V1ConnectorTester {
     static testMethod void getClosedDefectsTest() {
         String reference1 = '33';
         Defect closedDefect1 = new Defect('testing defect 1', null);
-		closedDefect1.changeDate = '2009-10-21T08:57:50.493';
+		closedDefect1.changeDate = '2009-10-21 08:57:50';
         closedDefect1.casesId = reference1.split(';');
         closedDefect1.assetNumber = 'D-01032';
         closedDefect1.token = 'Defect:1077';
@@ -693,7 +693,7 @@ private class V1ConnectorTester {
         closedDefect1.isClosed = true;
         String reference2 = '4354304350893';
         Defect closedDefect2 = new Defect('testing defect 2', null);
-		closedDefect2.changeDate = '2009-10-21T08:57:52.493';
+		closedDefect2.changeDate = '2009-10-21 08:57:52';
         closedDefect2.casesId = reference2.split(';');
         closedDefect2.assetNumber = 'D-01033';
         closedDefect2.token = 'Defect:1078';
@@ -704,14 +704,14 @@ private class V1ConnectorTester {
         String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
                         '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect1.token + '">' +
                             '<Attribute name="Number">' + closedDefect1.assetNumber + '</Attribute>' +
-                            '<Attribute name="ChangeDateUTC">' + closedDefect1.changeDate + '</Attribute>' +
+                            '<Attribute name="ChangeDateUTC">2009-10-21T08:57:50.493</Attribute>' +
 							'<Attribute name="Name">' + closedDefect1.title + '</Attribute>' +
                             '<Attribute name="Reference">' + reference1 + '</Attribute>' +
                             '<Attribute name="AssetState">128</Attribute>' +
                         '</Asset>' +
                         '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect2.token + '">' +
                             '<Attribute name="Number">' + closedDefect2.assetNumber + '</Attribute>' +
-                            '<Attribute name="ChangeDateUTC">' + closedDefect2.changeDate + '</Attribute>' +
+                            '<Attribute name="ChangeDateUTC">2009-10-21T08:57:52.493</Attribute>' +
 							'<Attribute name="Name">' + closedDefect2.title + '</Attribute>' +
                             '<Attribute name="Reference">' + reference2 + '</Attribute>' +
                             '<Attribute name="AssetState">128</Attribute>' +

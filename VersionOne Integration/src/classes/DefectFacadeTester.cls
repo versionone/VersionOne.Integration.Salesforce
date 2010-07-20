@@ -263,6 +263,15 @@ private class DefectFacadeTester {
         }
     }
 
+    static testMethod void getDateTimeTest() {
+    	String dateTime1 = '2009-10-21 08:57:50';
+    	String dateTime2 = '2009-10-21';
+    	String format = 'yyyy-MM-dd HH:mm:ss';
+        System.assertEquals(null, DefectFacade.getDateTime(null));
+        System.assertEquals(dateTime1, DefectFacade.getDateTime(dateTime1).format(format));
+        System.assertEquals(dateTime2+' 00:00:00', DefectFacade.getDateTime(dateTime2).format(format));
+    }
+
     private static Case createCase(String caseSubject, String caseDescription, Boolean isAssigned) {
         Case caseValue = new Case(
             Subject = 'case1',
