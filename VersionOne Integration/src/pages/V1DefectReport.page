@@ -12,29 +12,95 @@
 	}
 </script>
     <apex:actionStatus startText="Getting closed defects from VersionOne..." id="getDefectsFromVersionOne"/>
+    <apex:actionStatus startText="Updating closed Defects report..." id="updatingDefectsTable"/>
+
     <apex:form >
         <apex:pageBlock title="Closed Defects Report" mode="edit">
             <apex:pageBlockSection columns="1" id="dateInput">
                 <apex:pageBlockSectionItem >
 					<apex:outputPanel >
 	                	<apex:outputLabel value="Show closed defects since:" for="date" />&nbsp;
-						<apex:inputText size="30" id="date" tabindex="1" maxlength="255" value="{!UserDate}"/>
+						<apex:inputText size="30" id="date" tabindex="1" maxlength="255" value="{!UserDate}"/> (<i>YYYY-MM-DD</i>)&nbsp;
 						<apex:commandButton value="Show" id="showButton" status="getDefectsFromVersionOne"
 							 action="{!findClosedDefects}"
 							 onclick="disableElement('{!$Component.showButton}');"
-							 oncomplete="enableElement('{!$Component.showButton}');" />
+							 oncomplete="enableElement('{!$Component.showButton}');"
+							 rerender="tableOutput, errorMessages"/>
 					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
 		    </apex:pageBlockSection>
             <apex:pageBlockSection columns="1" id="tableOutput">
 	            <apex:pageBlockSectionItem >
-				    <apex:pageBlockTable value="{!ClosedDefectData}" var="item" id="defectTable">
+                    <apex:outputPanel style="text-align: right;" rendered="{!paginator.hasData}">
+					    <br/>
+					    <apex:repeat value="{!paginator.pagesList}" var="pageNumber"  rendered="{!paginator.totalPageNumber > 1}">
+	                        <apex:outputPanel rendered="{!(pageNumber + 1) != paginator.pageNumber}">
+	                            <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
+	                             value="javascript:return false;">{!pageNumber + 1} </apex:outputLink>
+	                        </apex:outputPanel>
+	                        <apex:outputPanel rendered="{!(pageNumber + 1) == paginator.pageNumber}">
+	                            <apex:outputText value="{!pageNumber + 1}"/>
+	                        </apex:outputPanel>
+	                        &nbsp;&nbsp;
+	                    </apex:repeat>
+			            <span style="font-size: x-small;">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
+			             out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/>
+			             in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/>&nbsp;results &nbsp;&nbsp;</span>
+			            <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}"
+			             disabled="{!paginator.previousButtonDisabled}" rerender="tableOutput" status="updatingDefectsTable"/>
+			            <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" rerender="tableOutput"
+			             disabled="{!paginator.nextButtonDisabled}" status="updatingDefectsTable" />
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+	            <apex:pageBlockSectionItem >
+				    <apex:pageBlockTable value="{!paginator.defects}" var="item" id="defectTable" rendered="{!displayClosedDefectsTable}">
 				        <apex:column >
-				        	<apex:facet name="header">Action</apex:facet>
+				        	<apex:facet name="header">ID</apex:facet>
+				        	<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank">{!item.defectPart.assetNumber}</apex:outputLink>
+				        </apex:column>
+				        <apex:column >
+				        	<apex:facet name="header">Name</apex:facet>
+				        	<apex:outputText value="{!item.defectPart.title}"/>
+				        </apex:column>
+				        <apex:column >
+				        	<apex:facet name="header">Cases</apex:facet>
+						    <apex:repeat value="{!item.defectPart.casesId}" var="caseId" >
+					        	<apex:outputText value="{!caseId}"/>&nbsp;
+					        </apex:repeat>
+				        </apex:column>
+				        <apex:column >
+				        	<apex:facet name="header">Date</apex:facet>
+				        	<apex:outputText value="{!item.defectPart.changeDate}"/>
 				        </apex:column>
 					</apex:pageBlockTable>
 				</apex:pageBlockSectionItem>
+	            <apex:pageBlockSectionItem >
+                    <apex:outputPanel style="text-align: right;" rendered="{!paginator.hasData}">
+					    <br/>
+					    <apex:repeat value="{!paginator.pagesList}" var="pageNumber"  rendered="{!paginator.totalPageNumber > 1}">
+	                        <apex:outputPanel rendered="{!(pageNumber + 1) != paginator.pageNumber}">
+	                            <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
+	                             value="javascript:return false;">{!pageNumber + 1} </apex:outputLink>
+	                        </apex:outputPanel>
+	                        <apex:outputPanel rendered="{!(pageNumber + 1) == paginator.pageNumber}">
+	                            <apex:outputText value="{!pageNumber + 1}"/>
+	                        </apex:outputPanel>
+	                        &nbsp;&nbsp;
+	                    </apex:repeat>
+			            <span style="font-size: x-small;">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
+			             out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/>
+			             in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/>&nbsp;results &nbsp;&nbsp;</span>
+			            <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}"
+			             disabled="{!paginator.previousButtonDisabled}" rerender="tableOutput" status="updatingDefectsTable"/>
+			            <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" rerender="tableOutput"
+			             disabled="{!paginator.nextButtonDisabled}" status="updatingDefectsTable" />
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
 			</apex:pageBlockSection>
 		</apex:pageBlock>
+		<apex:actionFunction name="goToPage" action="{!goToPage}" rerender="tableOutput" status="updatingDefectsTable">
+		    <apex:param name="pageNumber" value="" assignTo="{!pageNumber}" />
+		</apex:actionFunction>
+		<apex:pageMessages id="errorMessages"/>
 	</apex:form>
 </apex:page>
