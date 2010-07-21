@@ -36,7 +36,23 @@ private class V1ConnectorTester {
 
     static testMethod void convertToDateTimeTest2() {
         String changeDateUTC = '2009-10-21T08:57:50.000';
-        String expectedDateTime = '2009-10-21 08:57:49';
+        String expectedDateTime = '2009-10-21 08:57:50';
+
+        DateTime test = V1Connector.convertToDateTime(changeDateUTC);
+        System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');
+    }
+
+    static testMethod void convertToDateTimeTest3() {
+        String changeDateUTC = '2009-10-21 08:57:50.000';
+        String expectedDateTime = '2009-10-21 08:57:50';
+
+        DateTime test = V1Connector.convertToDateTime(changeDateUTC);
+        System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');
+    }
+
+    static testMethod void convertToDateTimeTest4() {
+        String changeDateUTC = '2009-10-21 08:57:50.500';
+        String expectedDateTime = '2009-10-21 08:57:51';
 
         DateTime test = V1Connector.convertToDateTime(changeDateUTC);
         System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');

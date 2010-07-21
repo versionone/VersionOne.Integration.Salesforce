@@ -191,7 +191,7 @@ public class V1Connector implements IV1Connector {
 
 
     /**
-    * Converts string with yyyy-MM-ddTHH:mm:ss.MMM format to DateTime object
+    * Converts string with yyyy-MM-ddTHH:mm:ss.MMM or yyyy-MM-dd HH:mm:ss.MMM format to DateTime object
     * If millisecond more then 0 - convert to yyyy-MM-ddTHH:mm:ss
     * if millisecond equals 0 - convert to yyyy-MM-ddTHH:mm:ss-1
     **/
@@ -200,6 +200,9 @@ public class V1Connector implements IV1Connector {
     		return null;
     	}
         String[] dateTimeData = utcDate.split('T');
+        if (dateTimeData.size() == 1 ) {
+        	dateTimeData  = utcDate.split(' ');
+        }
         String[] dateData = dateTimeData[0].split('-');
         String[] timeData = dateTimeData[1].split(':');
         Integer year = Integer.valueOf(dateData[0]);
@@ -210,9 +213,14 @@ public class V1Connector implements IV1Connector {
         Double secondAndMillisecond = Double.valueOf(timeData[2]);
         Integer second;
         if (secondAndMillisecond.intValue() == secondAndMillisecond ) {
-            second = secondAndMillisecond.intValue() - 1;
-        } else {
             second = secondAndMillisecond.intValue();
+        } else {
+        	String[] secAndMil = timeData[2].split('\\.');
+        	if (secAndMil.size() > 1 && Integer.valueOf(secAndMil[1]) > 499) {
+            	second = secondAndMillisecond.intValue() + 1;
+        	} else {
+        		second = secondAndMillisecond.intValue();
+        	}
         }
         return DateTime.newInstance(year, month, day, hour, minutes, second);
     }
@@ -383,7 +391,6 @@ public class V1Connector implements IV1Connector {
         XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
-        DateTime latestDate = settings.getLastDateChangeAsset();
         for (XMLDom.Element asset : assetTags) {
         	Defect closedDefectData = getDefect(asset);
 

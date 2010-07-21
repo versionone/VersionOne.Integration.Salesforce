@@ -175,7 +175,7 @@ private class DefectSearchControllerTester {
     private static DefectSearchController getController() {
         defectFacadeMockValue = new DefectFacadeMock();
         settingsValue = Settings.getTestSettings();
-        settingsValue.setProjectName(ProjectName);
+        settingsValue.setProjectName(projectName);
         DefectSearchController controller = new DefectSearchController(caseData);
         controller.defectFacade = defectFacadeMockValue;
         controller.Settings = settingsValue;
