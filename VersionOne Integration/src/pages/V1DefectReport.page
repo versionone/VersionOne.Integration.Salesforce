@@ -20,7 +20,7 @@
                 <apex:pageBlockSectionItem >
 					<apex:outputPanel >
 	                	<apex:outputLabel value="Show closed defects since:" for="date" />&nbsp;
-						<apex:inputText size="30" id="date" tabindex="1" maxlength="255" value="{!UserDate}"/> (<i>YYYY-MM-DD</i>)&nbsp;
+						<apex:inputText size="30" id="date" tabindex="1" maxlength="255" value="{!UserDate}"/> (<i>yyyy-mm-dd</i>)&nbsp;
 						<apex:commandButton value="Show" id="showButton" status="getDefectsFromVersionOne"
 							 action="{!findClosedDefects}"
 							 onclick="disableElement('{!$Component.showButton}');"
