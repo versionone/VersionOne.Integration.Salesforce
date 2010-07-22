@@ -38,6 +38,10 @@ public class V1DefectReportController {
     }
 
     public V1DefectReportController() {
+		Cookie lastDateTime = ApexPages.currentPage().getCookies().get('datetime');
+		if (lastDateTime != null) {
+			userDate = lastDateTime.getValue();
+		}
     }
 
 	public List<DefectWrapper> getClosedDefect() {
@@ -60,8 +64,13 @@ public class V1DefectReportController {
         try {
             List<Defect> defects = defectFacade.getClosedDefects(userDate);
             closedDefects = new List<DefectWrapper>();
+			DateTime latestDate = null;
             for(Defect defect : defects) {
                 closedDefects.add(new DefectWrapper(null, defect));
+                DateTime testDate = V1Connector.convertToDateTime(defect.changeDate);
+                if (latestDate == null || testDate > latestDate) {
+                	latestDate = testDate;
+                }
             }
 
             if(closedDefects.size() == 0) {
@@ -69,6 +78,15 @@ public class V1DefectReportController {
             }
 
             paginator = new DefectTablePaginator(ITEMS_PER_PAGE, closedDefects);
+
+			//DateTime nowDateTime = DateTime.now();
+			//Cookie newDateTime = new Cookie('datetime', DateTime.newInstanceGMT(nowDateTime.date(), nowDateTime.time()).format('yyyy-MM-dd hh:mm:ss'), null, 60*60*24*30*2, false);
+			if (latestDate != null) {
+            	//Cookie newDateTime = new Cookie('datetime', latestDate.format('yyyy-MM-dd hh:mm:ss'), null, 60*60*24*30*2, false);
+            	// store cookies during 2 months
+            	Cookie newDateTime = new Cookie('datetime', latestDate.format('yyyy-MM-dd'), null, 60*60*24*30*2, false);
+            	ApexPages.currentPage().setCookies(new Cookie[]{newDateTime});
+			}
         } catch(IntegrationException ex) {
             System.debug(ex.getMessage());
             addPageMessage(ApexPages.Severity.ERROR, ex.getMessage());
