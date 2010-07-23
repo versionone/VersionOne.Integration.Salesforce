@@ -51,7 +51,7 @@ private class V1ConnectorTester {
     }
 
     static testMethod void convertToDateTimeTest4() {
-        String changeDateUTC = '2009-10-21 08:57:50.500';
+        String changeDateUTC = '2009-10-21 08:57:50.501';
         String expectedDateTime = '2009-10-21 08:57:51';
 
         DateTime test = V1Connector.convertToDateTime(changeDateUTC);
