@@ -11,6 +11,20 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
     }
 
+    static testMethod void getCasesByCasesNumberTest() {
+        Case case1 = new Case(Subject='TestCase1');
+        Case case2 = new Case(Subject='TestCase2');
+        Case case3 = new Case(Subject='TestCase3');
+        Case case4 = new Case(Subject='TestCase4');
+		insert new Case[] {case1, case2, case3, case4};
+        case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
+        case3 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case3.Id];
+
+        Case[] newCase = V1CaseCollector.getCasesByCasesNumber(new String[]{case1.CaseNumber, case2.CaseNumber, case3.CaseNumber});
+        System.assertEquals(3, newCase.size(), 'Incorrect number of cases.');
+    }
+
     static testMethod void getCaseByCaseIdTest() {
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};

@@ -130,7 +130,8 @@ public class V1Connector implements IV1Connector {
         }
         String reference = getValue('Reference', asset.childNodes);
         if (reference != null) {
-        	defectData.casesId = reference.split(';');
+        	defectData.cases = V1CaseCollector.getCasesByCasesNumber(reference.split(';'));
+        	//defectData.casesNumber = reference.split(';');
         }
 
     	return defectData;
