@@ -2,8 +2,10 @@ public class V1DefectReportController {
 	private List<DefectWrapper> closedDefects = null;
 
 	public String userDate { get; set; }
-	public DefectTablePaginator paginator { get; private set; }
 	private final Integer ITEMS_PER_PAGE = 20;
+	private final String COOKIE_NAME = 'datetime';
+
+	public DefectTablePaginator paginator { get; private set; }
 
     private transient Settings innerSettings;
     public Settings settings {
@@ -38,7 +40,7 @@ public class V1DefectReportController {
     }
 
     public V1DefectReportController() {
-		Cookie lastDateTime = ApexPages.currentPage().getCookies().get('datetime');
+		Cookie lastDateTime = ApexPages.currentPage().getCookies().get(COOKIE_NAME);
 		if (lastDateTime != null) {
 			userDate = lastDateTime.getValue();
 		}
@@ -78,24 +80,21 @@ public class V1DefectReportController {
             }
 
             paginator = new DefectTablePaginator(ITEMS_PER_PAGE, closedDefects);
-
-			//DateTime nowDateTime = DateTime.now();
-			//Cookie newDateTime = new Cookie('datetime', DateTime.newInstanceGMT(nowDateTime.date(), nowDateTime.time()).format('yyyy-MM-dd hh:mm:ss'), null, 60*60*24*30*2, false);
-			if (latestDate != null) {
-            	//Cookie newDateTime = new Cookie('datetime', latestDate.format('yyyy-MM-dd hh:mm:ss'), null, 60*60*24*30*2, false);
-            	// store cookies during 2 months
-            	Cookie newDateTime = new Cookie('datetime', latestDate.format('yyyy-MM-dd'), null, 60*60*24*30*2, false);
-            	ApexPages.currentPage().setCookies(new Cookie[]{newDateTime});
-			}
-        } catch(IntegrationException ex) {
-            System.debug(ex.getMessage());
-            addPageMessage(ApexPages.Severity.ERROR, ex.getMessage());
+			storeCookie(latestDate);
         } catch (Exception ex) {
             System.debug(ex.getMessage());
             addPageMessage(ApexPages.Severity.ERROR, ex.getMessage());
         }
 
 		return null;
+	}
+
+	private void storeCookie(DateTime dateForCookie) {
+		if (dateForCookie != null) {
+        	// store cookies during 2 months
+        	Cookie newDateTime = new Cookie(COOKIE_NAME, dateForCookie.format('yyyy-MM-dd'), null, 60*60*24*30*2, false);
+        	ApexPages.currentPage().setCookies(new Cookie[]{newDateTime});
+		}
 	}
 
     private void addPageMessage(ApexPages.Severity severity, String text) {

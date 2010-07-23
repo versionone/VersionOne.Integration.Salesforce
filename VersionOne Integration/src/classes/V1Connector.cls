@@ -210,17 +210,12 @@ public class V1Connector implements IV1Connector {
         Integer day = Integer.valueOf(dateData[2]);
         Integer hour = Integer.valueOf(timeData[0]);
         Integer minutes = Integer.valueOf(timeData[1]);
-        Double secondAndMillisecond = Double.valueOf(timeData[2]);
+        Decimal secondAndMillisecond = Decimal.valueOf(timeData[2]);
         Integer second;
         if (secondAndMillisecond.intValue() == secondAndMillisecond ) {
             second = secondAndMillisecond.intValue();
         } else {
-        	String[] secAndMil = timeData[2].split('\\.');
-        	if (secAndMil.size() > 1 && Integer.valueOf(secAndMil[1]) > 499) {
-            	second = secondAndMillisecond.intValue() + 1;
-        	} else {
-        		second = secondAndMillisecond.intValue();
-        	}
+        	second = Math.round(secondAndMillisecond);
         }
         return DateTime.newInstance(year, month, day, hour, minutes, second);
     }
