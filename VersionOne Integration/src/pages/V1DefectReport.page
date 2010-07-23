@@ -64,8 +64,8 @@
 				        </apex:column>
 				        <apex:column >
 				        	<apex:facet name="header">Cases</apex:facet>
-						    <apex:repeat value="{!item.defectPart.casesId}" var="caseId" >
-					        	<apex:outputText value="{!caseId}"/>&nbsp;
+						    <apex:repeat value="{!item.defectPart.cases}" var="caseData" >
+						        <apex:outputLink value="/{!caseData.id}" target="_blank">{!caseData.caseNumber}</apex:outputLink>&nbsp;
 					        </apex:repeat>
 				        </apex:column>
 				        <apex:column >

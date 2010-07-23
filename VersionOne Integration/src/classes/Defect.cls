@@ -14,7 +14,8 @@ public class Defect {
     public Boolean isClosed{get; set;}
 
     //used only for closed defects report
-	public String[] casesId { get; set; }
+    public Case[] cases {get; set;}
+	//public String[] casesNumber { get; set; }
 	public String changeDate { get; set; }
 
 
