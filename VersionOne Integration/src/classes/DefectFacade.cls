@@ -79,7 +79,7 @@ public class DefectFacade implements IDefectFacade {
     public void assignDefectToCase(Case caseData, Defect defectData) {
         try {
             if(!defectData.isClosed) {
-                connector.updateReferenceForDefect(defectData.id, caseData.id);
+                connector.updateReferenceForDefect(defectData.id, caseData.CaseNumber);
             }
         } catch(Exception ex) {
             throw new IntegrationException('Failed to update VersionOne defect Reference field.');
@@ -108,8 +108,7 @@ public class DefectFacade implements IDefectFacade {
         if (caseData.V1DefectId__c == null || caseData.V1DefectId__c == '') {
             throw new IntegrationException('There is no defect assigned to the case.');
         }
-        String id = getDefectFromToken(caseData.V1DefectId__c);
-        String notRemovedData = removeInfoAboutAssociationFromDefect(id);
+        String notRemovedData = removeInfoAboutAssociationFromDefect(caseData);
 
         V1CaseCollector.updateCase(caseData, '', false, null);
 
@@ -175,7 +174,8 @@ public class DefectFacade implements IDefectFacade {
     	return datetime.valueOf(dateString);
     }
 
-    private String removeInfoAboutAssociationFromDefect(String id) {
+    private String removeInfoAboutAssociationFromDefect(Case caseData) {
+    	String Id = getDefectFromToken(caseData.V1DefectId__c);
         String notRemovedData = '';
 
         try {

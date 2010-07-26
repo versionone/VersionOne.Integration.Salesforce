@@ -5,7 +5,7 @@ public class V1Connector implements IV1Connector {
     public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'\'{0}\'\'';
     public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
     public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'\'{1}\'\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
-    public static final String DEFECT_REQUEST_URL = 'rest-1.v1/Data/Defect/{0}?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState';
+    public static final String DEFECT_REQUEST_URL = 'rest-1.v1/Data/Defect/{0}?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState,Reference';
     public static final String LINK_BY_DEFECT_ID_URL = 'rest-1.v1/Data/Link?sel=Name&where=(Asset=\'\'Defect:{0}\'\')';//'Defect:2345'
     public static final String DELETE_LINK_URL = 'rest-1.v1/Data/Link/{0}?op=Delete';
     public static final String UPDATE_REFERENCE_URL = 'rest-1.v1/Data/Defect/{0}';
@@ -53,6 +53,13 @@ public class V1Connector implements IV1Connector {
         if (defectData.isClosed) {
             return;
         }
+
+        if (defectData.cases != null && defectData.cases.size() > 0) {
+        	for(Case caseData : defectData.cases) {
+        		referenceValue = caseData.CaseNumber + ';' + referenceValue;
+        	}
+        }
+
         String url = String.format(UPDATE_REFERENCE_URL, new String[]{defectId});
 
         String body = '<Asset id="Defect:' + defectId + '">' +
@@ -129,6 +136,7 @@ public class V1Connector implements IV1Connector {
 			defectData.changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes)).format('yyyy-MM-dd hh:mm:ss');
         }
         String reference = getValue('Reference', asset.childNodes);
+        System.debug('!!!!reference=' + reference);
         if (reference != null) {
         	defectData.cases = V1CaseCollector.getCasesByCasesNumber(reference.split(';'));
         	//defectData.casesNumber = reference.split(';');
