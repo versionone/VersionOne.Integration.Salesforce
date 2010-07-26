@@ -407,6 +407,11 @@ private class V1ConnectorTester {
     }
 
     static testMethod void getDefectByIdTest() {
+        Case case1 = new Case(Subject='TestCase1');
+        Case case2 = new Case(Subject='TestCase2');
+		insert new Case[] {case1, case2};
+        case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
         String defectId = '2345';
         String defectToken = 'Defect:2345';
         String resolution = 'Duplicate';
@@ -416,7 +421,8 @@ private class V1ConnectorTester {
         String name = 'for paging testing 1';
         String priority = 'Medium';
         String status = 'In Progress';
-        String expectedUrl = 'rest-1.v1/Data/Defect/' + defectId + '?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState';
+        String reference = case1.CaseNumber + ';' + case2.CaseNumber;
+        String expectedUrl = 'rest-1.v1/Data/Defect/' + defectId + '?sel=Name,Description,Status.Name,Number,Scope.Name,ResolutionReason.Name,Priority.Name,AssetState,Reference';
         Settings testSettings = Settings.getTestSettings();
         String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="' + defectToken + '">' +
                         '<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
@@ -427,6 +433,7 @@ private class V1ConnectorTester {
                         '<Attribute name="Status.Name">' + status + '</Attribute>' +
                         '<Attribute name="Name">' + name + '</Attribute>' +
                         '<Attribute name="Priority.Name">' + priority + '</Attribute>' +
+                        '<Attribute name="Reference">' + reference + '</Attribute>' +
                       '</Asset>';
         IRequestor requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
@@ -441,6 +448,7 @@ private class V1ConnectorTester {
         System.assertEquals(name, defectData.title, 'Incorrect defect name.');
         System.assertEquals(priority, defectData.priority, 'Incorrect defect priority.');
         System.assertEquals(true, defectData.isClosed, 'Defect is closed!');
+        System.assertEquals(2, defectData.cases.size(), 'Incorrected amount of assigned cases.');
         System.assertEquals(expectedUrl, ((RequestorMock)requestor).getSentUrl(0), 'Incorrect requested URL.');
     }
 
@@ -548,6 +556,7 @@ private class V1ConnectorTester {
                         '<Attribute name="Status.Name">' + status + '</Attribute>' +
                         '<Attribute name="Name">' + name + '</Attribute>' +
                         '<Attribute name="Priority.Name">' + priority + '</Attribute>' +
+                        '<Attribute name="Reference"></Attribute>' +
                       '</Asset>';
         Settings testSettings = Settings.getTestSettings();
         RequestorMock requestor = new RequestorMock(xml, 200);
@@ -556,6 +565,44 @@ private class V1ConnectorTester {
         String expectionUrl = 'rest-1.v1/Data/Defect/' + defectId;
 
         connector.updateReferenceForDefect(defectId, '');
+        System.assertEquals(expectionBody, requestor.getSentBody(1));
+        System.assertEquals(expectionUrl, requestor.getSentUrl(1));
+    }
+
+    static testMethod void updateReferenceForDefectWithAlreadyAssignedCasesTest() {
+        Case case1 = new Case(Subject='TestCase1');
+        Case case2 = new Case(Subject='TestCase2');
+		insert new Case[] {case1, case2};
+        case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
+        String defectId = '2345';
+        String resolution = 'Duplicate';
+        String project = 'SalesForce test';
+        String description = 'q2312313132';
+        String token = 'D-01398';
+        String name = 'for paging testing 1';
+        String priority = 'Medium';
+        String status = 'In Progress';
+        String reference = case1.CaseNumber + ';' + case2.CaseNumber;
+
+        String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="Defect:' + defectId + '">' +
+                        '<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
+                        '<Attribute name="Scope.Name">' + project + '</Attribute>' +
+                        '<Attribute name="Description">' + description + '</Attribute>' +
+                        '<Attribute name="Number">' + token + '</Attribute>' +
+                        '<Attribute name="AssetState">64</Attribute>' +
+                        '<Attribute name="Status.Name">' + status + '</Attribute>' +
+                        '<Attribute name="Name">' + name + '</Attribute>' +
+                        '<Attribute name="Priority.Name">' + priority + '</Attribute>' +
+                        '<Attribute name="Reference">' + case1.CaseNumber + '</Attribute>' +
+                      '</Asset>';
+        Settings testSettings = Settings.getTestSettings();
+        RequestorMock requestor = new RequestorMock(xml, 200);
+        V1Connector connector = new V1Connector(testSettings, requestor);
+        String expectionBody = '<Asset id="Defect:' + defectId + '"><Attribute act="set" name="Reference">' + reference + '</Attribute></Asset>';
+        String expectionUrl = 'rest-1.v1/Data/Defect/' + defectId;
+
+        connector.updateReferenceForDefect(defectId, case2.CaseNumber);
         System.assertEquals(expectionBody, requestor.getSentBody(1));
         System.assertEquals(expectionUrl, requestor.getSentUrl(1));
     }
@@ -578,6 +625,7 @@ private class V1ConnectorTester {
                         '<Attribute name="Status.Name">' + status + '</Attribute>' +
                         '<Attribute name="Name">' + name + '</Attribute>' +
                         '<Attribute name="Priority.Name">' + priority + '</Attribute>' +
+                        '<Attribute name="Reference"></Attribute>' +
                       '</Asset>';
         Settings testSettings = Settings.getTestSettings();
         RequestorMock requestor = new RequestorMock(xml, 200);

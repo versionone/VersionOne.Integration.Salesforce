@@ -281,7 +281,7 @@ private class DefectFacadeTester {
             V1DefectId__c = isAssigned ? DEFECT_TOKEN : null
         );
         insert caseValue;
-        caseValue = [SELECT Subject, Id, Description, Product__c, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :caseValue.Id];
+        caseValue = [SELECT Subject, Id, Description, Product__c, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c, CaseNumber FROM Case WHERE Id = :caseValue.Id];
         return caseValue;
     }
 
