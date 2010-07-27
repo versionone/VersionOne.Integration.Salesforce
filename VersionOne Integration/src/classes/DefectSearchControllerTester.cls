@@ -40,7 +40,8 @@ private class DefectSearchControllerTester {
 
     static testMethod void searchFailureTest() {
     	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	defectFacadeMockValue.setSearchException(new IntegrationException());
+    	defectFacadeMockValue.addException(DefectFacadeMock.SEARCH_EXCEPTION, new IntegrationException());
+
 
     	controller.getSearchCriteria().queryString = 'test';
     	controller.getSearchCriteria().includeClosedDefects = false;
@@ -72,7 +73,7 @@ private class DefectSearchControllerTester {
 
     static testMethod void assignDefectFailureTest() {
     	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	defectFacadeMockValue.setAssignDefectToCaseException(new IntegrationException());
+    	defectFacadeMockValue.addException(DefectFacadeMock.ASSIGN_DEFECT_TO_CASE_EXCEPTION, new IntegrationException());
     	controller.assignedDefectToken = assignedDefectToken;
     	setupFoundDefect();
 
@@ -87,7 +88,8 @@ private class DefectSearchControllerTester {
 
     static testMethod void assignDefectWarningTest() {
     	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	defectFacadeMockValue.setAssignDefectToCaseException(new IntegrationException('', Severity.WARNING));
+    	//defectFacadeMockValue.setAssignDefectToCaseException(new IntegrationException('', Severity.WARNING));
+    	defectFacadeMockValue.addException(DefectFacadeMock.ASSIGN_DEFECT_TO_CASE_EXCEPTION, new IntegrationException('', Severity.WARNING));
     	controller.assignedDefectToken = assignedDefectToken;
     	setupFoundDefect();
 
@@ -119,7 +121,8 @@ private class DefectSearchControllerTester {
 
     static testMethod void unassignDefectFailureTest() {
     	DefectSearchController controller = getControllerWithAssignedDefect();
-    	defectFacadeMockValue.setUnassignDefectFromCaseException(new IntegrationException());
+    	//defectFacadeMockValue.setUnassignDefectFromCaseException(new IntegrationException());
+    	defectFacadeMockValue.addException(DefectFacadeMock.UNASSIGN_DEFECT_FROM_CASE_EXCEPTION, new IntegrationException());
 
     	controller.unassignDefectFromCase();
 

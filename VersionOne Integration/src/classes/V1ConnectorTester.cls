@@ -453,6 +453,9 @@ private class V1ConnectorTester {
     }
 
     static testMethod void removeLinkFromDefectTest() {
+        Case case1 = new Case(Subject='TestCase1');
+		insert new Case[] {case1};
+        case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         String defectId = '2345';
         String linkId = '2346';
         Settings testSettings = Settings.getTestSettings();
@@ -460,43 +463,54 @@ private class V1ConnectorTester {
         String expectedUrl2 = 'rest-1.v1/Data/Link/' + linkId + '?op=Delete';
         String xml = '<Assets total="1" pageSize="2147483647" pageStart="0">' +
                         '<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId + '" id="Link:' + linkId + '">' +
-                        '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
+                        '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + ' #' + case1.CaseNumber + '</Attribute>' +
                         '</Asset>' +
                      '</Assets>';
         RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        connector.removeLinkFromDefect(defectId);
+        connector.removeLinkFromDefect(defectId, case1);
+
         System.assertEquals(expectedUrl1, requestor.getSentUrl(0), 'Incorrect requested URL for link.');
         System.assertEquals(expectedUrl2, requestor.getSentUrl(1), 'Incorrect requested URL for deleting link.');
     }
 
     static testMethod void removeLinkFromDefectWithMultipleLinksTest() {
+        Case case1 = new Case(Subject='TestCase1');
+        Case case2 = new Case(Subject='TestCase2');
+		insert new Case[] {case1, case2};
+        case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
         String defectId = '2345';
         String linkId = '2346';
         String linkId2 = '2347';
         Settings testSettings = Settings.getTestSettings();
         String expectedUrl1 = 'rest-1.v1/Data/Link?sel=Name&where=(Asset=\'Defect:' + defectId + '\')';
         String expectedUrl2 = 'rest-1.v1/Data/Link/' + linkId + '?op=Delete';
-        String expectedUrl3 = 'rest-1.v1/Data/Link/' + linkId2 + '?op=Delete';
         String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
                         '<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId + '" id="Link:' + linkId + '">' +
-                            '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
+                            '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + ' #' + case1.CaseNumber + '</Attribute>' +
                         '</Asset>' +
                         '<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId2 + '" id="Link:' + linkId2 + '">' +
-                            '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
+                            '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + ' #' + case2.CaseNumber + '</Attribute>' +
                         '</Asset>' +
                       '</Assets>';
         RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        connector.removeLinkFromDefect(defectId);
+        connector.removeLinkFromDefect(defectId, case1);
         System.assertEquals(expectedUrl1, requestor.getSentUrl(0), 'Incorrect requested URL for link.');
         System.assertEquals(expectedUrl2, requestor.getSentUrl(1), 'Incorrect requested URL for link.');
-        System.assertEquals(expectedUrl3, requestor.getSentUrl(2), 'Incorrect requested URL for link.');
+        try {
+            System.assertEquals(null, requestor.getSentUrl(2));
+            System.assert(false, 'This cannot be reached. Have to be only 2 requests');
+        } catch (Exception ex){}
     }
 
     static testMethod void removeLinkFromDefectWithMultipleLinksButRemoveOnlyOneTest() {
+        Case case1 = new Case(Subject='TestCase1');
+		insert new Case[] {case1};
+        case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         String defectId = '2345';
         String linkId = '2346';
         Settings testSettings = Settings.getTestSettings();
@@ -504,7 +518,7 @@ private class V1ConnectorTester {
         String expectedUrl2 = 'rest-1.v1/Data/Link/' + linkId + '?op=Delete';
         String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
                         '<Asset href="/VersionOne/rest-1.v1/Data/Link/' + linkId + '" id="Link:' + linkId + '">' +
-                            '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + '</Attribute>' +
+                            '<Attribute name="Name">' + V1Connector.LINK_NAME_TO_CASE + ' #' + case1.CaseNumber + '</Attribute>' +
                         '</Asset>' +
                         '<Asset href="/VersionOne/rest-1.v1/Data/Link/2415" id="Link:2415">' +
                             '<Attribute name="Name">test2</Attribute>' +
@@ -513,7 +527,7 @@ private class V1ConnectorTester {
         RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        connector.removeLinkFromDefect(defectId);
+        connector.removeLinkFromDefect(defectId, case1);
         System.assertEquals(expectedUrl1, requestor.getSentUrl(0), 'Incorrect requested URL for link.');
         System.assertEquals(expectedUrl2, requestor.getSentUrl(1), 'Incorrect requested URL for link.');
         try {
@@ -523,6 +537,9 @@ private class V1ConnectorTester {
     }
 
     static testMethod void removeLinkFromDefectButNoLinkTest() {
+        Case case1 = new Case(Subject='TestCase1');
+		insert new Case[] {case1};
+        case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         String defectId = '2345';
         String linkId = '2346';
         Settings testSettings = Settings.getTestSettings();
@@ -533,7 +550,7 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         try {
-            connector.removeLinkFromDefect(defectId);
+            connector.removeLinkFromDefect(defectId, case1);
             System.assert(false, 'This cannot be reached.');
         } catch (V1RequestException ex){}
     }

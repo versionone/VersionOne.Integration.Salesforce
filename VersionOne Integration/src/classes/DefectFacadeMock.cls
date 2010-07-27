@@ -3,12 +3,14 @@ public class DefectFacadeMock implements IDefectFacade {
     public static final String CreatedDefectToken = 'Defect:2345';
     public static final String DefectTitle = 'Defect Title';
     public static final String DefectDescription = 'Defect Description';
-    private static Exception createDefectInVersionOneException;
-    private static Exception defectByIdException;
-    private static Exception assignDefectToCaseException;
-    private static Exception unassignDefectFromCaseException;
-    private static Exception publishStatusException;
-    private static Exception searchException;
+
+    private static final Map<String, Exception> exceptions = new Map<String, Exception>();
+    public static final String CREATE_DEFECT_IN_V1_EXCEPTION = 'createDefectInVersionOneException';
+    public static final String DEFECT_BY_ID_EXCEPTION = 'defectByIdException';
+    public static final String ASSIGN_DEFECT_TO_CASE_EXCEPTION = 'assignDefectToCaseException';
+    public static final String UNASSIGN_DEFECT_FROM_CASE_EXCEPTION = 'unassignDefectFromCaseException';
+    public static final String PUBLISH_STATUS_EXCEPTION = 'publishStatusException';
+    public static final String SEARCH_EXCEPTION = 'searchException';
 
     public AssignDefectPassedData assignDefectResultValue { get; private set; }
 
@@ -20,67 +22,68 @@ public class DefectFacadeMock implements IDefectFacade {
     }
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
-        System.debug('createDefectInVersionOneException=' + createDefectInVersionOneException);
-        if (createDefectInVersionOneException != null) {
-            throw createDefectInVersionOneException;
+        System.debug('createDefectInVersionOneException=' + exceptions.get('createDefectInVersionOneException'));
+        if (exceptions.get('createDefectInVersionOneException') != null) {
+            throw exceptions.get('createDefectInVersionOneException');
         }
         return CreatedDefectToken;
     }
 
     public List<Defect> searchForDefects(DefectSearchCriteria searchCriteria) {
-        if(searchException != null) {
-            throw searchException;
+        if(exceptions.get('searchException') != null) {
+            throw exceptions.get('searchException');
         }
 
         return foundDefects;
     }
-
+/*
     public void setSearchException(Exception ex) {
-        searchException = ex;
+        exceptions.put('searchException', ex);
     }
+
 
     public void setCreateDefectInVersionOneException(Exception ex) {
-        createDefectInVersionOneException = ex;
+    	exceptions.put('createDefectInVersionOneException', ex);
     }
-
+    */
     public void assignDefectToCase(Case caseData, Defect defectData) {
         assignDefectResultValue = new AssignDefectPassedData(caseData, defectData);
 
-        if(assignDefectToCaseException != null) {
-            throw assignDefectToCaseException;
+        if(exceptions.get('assignDefectToCaseException') != null) {
+            throw exceptions.get('assignDefectToCaseException');
         }
     }
 
     public void unassignDefectFromCase(Case caseData) {
         assignDefectResultValue = new AssignDefectPassedData(caseData, null);
 
-        if (unassignDefectFromCaseException != null) {
-            throw unassignDefectFromCaseException;
+        if (exceptions.get('unassignDefectFromCaseException') != null) {
+            throw exceptions.get('unassignDefectFromCaseException');
         }
     }
-
+/*
     public void setAssignDefectToCaseException(Exception ex) {
-        assignDefectToCaseException = ex;
+        exceptions.put('assignDefectToCaseException', ex);
     }
 
     public void setUnassignDefectFromCaseException(Exception ex) {
-        unassignDefectFromCaseException = ex;
+    	exceptions.put('unassignDefectFromCaseException', ex);
     }
-
+*/
     public void publishStatus(Case caseData) {
-        if (publishStatusException != null) {
-            throw publishStatusException;
+        if (exceptions.get('publishStatusException') != null) {
+            throw exceptions.get('publishStatusException');
         }
     }
-
+/*
     public void setPublishStatusException(Exception ex) {
-        publishStatusException = ex;
+    	exceptions.put('publishStatusException', ex);
     }
-
+*/
 
     public Defect getDefectByToken(String defectToken){
-        if (defectByIdException != null) {
-            throw defectByIdException;
+        if (exceptions.get('defectByIdException') != null) {
+            throw exceptions.get('defectByIdException');
         }
         Defect defectData = new Defect('title', 'description');
         defectData.id = CreatedDefectToken;
@@ -90,13 +93,18 @@ public class DefectFacadeMock implements IDefectFacade {
 
         return defectData;
     }
-
+/*
     public void setGetDefectByIdException(Exception ex) {
-        defectByIdException = ex;
+    	exceptions.put('defectByIdException', ex);
     }
+*/
 
 	public List<Defect> getClosedDefects(String dateString) {
 		return closedDefects;
+	}
+
+	public void addException(String name, Exception ex) {
+		exceptions.put(name, ex);
 	}
 
     public class AssignDefectPassedData {

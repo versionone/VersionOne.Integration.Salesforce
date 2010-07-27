@@ -27,7 +27,7 @@ public class V1Connector implements IV1Connector {
         this.requestor = requestor;
     }
 
-    public void removeLinkFromDefect(String defectId) {
+    public void removeLinkFromDefect(String defectId, Case caseData) {
         String url = String.format(LINK_BY_DEFECT_ID_URL, new String[]{defectId});
         requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
@@ -40,7 +40,7 @@ public class V1Connector implements IV1Connector {
         for (XMLDom.Element asset : assets) {
             String name = getValue('Name', asset.childNodes);
             String linkId = asset.getAttribute('id').split(':')[1];
-            if (linkId != '' && name == LINK_NAME_TO_CASE) {
+            if (linkId != '' && name == LINK_NAME_TO_CASE + ' #' + caseData.CaseNumber) {
                 url = String.format(DELETE_LINK_URL, new String[]{linkId});
                 requestor.request(requestor.createRequest('', url, 'POST'));
                 validateResponse();
