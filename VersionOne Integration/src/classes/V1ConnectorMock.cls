@@ -10,6 +10,7 @@ public class V1ConnectorMock implements IV1Connector {
     private Exception removeLinkFromDefectException;
     private Exception updateReferenceForDefectException;
     private Exception searchForDefectsException;
+    private Exception deleteReferenceInDefectException;
     private String[] fieldsForSearch;
 
     public static final String defaultProjectId = '1010';
@@ -69,6 +70,17 @@ public class V1ConnectorMock implements IV1Connector {
         updateReferenceForDefectException = ex;
     }
 
+    public void deleteReferenceInDefect(String defectId, String caseNumberToDelete) {
+        throwException();
+        if (deleteReferenceInDefectException != null) {
+            throw deleteReferenceInDefectException;
+        }
+    }
+
+    public void setDeleteReferenceInDefectException(Exception ex) {
+        deleteReferenceInDefectException = ex;
+    }
+
     public String getSourceId() {
         throwException();
         return sourceId;
@@ -123,8 +135,7 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     public List<Defect> getClosedDefects(DateTime dateData) {
-        throwException();
-        return closedDefects;
+        return null;
     }
 
     /**

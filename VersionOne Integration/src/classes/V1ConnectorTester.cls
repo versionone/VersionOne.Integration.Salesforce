@@ -229,7 +229,7 @@ private class V1ConnectorTester {
         String body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
                         '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
-                        '<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
+                        '<Attribute act="set" name="Name">SalesForce Case #' + case1.CaseNumber + '</Attribute>' +
                         '<Relation act="set" name="Asset">' +
                             '<Asset idref="' + defectId + '"/>' +
                         '</Relation>' +
@@ -255,7 +255,7 @@ private class V1ConnectorTester {
         String body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
                         '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
-                        '<Attribute act="set" name="Name">SalesForce Case</Attribute>' +
+                        '<Attribute act="set" name="Name">SalesForce Case #' + case1.CaseNumber + '</Attribute>' +
                         '<Relation act="set" name="Asset">' +
                             '<Asset idref="' + defectId + '"/>' +
                         '</Relation>' +
@@ -636,6 +636,45 @@ private class V1ConnectorTester {
             System.assertEquals(null, requestor.getSentUrl(1));
             System.assert(false, 'This cannot be reached. Have to be only 1 request');
         } catch (Exception ex){}
+    }
+
+    static testMethod void deleteReferenceInDefectTest() {
+        Case case1 = new Case(Subject='TestCase1');
+        Case case2 = new Case(Subject='TestCase2');
+		insert new Case[] {case1, case2};
+        case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
+        String defectId = '2345';
+        String resolution = 'Duplicate';
+        String project = 'SalesForce test';
+        String description = 'q2312313132';
+        String token = 'D-01398';
+        String name = 'for paging testing 1';
+        String priority = 'Medium';
+        String status = 'In Progress';
+        String reference = case1.CaseNumber + ';' + case2.CaseNumber;
+
+        String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="Defect:' + defectId + '">' +
+                        '<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
+                        '<Attribute name="Scope.Name">' + project + '</Attribute>' +
+                        '<Attribute name="Description">' + description + '</Attribute>' +
+                        '<Attribute name="Number">' + token + '</Attribute>' +
+                        '<Attribute name="AssetState">64</Attribute>' +
+                        '<Attribute name="Status.Name">' + status + '</Attribute>' +
+                        '<Attribute name="Name">' + name + '</Attribute>' +
+                        '<Attribute name="Priority.Name">' + priority + '</Attribute>' +
+                        '<Attribute name="Reference">' + reference + '</Attribute>' +
+                      '</Asset>';
+
+        Settings testSettings = Settings.getTestSettings();
+        RequestorMock requestor = new RequestorMock(xml, 200);
+        V1Connector connector = new V1Connector(testSettings, requestor);
+        String expectionBody = '<Asset id="Defect:' + defectId + '"><Attribute act="set" name="Reference">' + case1.CaseNumber + '</Attribute></Asset>';
+        String expectionUrl = 'rest-1.v1/Data/Defect/' + defectId;
+
+        connector.deleteReferenceInDefect(defectId, case2.CaseNumber);
+        System.assertEquals(expectionBody, requestor.getSentBody(1));
+        System.assertEquals(expectionUrl, requestor.getSentUrl(1));
     }
 
     static testMethod void searchDefectsTest() {

@@ -179,7 +179,7 @@ public class DefectFacade implements IDefectFacade {
         String notRemovedData = '';
 
         try {
-            connector.updateReferenceForDefect(id, '');
+            connector.deleteReferenceInDefect(id, caseData.CaseNumber);
         } catch (Exception ex) {
             notRemovedData = 'Reference';
         }

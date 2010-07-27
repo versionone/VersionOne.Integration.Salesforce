@@ -60,6 +60,30 @@ public class V1Connector implements IV1Connector {
         	}
         }
 
+        updateReference(referenceValue, defectId);
+    }
+
+    public void deleteReferenceInDefect(String defectId, String caseNumberToDelete) {
+        Defect defectData = getDefectById(defectId);
+        if (defectData.isClosed) {
+            return;
+        }
+		String reference = '';
+        if (defectData.cases != null) {
+        	for(Case caseData : defectData.cases) {
+        		if (caseData.CaseNumber != caseNumberToDelete) {
+        			if (reference != '') {
+        				reference = reference + ';';
+        			}
+        			reference = reference + caseData.CaseNumber;
+        		}
+        	}
+        }
+
+        updateReference(reference, defectId);
+    }
+
+    private void updateReference(String referenceValue, String defectId) {
         String url = String.format(UPDATE_REFERENCE_URL, new String[]{defectId});
 
         String body = '<Asset id="Defect:' + defectId + '">' +
@@ -316,7 +340,7 @@ public class V1Connector implements IV1Connector {
         String body = '<Asset>' +
                         attributeNode('OnMenu', 'true') +
                         attributeNode('URL', 'https://na7.salesforce.com/' + caseData.Id) +
-                        attributeNode('Name', LINK_NAME_TO_CASE) +
+                        attributeNode('Name', LINK_NAME_TO_CASE + ' #' + caseData.caseNumber) +
                         relationNode('Asset', workitemId) +
                        '</Asset>';
 
