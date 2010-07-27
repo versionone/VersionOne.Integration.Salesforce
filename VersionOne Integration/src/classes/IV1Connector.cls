@@ -22,9 +22,17 @@ public interface IV1Connector {
 
 	/**
 	* Updates reference for the defect.
-	* defectId - defect id for updating.
+	* defectId 			- defect id for updating.
+	* referenceValue	- add this reference to defect reference.
 	**/
 	void updateReferenceForDefect(String defectId, String referenceValue);
+
+	/**
+	* Defect reference from the defect.
+	* defectId 			 - defect id for updating.
+	* caseNumberToDelete - remove this case number from the reference.
+	**/
+	void deleteReferenceInDefect(String defectId, String caseNumberToDelete);
 
     /**
     * Returns: find and return id of current source(from Settings).
