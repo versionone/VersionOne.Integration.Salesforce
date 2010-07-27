@@ -34,8 +34,9 @@ private class DefectControllerTester {
 
     static testMethod void createDefectWithExceptionTest() {
         DefectController controller = getControllerWithoutAssignedDefect();
-        IDefectFacade facade = controller.defectFacade;
-        ((DefectFacadeMock)facade).setCreateDefectInVersionOneException(new IntegrationException('test exception'));
+        DefectFacadeMock facade = (DefectFacadeMock)controller.defectFacade;
+        //((DefectFacadeMock)facade).setCreateDefectInVersionOneException(new IntegrationException('test exception'));
+        facade.addException('createDefectInVersionOneException', new IntegrationException('test exception'));
         controller.defectFacade = facade;
         controller.createDefect();
         Defect defect = controller.getCreatingDefect();
@@ -54,8 +55,9 @@ private class DefectControllerTester {
 
     static testMethod void getAssignedDefectWithExceptionTest() {
         DefectController controller = getControllerWithAssignedDefect();
-        IDefectFacade facade = controller.defectFacade;
-        ((DefectFacadeMock)facade).setGetDefectByIdException(new IntegrationException('test exception'));
+        DefectFacadeMock facade = (DefectFacadeMock)controller.defectFacade;
+        //((DefectFacadeMock)facade).setGetDefectByIdException(new IntegrationException('test exception'));
+        facade.addException('defectByIdException', new IntegrationException('test exception'));
         controller.defectFacade = facade;
 
         Defect defectData = controller.getAssignedDefect();
@@ -94,8 +96,9 @@ private class DefectControllerTester {
 
     static testMethod void unassignDefectWithExeptionTest() {
         DefectController controller = getControllerWithAssignedDefect();
-        IDefectFacade facade = controller.defectFacade;
-        ((DefectFacadeMock)facade).setUnassignDefectFromCaseException(new IntegrationException('test exception'));
+        DefectFacadeMock facade = (DefectFacadeMock)controller.defectFacade;
+        //((DefectFacadeMock)facade).setUnassignDefectFromCaseException(new IntegrationException('test exception'));
+        facade.addException('unassignDefectFromCaseException', new IntegrationException('test exception'));
         controller.defectFacade = facade;
 
         controller.unassignDefect();
@@ -113,8 +116,9 @@ private class DefectControllerTester {
 
     static testMethod void publishStatusWithExceptionTest() {
         DefectController controller = getControllerWithAssignedDefect();
-        IDefectFacade facade = controller.defectFacade;
-        ((DefectFacadeMock)facade).setPublishStatusException(new IntegrationException('test exception'));
+        DefectFacadeMock facade = (DefectFacadeMock)controller.defectFacade;
+        //((DefectFacadeMock)facade).setPublishStatusException(new IntegrationException('test exception'));
+        facade.addException('publishStatusException', new IntegrationException('test exception'));
         controller.defectFacade = facade;
 
         controller.publishStatus();

@@ -272,6 +272,18 @@ private class DefectFacadeTester {
         System.assertEquals(dateTime2+' 00:00:00', DefectFacade.getDateTime(dateTime2).format(format));
     }
 
+    static testMethod void getClosedDefectsWithExceptionTest() {
+        V1ConnectorMock connector = new V1ConnectorMock();
+        connector.setGettingClosedDefectsException(new IntegrationException());
+        IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
+
+        try {
+            connector.getClosedDefects(null);
+            System.assert(false, 'This line should not be reached - we\'re awaiting the IntegrationException exception');
+        } catch(IntegrationException ex) { }
+
+    }
+
     private static Case createCase(String caseSubject, String caseDescription, Boolean isAssigned) {
         Case caseValue = new Case(
             Subject = 'case1',

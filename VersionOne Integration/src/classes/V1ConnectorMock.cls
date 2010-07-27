@@ -11,6 +11,7 @@ public class V1ConnectorMock implements IV1Connector {
     private Exception updateReferenceForDefectException;
     private Exception searchForDefectsException;
     private Exception deleteReferenceInDefectException;
+    private Exception gettingClosedDefectsException;
     private String[] fieldsForSearch;
 
     public static final String defaultProjectId = '1010';
@@ -48,7 +49,7 @@ public class V1ConnectorMock implements IV1Connector {
 		searchForDefectsException = ex;
 	}
 
-    public void removeLinkFromDefect(String defectId) {
+    public void removeLinkFromDefect(String defectId, Case caseData) {
         throwException();
         if (removeLinkFromDefectException != null) {
             throw removeLinkFromDefectException;
@@ -135,8 +136,16 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     public List<Defect> getClosedDefects(DateTime dateData) {
+        if (gettingClosedDefectsException != null) {
+            throw gettingClosedDefectsException;
+        }
         return null;
     }
+
+    public void setGettingClosedDefectsException(Exception ex) {
+    	gettingClosedDefectsException = ex;
+    }
+
 
     /**
      * Enables exception throwing on next calls of any methods.

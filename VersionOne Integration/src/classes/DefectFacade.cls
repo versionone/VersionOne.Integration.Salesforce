@@ -185,7 +185,7 @@ public class DefectFacade implements IDefectFacade {
         }
 
         try {
-            connector.removeLinkFromDefect(id);
+            connector.removeLinkFromDefect(id, caseData);
         } catch (Exception ex) {
             if (notRemovedData != '') {
                 notRemovedData += ', ';

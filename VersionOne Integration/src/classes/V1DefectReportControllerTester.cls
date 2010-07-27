@@ -44,7 +44,8 @@ private class V1DefectReportControllerTester {
 
     static testMethod void findClosedDefectsWithExceptionTest() {
         V1DefectReportController controller = getController();
-        defectFacadeMockValue.setSearchException(new IntegrationException());
+        //defectFacadeMockValue.setSearchException(new IntegrationException());
+        defectFacadeMockValue.addException('searchException', new IntegrationException());
         controller.findClosedDefects();
 
 		Cookie lastDateTime = ApexPages.currentPage().getCookies().get('datetime');

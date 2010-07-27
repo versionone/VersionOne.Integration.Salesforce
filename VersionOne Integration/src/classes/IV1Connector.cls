@@ -17,8 +17,9 @@ public interface IV1Connector {
     /**
     * Removes link from defect in VersionOne if defect is not closed.
     * defectId  - defect id in the VersionOne.
+    * caseData  - link to this case need to delete.
     **/
-	void removeLinkFromDefect(String defectId);
+	void removeLinkFromDefect(String defectId, Case caseData);
 
 	/**
 	* Updates reference for the defect.
