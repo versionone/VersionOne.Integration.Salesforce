@@ -1,17 +1,18 @@
 public class V1ConnectorMock implements IV1Connector {
-
+    public static final String CREATION_WORKITEM_EXCEPTION = 'creationWorkitemException';
+    public static final String CREATION_LINK_EXCEPTION = 'createLinkException';
+    public static final String REMOVING_LINK_FROM_DEFECT_EXCEPTION = 'removeLinkFromDefectException';
+    public static final String UPDATING_REFERENCE_FOR_DEFECT_EXCEPTION = 'updateReferenceForDefectException';
+    public static final String SEARCHING_FOR_DEFECTS_EXCEPTION = 'searchForDefectsException';
+    public static final String DELETION_REFERENCE_IN_DEFECT_EXCEPTION = 'deleteReferenceInDefectException';
+    public static final String GETTING_CLOSED_DEFECTS_EXCEPTION = 'gettingClosedDefectsException';
     private String sourceId = '123456';
     private Exception ex;
-    private Exception creationWorkitemException;
-    private Exception createLinkException;
     public String createdWorkitemToken;
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
     private List<Defect> closedDefects = new List<Defect>();
-    private Exception removeLinkFromDefectException;
-    private Exception updateReferenceForDefectException;
-    private Exception searchForDefectsException;
-    private Exception deleteReferenceInDefectException;
-    private Exception gettingClosedDefectsException;
+
+    public final Map<String, Exception> exceptions = new Map<String, Exception>();
     private String[] fieldsForSearch;
 
     public static final String defaultProjectId = '1010';
@@ -34,8 +35,8 @@ public class V1ConnectorMock implements IV1Connector {
 		this.fieldsForSearch = fieldsForSearch;
 		//defectSearchCriteria.searchIn = fieldsForSearch;
 
-		if(searchForDefectsException != null) {
-			throw searchForDefectsException;
+		if(exceptions.get(SEARCHING_FOR_DEFECTS_EXCEPTION) != null) {
+			throw exceptions.get(SEARCHING_FOR_DEFECTS_EXCEPTION);
 		}
 
 		return null;
@@ -45,41 +46,25 @@ public class V1ConnectorMock implements IV1Connector {
 		return fieldsForSearch;
 	}
 
-	public void setSearchForDefectsException(Exception ex) {
-		searchForDefectsException = ex;
-	}
-
     public void removeLinkFromDefect(String defectId, Case caseData) {
         throwException();
-        if (removeLinkFromDefectException != null) {
-            throw removeLinkFromDefectException;
+        if (exceptions.get(REMOVING_LINK_FROM_DEFECT_EXCEPTION) != null) {
+            throw exceptions.get(REMOVING_LINK_FROM_DEFECT_EXCEPTION);
         }
-    }
-
-    public void setRemoveLinkFromDefectException(Exception ex) {
-        removeLinkFromDefectException = ex;
     }
 
     public void updateReferenceForDefect(String defectId, String referenceValue) {
         throwException();
-        if (updateReferenceForDefectException != null) {
-            throw updateReferenceForDefectException;
+        if (exceptions.get(UPDATING_REFERENCE_FOR_DEFECT_EXCEPTION) != null) {
+            throw exceptions.get(UPDATING_REFERENCE_FOR_DEFECT_EXCEPTION);
         }
-    }
-
-    public void setUpdateReferenceForDefectException(Exception ex) {
-        updateReferenceForDefectException = ex;
     }
 
     public void deleteReferenceInDefect(String defectId, String caseNumberToDelete) {
         throwException();
-        if (deleteReferenceInDefectException != null) {
-            throw deleteReferenceInDefectException;
+        if (exceptions.get(DELETION_REFERENCE_IN_DEFECT_EXCEPTION) != null) {
+            throw exceptions.get(DELETION_REFERENCE_IN_DEFECT_EXCEPTION);
         }
-    }
-
-    public void setDeleteReferenceInDefectException(Exception ex) {
-        deleteReferenceInDefectException = ex;
     }
 
     public String getSourceId() {
@@ -105,18 +90,14 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     public void createLinkV1ToSF(String defectId, Case caseData) {
-        if (createLinkException != null) {
-            throw createLinkException;
+        if (exceptions.get(CREATION_LINK_EXCEPTION) != null) {
+            throw exceptions.get(CREATION_LINK_EXCEPTION);
         }
     }
 
-    public void setExceptionForLinkCreationInV1(Exception ex) {
-        createLinkException = ex;
-    }
-
     public String createWorkitemInV1(Case caseData, Defect defectData, String projectId) {
-        if (creationWorkitemException != null) {
-            throw creationWorkitemException;
+        if (exceptions.get(CREATION_WORKITEM_EXCEPTION) != null) {
+            throw exceptions.get(CREATION_WORKITEM_EXCEPTION);
         }
 
         defectData.project = projectId;
@@ -126,24 +107,15 @@ public class V1ConnectorMock implements IV1Connector {
     public void setCreatedWorkitemToken(String token) {
         createdWorkitemToken = token;
     }
-
-    public void setExceptionForCreationWorkitemInV1(Exception ex) {
-        creationWorkitemException = ex;
-    }
-
     public Settings getSettings() {
         return Settings.getTestSettings();
     }
 
     public List<Defect> getClosedDefects(DateTime dateData) {
-        if (gettingClosedDefectsException != null) {
-            throw gettingClosedDefectsException;
+        if (exceptions.get(GETTING_CLOSED_DEFECTS_EXCEPTION) != null) {
+            throw exceptions.get(GETTING_CLOSED_DEFECTS_EXCEPTION);
         }
         return null;
-    }
-
-    public void setGettingClosedDefectsException(Exception ex) {
-    	gettingClosedDefectsException = ex;
     }
 
 
@@ -152,6 +124,10 @@ public class V1ConnectorMock implements IV1Connector {
      */
     public void enableException(Exception ex) {
         this.ex = ex;
+    }
+
+    public void addException(String name, Exception ex) {
+    	exceptions.put(name, ex);
     }
 
     private void throwException() {

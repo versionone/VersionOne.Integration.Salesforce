@@ -22,68 +22,46 @@ public class DefectFacadeMock implements IDefectFacade {
     }
 
     public String createDefectInVersionOne(Case caseData, Defect defectData) {
-        System.debug('createDefectInVersionOneException=' + exceptions.get('createDefectInVersionOneException'));
-        if (exceptions.get('createDefectInVersionOneException') != null) {
-            throw exceptions.get('createDefectInVersionOneException');
+        System.debug('createDefectInVersionOneException=' + exceptions.get(CREATE_DEFECT_IN_V1_EXCEPTION));
+        if (exceptions.get(CREATE_DEFECT_IN_V1_EXCEPTION) != null) {
+            throw exceptions.get(CREATE_DEFECT_IN_V1_EXCEPTION);
         }
         return CreatedDefectToken;
     }
 
     public List<Defect> searchForDefects(DefectSearchCriteria searchCriteria) {
-        if(exceptions.get('searchException') != null) {
-            throw exceptions.get('searchException');
+        if(exceptions.get(SEARCH_EXCEPTION) != null) {
+            throw exceptions.get(SEARCH_EXCEPTION);
         }
 
         return foundDefects;
     }
-/*
-    public void setSearchException(Exception ex) {
-        exceptions.put('searchException', ex);
-    }
 
-
-    public void setCreateDefectInVersionOneException(Exception ex) {
-    	exceptions.put('createDefectInVersionOneException', ex);
-    }
-    */
     public void assignDefectToCase(Case caseData, Defect defectData) {
         assignDefectResultValue = new AssignDefectPassedData(caseData, defectData);
 
-        if(exceptions.get('assignDefectToCaseException') != null) {
-            throw exceptions.get('assignDefectToCaseException');
+        if(exceptions.get(ASSIGN_DEFECT_TO_CASE_EXCEPTION) != null) {
+            throw exceptions.get(ASSIGN_DEFECT_TO_CASE_EXCEPTION);
         }
     }
 
     public void unassignDefectFromCase(Case caseData) {
         assignDefectResultValue = new AssignDefectPassedData(caseData, null);
 
-        if (exceptions.get('unassignDefectFromCaseException') != null) {
-            throw exceptions.get('unassignDefectFromCaseException');
+        if (exceptions.get(UNASSIGN_DEFECT_FROM_CASE_EXCEPTION) != null) {
+            throw exceptions.get(UNASSIGN_DEFECT_FROM_CASE_EXCEPTION);
         }
-    }
-/*
-    public void setAssignDefectToCaseException(Exception ex) {
-        exceptions.put('assignDefectToCaseException', ex);
     }
 
-    public void setUnassignDefectFromCaseException(Exception ex) {
-    	exceptions.put('unassignDefectFromCaseException', ex);
-    }
-*/
     public void publishStatus(Case caseData) {
-        if (exceptions.get('publishStatusException') != null) {
-            throw exceptions.get('publishStatusException');
+        if (exceptions.get(PUBLISH_STATUS_EXCEPTION) != null) {
+            throw exceptions.get(PUBLISH_STATUS_EXCEPTION);
         }
     }
-/*
-    public void setPublishStatusException(Exception ex) {
-    	exceptions.put('publishStatusException', ex);
-    }
-*/
 
     public Defect getDefectByToken(String defectToken){
-        if (exceptions.get('defectByIdException') != null) {
-            throw exceptions.get('defectByIdException');
+        if (exceptions.get(DEFECT_BY_ID_EXCEPTION) != null) {
+            throw exceptions.get(DEFECT_BY_ID_EXCEPTION);
         }
         Defect defectData = new Defect('title', 'description');
         defectData.id = CreatedDefectToken;
@@ -93,11 +71,6 @@ public class DefectFacadeMock implements IDefectFacade {
 
         return defectData;
     }
-/*
-    public void setGetDefectByIdException(Exception ex) {
-    	exceptions.put('defectByIdException', ex);
-    }
-*/
 
 	public List<Defect> getClosedDefects(String dateString) {
 		return closedDefects;

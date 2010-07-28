@@ -55,7 +55,7 @@ private class DefectFacadeTester {
         Defect defectData = new Defect('defect name', 'defect description');
 
         // Exception during defect creation
-        connector.setExceptionForCreationWorkitemInV1(new NullPointerException());
+        connector.addException(V1ConnectorMock.CREATION_WORKITEM_EXCEPTION, new IntegrationException());
         Case case1 = createCase('case1', 'desc', false);
 
         String createdDefectToken;
@@ -70,8 +70,8 @@ private class DefectFacadeTester {
         System.assertEquals(null, newCase1.V1DefectId__c, 'Incorrect defect token');
 
         //Exception during link creation
-        connector.setExceptionForCreationWorkitemInV1(null);
-        connector.setExceptionForLinkCreationInV1(new NullPointerException());
+        connector.addException(V1ConnectorMock.CREATION_WORKITEM_EXCEPTION, null);
+        connector.addException(V1ConnectorMock.CREATION_LINK_EXCEPTION, new IntegrationException());
         case1 = new Case(Subject = 'case1', Description = 'desc');
         insert case1;
         case1 = [SELECT Subject, Id, Description, Product__c, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
@@ -118,7 +118,7 @@ private class DefectFacadeTester {
         V1ConnectorMock connector = new V1ConnectorMock();
         IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
 
-        connector.setUpdateReferenceForDefectException(new IntegrationException());
+        connector.addException(V1ConnectorMock.UPDATING_REFERENCE_FOR_DEFECT_EXCEPTION, new IntegrationException());
 
         try {
             defectFacade.assignDefectToCase(caseValue, defectValue);
@@ -133,7 +133,7 @@ private class DefectFacadeTester {
         V1ConnectorMock connector = new V1ConnectorMock();
         IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
 
-        connector.setExceptionForLinkCreationInV1(new IntegrationException());
+        connector.addException(V1ConnectorMock.CREATION_LINK_EXCEPTION, new IntegrationException());
 
         try {
             defectFacade.assignDefectToCase(caseValue, defectValue);
@@ -156,7 +156,7 @@ private class DefectFacadeTester {
         V1ConnectorMock connector = new V1ConnectorMock();
         IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
 
-        connector.setUpdateReferenceForDefectException(new IntegrationException());
+        connector.addException(V1ConnectorMock.UPDATING_REFERENCE_FOR_DEFECT_EXCEPTION, new IntegrationException());
 
         defectFacade.assignDefectToCase(caseValue, defectValue);
         caseValue = [SELECT Subject, Id, Description, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c FROM Case WHERE Id = :caseValue.Id];
@@ -183,8 +183,8 @@ private class DefectFacadeTester {
         Case case1 = createCase('case1', 'desc', true);
 
         V1ConnectorMock connector = new V1ConnectorMock();
-        connector.setRemoveLinkFromDefectException(new NullPointerException());
-        connector.setUpdateReferenceForDefectException(new NullPointerException());
+        connector.addException(V1ConnectorMock.REMOVING_LINK_FROM_DEFECT_EXCEPTION, new IntegrationException());
+        connector.addException(V1ConnectorMock.UPDATING_REFERENCE_FOR_DEFECT_EXCEPTION, new IntegrationException());
         IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
         try {
             defectFacade.unassignDefectFromCase(case1);
@@ -208,7 +208,7 @@ private class DefectFacadeTester {
     static testMethod void searchForDefectsFailureTest() {
         V1ConnectorMock connector = new V1ConnectorMock();
         IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
-        connector.setSearchForDefectsException(new IntegrationException());
+        connector.addException(V1ConnectorMock.SEARCHING_FOR_DEFECTS_EXCEPTION, new IntegrationException());
         DefectSearchCriteria criteria = new DefectSearchCriteria();
         criteria.includeClosedDefects = true;
         criteria.queryString = 'test';
@@ -274,7 +274,7 @@ private class DefectFacadeTester {
 
     static testMethod void getClosedDefectsWithExceptionTest() {
         V1ConnectorMock connector = new V1ConnectorMock();
-        connector.setGettingClosedDefectsException(new IntegrationException());
+        connector.addException(V1ConnectorMock.GETTING_CLOSED_DEFECTS_EXCEPTION, new IntegrationException());
         IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
 
         try {
