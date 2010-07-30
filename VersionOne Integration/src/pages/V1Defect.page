@@ -1,4 +1,11 @@
 <apex:page extensions="DefectController" standardController="Case" tabStyle="Case">
+	<style>
+	body {
+
+	   background-color: #F3F3EC;
+
+	}
+	</style>
 	<script type="text/javascript">
 		////<![CDATA[
         function disableElement(ele) {
@@ -80,7 +87,7 @@
                         }
                       	</script>
 				</apex:commandButton>
-				<apex:commandButton value="Cancel" id="CancelButton" 
+				<apex:commandButton value="Cancel" id="CancelButton"
 					rerender="CreateDefectSector" status="empty"
 					action="{!cancelForm}" onClick="disableFormButtons();"
 					rendered="{!isEditForm && not(areThereErrors)}">

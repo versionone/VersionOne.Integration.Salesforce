@@ -1,4 +1,11 @@
 <apex:page extensions="DefectSearchController" standardController="Case" tabStyle="Case">
+	<style>
+	body {
+
+	   background-color: #F3F3EC;
+
+	}
+	</style>
     <script type="text/javascript">
         ////<![CDATA[
         function enableButton(buttonId) {
