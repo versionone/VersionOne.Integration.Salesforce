@@ -39,7 +39,6 @@ public class RequestorMock implements IRequestor {
     public void request(HttpRequest request) {
         System.debug('Call number:' + numberRequest);
         if (exceptions != null && exceptions.get(numberRequest) != null) {
-            System.debug('Going to throw exception:' + exceptions.get(numberRequest));
             throw exceptions.get(numberRequest);
         }
         numberRequest++;
