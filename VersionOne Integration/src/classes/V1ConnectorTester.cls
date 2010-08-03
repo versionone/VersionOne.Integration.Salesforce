@@ -564,6 +564,7 @@ private class V1ConnectorTester {
         String name = 'for paging testing 1';
         String priority = 'Medium';
         String status = 'In Progress';
+        String sourceId = '1234';
         String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="Defect:' + defectId + '">' +
                         '<Attribute name="ResolutionReason.Name">' + resolution + '</Attribute>' +
                         '<Attribute name="Scope.Name">' + project + '</Attribute>' +
@@ -576,9 +577,10 @@ private class V1ConnectorTester {
                         '<Attribute name="Reference"></Attribute>' +
                       '</Asset>';
         Settings testSettings = Settings.getTestSettings();
+        testSettings.setSourceId(sourceId);
         RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
-        String expectionBody = '<Asset id="Defect:' + defectId + '"><Attribute act="set" name="Reference"></Attribute></Asset>';
+        String expectionBody = '<Asset id="Defect:' + defectId + '"><Attribute act="set" name="Reference"></Attribute><Relation act="set" name="Source"><Asset idref="StorySource:' + sourceId + '"/></Relation></Asset>';
         String expectionUrl = 'rest-1.v1/Data/Defect/' + defectId;
 
         connector.updateReferenceForDefect(defectId, '');
@@ -600,6 +602,7 @@ private class V1ConnectorTester {
         String name = 'for paging testing 1';
         String priority = 'Medium';
         String status = 'In Progress';
+        String sourceId = '1234';
         String reference = case1.CaseNumber + ';' + case2.CaseNumber;
 
         String xml = '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + defectId + '" id="Defect:' + defectId + '">' +
@@ -614,9 +617,10 @@ private class V1ConnectorTester {
                         '<Attribute name="Reference">' + case1.CaseNumber + '</Attribute>' +
                       '</Asset>';
         Settings testSettings = Settings.getTestSettings();
+        testSettings.setSourceId(sourceId);
         RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
-        String expectionBody = '<Asset id="Defect:' + defectId + '"><Attribute act="set" name="Reference">' + reference + '</Attribute></Asset>';
+        String expectionBody = '<Asset id="Defect:' + defectId + '"><Attribute act="set" name="Reference">' + reference + '</Attribute><Relation act="set" name="Source"><Asset idref="StorySource:' + sourceId + '"/></Relation></Asset>';
         String expectionUrl = 'rest-1.v1/Data/Defect/' + defectId;
 
         connector.updateReferenceForDefect(defectId, case2.CaseNumber);
