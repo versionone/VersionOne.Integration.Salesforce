@@ -60,7 +60,7 @@ public class V1Connector implements IV1Connector {
         	}
         }
 
-        updateReference(referenceValue, defectId);
+        updateReference(referenceValue, defectId, relationNode('Source', 'StorySource:' + settings.getSourceId()));
     }
 
     public void deleteReferenceInDefect(String defectId, String caseNumberToDelete) {
@@ -80,14 +80,15 @@ public class V1Connector implements IV1Connector {
         	}
         }
 
-        updateReference(reference, defectId);
+        updateReference(reference, defectId, '');
     }
 
-    private void updateReference(String referenceValue, String defectId) {
+    private void updateReference(String referenceValue, String defectId, String sourceNode) {
         String url = String.format(UPDATE_REFERENCE_URL, new String[]{defectId});
 
         String body = '<Asset id="Defect:' + defectId + '">' +
                         attributeNode('Reference', referenceValue) +
+                        sourceNode +
                       '</Asset>';
         requestor.request(requestor.createRequest(body, url, 'POST'));
         validateResponse();
