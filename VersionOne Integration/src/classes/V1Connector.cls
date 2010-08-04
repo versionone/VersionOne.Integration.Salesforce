@@ -14,8 +14,8 @@ public class V1Connector implements IV1Connector {
     public static final String FIELDS_LIST_FOR_SEARCH_TEMPLATE = '&findin={0}';
     public static final String SEARCH_PART_FOR_CLOSED_DEFECT_URL = '&where=(Defect.AssetState!=\'Closed\')';
 
-    public static final String DEFAULT_DEFECT_NAME = 'Case from SalesForce';
-    public static final String LINK_NAME_TO_CASE = 'SalesForce Case';
+    public static final String DEFAULT_DEFECT_NAME = 'Case from Salesforce';
+    public static final String LINK_NAME_TO_CASE = 'Salesforce Case';
 
     private final Settings settings;
     private final transient IRequestor requestor;
@@ -331,7 +331,7 @@ public class V1Connector implements IV1Connector {
     /////////////////// Create in the VersionOne
 
     /**
-    * Creates link to the corresponding case in the SalesForce
+    * Creates link to the corresponding case in the Salesforce
     **/
     public void createLinkV1ToSF(String workitemId, Case caseData) {
     	//throw new V1RequestException('Problem to create link to case');

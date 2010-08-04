@@ -140,7 +140,7 @@
         <apex:pageBlock title="VersionOne Project for Defect Creation" id="ProjectMapping">
             <apex:pageBlockSection rendered="{!isGotProjects}" columns="1">
                 <apex:pageBlockSectionItem >
-	                <apex:outputLabel value="SalesForce product" for="ProductId" />
+	                <apex:outputLabel value="Salesforce product" for="ProductId" />
                     <apex:selectList size="1" required="false" id="ProductId" value="{!currentMapping.productId}">
                         <apex:selectOptions value="{!ProductList}"/>
 	                    <script type="text/javascript">
@@ -191,7 +191,7 @@
 			                	onclick="disableAddMappingButton();removeMapping('{!mapping.mappingId}');">Remove</apex:outputLink>
 						</apex:column>
 						<apex:column >
-							<apex:facet name="header">SalesForce Product</apex:facet>
+							<apex:facet name="header">Salesforce Product</apex:facet>
 							<apex:outputText value="{!mapping.productName}"/>
 						</apex:column>
 						<apex:column >

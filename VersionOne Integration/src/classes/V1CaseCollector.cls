@@ -50,7 +50,7 @@ public class V1CaseCollector {
     }
 
     /**
-     * Returns all mapping VersionOne projects to the SalesForce products.
+     * Returns all mapping VersionOne projects to the Salesforce products.
      **/
     public static List<MappingV1ProjectsToSFProducts__c> getMappingList() {
         return [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
@@ -67,7 +67,7 @@ public class V1CaseCollector {
     }
 
     /**
-     * Adds new mapping to the SalesForce store(custom object).
+     * Adds new mapping to the Salesforce store(custom object).
      * mapping - information about mapping.
      **/
     public static void addNewMapping(ProjectProductMapping mapping) {
