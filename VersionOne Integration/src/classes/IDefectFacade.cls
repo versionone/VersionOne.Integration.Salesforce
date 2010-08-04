@@ -6,7 +6,7 @@ public interface IDefectFacade {
 	List<V1FieldData> getFieldsData();
 
     /**
-    * Create defect in the VersionOne and assign it to a case in the SalesForce
+    * Create defect in the VersionOne and assign it to a case in the Salesforce
     * caseData 		- case for assign
     * defectData 	- information about new defect
     * Returns id of created defect
@@ -14,7 +14,7 @@ public interface IDefectFacade {
     String createDefectInVersionOne(Case caseData, Defect defectData);
 
     /**
-    * Assign defect in the VersionOne to case in the SalesForce
+    * Assign defect in the VersionOne to case in the Salesforce
     * caseData 		- case for assignment
     * defectData    - defect to assign
     **/
@@ -22,7 +22,7 @@ public interface IDefectFacade {
 
     /**
     * Unsaaign a defect from the case. Also removes data from defect in the VersionOne
-    * and information about defect from case in the SalesForce
+    * and information about defect from case in the Salesforce
     * caseData - case for removing assigned defect
     **/
     void unassignDefectFromCase(Case caseData);

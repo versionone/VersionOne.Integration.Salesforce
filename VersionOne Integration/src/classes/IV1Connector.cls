@@ -52,7 +52,7 @@ public interface IV1Connector {
     String getDefaultProjectId();
 
     /**
-    * Creates link to SalesForce web page with information about case.
+    * Creates link to Salesforce web page with information about case.
     * defectId  - defect id in the VersionOne.
     * caseData	- case to create link to.
     **/
@@ -60,7 +60,7 @@ public interface IV1Connector {
 
     /**
     * Creates defect or story in the VersionOne.
-    * caseData - SalesForce case.
+    * caseData - Salesforce case.
     * projectId - project id in the VersionOne.
     * sourceId - source id in the VersionOne.
     * Return: id of created workitem in the VersionOne.

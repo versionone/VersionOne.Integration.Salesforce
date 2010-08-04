@@ -213,7 +213,7 @@ private class V1ConnectorTester {
         }
     }
 
-    static testMethod void correctCreatingLinkToSalesForceCaseTest() {
+    static testMethod void correctCreatingLinkToSalesforceCaseTest() {
         Case case1 = new Case(Subject = 'case1');
         insert case1;
         case1 = [SELECT CaseNumber, OwnerId FROM Case WHERE Id = :case1.Id];
@@ -229,7 +229,7 @@ private class V1ConnectorTester {
         String body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
                         '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
-                        '<Attribute act="set" name="Name">SalesForce Case #' + case1.CaseNumber + '</Attribute>' +
+                        '<Attribute act="set" name="Name">Salesforce Case #' + case1.CaseNumber + '</Attribute>' +
                         '<Relation act="set" name="Asset">' +
                             '<Asset idref="' + defectId + '"/>' +
                         '</Relation>' +
@@ -238,7 +238,7 @@ private class V1ConnectorTester {
         System.assertEquals(body, requestor.getSentBody(0), 'Incorrect created body for POST.');
     }
 
-    static testMethod void incorrectCreatingLinkToSalesForceCaseTest() {
+    static testMethod void incorrectCreatingLinkToSalesforceCaseTest() {
         Case case1 = new Case(Subject = 'case1');
         insert case1;
         case1 = [SELECT CaseNumber, OwnerId FROM Case WHERE Id = :case1.Id];
@@ -255,7 +255,7 @@ private class V1ConnectorTester {
         String body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
                         '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
-                        '<Attribute act="set" name="Name">SalesForce Case #' + case1.CaseNumber + '</Attribute>' +
+                        '<Attribute act="set" name="Name">Salesforce Case #' + case1.CaseNumber + '</Attribute>' +
                         '<Relation act="set" name="Asset">' +
                             '<Asset idref="' + defectId + '"/>' +
                         '</Relation>' +
@@ -303,7 +303,7 @@ private class V1ConnectorTester {
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
 
         //case 2
-        caseName = 'Case from SalesForce';
+        caseName = 'Case from Salesforce';
         defectData = new Defect(caseName, '');
         sourceName = 'TestSource';
         sourceId = '1010';
@@ -415,7 +415,7 @@ private class V1ConnectorTester {
         String defectId = '2345';
         String defectToken = 'Defect:2345';
         String resolution = 'Duplicate';
-        String project = 'SalesForce test';
+        String project = 'Salesforce test';
         String description = 'q2312313132';
         String assetNumber = 'D-01398';
         String name = 'for paging testing 1';
@@ -558,7 +558,7 @@ private class V1ConnectorTester {
     static testMethod void updateReferenceForDefectTest() {
         String defectId = '2345';
         String resolution = 'Duplicate';
-        String project = 'SalesForce test';
+        String project = 'Salesforce test';
         String description = 'q2312313132';
         String token = 'D-01398';
         String name = 'for paging testing 1';
@@ -596,7 +596,7 @@ private class V1ConnectorTester {
         case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
         String defectId = '2345';
         String resolution = 'Duplicate';
-        String project = 'SalesForce test';
+        String project = 'Salesforce test';
         String description = 'q2312313132';
         String token = 'D-01398';
         String name = 'for paging testing 1';
@@ -631,7 +631,7 @@ private class V1ConnectorTester {
     static testMethod void updateReferenceForDefectButWithoutUpdateTest() {
         String defectId = '2345';
         String resolution = 'Duplicate';
-        String project = 'SalesForce test';
+        String project = 'Salesforce test';
         String description = 'q2312313132';
         String token = 'D-01398';
         String name = 'for paging testing 1';
@@ -667,7 +667,7 @@ private class V1ConnectorTester {
         case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
         String defectId = '2345';
         String resolution = 'Duplicate';
-        String project = 'SalesForce test';
+        String project = 'Salesforce test';
         String description = 'q2312313132';
         String token = 'D-01398';
         String name = 'for paging testing 1';
@@ -706,7 +706,7 @@ private class V1ConnectorTester {
     	expectedDefect1.token = 'Defect:2469';
     	expectedDefect1.assetNumber = 'D-01470';
     	expectedDefect1.isClosed = false;
-    	expectedDefect1.project = 'SalesForce test';
+    	expectedDefect1.project = 'Salesforce test';
     	expectedDefect1.priority = 'Low';
     	expectedDefect1.resolution = '';
 		Defect expectedDefect2 = new Defect('testing new functionality', null);
@@ -715,7 +715,7 @@ private class V1ConnectorTester {
 		expectedDefect2.status = '';
 		expectedDefect2.assetNumber = 'D-01472';
 		expectedDefect2.isClosed = false;
-		expectedDefect2.project = 'SalesForce test';
+		expectedDefect2.project = 'Salesforce test';
 		expectedDefect2.priority = '';
 		expectedDefect2.resolution = 'Fixed';
     	String searchPhrase = 'testing new functionality';
@@ -760,7 +760,7 @@ private class V1ConnectorTester {
     	expectedDefect1.token = 'Defect:2469';
     	expectedDefect1.assetNumber = 'D-01470';
     	expectedDefect1.isClosed = true;
-    	expectedDefect1.project = 'SalesForce test';
+    	expectedDefect1.project = 'Salesforce test';
     	expectedDefect1.priority = 'Low';
     	expectedDefect1.resolution = '';
 		Defect expectedDefect2 = new Defect('testing new functionality', null);
@@ -769,7 +769,7 @@ private class V1ConnectorTester {
 		expectedDefect2.status = '';
 		expectedDefect2.assetNumber = 'D-01472';
 		expectedDefect2.isClosed = false;
-		expectedDefect2.project = 'SalesForce test';
+		expectedDefect2.project = 'Salesforce test';
 		expectedDefect2.priority = '';
 		expectedDefect2.resolution = 'Fixed';
     	String searchPhrase = 'testing new functionality';
