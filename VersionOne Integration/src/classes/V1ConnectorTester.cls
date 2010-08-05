@@ -811,9 +811,9 @@ private class V1ConnectorTester {
         Case case2 = new Case(Subject='TestCase2');
         Case case3 = new Case(Subject='TestCase3');
 		insert new Case[] {case1, case2, case3};
-        case1 = [SELECT CaseNumber, Id FROM Case WHERE Id = :case1.Id];
-        case2 = [SELECT CaseNumber, Id FROM Case WHERE Id = :case2.Id];
-        case3 = [SELECT CaseNumber, Id FROM Case WHERE Id = :case3.Id];
+        case1 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case2.Id];
+        case3 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case3.Id];
 
         Defect closedDefect1 = new Defect('testing defect 1', null);
 		closedDefect1.changeDate = '2009-10-21 08:57:50';

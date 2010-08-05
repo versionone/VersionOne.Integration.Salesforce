@@ -161,7 +161,6 @@ public class V1Connector implements IV1Connector {
 			defectData.changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes)).format('yyyy-MM-dd hh:mm:ss');
         }
         String reference = getValue('Reference', asset.childNodes);
-        System.debug('!!!!reference=' + reference);
         if (reference != null) {
         	defectData.cases = V1CaseCollector.getCasesByCasesNumber(reference.split(';'));
         	//defectData.casesNumber = reference.split(';');
