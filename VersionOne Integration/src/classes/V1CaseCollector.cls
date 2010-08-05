@@ -23,7 +23,7 @@ public class V1CaseCollector {
      * Return: found cases.
      */
     public static Case[] getCasesByCasesNumber(String[] casesNumber) {
-        return [SELECT id, CaseNumber FROM Case WHERE CaseNumber in :casesNumber];
+        return [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE CaseNumber in :casesNumber];
     }
 
     /**
