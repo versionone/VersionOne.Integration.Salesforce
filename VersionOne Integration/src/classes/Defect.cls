@@ -12,6 +12,21 @@ public class Defect {
     public String status {get; set;}
     public String resolution {get; set;}
     public Boolean isClosed{get; set;}
+    public String[] owners{get; set;}
+
+    public String getOwnersAsString() {
+    	if (owners == null) {
+    		return '';
+    	}
+    	String ownersString = '';
+    	for (String owner : owners) {
+    		if (ownersString != '') {
+    			ownersString += ', ';
+    		}
+    		ownersString += owner;
+    	}
+    	return ownersString;
+    }
 
     //used only for closed defects report
     public Case[] cases {get; set;}

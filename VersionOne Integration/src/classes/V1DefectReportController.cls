@@ -2,8 +2,11 @@ public class V1DefectReportController {
 	private List<DefectWrapper> closedDefects = null;
 
 	public String userDate { get; set; }
+	public String ownerDefectList { get; set; }
 	private final Integer ITEMS_PER_PAGE = 20;
 	private final String COOKIE_NAME = 'datetime';
+	private final String SHOW_MY_DEFECTS = '1';
+	private final String SHOW_ALL_DEFECTS = '2';
 
 	public DefectTablePaginator paginator { get; private set; }
 
@@ -44,10 +47,18 @@ public class V1DefectReportController {
 		if (lastDateTime != null) {
 			userDate = lastDateTime.getValue();
 		}
+		ownerDefectList = SHOW_ALL_DEFECTS;
     }
 
 	public List<DefectWrapper> getClosedDefect() {
 		return closedDefects;
+	}
+
+	public List<SelectOption> getOwnerDefectListOptions() {
+        List<SelectOption> options = new List<SelectOption>();
+        options.add(new SelectOption(SHOW_ALL_DEFECTS, 'Show all defects'));
+        options.add(new SelectOption(SHOW_MY_DEFECTS, 'Show only my defects'));
+		return options;
 	}
 
     public void goToPage() {
@@ -64,7 +75,7 @@ public class V1DefectReportController {
         paginator = new DefectTablePaginator(ITEMS_PER_PAGE, new List<DefectWrapper>());
 
         try {
-            List<Defect> defects = defectFacade.getClosedDefects(userDate);
+            List<Defect> defects = defectFacade.getClosedDefects(userDate, ownerDefectList == SHOW_ALL_DEFECTS);
             closedDefects = new List<DefectWrapper>();
 			DateTime latestDate = null;
             for(Defect defect : defects) {

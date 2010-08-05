@@ -48,7 +48,8 @@ public interface IDefectFacade {
 
     /**
     * Lookup closed VersionOne defects.
-    * dateString 	- date since will lookup closed defects.
+    * dateString 		- date since will lookup closed defects.
+    * isShowAllDefects	- true - show all defects, false only assigned to current used.
     **/
-    List<Defect> getClosedDefects(String dateString);
+    List<Defect> getClosedDefects(String dateString, Boolean isShowAllDefects);
 }

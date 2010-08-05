@@ -65,6 +65,11 @@
 							 rerender="tableOutput, errorMessages"/>
 					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+					<apex:selectRadio value="{!ownerDefectList}">
+						<apex:selectOptions value="{!ownerDefectListOptions}"/>
+					</apex:selectRadio>
+				</apex:pageBlockSectionItem>
 		    </apex:pageBlockSection>
             <apex:pageBlockSection columns="1" id="tableOutput">
 	            <apex:pageBlockSectionItem >
@@ -100,16 +105,19 @@
 				        	<apex:outputText value="{!item.defectPart.title}"/>
 				        </apex:column>
 				        <apex:column >
+				        	<apex:facet name="header">Owners</apex:facet>
+				        	<apex:outputText value="{!item.defectPart.ownersAsString}"/>&nbsp;
+				        </apex:column>
+				        <apex:column >
 				        	<apex:facet name="header">Cases</apex:facet>
 						    <apex:repeat value="{!item.defectPart.cases}" var="caseData" >
 						        <apex:outputLink value="/{!caseData.id}" target="_blank" onmouseover="displayMenu(this,'menu{!caseData.id}_{!item.defectPart.token}');">{!caseData.caseNumber}</apex:outputLink>&nbsp;
 <div class="popup" id="menu{!caseData.id}_{!item.defectPart.token}" style="display:none;">
 	<b>Subject</b>:{!caseData.Subject}<br/>
 	<b>Status:</b> {!caseData.Status}<br/>
-	<b>Created Date:</b> {!caseData.CreatedDate}<br/>
 	<b>OwnerId:</b> {!caseData.Owner.Name}<br/>
-
-	<a href="javascript:void(0)" onclick="hideMenu('menu{!caseData.id}_{!item.defectPart.token}');">(Close popup)</a>
+	<b>Created Date:</b> {!caseData.CreatedDate}<br/><br/>
+	<a href="javascript:void(0)" onclick="hideMenu('menu{!caseData.id}_{!item.defectPart.token}');">Close</a>
 </div>
 					        </apex:repeat>
 				        </apex:column>

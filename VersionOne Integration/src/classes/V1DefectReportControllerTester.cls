@@ -56,6 +56,11 @@ private class V1DefectReportControllerTester {
     	pageMessageAssert(ApexPages.Severity.ERROR);
     }
 
+    static testMethod void getOwnerDefectListOptionsTest() {
+    	V1DefectReportController controller = getController();
+    	System.assertEquals(2, controller.getOwnerDefectListOptions().size());
+    }
+
     static testMethod void goToPageTest() {
     	V1DefectReportController controller = getController();
     	fillLotOfClosedDefects();

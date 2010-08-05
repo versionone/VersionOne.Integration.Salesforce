@@ -12,6 +12,7 @@ Add the following fields:
   DateLastClosedAsset - Date/Time
   V1ProjectId   - Text(10)
   V1ProjectName - Text(100)
+  V1MemberId	- Text(10)
 ----------------------
 
 Allow access to V1 Server (Setup>Administration Setup>Security Controls>Remote Site Settings)

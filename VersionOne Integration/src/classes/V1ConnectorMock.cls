@@ -7,6 +7,7 @@ public class V1ConnectorMock implements IV1Connector {
     public static final String DELETION_REFERENCE_IN_DEFECT_EXCEPTION = 'deleteReferenceInDefectException';
     public static final String GETTING_CLOSED_DEFECTS_EXCEPTION = 'gettingClosedDefectsException';
     private String sourceId = '123456';
+    public static final String MEMBER_ID = '20';
     private Exception ex;
     public String createdWorkitemToken;
     private Map<String, Boolean> alreadyExistedDefects = new Map<String, Boolean>();
@@ -76,6 +77,12 @@ public class V1ConnectorMock implements IV1Connector {
         this.sourceId = sourceId;
     }
 
+    public String getCurrentMemberId() {
+    	throwException();
+
+    	return MEMBER_ID;
+    }
+
     public Map<String, String> findAllProjects() {
         throwException();
         Map<String, String> result = new Map<String, String>();
@@ -111,7 +118,7 @@ public class V1ConnectorMock implements IV1Connector {
         return Settings.getTestSettings();
     }
 
-    public List<Defect> getClosedDefects(DateTime dateData) {
+    public List<Defect> getClosedDefects(DateTime dateData, Boolean isShowAllDefects) {
         if (exceptions.get(GETTING_CLOSED_DEFECTS_EXCEPTION) != null) {
             throw exceptions.get(GETTING_CLOSED_DEFECTS_EXCEPTION);
         }

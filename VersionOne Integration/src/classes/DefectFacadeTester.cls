@@ -278,7 +278,7 @@ private class DefectFacadeTester {
         IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
 
         try {
-            connector.getClosedDefects(null);
+            connector.getClosedDefects(null, true);
             System.assert(false, 'This line should not be reached - we\'re awaiting the IntegrationException exception');
         } catch(IntegrationException ex) { }
 

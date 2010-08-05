@@ -26,6 +26,35 @@ private class V1ConnectorTester {
         System.assertEquals(null, synch.getValue('test', attibuteTags), 'Incorrect test value.');
     }
 
+    static testMethod void getValuesTest() {
+        String numberData = 'D-01032';
+        String changeDateUTC = '2009-10-21T08:57:50.493';
+        String reference = '33';
+        String value1 = 'Administrator';
+        String value2 = 'Testing';
+        String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="Defect:1077">' +
+                            '<Attribute name="Number">' + numberData + '</Attribute>' +
+                            '<Attribute name="ChangeDateUTC">' + changeDateUTC + '</Attribute>' +
+                            '<Attribute name="Reference">' + reference + '</Attribute>' +
+                            '<Attribute name="Owners.Name">' +
+                            	'<Value>Administrator</Value>' +
+                            	'<Value>Testing</Value>' +
+                            '</Attribute>' +
+                        '</Asset>' +
+                      '</Assets>';
+        XMLDom xmlParser = new XMLDom();
+        xmlParser.parseFromString(xml);
+        List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
+        List<XMLDom.Element> attibuteTags = assetTags.get(0).childNodes;
+
+        V1Connector connector = new V1Connector(Settings.getTestSettings(), new RequestorMock('', 200));
+        List<String> owners = connector.getValues('Owners.Name', attibuteTags);
+        System.assertEquals(2, owners.size(), 'Incorrect number of owners.');
+        System.assertEquals(value1, owners.get(0), 'Value \'' + value1 + '\' not found.');
+        System.assertEquals(value2, owners.get(1), 'Value \'' + value2 + '\' not found.');
+    }
+
     static testMethod void convertToDateTimeTest() {
         String changeDateUTC = '2009-10-21T08:57:50.493';
         String expectedDateTime = '2009-10-21 08:57:50';
@@ -58,7 +87,7 @@ private class V1ConnectorTester {
         System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');
     }
 
-    static testMethod void correctGetSourceTokenTester() {
+    static testMethod void correctGetSourceIdTester() {
         String sourceName = 'TestSource';
         String sourceIdExpected = '1010';
         Settings testSettings = Settings.getTestSettings();
@@ -122,6 +151,17 @@ private class V1ConnectorTester {
             String sourceId = connector.getSourceId();
             System.assert(false, 'This cannot be reached.');
         } catch (V1RequestException ex) {}
+    }
+
+    static testMethod void correctGetMemberIdTester() {
+        String expectedMemberId = '20';
+        Settings testSettings = Settings.getTestSettings();
+        String body = '<Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/Member/20" id="Member:' + expectedMemberId + '"/></Assets>';
+        IRequestor requestor = new RequestorMock(body, 200);
+        IV1Connector connector = new V1Connector(testSettings, requestor);
+
+        String memberId = connector.getCurrentMemberId();
+        System.assertEquals(expectedMemberId, memberId, 'Incorrect id of current member');
     }
 
     static testMethod void correctProjectsListTest() {
@@ -853,7 +893,7 @@ private class V1ConnectorTester {
         String expectedDate = '2009-10-20T09:57:33';
         V1Connector connector = new V1Connector(testSettings, testRequestor);
 
-        List<Defect> closedDefects = connector.getClosedDefects(Datetime.newInstance(2009, 10, 20, 9, 57, 33));
+        List<Defect> closedDefects = connector.getClosedDefects(Datetime.newInstance(2009, 10, 20, 9, 57, 33), true);
 
         System.assertEquals(2, closedDefects.size(), 'Incorrect number of assets.');
         assertContains(closedDefect1, closedDefects, 'Can\'t find closed defect');
@@ -862,6 +902,50 @@ private class V1ConnectorTester {
         System.assertEquals(1, testRequestor.numberRequest, 'Wrong requests count.');
         System.assert(testRequestor.getSentUrl(0).contains('Source=\'StorySource:' + sourceId), 'Incorrect request url: ' + testRequestor.getSentUrl(0));
         System.assert(testRequestor.getSentUrl(0).contains(expectedDate), 'Incorrect request url.');
+    }
+
+    static testMethod void getClosedDefectsOnlyFromCurrentMemberTest() {
+        Case case1 = new Case(Subject='TestCase1');
+        Case case2 = new Case(Subject='TestCase2');
+		insert new Case[] {case1, case2};
+        case1 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case2.Id];
+
+        Defect closedDefect1 = new Defect('testing defect 1', null);
+		closedDefect1.changeDate = '2009-10-21 08:57:50';
+        closedDefect1.cases = new Case[]{case1,case2};
+        closedDefect1.assetNumber = 'D-01032';
+        closedDefect1.token = 'Defect:1077';
+        closedDefect1.id = '1077';
+        closedDefect1.isClosed = true;
+        String queueId = '12345667';
+        String sourceId = '1010';
+        String memberId = '12';
+        String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect1.token + '">' +
+                            '<Attribute name="Number">' + closedDefect1.assetNumber + '</Attribute>' +
+                            '<Attribute name="ChangeDateUTC">2009-10-21T08:57:50.493</Attribute>' +
+							'<Attribute name="Name">' + closedDefect1.title + '</Attribute>' +
+                            '<Attribute name="Reference">' + case1.CaseNumber + ';' + case2.CaseNumber + '</Attribute>' +
+                            '<Attribute name="AssetState">128</Attribute>' +
+                        '</Asset>' +
+                      '</Assets>';
+        Settings testSettings = Settings.getTestSettings();
+        RequestorMock testRequestor = new RequestorMock(xml, 200);
+        testSettings.setSourceId(sourceId);
+        testSettings.setCurrentMemberId(memberId);
+        String expectedDate = '2009-10-20T09:57:33';
+        V1Connector connector = new V1Connector(testSettings, testRequestor);
+
+        List<Defect> closedDefects = connector.getClosedDefects(Datetime.newInstance(2009, 10, 20, 9, 57, 33), false);
+
+        System.assertEquals(1, closedDefects.size(), 'Incorrect number of assets.');
+        assertContains(closedDefect1, closedDefects, 'Can\'t find closed defect');
+        //System.assertEquals('2009-10-21 08:57:50', testSettings.getLastDateChangeAsset().format('yyyy-MM-dd HH:mm:ss'), 'Incorrect latest datetime of chaned asset.');
+        System.assertEquals(1, testRequestor.numberRequest, 'Wrong requests count.');
+        System.assert(testRequestor.getSentUrl(0).contains('Source=\'StorySource:' + sourceId), 'Incorrect request url: ' + testRequestor.getSentUrl(0));
+        System.assert(testRequestor.getSentUrl(0).contains(expectedDate), 'Incorrect request url.');
+        System.assert(testRequestor.getSentUrl(0).contains('Owners=\'Member:' + memberId + '\''), 'Incorrect request url.');
     }
 
     private static String createSearchQuery(string searchPhrase) {
