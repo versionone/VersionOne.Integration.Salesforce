@@ -159,7 +159,10 @@ private class SettingsControllerTester {
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
         System.assertEquals('', controller.testSeverity, 'Incorrect test severity.');
 
-        controller.saveSettings();
+        System.assertEquals(sourceIdExpected, settingsData.getSourceId(), 'Incorrect source id.');
+        System.assertEquals(V1ConnectorMock.MEMBER_ID, settingsData.getCurrentMemberId(), 'Incorrect member id.');
+
+        //controller.saveSettings();
 
         //no source id
         connector.setTestSourceId(null);

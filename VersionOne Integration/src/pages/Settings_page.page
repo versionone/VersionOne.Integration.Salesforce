@@ -26,15 +26,14 @@
         	var product = getSelectedProdcut();
         	var result = true;
 
-        	SFUserProductList.forEach(
-        		function (x, idx) {
-        			var mappingData = x.split("|||");
-        			if (mappingData[0] == product.value && mappingId != mappingData[1] && result) {
-        				alert ('Product already used in mapping');
-	        			result = false;
-    	    			return;
-        			}
-				});
+			for (var index=0;index<SFUserProductList.length;index++) {
+				var mappingData = SFUserProductList[index].split("|||");
+       			if (mappingData[0] == product.value && mappingId != mappingData[1] && result) {
+       				alert ('Product already used in mapping');
+        			result = false;
+   	    			break;
+       			}
+			}
         	return result;
         }
     //]]>

@@ -72,7 +72,7 @@ public class DefectFacadeMock implements IDefectFacade {
         return defectData;
     }
 
-	public List<Defect> getClosedDefects(String dateString) {
+	public List<Defect> getClosedDefects(String dateString, Boolean isShowAllDefects) {
 		return closedDefects;
 	}
 

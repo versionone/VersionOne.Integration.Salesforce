@@ -112,11 +112,14 @@ public class SettingsController {
 
     public PageReference saveSettings() {
         isSettingsCorrect = validateSettings();
-        String sourceId;
+        String sourceId, memberId;
         try {
             sourceId = connector.getSourceId();
         } catch (Exception ex) {}
-        if (!isSettingsCorrect || sourceId == null) {
+        try {
+            memberId = connector.getCurrentMemberId();
+        } catch (Exception ex) {}
+        if (!isSettingsCorrect || sourceId == null || memberId == null) {
             isSettingsCorrect = false;
             isSettingsValidated = false;
             testMessage = '';
@@ -124,7 +127,7 @@ public class SettingsController {
             addErrorMessage('Settings is not correct or was not validated.');
             return null;
         }
-
+        settings.setCurrentMemberId(memberId);
         settings.setSourceId(sourceId);
 
         System.debug('Save Settings');

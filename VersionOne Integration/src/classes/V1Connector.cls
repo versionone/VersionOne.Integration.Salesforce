@@ -1,7 +1,7 @@
 public class V1Connector implements IV1Connector {
 
     public static final String DATA_URL = 'rest-1.v1/Data/';
-    public static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=AssetState,Name,Number,ChangeDateUTC,Reference&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'\'Closed\'\'{1})';
+    public static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=AssetState,Name,Number,ChangeDateUTC,Reference,Owners.Name&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'\'Closed\'\'{1}{2})';
     public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'\'{0}\'\'';
     public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
     public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'\'{1}\'\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
@@ -13,6 +13,7 @@ public class V1Connector implements IV1Connector {
     public static final String SEARCH_WORD_TEMPLATE = '&find={0}';
     public static final String FIELDS_LIST_FOR_SEARCH_TEMPLATE = '&findin={0}';
     public static final String SEARCH_PART_FOR_CLOSED_DEFECT_URL = '&where=(Defect.AssetState!=\'Closed\')';
+    public static final String MEMBER_URL = 'rest-1.v1/Data/Member?sel=&where=Member.IsSelf=\'True\'';
 
     public static final String DEFAULT_DEFECT_NAME = 'Case from Salesforce';
     public static final String LINK_NAME_TO_CASE = 'Salesforce Case';
@@ -156,6 +157,7 @@ public class V1Connector implements IV1Connector {
         defectData.isClosed = getValue('AssetState', asset.childNodes) == Defect.ClosedAssetState;
         defectData.priority = getValue('Priority.Name', asset.childNodes);
         defectData.status = getValue('Status.Name', asset.childNodes);
+        defectData.owners = getValues('Owners.Name', asset.childNodes);
         DateTime changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes));
         if (changeDate != null) {
 			defectData.changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes)).format('yyyy-MM-dd hh:mm:ss');
@@ -187,6 +189,20 @@ public class V1Connector implements IV1Connector {
             return assetTag.getAttribute('id').split(':')[1];
         }
         return null;
+    }
+
+    public String getCurrentMemberId() {
+    	XMLDom xmlParser = new XMLDom();
+
+        HttpRequest req = requestor.createRequest('', MEMBER_URL, 'GET');
+        requestor.request(req);
+        validateResponse();
+        xmlParser.parseFromString(requestor.getBody());
+        XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
+        if (assetTag != null) {
+            return assetTag.getAttribute('id').split(':')[1];
+        }
+    	return null;
     }
 
     /**
@@ -221,6 +237,27 @@ public class V1Connector implements IV1Connector {
 
         return null;
     }
+
+    /**
+    * Get values from elements with specific name attribute
+    *
+    * String attributeValue - value of name attribute for looking for.
+    **/
+    public String[] getValues(String attributeValue, List<XMLDom.Element> assetsData) {
+    	List<String> data = new List<String>();
+        for (XMLDom.Element element : assetsData) {
+            String attibuteValue = element.getAttribute('name');
+            if (attibuteValue != null && attibuteValue.equals(attributeValue)) {
+                List<XMLDom.Element> elements = element.getElementsByTagName('Value');
+                for (XMLDom.Element ele : elements) {
+                	data.add(ele.nodeValue);
+                }
+            }
+        }
+
+        return data;
+    }
+
 
 
     /**
@@ -405,15 +442,19 @@ public class V1Connector implements IV1Connector {
         return settings;
     }
 
-    public List<Defect> getClosedDefects(DateTime dateData) {
+    public List<Defect> getClosedDefects(DateTime dateData, Boolean isShowAllDefects) {
 
         List<Defect> closedDefects = new List<Defect>();
         String dateRestriction = '';
         if (dateData != null) {
             dateRestriction = ';ChangeDateUTC>\'' + dateData.format('yyyy-MM-dd\'T\'HH:mm:ss') + '\'';
         }
+        String usedRestriction = '';
+        if (!isShowAllDefects) {
+        	usedRestriction = ';Owners=\'Member:' + settings.getCurrentMemberId() + '\'';
+        }
         //Send the request, and get a response
-        String url = String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), dateRestriction});
+        String url = String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), dateRestriction, usedRestriction});
         requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
         XMLDom xmlParser = new XMLDom();

@@ -41,6 +41,11 @@ public interface IV1Connector {
     String getSourceId();
 
     /**
+    * Returns current loggined member id.
+    **/
+    String getCurrentMemberId();
+
+    /**
     * Gather all project from the VersionOne.
     * Return: list of projects; key - name, value - id.
     **/
@@ -74,8 +79,9 @@ public interface IV1Connector {
 
     /**
     * Request information about closed defects since specified date,
-    * dateData - since this date will be gathered all closed defects.
+    * dateData 			- since this date will be gathered all closed defects.
+    * isShowAllDefects	- true - show all defects, false only assigned to current used.
     * Return: defects which were closed since the date.
     **/
-    List<Defect> getClosedDefects(DateTime dateData);
+    List<Defect> getClosedDefects(DateTime dateData, Boolean isShowAllDefects);
 }
