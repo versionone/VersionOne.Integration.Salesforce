@@ -102,14 +102,14 @@
 				        <apex:column >
 				        	<apex:facet name="header">Cases</apex:facet>
 						    <apex:repeat value="{!item.defectPart.cases}" var="caseData" >
-						        <apex:outputLink value="/{!caseData.id}" target="_blank" onmouseover="displayMenu(this,'menu{!caseData.id}');">{!caseData.caseNumber}</apex:outputLink>&nbsp;
-<div class="popup" id="menu{!caseData.id}" style="display:none;">
+						        <apex:outputLink value="/{!caseData.id}" target="_blank" onmouseover="displayMenu(this,'menu{!caseData.id}_{!item.defectPart.token}');">{!caseData.caseNumber}</apex:outputLink>&nbsp;
+<div class="popup" id="menu{!caseData.id}_{!item.defectPart.token}" style="display:none;">
 	<b>Subject</b>:{!caseData.Subject}<br/>
 	<b>Status:</b> {!caseData.Status}<br/>
 	<b>Created Date:</b> {!caseData.CreatedDate}<br/>
 	<b>OwnerId:</b> {!caseData.Owner.Name}<br/>
 
-	<a href="javascript:void(0)" onclick="hideMenu('menu{!caseData.id}');">(Close popup)</a>
+	<a href="javascript:void(0)" onclick="hideMenu('menu{!caseData.id}_{!item.defectPart.token}');">(Close popup)</a>
 </div>
 					        </apex:repeat>
 				        </apex:column>
