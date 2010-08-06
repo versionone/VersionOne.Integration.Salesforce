@@ -1,4 +1,4 @@
-public class SettingsController {
+public with sharing class SettingsController {
 
     private static String DEFAULT_PRODUCT = 'Not in this list';
     private static String DEFAULT_PRODUCT_ID = '0';

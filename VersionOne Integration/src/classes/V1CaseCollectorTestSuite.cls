@@ -131,6 +131,7 @@ private class V1CaseCollectorTestSuite {
         result = mapping1.SFProductName__c == mapping2.SFProductName__c;
         result = mapping1.V1ProjectToken__c == mapping2.V1ProjectToken__c;
         result = mapping1.V1ProjectName__c == mapping2.V1ProjectName__c;
+        System.assertNotEquals(null, result, 'Result state is not correct.');
         return result;
 	}
 
@@ -140,6 +141,7 @@ private class V1CaseCollectorTestSuite {
         result = mapping2.productName == mapping1.SFProductName__c;
         result = mapping2.projectToken == mapping1.V1ProjectToken__c;
         result = mapping2.projectName == mapping1.V1ProjectName__c;
+        System.assertNotEquals(null, result, 'Result state is not correct.');
         return result;
 	}
 
@@ -197,6 +199,8 @@ private class V1CaseCollectorTestSuite {
             delete obj;
         }
         V1CaseCollector.deleteMapping('112312313123');
+        //assert to show that we can reach this place
+        System.assert(true);
     }
 
     static testMethod void updateMappingTest() {

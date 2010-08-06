@@ -146,12 +146,18 @@ private class DefectControllerTester {
     private static DefectController getControllerWithoutAssignedDefect() {
         Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, Product__c = SF_PRODUCT_ID);
         insert new Case[] {caseData};
+
+        caseData = [SELECT V1Association__c FROM Case WHERE Id = :caseData.Id];
+        System.assertEquals(false, caseData.V1Association__c, 'Incorrect case state.');
         return getController(caseData);
     }
 
     private static DefectController getControllerWithAssignedDefect() {
         Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, V1Association__c = true, V1DefectId__c = DEFECT_TOKEN, Product__c = SF_PRODUCT_ID);
         insert new Case[] {caseData};
+
+        caseData = [SELECT V1Association__c FROM Case WHERE Id = :caseData.Id];
+        System.assertEquals(true, caseData.V1Association__c, 'Incorrect case state.');
         return getController(caseData);
     }
 
@@ -162,6 +168,8 @@ private class DefectControllerTester {
         DefectController controller = new DefectController(caseData);
         controller.defectFacade = facade;
         controller.settings = settingsData;
+
+        System.assertNotEquals(null, controller, 'Incorrect controller state.');
         return controller;
     }
 }

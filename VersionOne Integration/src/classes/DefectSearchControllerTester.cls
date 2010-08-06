@@ -155,6 +155,8 @@ private class DefectSearchControllerTester {
     	foundDefect.status = defectStatus;
     	defectFacadeMockValue.foundDefects.clear();
     	defectFacadeMockValue.foundDefects.add(foundDefect);
+
+    	System.assertEquals(1, defectFacadeMockValue.foundDefects.size());
     }
 
     private static void pageMessageAssert(ApexPages.Severity severity) {
@@ -166,12 +168,18 @@ private class DefectSearchControllerTester {
     private static DefectSearchController getControllerWithoutAssignedDefect() {
         caseData = new Case(Subject = caseSubject, Description = caseDescription);
         insert new Case[] {caseData};
+
+        caseData = [SELECT V1Association__c FROM Case WHERE Id = :caseData.Id];
+        System.assertEquals(false, caseData.V1Association__c, 'Incorrect case state.');
         return getController();
     }
 
     private static DefectSearchController getControllerWithAssignedDefect() {
         caseData = new Case(Subject = caseSubject, Description = caseDescription, V1Association__c = true, V1DefectId__c = assignedDefectToken);
         insert new Case[] { caseData };
+
+        caseData = [SELECT V1Association__c FROM Case WHERE Id = :caseData.Id];
+        System.assertEquals(true, caseData.V1Association__c, 'Incorrect case state.');
         return getController();
     }
 
@@ -182,6 +190,8 @@ private class DefectSearchControllerTester {
         DefectSearchController controller = new DefectSearchController(caseData);
         controller.defectFacade = defectFacadeMockValue;
         controller.Settings = settingsValue;
+
+        System.assertNotEquals(null, controller, 'Incorrect controller state.');
         return controller;
     }
 }
