@@ -1,4 +1,4 @@
-public class DefectController {
+public with sharing class DefectController {
     private Case caseData;
     private Defect defect;
     public Boolean isEditForm {set;get; }
@@ -69,7 +69,7 @@ public class DefectController {
             String token = defectFacade.createDefectInVersionOne(caseData, defect);
             defect.token = token;
             if(token != null) {
-                defect.id = token.split(':')[1];	
+                defect.id = token.split(':')[1];
             }
         } catch (IntegrationException ex) {
             System.debug('ex=' + ex);

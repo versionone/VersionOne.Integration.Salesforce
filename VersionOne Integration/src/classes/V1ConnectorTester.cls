@@ -955,7 +955,7 @@ private class V1ConnectorTester {
     	for(String part : parts) {
     		query += '&find=' + part;
     	}
-
+		System.assertNotEquals(null, query, 'Incorrect query state.');
     	return query;
     }
 
@@ -975,7 +975,7 @@ private class V1ConnectorTester {
     	result = result && defect1.isClosed == defect2.isClosed;
     	result = result && defect1.cases == defect2.cases;
     	result = result && defect1.changeDate == defect2.changeDate;
-
+		System.assertNotEquals(null, result, 'Incorrect result state.');
     	return result;
     }
 

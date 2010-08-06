@@ -53,7 +53,7 @@ public class V1CaseCollector {
      * Returns all mapping VersionOne projects to the Salesforce products.
      **/
     public static List<MappingV1ProjectsToSFProducts__c> getMappingList() {
-        return [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
+        return [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c LIMIT 5000];
     }
 
     /**

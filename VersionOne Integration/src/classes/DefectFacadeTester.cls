@@ -294,6 +294,7 @@ private class DefectFacadeTester {
         );
         insert caseValue;
         caseValue = [SELECT Subject, Id, Description, Product__c, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c, CaseNumber FROM Case WHERE Id = :caseValue.Id];
+        System.assertNotEquals(null, caseValue);
         return caseValue;
     }
 
@@ -302,12 +303,15 @@ private class DefectFacadeTester {
             [select Id from MappingV1ProjectsToSFProducts__c]) {
             delete obj;
         }
+
+         System.assertEquals(0, [select Id from MappingV1ProjectsToSFProducts__c LIMIT 5].size());
     }
 
     private static Defect createDefect(String title, String description, Boolean isClosed) {
         Defect defectValue = new Defect(title, description);
         defectValue.token = DEFECT_TOKEN;
         defectValue.isClosed = isClosed;
+        System.assertNotEquals(null, defectValue);
         return defectValue;
     }
 }

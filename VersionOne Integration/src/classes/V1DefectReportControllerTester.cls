@@ -81,6 +81,7 @@ private class V1DefectReportControllerTester {
 	    	foundDefect.changeDate = changeDate;
 	    	defectFacadeMockValue.closedDefects.add(foundDefect);
     	}
+    	System.assertEquals(25, defectFacadeMockValue.closedDefects.size(), 'Incorrect numbers of closed defects.');
     }
 
     private static void pageMessageAssert(ApexPages.Severity severity) {
@@ -94,6 +95,7 @@ private class V1DefectReportControllerTester {
     	Defect foundDefect = new Defect(caseSubject, caseDescription);
     	foundDefect.changeDate = changeDate;
     	defectFacadeMockValue.closedDefects.add(foundDefect);
+    	System.assertEquals(1, defectFacadeMockValue.closedDefects.size(), 'Incorrect numbers of closed defects.');
     }
 
     private static V1DefectReportController getController() {
@@ -102,6 +104,7 @@ private class V1DefectReportControllerTester {
         V1DefectReportController controller = new V1DefectReportController();
         controller.defectFacade = defectFacadeMockValue;
         controller.Settings = settingsValue;
+		System.assertNotEquals(null, controller, 'Incorrect controller state.');
         return controller;
     }
 }

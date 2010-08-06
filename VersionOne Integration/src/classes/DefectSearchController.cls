@@ -1,4 +1,4 @@
-public class DefectSearchController {
+public with sharing class DefectSearchController {
     private final Integer ITEMS_PER_PAGE = 10;
 
     private Case currentCaseValue;

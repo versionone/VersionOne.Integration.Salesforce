@@ -124,8 +124,22 @@ private class XMLDomTest {
     }
 
     public static testmethod void test4() {
-        xmldom f = new xmldom( '<RetrieveItem_Request_1 xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/Quotes_1"><ItemRequest Scope="All"><QoS xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon"><TimelinessInfo Timeliness="DELAYED" /><RateInfo Rate="UNSPECIFIED" /></QoS><Fields xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon" /><RequestKey xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon" Name="MSFT.O" Service="" NameType="RIC" /></ItemRequest></RetrieveItem_Request_1>');
+    	String xml = '<RetrieveItem_Request_1 xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/Quotes_1"><ItemRequest Scope="All"><QoS xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon"><TimelinessInfo Timeliness="DELAYED" /><RateInfo Rate="UNSPECIFIED" /></QoS><Fields xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon" /><RequestKey xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon" Name="MSFT.O" Service="" NameType="RIC" /></ItemRequest></RetrieveItem_Request_1>';
+    	String expectedXml = '<#document >\n'+
+								'<RetrieveItem_Request_1 xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/Quotes_1\' >\n'+
+									'<ItemRequest Scope=\'All\' >\n'+
+										'<QoS xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon\' >\n'+
+											'<TimelinessInfo Timeliness=\'DELAYED\'  />\n'+
+											'<RateInfo Rate=\'UNSPECIFIED\'  />\n'+
+										'</QoS>\n'+
+										'<Fields xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon\'  />\n'+
+										'<RequestKey Name=\'MSFT.O\' Service=\'\' NameType=\'RIC\' xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon\'  />\n'+
+									'</ItemRequest>\n'+
+								'</RetrieveItem_Request_1>\n'+
+							'</#document>\n';
+        xmldom f = new xmldom( xml);
         system.debug( f.toXmlString() );
+        system.assertEquals(expectedXml, f.toXmlString());
     }
 
     public static testmethod void test_except() {
