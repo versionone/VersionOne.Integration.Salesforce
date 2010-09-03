@@ -26,6 +26,27 @@ public class V1CaseCollector {
         return [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE CaseNumber in :casesNumber];
     }
 
+
+    /* Query cases with specified owner, and cases aren't processing atm.
+     * ownerId - ID of an owner.
+     * isClosed - is case closed.
+     *			true  - gather only not closed cases
+     *			false - gather only closed cases
+     * Return: Array of cases.
+     */
+    public static Case[] getCasesByOwnerId(String ownerId, Boolean isClosed) {
+        Case[] cases;
+        if (isClosed) {
+            cases = [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+                          FROM Case WHERE OwnerId = :ownerId and Status = 'Closed' and V1Association__c = true ];
+        } else {
+            cases = [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+                          FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed' and V1Association__c = true ];
+        }
+        System.debug('==> getCasesByOwnerId() found: ' + cases.size());
+        return cases;
+    }
+
     /**
      * Update case.
      * caseData 	- case which need to be updated.

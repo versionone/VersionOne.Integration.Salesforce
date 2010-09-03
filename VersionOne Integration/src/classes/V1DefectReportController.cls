@@ -1,12 +1,18 @@
 public class V1DefectReportController {
-	private List<DefectWrapper> closedDefects = null;
+	private List<DefectWrapper> casesWithDefects = null;
 
-	public String userDate { get; set; }
-	public String ownerDefectList { get; set; }
+	//public String userDate { get; set; }
+	//public String ownerDefectList { get; set; }
+	public String ownerCaseList { get; set; }
+	public String caseStatusList { get; set; }
+	public String defectStatusList { get; set; }
 	private final Integer ITEMS_PER_PAGE = 20;
-	private final String COOKIE_NAME = 'datetime';
-	private final String SHOW_MY_DEFECTS = '1';
-	private final String SHOW_ALL_DEFECTS = '2';
+	//private final String SHOW_MY_DEFECTS = '1';
+	//private final String SHOW_ALL_DEFECTS = '2';
+	private final String MY_CASE = '1';
+	private final String ALL_CASE = '2';
+	private final String OPEN = '1';
+	private final String CLOSED = '2';
 
 	public DefectTablePaginator paginator { get; private set; }
 
@@ -36,28 +42,43 @@ public class V1DefectReportController {
         }
     }
 
-    public boolean displayClosedDefectsTable {
+    public boolean displayCasesWithDefectsTable {
     	get {
-    		return closedDefects != null && closedDefects.size() > 0;
+    		return casesWithDefects != null && casesWithDefects.size() > 0;
     	}
     }
 
     public V1DefectReportController() {
-		Cookie lastDateTime = ApexPages.currentPage().getCookies().get(COOKIE_NAME);
-		if (lastDateTime != null) {
-			userDate = lastDateTime.getValue();
-		}
-		ownerDefectList = SHOW_ALL_DEFECTS;
+		//ownerDefectList = SHOW_ALL_DEFECTS;
+		ownerCaseList = MY_CASE;
+		caseStatusList = OPEN;
+		defectStatusList = CLOSED;
     }
 
-	public List<DefectWrapper> getClosedDefect() {
-		return closedDefects;
+	public List<DefectWrapper> getCasesWithDefect() {
+		return casesWithDefects;
 	}
 
+/*
 	public List<SelectOption> getOwnerDefectListOptions() {
         List<SelectOption> options = new List<SelectOption>();
         options.add(new SelectOption(SHOW_ALL_DEFECTS, 'Show all defects'));
         options.add(new SelectOption(SHOW_MY_DEFECTS, 'Show only my defects'));
+		return options;
+	}
+*/
+
+	public List<SelectOption> getOwnerCaseListOptions() {
+        List<SelectOption> options = new List<SelectOption>();
+        options.add(new SelectOption(MY_CASE, 'All'));
+        options.add(new SelectOption(ALL_CASE, 'Mine'));
+		return options;
+	}
+
+	public List<SelectOption> getStatusListOptions() {
+        List<SelectOption> options = new List<SelectOption>();
+        options.add(new SelectOption(OPEN, 'Open'));
+        options.add(new SelectOption(CLOSED, 'Closed'));
 		return options;
 	}
 
@@ -70,42 +91,25 @@ public class V1DefectReportController {
         }
     }
 
-	public PageReference findClosedDefects() {
-        closedDefects = null;
+	public PageReference findCasesWithDefects() {
+        casesWithDefects = new List<DefectWrapper>();
         paginator = new DefectTablePaginator(ITEMS_PER_PAGE, new List<DefectWrapper>());
 
         try {
-            List<Defect> defects = defectFacade.getClosedDefects(userDate, ownerDefectList == SHOW_ALL_DEFECTS);
-            closedDefects = new List<DefectWrapper>();
-			DateTime latestDate = null;
-            for(Defect defect : defects) {
-                closedDefects.add(new DefectWrapper(null, defect));
-                DateTime testDate = V1Connector.convertToDateTime(defect.changeDate);
-                if (latestDate == null || testDate > latestDate) {
-                	latestDate = testDate;
-                }
+            casesWithDefects = defectFacade.getCasesWithDefects(ownerCaseList == ALL_CASE, caseStatusList == CLOSED, defectStatusList == CLOSED);
+
+            if(casesWithDefects.size() == 0) {
+                addPageMessage(ApexPages.Severity.INFO, 'There are no defects.');
             }
 
-            if(closedDefects.size() == 0) {
-                addPageMessage(ApexPages.Severity.INFO, 'There are no defects closed since ' + userDate);
-            }
-
-            paginator = new DefectTablePaginator(ITEMS_PER_PAGE, closedDefects);
-			storeCookie(latestDate);
+            paginator = new DefectTablePaginator(ITEMS_PER_PAGE, casesWithDefects);
         } catch (Exception ex) {
+        	casesWithDefects = new List<DefectWrapper>();
             System.debug(ex.getMessage());
             addPageMessage(ApexPages.Severity.ERROR, ex.getMessage());
         }
 
 		return null;
-	}
-
-	private void storeCookie(DateTime dateForCookie) {
-		if (dateForCookie != null) {
-        	// store cookies during 2 months
-        	Cookie newDateTime = new Cookie(COOKIE_NAME, dateForCookie.format('yyyy-MM-dd'), null, 60*60*24*30*2, false);
-        	ApexPages.currentPage().setCookies(new Cookie[]{newDateTime});
-		}
 	}
 
     private void addPageMessage(ApexPages.Severity severity, String text) {

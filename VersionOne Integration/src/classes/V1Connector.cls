@@ -1,7 +1,7 @@
 public class V1Connector implements IV1Connector {
 
     public static final String DATA_URL = 'rest-1.v1/Data/';
-    public static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=AssetState,Name,Number,ChangeDateUTC,Reference,Owners.Name&where=(Source=\'\'StorySource:{0}\'\';AssetState=\'\'Closed\'\'{1}{2})';
+    public static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=AssetState,Name,Number,ChangeDateUTC,Reference,Owners.Name&where=(Source=\'\'StorySource:{0}\'\'{1}{2})';
     public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'\'{0}\'\'';
     public static final String SCOPE_URL  = 'rest-1.v1/Data/Scope?sel=Name&where=(Scope.AssetState!=\'Closed\')';
     public static final String WORKITEM_REFERENCE_SEARCH_URL = 'rest-1.v1/Data/PrimaryWorkitem?sel=Reference&where=(({0});Source.Name=\'\'{1}\'\')';// {0} - Reference='%ref1%'|Reference='%ref2%'
@@ -163,6 +163,7 @@ public class V1Connector implements IV1Connector {
 			defectData.changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes)).format('yyyy-MM-dd hh:mm:ss');
         }
         String reference = getValue('Reference', asset.childNodes);
+
         if (reference != null) {
         	defectData.cases = V1CaseCollector.getCasesByCasesNumber(reference.split(';'));
         	//defectData.casesNumber = reference.split(';');
@@ -442,29 +443,49 @@ public class V1Connector implements IV1Connector {
         return settings;
     }
 
-    public List<Defect> getClosedDefects(DateTime dateData, Boolean isShowAllDefects) {
-
-        List<Defect> closedDefects = new List<Defect>();
-        String dateRestriction = '';
-        if (dateData != null) {
-            dateRestriction = ';ChangeDateUTC>\'' + dateData.format('yyyy-MM-dd\'T\'HH:mm:ss') + '\'';
+    public List<Defect> getAssignedDefects(Case[] cases, Boolean isClosedDefects) {
+        List<Defect> assignedDefects = new List<Defect>();
+        if (cases.size() == 0) {
+        	return assignedDefects;
         }
-        String usedRestriction = '';
-        if (!isShowAllDefects) {
-        	usedRestriction = ';Owners=\'Member:' + settings.getCurrentMemberId() + '\'';
+
+        String defectStatus = '';
+        if (isClosedDefects) {
+        	defectStatus = ';AssetState=\'Closed\'';
+        } else {
+        	defectStatus = ';AssetState!=\'Closed\'';
         }
         //Send the request, and get a response
-        String url = String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), dateRestriction, usedRestriction});
+        String defectsIds = getDefectIdsURL(cases);
+        String url = String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), defectStatus, defectsIds});
+
         requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
         XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
         for (XMLDom.Element asset : assetTags) {
-        	Defect closedDefectData = getDefect(asset);
-
-            closedDefects.add(closedDefectData);
+        	Defect defectData = getDefect(asset);
+            assignedDefects.add(defectData);
         }
-        return closedDefects;
+        return assignedDefects;
+    }
+
+    private String getDefectIdsURL(Case[] cases) {
+    	if(cases.size() == 0) {
+    		return '';
+    	}
+    	String defectIds = ';(';
+    	Boolean addSeparator = false;
+    	for (Case caseData : cases) {
+    		if (addSeparator) {
+    			defectIds = defectIds + '|';
+    		} else {
+    			addSeparator = true;
+    		}
+    		defectIds = defectIds + 'Defect.ID=' + '\'' + caseData.V1DefectId__c + '\'';
+    	}
+    	defectIds = defectIds + ')';
+    	return defectIds;
     }
 }

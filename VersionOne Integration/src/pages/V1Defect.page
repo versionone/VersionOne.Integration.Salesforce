@@ -27,7 +27,7 @@
 		}
 
 		function refreshWindow(){
-			parent.location.href="/{!Case.Id}";
+			parent.location.href="/<apex:outputText value="{!Case.Id}"/>";
 		}
 
 		function disableFormButtons() {
@@ -191,7 +191,7 @@
 					<apex:pageBlockTable value="{!AssignedDefect}" var="d" rendered="{!isDefectAssigned}">
 						<apex:column >
 							<apex:facet name="header">ID</apex:facet>
-							<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!d.token}" target="_blank">{!d.assetNumber}</apex:outputLink>
+							<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!d.token}" target="_blank" ><apex:outputText value="{!d.assetNumber}"/></apex:outputLink>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">Title</apex:facet>

@@ -154,12 +154,31 @@ public class DefectFacade implements IDefectFacade {
         }
     }
 
-    public List<Defect> getClosedDefects(String dateString, Boolean isShowAllDefects) {
+    public List<DefectWrapper> getCasesWithDefects(Boolean isShowAllCase, Boolean isClosedCases, Boolean isClosedDefects) {
+		Case[] cases = V1CaseCollector.getCasesByOwnerId(Userinfo.getUserId(), isClosedCases);
     	try {
-    		return connector.getClosedDefects(getDateTime(dateString), isShowAllDefects);
+    		List<Defect> defects = connector.getAssignedDefects(cases, isClosedDefects);
+    		List<DefectWrapper> defectsWithCases = new List<DefectWrapper>();
+    		if (defects == null) {
+    			return defectsWithCases;
+    		}
+    		for (Defect defectData : defects) {
+    			Case caseData = findCase(defectData.id, cases);
+    			defectsWithCases.add(new DefectWrapper(caseData, defectData));
+    		}
+    		return defectsWithCases;
     	} catch(Exception ex) {
             throw new IntegrationException('Failed to get closed defects.');
         }
+    }
+
+    private Case findCase(String defectId, Case[] cases) {
+    	for (Case caseData : cases) {
+    		if (caseData.V1DefectId__c == 'Defect:' + defectId) {
+    			return caseData;
+    		}
+    	}
+    	return null;
     }
 
     public static DateTime getDateTime(String dateString) {

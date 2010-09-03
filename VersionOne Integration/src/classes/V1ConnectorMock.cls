@@ -5,7 +5,7 @@ public class V1ConnectorMock implements IV1Connector {
     public static final String UPDATING_REFERENCE_FOR_DEFECT_EXCEPTION = 'updateReferenceForDefectException';
     public static final String SEARCHING_FOR_DEFECTS_EXCEPTION = 'searchForDefectsException';
     public static final String DELETION_REFERENCE_IN_DEFECT_EXCEPTION = 'deleteReferenceInDefectException';
-    public static final String GETTING_CLOSED_DEFECTS_EXCEPTION = 'gettingClosedDefectsException';
+    public static final String GETTING_CASES_WITH_DEFECTS_EXCEPTION = 'gettingCasesWithDefectsException';
     private String sourceId = '123456';
     public static final String MEMBER_ID = '20';
     private Exception ex;
@@ -20,6 +20,7 @@ public class V1ConnectorMock implements IV1Connector {
     public static final String developmentStatus = 'In Progress';
 
     public DefectSearchCriteria defectSearchCriteria { get; private set; }
+    public List<Defect> AssignedDefects {get; set;}
 
     public Defect getDefectById(String id) {
         Defect defectData = new Defect('title', 'description');
@@ -118,11 +119,11 @@ public class V1ConnectorMock implements IV1Connector {
         return Settings.getTestSettings();
     }
 
-    public List<Defect> getClosedDefects(DateTime dateData, Boolean isShowAllDefects) {
-        if (exceptions.get(GETTING_CLOSED_DEFECTS_EXCEPTION) != null) {
-            throw exceptions.get(GETTING_CLOSED_DEFECTS_EXCEPTION);
+    public List<Defect> getAssignedDefects(Case[] cases, Boolean isClosedDefects) {
+        if (exceptions.get(GETTING_CASES_WITH_DEFECTS_EXCEPTION) != null) {
+            throw exceptions.get(GETTING_CASES_WITH_DEFECTS_EXCEPTION);
         }
-        return null;
+        return AssignedDefects;
     }
 
 

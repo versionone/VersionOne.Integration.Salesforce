@@ -11,11 +11,12 @@ public class DefectFacadeMock implements IDefectFacade {
     public static final String UNASSIGN_DEFECT_FROM_CASE_EXCEPTION = 'unassignDefectFromCaseException';
     public static final String PUBLISH_STATUS_EXCEPTION = 'publishStatusException';
     public static final String SEARCH_EXCEPTION = 'searchException';
+    public static final String GETTING_CASES_WITH_DEFECT_EXCEPTION = 'getCasesWithDefects';
 
     public AssignDefectPassedData assignDefectResultValue { get; private set; }
 
     public List<Defect> foundDefects { get; set; }
-    public List<Defect> closedDefects { get; set; }
+    public List<DefectWrapper> casesWithDefects { get; set; }
 
     public List<V1FieldData> getFieldsData() {
         return new List<V1FieldData>();
@@ -72,8 +73,11 @@ public class DefectFacadeMock implements IDefectFacade {
         return defectData;
     }
 
-	public List<Defect> getClosedDefects(String dateString, Boolean isShowAllDefects) {
-		return closedDefects;
+	public List<DefectWrapper> getCasesWithDefects(Boolean isShowAllCase, Boolean isClosedCases, Boolean isClosedDefects) {
+        if(exceptions.get(GETTING_CASES_WITH_DEFECT_EXCEPTION) != null) {
+            throw exceptions.get(GETTING_CASES_WITH_DEFECT_EXCEPTION);
+        }
+		return casesWithDefects;
 	}
 
 	public void addException(String name, Exception ex) {

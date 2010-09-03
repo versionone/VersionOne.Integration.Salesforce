@@ -180,14 +180,14 @@
 						<apex:column >
 							<apex:facet name="header">Actions</apex:facet>
 			                <apex:outputLink value="javascript:void(0);"
-			                	onclick="disableAddMappingButton();updateProject('{!mapping.mappingId}');"
+			                	onclick="disableAddMappingButton();updateProject('{!HTMLENCODE(mapping.mappingId)}');"
 			                	rendered="{!not(mapping.isDeletable)}">Update VersionOne Project</apex:outputLink>
 			                <apex:outputLink value="javascript:void(0);"
-			                	onclick="if (isMappingDataValide('{!mapping.mappingId}')){disableAddMappingButton();updateProject('{!mapping.mappingId}');}"
+			                	onclick="if (isMappingDataValide('{!HTMLENCODE(mapping.mappingId)}')){disableAddMappingButton();updateProject('{!HTMLENCODE(mapping.mappingId)}');}"
 			                	rendered="{!mapping.isDeletable}">Update</apex:outputLink>
 	            		    &nbsp;&nbsp;
 			                <apex:outputLink value="javascript:void(0);" rendered="{!mapping.isDeletable}"
-			                	onclick="disableAddMappingButton();removeMapping('{!mapping.mappingId}');">Remove</apex:outputLink>
+			                	onclick="disableAddMappingButton();removeMapping('{!HTMLENCODE(mapping.mappingId)}');">Remove</apex:outputLink>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">Salesforce Product</apex:facet>

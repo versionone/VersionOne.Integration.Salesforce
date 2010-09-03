@@ -78,10 +78,10 @@ public interface IV1Connector {
     Settings getSettings();
 
     /**
-    * Request information about closed defects since specified date,
-    * dateData 			- since this date will be gathered all closed defects.
-    * isShowAllDefects	- true - show all defects, false only assigned to current used.
-    * Return: defects which were closed since the date.
+    * Request information about assigned defects,
+    * cases 			- collect all defects which was assigned this these cases.
+    * isClosedDefects	- true - collect only closed defect, false only with open status.
+    * Return: defects which were assiged to specific cases.
     **/
-    List<Defect> getClosedDefects(DateTime dateData, Boolean isShowAllDefects);
+    List<Defect> getAssignedDefects(Case[] cases, Boolean isClosedDefects);
 }

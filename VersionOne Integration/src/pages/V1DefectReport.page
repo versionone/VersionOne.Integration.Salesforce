@@ -54,22 +54,56 @@
     <apex:form >
         <apex:pageBlock title="Closed Defects Report" mode="edit">
             <apex:pageBlockSection columns="1" id="dateInput">
+            	<!--
                 <apex:pageBlockSectionItem >
 					<apex:outputPanel >
 	                	<apex:outputLabel value="Show closed defects since:" for="date" />&nbsp;
 						<apex:inputText size="30" id="date" tabindex="1" maxlength="255" value="{!UserDate}"/> (<i>yyyy-mm-dd</i>)&nbsp;
 						<apex:commandButton value="Show" id="showButton" status="getDefectsFromVersionOne"
-							 action="{!findClosedDefects}"
+							 action="{!findCasesWithDefects}"
 							 onclick="disableElement('{!$Component.showButton}');"
 							 oncomplete="enableElement('{!$Component.showButton}');"
 							 rerender="tableOutput, errorMessages"/>
 					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
-                <apex:pageBlockSectionItem >
-					<apex:selectRadio value="{!ownerDefectList}">
-						<apex:selectOptions value="{!ownerDefectListOptions}"/>
-					</apex:selectRadio>
-				</apex:pageBlockSectionItem>
+				 -->
+				<apex:outputPanel >
+				<table border="0">
+				<thead>
+				<tr>
+					<td width="200px"><b>Salesforce Case Owner</b></td>
+					<td width="200px"><b>Salesforce Cases</b></td>
+					<td width="200px"><b>VersionOne Defects</b></td>
+				</tr>
+				</thead>
+				<tr>
+					<td>
+						<apex:selectRadio value="{!ownerCaseList}" layout="pageDirection">
+							<apex:selectOptions value="{!ownerCaseListOptions}"/>
+						</apex:selectRadio>
+					</td>
+					<td>
+						<apex:selectRadio value="{!caseStatusList}" layout="pageDirection">
+							<apex:selectOptions value="{!statusListOptions}"/>
+						</apex:selectRadio>
+					</td>
+					<td>
+						<apex:selectRadio value="{!defectStatusList}" layout="pageDirection">
+							<apex:selectOptions value="{!statusListOptions}"/>
+						</apex:selectRadio>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3" style="text-align: right;">
+						<apex:commandButton style="text-align: right;" value="Show" id="showButton" status="getDefectsFromVersionOne"
+								 action="{!findCasesWithDefects}"
+								 onclick="disableElement('{!$Component.showButton}');"
+								 oncomplete="enableElement('{!$Component.showButton}');"
+								 rerender="tableOutput, errorMessages"/>
+					</td>
+				</tr>
+				</table>
+				</apex:outputPanel>
 		    </apex:pageBlockSection>
             <apex:pageBlockSection columns="1" id="tableOutput">
 	            <apex:pageBlockSectionItem >
@@ -78,7 +112,7 @@
 					    <apex:repeat value="{!paginator.pagesList}" var="pageNumber"  rendered="{!paginator.totalPageNumber > 1}">
 	                        <apex:outputPanel rendered="{!(pageNumber + 1) != paginator.pageNumber}">
 	                            <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
-	                             value="javascript:return false;">{!pageNumber + 1} </apex:outputLink>
+	                             value="javascript:return false;"><apex:outputText value="{!pageNumber + 1}"/> </apex:outputLink>
 	                        </apex:outputPanel>
 	                        <apex:outputPanel rendered="{!(pageNumber + 1) == paginator.pageNumber}">
 	                            <apex:outputText value="{!pageNumber + 1}"/>
@@ -95,10 +129,41 @@
 					</apex:outputPanel>
 				</apex:pageBlockSectionItem>
 	            <apex:pageBlockSectionItem >
-				    <apex:pageBlockTable value="{!paginator.defects}" var="item" id="defectTable" rendered="{!displayClosedDefectsTable}">
+				    <apex:pageBlockTable value="{!paginator.defects}" var="item" id="defectTable" rendered="{!displayCasesWithDefectsTable}">
 				        <apex:column >
 				        	<apex:facet name="header">ID</apex:facet>
-				        	<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank">{!item.defectPart.assetNumber}</apex:outputLink>
+				        	<apex:outputLink value="/{!item.casePart.id}" target="_blank" ><apex:outputText value="{!item.casePart.caseNumber}"/></apex:outputLink>
+				        </apex:column>
+				        <apex:column >
+				        	<apex:facet name="header">Case Owner</apex:facet>
+				        	<apex:outputText value="{!item.casePart.Owner.Name}"/>
+				        </apex:column>
+				        <apex:column >
+				        	<apex:facet name="header">Subject</apex:facet>
+				        	<apex:outputText value="{!item.casePart.Subject}"/>
+				        </apex:column>
+				        <apex:column >
+				        	<apex:facet name="header">Date/Time Open</apex:facet>
+				        	<apex:outputText value="{!item.casePart.CreatedDate}"/>
+				        </apex:column>
+				        <apex:column >
+				        	<apex:facet name="header">VersionOne Defect</apex:facet>
+							<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank" onmouseover="displayMenu(this,'menu{!HTMLENCODE(item.casePart.id)}_{!HTMLENCODE(item.defectPart.token)}');"><apex:outputText value="{!item.defectPart.assetNumber}"/></apex:outputLink>
+<div class="popup" id="menu{!HTMLENCODE(item.casePart.id)}_{!HTMLENCODE(item.defectPart.token)}" style="display:none;">
+	<b>Title</b>:<apex:outputText value="{!item.defectPart.title}"/><br/>
+	<b>Owner:</b> <apex:outputText value="{!item.defectPart.ownersAsString}"/><br/>
+	<b>Change Date:</b> <apex:outputText value="{!item.defectPart.changeDate}"/><br/><br/>
+	<a href="javascript:void(0)" onclick="hideMenu('menu{!HTMLENCODE(item.casePart.id)}_{!HTMLENCODE(item.defectPart.token)}');">Close</a>
+</div>
+				        </apex:column>
+				    </apex:pageBlockTable>
+				</apex:pageBlockSectionItem>
+				<!--
+	            <apex:pageBlockSectionItem >
+				    <apex:pageBlockTable value="{!paginator.defects}" var="item" id="defectTable" rendered="{!displayCasesWithDefectsTable}">
+				        <apex:column >
+				        	<apex:facet name="header">ID</apex:facet>
+				        	<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank"><apex:outputText value="{!item.defectPart.assetNumber}"/></apex:outputLink>
 				        </apex:column>
 				        <apex:column >
 				        	<apex:facet name="header">Name</apex:facet>
@@ -111,13 +176,13 @@
 				        <apex:column >
 				        	<apex:facet name="header">Cases</apex:facet>
 						    <apex:repeat value="{!item.defectPart.cases}" var="caseData" >
-						        <apex:outputLink value="/{!caseData.id}" target="_blank" onmouseover="displayMenu(this,'menu{!caseData.id}_{!item.defectPart.token}');">{!caseData.caseNumber}</apex:outputLink>&nbsp;
-<div class="popup" id="menu{!caseData.id}_{!item.defectPart.token}" style="display:none;">
-	<b>Subject</b>:{!caseData.Subject}<br/>
-	<b>Status:</b> {!caseData.Status}<br/>
-	<b>OwnerId:</b> {!caseData.Owner.Name}<br/>
-	<b>Created Date:</b> {!caseData.CreatedDate}<br/><br/>
-	<a href="javascript:void(0)" onclick="hideMenu('menu{!caseData.id}_{!item.defectPart.token}');">Close</a>
+						        <apex:outputLink value="/{!caseData.id}" target="_blank" onmouseover="displayMenu(this,'menu{!HTMLENCODE(caseData.id)}_{!HTMLENCODE(item.defectPart.token)}');"><apex:outputText value="{!caseData.caseNumber}"/></apex:outputLink>&nbsp;
+<div class="popup" id="menu{!HTMLENCODE(caseData.id)}_{!HTMLENCODE(item.defectPart.token)}" style="display:none;">
+	<b>Subject</b>:<apex:outputText value="{!caseData.Subject}"/><br/>
+	<b>Status:</b> <apex:outputText value="{!caseData.Status}"/><br/>
+	<b>OwnerId:</b> <apex:outputText value="{!caseData.Owner.Name}"/><br/>
+	<b>Created Date:</b> <apex:outputText value="{!caseData.CreatedDate}"/><br/><br/>
+	<a href="javascript:void(0)" onclick="hideMenu('menu{!HTMLENCODE(caseData.id)}_{!HTMLENCODE(item.defectPart.token)}');">Close</a>
 </div>
 					        </apex:repeat>
 				        </apex:column>
@@ -127,13 +192,14 @@
 				        </apex:column>
 					</apex:pageBlockTable>
 				</apex:pageBlockSectionItem>
+ -->
 	            <apex:pageBlockSectionItem >
                     <apex:outputPanel style="text-align: right;" rendered="{!paginator.hasData}">
 					    <br/>
 					    <apex:repeat value="{!paginator.pagesList}" var="pageNumber"  rendered="{!paginator.totalPageNumber > 1}">
 	                        <apex:outputPanel rendered="{!(pageNumber + 1) != paginator.pageNumber}">
 	                            <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
-	                             value="javascript:return false;">{!pageNumber + 1} </apex:outputLink>
+	                             value="javascript:return false;"><apex:outputText value="{!pageNumber + 1}"/> </apex:outputLink>
 	                        </apex:outputPanel>
 	                        <apex:outputPanel rendered="{!(pageNumber + 1) == paginator.pageNumber}">
 	                            <apex:outputText value="{!pageNumber + 1}"/>
