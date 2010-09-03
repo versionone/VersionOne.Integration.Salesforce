@@ -272,13 +272,48 @@ private class DefectFacadeTester {
         System.assertEquals(dateTime2+' 00:00:00', DefectFacade.getDateTime(dateTime2).format(format));
     }
 
-    static testMethod void getClosedDefectsWithExceptionTest() {
+    static testMethod void getCasesWithDefectsTest() {
         V1ConnectorMock connector = new V1ConnectorMock();
-        connector.addException(V1ConnectorMock.GETTING_CLOSED_DEFECTS_EXCEPTION, new IntegrationException());
+        connector.setCreatedWorkitemToken(DEFECT_TOKEN);
         IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
 
+    	User userData = createUser('testUser');
+    	List<Case> cases = new List<Case>();
+    	List<Defect> defects = new List<Defect>();
+    	Integer numberRecords = 100;
+		System.runAs(userData){
+	    	for (Integer i=0; i<numberRecords; i++) {
+		        Case caseValue = new Case(
+		            Subject = 'case'+i,
+		            Description = 'desc'+i,
+		            Product__c = PRODUCT_ID,
+		            V1Association__c = true,
+		            V1DefectId__c = 'Defect:'+i,
+		            OwnerId = Userinfo.getUserId()
+		        );
+	    	    cases.add(caseValue);
+	    	    Defect defectData = new Defect('case'+i, 'desc'+i);
+	    	    defectData.id = String.valueof(i);
+	    	    defects.add(defectData);
+	    	}
+	    	insert cases;
+	    	connector.AssignedDefects = defects;
+
+    		List<DefectWrapper> wrappedDefects = defectFacade.getCasesWithDefects(true, false, true);
+    		System.assertEquals(numberRecords, wrappedDefects.size(), 'Incorrect numbers of defects.');
+    		for (Integer i=0; i<numberRecords; i++) {
+    			System.assertNotEquals(null, wrappedDefects.get(i).casePart, 'Case can\'t be null.');
+    			System.assertNotEquals(null, wrappedDefects.get(i).defectPart, 'Defect can\'t be null.');
+    		}
+		}
+    }
+
+    static testMethod void getCasesWithDefectsWithExceptionTest() {
+        V1ConnectorMock connector = new V1ConnectorMock();
+        connector.addException(V1ConnectorMock.GETTING_CASES_WITH_DEFECTS_EXCEPTION, new IntegrationException());
+        IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
         try {
-            connector.getClosedDefects(null, true);
+            defectFacade.getCasesWithDefects(true, true, true);
             System.assert(false, 'This line should not be reached - we\'re awaiting the IntegrationException exception');
         } catch(IntegrationException ex) { }
 
@@ -313,5 +348,19 @@ private class DefectFacadeTester {
         defectValue.isClosed = isClosed;
         System.assertNotEquals(null, defectValue);
         return defectValue;
+    }
+
+    private static User createUser(String alias) {
+        User user = new User();
+        user.Username = alias + '@not-a-mail.com';
+        user.LastName = alias;
+        user.Email = alias + '@not-a-mail.com';
+        user.alias = alias;
+        user.TimeZoneSidKey = 'America/New_York';
+        user.LocaleSidKey = 'en_US';
+        user.EmailEncodingKey = 'ISO-8859-1';
+        user.ProfileId = [select id from Profile where Name='System Administrator'].Id;
+        user.LanguageLocaleKey = 'en_US';
+        return user;
     }
 }

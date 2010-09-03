@@ -242,4 +242,58 @@ private class V1CaseCollectorTestSuite {
         assertMappingContain(mappingData1, mappings, 'Incorect product data in mapping which was not updated.');
         assertMappingContain(updateForMapping, mappings, 'Incorect product data in mapping which was not updated.');
     }
+
+    static testMethod void getCasesByOwnerIdTest() {
+        String queueName = 'TestQueue1';
+        Group queue = new Group(Type='Queue', Name=queueName);
+        insert queue;
+        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+        insert sobj;
+
+        System.runAs(createUser('test4356')){
+            Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id, V1Association__c = true);
+            Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id, V1Association__c = true);
+            Case case3 = new Case(Subject='TestCase3', OwnerId = queue.Id, V1Association__c = true);
+            Case case4 = new Case(Subject='TestCase4');
+            insert new Case[] {case1, case2, case3, case4};
+
+            Case[] cases = V1CaseCollector.getCasesByOwnerId(queue.Id, false);
+            System.assertEquals(3, cases.size(), 'Incorrect numbers of cases.');
+
+            case2.status = 'Closed';
+            case3.V1Association__c = false;
+            update new Case[] {case2, case3};
+            Case[] newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, true);
+            System.assertEquals(1, newCases.size(), 'Incorrect numbers of cases. One cases have to be closed');
+            assertContains(case2, newCases, 'Wrong owned case2.');
+            newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, false);
+            System.assertEquals(1, newCases.size(), 'Incorrect numbers of cases. Two classes have to be not closed');
+            assertContains(case1, newCases, 'Wrong owned case1.');
+        }
+    }
+
+    static void assertContains (SObject expect, SObject[] actuals, String msg) {
+        Boolean contains = false;
+        for (SObject o : actuals) {
+            if (o.Id == expect.Id) {
+                contains = true;
+                break;
+            }
+        }
+        System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
+    }
+
+    static User createUser(String alias) {
+        User user = new User();
+        user.Username = alias + '@not-a-mail.com';
+        user.LastName = alias;
+        user.Email = alias + '@not-a-mail.com';
+        user.alias = alias;
+        user.TimeZoneSidKey = 'America/New_York';
+        user.LocaleSidKey = 'en_US';
+        user.EmailEncodingKey = 'ISO-8859-1';
+        user.ProfileId = [select id from Profile where Name='System Administrator'].Id;
+        user.LanguageLocaleKey = 'en_US';
+        return user;
+    }
 }

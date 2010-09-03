@@ -49,7 +49,9 @@ public interface IDefectFacade {
     /**
     * Lookup closed VersionOne defects.
     * dateString 		- date since will lookup closed defects.
-    * isShowAllDefects	- true - show all defects, false only assigned to current used.
+    * isShowAllCase		- true - show all cases, false only assigned to current user.
+    * isClosedCases		- true - show only closed cases, false only open cases.
+    * isClosedDefects	- true - show only closed defects, false only open defect.
     **/
-    List<Defect> getClosedDefects(String dateString, Boolean isShowAllDefects);
+    List<DefectWrapper> getCasesWithDefects(Boolean isShowAllCase, Boolean isClosedCases, Boolean isClosedDefects);
 }

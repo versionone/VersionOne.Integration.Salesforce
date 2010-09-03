@@ -846,14 +846,14 @@ private class V1ConnectorTester {
         System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
     }
 
-    static testMethod void getClosedDefectsTest() {
+    static testMethod void getAssignedDefectsOnlyClosedDefectsTest() {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
         Case case3 = new Case(Subject='TestCase3');
 		insert new Case[] {case1, case2, case3};
-        case1 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case1.Id];
-        case2 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case2.Id];
-        case3 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case3.Id];
+        case1 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case2.Id];
+        case3 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case3.Id];
 
         Defect closedDefect1 = new Defect('testing defect 1', null);
 		closedDefect1.changeDate = '2009-10-21 08:57:50';
@@ -893,7 +893,7 @@ private class V1ConnectorTester {
         String expectedDate = '2009-10-20T09:57:33';
         V1Connector connector = new V1Connector(testSettings, testRequestor);
 
-        List<Defect> closedDefects = connector.getClosedDefects(Datetime.newInstance(2009, 10, 20, 9, 57, 33), true);
+        List<Defect> closedDefects = connector.getAssignedDefects(new Case[] {case1, case2, case3}, true);
 
         System.assertEquals(2, closedDefects.size(), 'Incorrect number of assets.');
         assertContains(closedDefect1, closedDefects, 'Can\'t find closed defect');
@@ -901,15 +901,15 @@ private class V1ConnectorTester {
         //System.assertEquals('2009-10-21 08:57:50', testSettings.getLastDateChangeAsset().format('yyyy-MM-dd HH:mm:ss'), 'Incorrect latest datetime of chaned asset.');
         System.assertEquals(1, testRequestor.numberRequest, 'Wrong requests count.');
         System.assert(testRequestor.getSentUrl(0).contains('Source=\'StorySource:' + sourceId), 'Incorrect request url: ' + testRequestor.getSentUrl(0));
-        System.assert(testRequestor.getSentUrl(0).contains(expectedDate), 'Incorrect request url.');
+        System.assert(testRequestor.getSentUrl(0).contains(';AssetState=\'Closed\''), 'Incorrect request url.');
     }
 
-    static testMethod void getClosedDefectsOnlyFromCurrentMemberTest() {
+    static testMethod void getAssignedDefectsOnlyNotClosedDefectsTest() {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
 		insert new Case[] {case1, case2};
-        case1 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case1.Id];
-        case2 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE Id = :case2.Id];
+        case1 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        case2 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case2.Id];
 
         Defect closedDefect1 = new Defect('testing defect 1', null);
 		closedDefect1.changeDate = '2009-10-21 08:57:50';
@@ -937,15 +937,14 @@ private class V1ConnectorTester {
         String expectedDate = '2009-10-20T09:57:33';
         V1Connector connector = new V1Connector(testSettings, testRequestor);
 
-        List<Defect> closedDefects = connector.getClosedDefects(Datetime.newInstance(2009, 10, 20, 9, 57, 33), false);
+        List<Defect> closedDefects = connector.getAssignedDefects(new Case[] {case1, case2}, false);
 
         System.assertEquals(1, closedDefects.size(), 'Incorrect number of assets.');
         assertContains(closedDefect1, closedDefects, 'Can\'t find closed defect');
         //System.assertEquals('2009-10-21 08:57:50', testSettings.getLastDateChangeAsset().format('yyyy-MM-dd HH:mm:ss'), 'Incorrect latest datetime of chaned asset.');
         System.assertEquals(1, testRequestor.numberRequest, 'Wrong requests count.');
         System.assert(testRequestor.getSentUrl(0).contains('Source=\'StorySource:' + sourceId), 'Incorrect request url: ' + testRequestor.getSentUrl(0));
-        System.assert(testRequestor.getSentUrl(0).contains(expectedDate), 'Incorrect request url.');
-        System.assert(testRequestor.getSentUrl(0).contains('Owners=\'Member:' + memberId + '\''), 'Incorrect request url.');
+        System.assert(testRequestor.getSentUrl(0).contains(';AssetState!=\'Closed\''), 'Incorrect request url.');
     }
 
     private static String createSearchQuery(string searchPhrase) {

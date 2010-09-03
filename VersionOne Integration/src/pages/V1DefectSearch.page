@@ -55,8 +55,8 @@
 		            <script type="text/javascript">
 		                <![CDATA[
                         function maybeRefreshWindow() {
-                            if({!refreshWindow}) {
-                                parent.location.href = "/{!currentCase.Id}";
+                            if(<apex:outputText value="{!refreshWindow}"/>) {
+                                parent.location.href = "/<apex:outputText value="{!currentCase.Id}"/>";
                             }
                         }
                         ]]>
@@ -66,7 +66,7 @@
 					    <apex:repeat value="{!paginator.pagesList}" var="pageNumber"  rendered="{!paginator.totalPageNumber > 1}">
 	                        <apex:outputPanel rendered="{!(pageNumber + 1) != paginator.pageNumber}">
 	                            <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
-	                             value="javascript:return false;">{!pageNumber + 1} </apex:outputLink>
+	                             value="javascript:return false;"><apex:outputText value="{!pageNumber + 1}"/> </apex:outputLink>
 	                        </apex:outputPanel>
 	                        <apex:outputPanel rendered="{!(pageNumber + 1) == paginator.pageNumber}">
 	                            <apex:outputText value="{!pageNumber + 1}"/>
@@ -100,7 +100,7 @@
 				        </apex:column>
 					    <apex:column >
 						    <apex:facet name="header">ID</apex:facet>
-							<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank">{!item.defectPart.assetNumber}</apex:outputLink>
+							<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank"><apex:outputText value="{!item.defectPart.assetNumber}"/></apex:outputLink>
 						</apex:column>
 						<apex:column >
 							<apex:facet name="header">Title</apex:facet>
