@@ -857,14 +857,16 @@ private class V1ConnectorTester {
 
         Defect closedDefect1 = new Defect('testing defect 1', null);
 		closedDefect1.changeDate = '2009-10-21 08:57:50';
-        closedDefect1.cases = new Case[]{case1,case2};
+        //closedDefect1.cases = new Case[]{case1,case2};
+        closedDefect1.cases = null;
         closedDefect1.assetNumber = 'D-01032';
         closedDefect1.token = 'Defect:1077';
         closedDefect1.id = '1077';
         closedDefect1.isClosed = true;
         Defect closedDefect2 = new Defect('testing defect 2', null);
 		closedDefect2.changeDate = '2009-10-21 08:57:52';
-        closedDefect2.cases = new Case[]{case1,case3};
+        //closedDefect2.cases = new Case[]{case1,case3};
+        closedDefect2.cases = null;
         closedDefect2.assetNumber = 'D-01033';
         closedDefect2.token = 'Defect:1078';
         closedDefect2.id = '1078';
@@ -913,7 +915,8 @@ private class V1ConnectorTester {
 
         Defect closedDefect1 = new Defect('testing defect 1', null);
 		closedDefect1.changeDate = '2009-10-21 08:57:50';
-        closedDefect1.cases = new Case[]{case1,case2};
+        //closedDefect1.cases = new Case[]{case1,case2};
+        closedDefect1.cases = null;
         closedDefect1.assetNumber = 'D-01032';
         closedDefect1.token = 'Defect:1077';
         closedDefect1.id = '1077';
@@ -945,6 +948,53 @@ private class V1ConnectorTester {
         System.assertEquals(1, testRequestor.numberRequest, 'Wrong requests count.');
         System.assert(testRequestor.getSentUrl(0).contains('Source=\'StorySource:' + sourceId), 'Incorrect request url: ' + testRequestor.getSentUrl(0));
         System.assert(testRequestor.getSentUrl(0).contains(';AssetState!=\'Closed\''), 'Incorrect request url.');
+    }
+
+    static testMethod void getAssignedDefectsWithManyResultsTest() {
+    	User userData = createUser('testUser');
+    	List<Case> cases = new List<Case>();
+    	List<Defect> defects = new List<Defect>();
+    	Integer numberRecords = 250;
+        String queueId = '12345667';
+        String sourceId = '1010';
+        String memberId = '12';
+
+        String xmlStart = '<Assets total="2" pageSize="2147483647" pageStart="0">';
+        List<String> allResponce = new List<String>();
+        String xml = '';
+        String xmlFinish = '</Assets>';
+
+    	for (Integer i=0; i<numberRecords; i++) {
+	        Case caseValue = new Case(
+	            Subject = 'case'+i,
+	            Description = 'desc'+i,
+	            V1Association__c = true,
+	            V1DefectId__c = 'Defect:'+i,
+	            OwnerId = Userinfo.getUserId()
+	        );
+    	    cases.add(caseValue);
+    	    xml = xml + '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="Defect:'+ i +'">' +
+                            '<Attribute name="Number">123</Attribute>' +
+                            '<Attribute name="ChangeDateUTC">2009-10-21T08:57:50.493</Attribute>' +
+							'<Attribute name="Name">case ' + i + '</Attribute>' +
+                            '<Attribute name="Reference">123</Attribute>' +
+                            '<Attribute name="AssetState">128</Attribute>' +
+                        '</Asset>';
+			if (i == 200) {
+				allResponce.add(xmlStart + xml + xmlFinish);
+				xml = '';
+			}
+    	}
+    	allResponce.add(xmlStart + xml + xmlFinish);
+
+        Settings testSettings = Settings.getTestSettings();
+        RequestorMock testRequestor = new RequestorMock(allResponce, new List<Integer>{200, 200}, null);
+        testSettings.setSourceId(sourceId);
+        testSettings.setCurrentMemberId(memberId);
+        V1Connector connector = new V1Connector(testSettings, testRequestor);
+
+        List<Defect> closedDefects = connector.getAssignedDefects(cases, false);
+        System.assertEquals(numberRecords, closedDefects.size(), 'Wrong number of results.');
     }
 
     private static String createSearchQuery(string searchPhrase) {
@@ -987,5 +1037,19 @@ private class V1ConnectorTester {
             }
         }
         System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
+    }
+
+    private static User createUser(String alias) {
+        User user = new User();
+        user.Username = alias + '@not-a-mail.com';
+        user.LastName = alias;
+        user.Email = alias + '@not-a-mail.com';
+        user.alias = alias;
+        user.TimeZoneSidKey = 'America/New_York';
+        user.LocaleSidKey = 'en_US';
+        user.EmailEncodingKey = 'ISO-8859-1';
+        user.ProfileId = [select id from Profile where Name='System Administrator'].Id;
+        user.LanguageLocaleKey = 'en_US';
+        return user;
     }
 }

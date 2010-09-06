@@ -243,32 +243,37 @@ private class V1CaseCollectorTestSuite {
         assertMappingContain(updateForMapping, mappings, 'Incorect product data in mapping which was not updated.');
     }
 
-    static testMethod void getCasesByOwnerIdTest() {
-        String queueName = 'TestQueue1';
-        Group queue = new Group(Type='Queue', Name=queueName);
-        insert queue;
-        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
-        insert sobj;
+    static testMethod void getCasesTest() {
+        for (Case obj : [select Id from Case]) {
+            delete obj;
+        }
 
         System.runAs(createUser('test4356')){
+	        String queueName = 'TestQueue1';
+	        Group queue = new Group(Type='Queue', Name=queueName);
+	        insert queue;
+	        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+	        insert sobj;
             Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id, V1Association__c = true);
             Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id, V1Association__c = true);
             Case case3 = new Case(Subject='TestCase3', OwnerId = queue.Id, V1Association__c = true);
-            Case case4 = new Case(Subject='TestCase4');
+            Case case4 = new Case(Subject='TestCase4', V1Association__c = true);
             insert new Case[] {case1, case2, case3, case4};
 
-            Case[] cases = V1CaseCollector.getCasesByOwnerId(queue.Id, false);
+            Case[] cases = V1CaseCollector.getCases(queue.Id, false);
             System.assertEquals(3, cases.size(), 'Incorrect numbers of cases.');
 
             case2.status = 'Closed';
             case3.V1Association__c = false;
             update new Case[] {case2, case3};
-            Case[] newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, true);
+            Case[] newCases = V1CaseCollector.getCases(queue.Id, true);
             System.assertEquals(1, newCases.size(), 'Incorrect numbers of cases. One cases have to be closed');
-            assertContains(case2, newCases, 'Wrong owned case2.');
-            newCases = V1CaseCollector.getCasesByOwnerId(queue.Id, false);
+            assertContains(case2, newCases, 'Incorrect data in result.');
+            newCases = V1CaseCollector.getCases(queue.Id, false);
             System.assertEquals(1, newCases.size(), 'Incorrect numbers of cases. Two classes have to be not closed');
-            assertContains(case1, newCases, 'Wrong owned case1.');
+            assertContains(case1, newCases, 'Incorrect data in result.');
+            newCases = V1CaseCollector.getCases(null, false);
+            System.assertEquals(2, newCases.size(), 'Incorrect numbers of cases.');
         }
     }
 

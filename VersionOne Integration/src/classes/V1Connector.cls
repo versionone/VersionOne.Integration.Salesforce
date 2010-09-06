@@ -148,6 +148,10 @@ public class V1Connector implements IV1Connector {
     }
 
     private Defect getDefect(XMLDom.Element asset) {
+    	return getDefect(asset, true);
+    }
+
+    private Defect getDefect(XMLDom.Element asset, Boolean isReferenceProcess) {
     	Defect defectData = new Defect(getValue('Name', asset.childNodes), getValue('Description', asset.childNodes));
         defectData.resolution = getValue('ResolutionReason.Name', asset.childNodes);
         defectData.project = getValue('Scope.Name', asset.childNodes);
@@ -164,7 +168,7 @@ public class V1Connector implements IV1Connector {
         }
         String reference = getValue('Reference', asset.childNodes);
 
-        if (reference != null) {
+        if (reference != null && isReferenceProcess) {
         	defectData.cases = V1CaseCollector.getCasesByCasesNumber(reference.split(';'));
         	//defectData.casesNumber = reference.split(';');
         }
@@ -455,29 +459,38 @@ public class V1Connector implements IV1Connector {
         } else {
         	defectStatus = ';AssetState!=\'Closed\'';
         }
-        //Send the request, and get a response
-        String defectsIds = getDefectIdsURL(cases);
-        String url = String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), defectStatus, defectsIds});
+        Integer start = 0;
+        Integer numbersToProcess = 200;
+        while (start < cases.size() && canMakeCallouts(1)) {
+	        String defectsIds = getDefectIdsURL(cases, start, numbersToProcess);
+	        String url = String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), defectStatus, defectsIds});
 
-        requestor.request(requestor.createRequest('', url, 'GET'));
-        validateResponse();
-        XMLDom xmlParser = new XMLDom();
-        xmlParser.parseFromString(requestor.getBody());
-        XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
-        for (XMLDom.Element asset : assetTags) {
-        	Defect defectData = getDefect(asset);
-            assignedDefects.add(defectData);
+			//Send the request, and get a response
+	        requestor.request(requestor.createRequest('', url, 'GET'));
+	        validateResponse();
+	        XMLDom xmlParser = new XMLDom();
+	        xmlParser.parseFromString(requestor.getBody());
+	        XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
+	        for (XMLDom.Element asset : assetTags) {
+	        	Defect defectData = getDefect(asset, false);
+	            assignedDefects.add(defectData);
+	        }
+	        start = start + numbersToProcess;
         }
         return assignedDefects;
     }
 
-    private String getDefectIdsURL(Case[] cases) {
-    	if(cases.size() == 0) {
+    private String getDefectIdsURL(Case[] cases, Integer start, Integer numbers) {
+    	if(cases.size() == 0 || cases.size() < start) {
     		return '';
+    	}
+    	if (cases.size() < start + numbers) {
+    		numbers = cases.size() - start;
     	}
     	String defectIds = ';(';
     	Boolean addSeparator = false;
-    	for (Case caseData : cases) {
+    	for (Integer i=start; i<start+numbers; i++) {
+    		Case caseData = cases.get(i);
     		if (addSeparator) {
     			defectIds = defectIds + '|';
     		} else {
@@ -487,5 +500,9 @@ public class V1Connector implements IV1Connector {
     	}
     	defectIds = defectIds + ')';
     	return defectIds;
+    }
+
+    private Boolean canMakeCallouts(Integer count) {
+        return Limits.getCallouts() + count <= Limits.getLimitCallouts();
     }
 }

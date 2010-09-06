@@ -70,8 +70,8 @@ public class V1DefectReportController {
 
 	public List<SelectOption> getOwnerCaseListOptions() {
         List<SelectOption> options = new List<SelectOption>();
-        options.add(new SelectOption(MY_CASE, 'All'));
-        options.add(new SelectOption(ALL_CASE, 'Mine'));
+        options.add(new SelectOption(ALL_CASE, 'All'));
+		options.add(new SelectOption(MY_CASE, 'Mine'));
 		return options;
 	}
 
@@ -99,7 +99,7 @@ public class V1DefectReportController {
             casesWithDefects = defectFacade.getCasesWithDefects(ownerCaseList == ALL_CASE, caseStatusList == CLOSED, defectStatusList == CLOSED);
 
             if(casesWithDefects.size() == 0) {
-                addPageMessage(ApexPages.Severity.INFO, 'There are no defects.');
+                addPageMessage(ApexPages.Severity.INFO, 'There are no records.');
             }
 
             paginator = new DefectTablePaginator(ITEMS_PER_PAGE, casesWithDefects);
