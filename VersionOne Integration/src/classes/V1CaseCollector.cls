@@ -27,25 +27,45 @@ public class V1CaseCollector {
     }
 
 
-    /* Query cases with specified owner, and cases aren't processing atm.
-     * ownerId - ID of an owner.
+    /* Query cases with specified owner and status.
+     * ownerId - ID of an owner, null - owner doesn't matter.
      * isClosed - is case closed.
      *			true  - gather only not closed cases
      *			false - gather only closed cases
      * Return: Array of cases.
      */
-    public static Case[] getCasesByOwnerId(String ownerId, Boolean isClosed) {
+    public static Case[] getCases(String ownerId, Boolean isClosed) {
         Case[] cases;
-        if (isClosed) {
-            cases = [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-                          FROM Case WHERE OwnerId = :ownerId and Status = 'Closed' and V1Association__c = true ];
-        } else {
-            cases = [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-                          FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed' and V1Association__c = true ];
-        }
+
+        if (ownerId != null) {
+        	cases = getCasesByOwnerId(ownerId, isClosed);
+		} else {
+        	cases = getCasesByStatus(isClosed);
+		}
+
         System.debug('==> getCasesByOwnerId() found: ' + cases.size());
         return cases;
     }
+
+    private static Case[] getCasesByOwnerId(String ownerId, Boolean isClosed) {
+		if (isClosed) {
+        	return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+            	          FROM Case WHERE OwnerId = :ownerId and Status = 'Closed' and V1Association__c = true ];
+		} else {
+        	return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+            	          FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed' and V1Association__c = true ];
+		}
+	}
+
+    private static Case[] getCasesByStatus(Boolean isClosed) {
+		if (isClosed) {
+        	return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+                	          FROM Case WHERE Status = 'Closed' and V1Association__c = true LIMIT 5000];
+		} else {
+        	return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+                	          FROM Case WHERE Status <> 'Closed' and V1Association__c = true LIMIT 5000];
+		}
+	}
 
     /**
      * Update case.

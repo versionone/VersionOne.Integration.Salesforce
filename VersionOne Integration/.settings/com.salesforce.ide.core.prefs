@@ -1,4 +1,4 @@
-#Fri Jan 15 15:48:52 MSK 2010
+#Mon Sep 06 17:03:18 MSD 2010
 ExecuteAnonymousApex_code=Debug
 ExecuteAnonymousApex_profiling=Info
 ExecuteAnonymousCallout=Info
@@ -6,7 +6,7 @@ ExecuteAnonymousDb=Info
 ExecuteAnonymousValidation=Info
 ExecuteAnonymousWorkflow=Info
 RunTestApex_code=Debug
-RunTestApex_profiling=Info
+RunTestApex_profiling=None
 RunTestCallout=Info
 RunTestDb=Info
 RunTestValidation=Info

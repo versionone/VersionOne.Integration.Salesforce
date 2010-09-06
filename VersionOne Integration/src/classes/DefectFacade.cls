@@ -155,7 +155,11 @@ public class DefectFacade implements IDefectFacade {
     }
 
     public List<DefectWrapper> getCasesWithDefects(Boolean isShowAllCase, Boolean isClosedCases, Boolean isClosedDefects) {
-		Case[] cases = V1CaseCollector.getCasesByOwnerId(Userinfo.getUserId(), isClosedCases);
+    	String userId = null;
+    	if (!isShowAllCase) {
+    		userId = Userinfo.getUserId();
+    	}
+		Case[] cases = V1CaseCollector.getCases(userId, isClosedCases);
     	try {
     		List<Defect> defects = connector.getAssignedDefects(cases, isClosedDefects);
     		List<DefectWrapper> defectsWithCases = new List<DefectWrapper>();

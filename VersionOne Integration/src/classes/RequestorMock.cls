@@ -3,8 +3,8 @@
 *
 **/
 public class RequestorMock implements IRequestor {
-    public String responceBody;
-    public Integer statusCode;
+    public List<String> responceBody = new List<String>();
+    public List<Integer> statusCode = new List<Integer>();
     public List<String> bodyForSend = new List<String>();
     public List<String> urlForSend = new List<String>();
     public Integer numberRequest = 0;
@@ -15,17 +15,29 @@ public class RequestorMock implements IRequestor {
     }
 
     public RequestorMock(String body, Integer statusCode, List<Exception> exceptions) {
-        this.responceBody = body;
-        this.statusCode = statusCode;
+        this.responceBody.add(body);
+        this.statusCode.add(statusCode);
+        this.exceptions = exceptions;
+    }
+
+    public RequestorMock(List<String> bodies, List<Integer> statusCodes, List<Exception> exceptions) {
+        this.responceBody = bodies;
+        this.statusCode = statusCodes;
         this.exceptions = exceptions;
     }
 
     public String getBody() {
-        return responceBody;
+    	if (numberRequest > responceBody.size()) {
+    		responceBody.get(0);
+    	}
+        return responceBody.get(numberRequest-1);
     }
 
     public Integer getStatusCode() {
-        return statusCode;
+    	if (numberRequest > statusCode.size()) {
+    		return statusCode.get(0);
+    	}
+        return statusCode.get(numberRequest-1);
     }
 
     public String getSentBody(Integer i) {
