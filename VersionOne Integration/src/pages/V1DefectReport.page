@@ -160,41 +160,6 @@
 				        </apex:column>
 				    </apex:pageBlockTable>
 				</apex:pageBlockSectionItem>
-				<!--
-	            <apex:pageBlockSectionItem >
-				    <apex:pageBlockTable value="{!paginator.defects}" var="item" id="defectTable" rendered="{!displayCasesWithDefectsTable}">
-				        <apex:column >
-				        	<apex:facet name="header">ID</apex:facet>
-				        	<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank"><apex:outputText value="{!item.defectPart.assetNumber}"/></apex:outputLink>
-				        </apex:column>
-				        <apex:column >
-				        	<apex:facet name="header">Name</apex:facet>
-				        	<apex:outputText value="{!item.defectPart.title}"/>
-				        </apex:column>
-				        <apex:column >
-				        	<apex:facet name="header">Owners</apex:facet>
-				        	<apex:outputText value="{!item.defectPart.ownersAsString}"/>&nbsp;
-				        </apex:column>
-				        <apex:column >
-				        	<apex:facet name="header">Cases</apex:facet>
-						    <apex:repeat value="{!item.defectPart.cases}" var="caseData" >
-						        <apex:outputLink value="/{!caseData.id}" target="_blank" onmouseover="displayMenu(this,'menu{!HTMLENCODE(caseData.id)}_{!HTMLENCODE(item.defectPart.token)}');"><apex:outputText value="{!caseData.caseNumber}"/></apex:outputLink>&nbsp;
-<div class="popup" id="menu{!HTMLENCODE(caseData.id)}_{!HTMLENCODE(item.defectPart.token)}" style="display:none;">
-	<b>Subject</b>:<apex:outputText value="{!caseData.Subject}"/><br/>
-	<b>Status:</b> <apex:outputText value="{!caseData.Status}"/><br/>
-	<b>OwnerId:</b> <apex:outputText value="{!caseData.Owner.Name}"/><br/>
-	<b>Created Date:</b> <apex:outputText value="{!caseData.CreatedDate}"/><br/><br/>
-	<a href="javascript:void(0)" onclick="hideMenu('menu{!HTMLENCODE(caseData.id)}_{!HTMLENCODE(item.defectPart.token)}');">Close</a>
-</div>
-					        </apex:repeat>
-				        </apex:column>
-				        <apex:column >
-				        	<apex:facet name="header">Date</apex:facet>
-				        	<apex:outputText value="{!item.defectPart.changeDate}"/>
-				        </apex:column>
-					</apex:pageBlockTable>
-				</apex:pageBlockSectionItem>
- -->
 	            <apex:pageBlockSectionItem >
                     <apex:outputPanel style="text-align: right;" rendered="{!paginator.hasData}">
 					    <br/>
