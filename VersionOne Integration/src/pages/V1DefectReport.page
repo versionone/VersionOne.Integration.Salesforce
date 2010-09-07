@@ -30,7 +30,9 @@
 
 	function hideMenu(named) {
 		var menuElement = document.getElementById(named);
-		menuElement.style.display = "none";
+		if (menuElement != null) {
+			menuElement.style.display = "none";
+		}
 	}
 </script>
 
