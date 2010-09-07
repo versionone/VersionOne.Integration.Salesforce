@@ -36,12 +36,12 @@
 			}
         	return result;
         }
+        var SFUserProductList = [];
     //]]>
     </script>
     <apex:outputPanel id="JSMappingData">
-    <script>var SFUserProductList = [];</script>
 	<apex:repeat value="{!mappings}" var="mapping">
-	  <!-- Pushing item into Javascript array -->
+	  <!-- Pushing items into Javascript array -->
 	  <script>SFUserProductList.push('<apex:outputText escape="true" value="{!mapping.productId}" />|||<apex:outputText escape="true" value="{!mapping.mappingId}" />');</script>
 	</apex:repeat>
 	</apex:outputPanel>
