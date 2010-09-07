@@ -124,7 +124,7 @@ public with sharing class SettingsController {
             isSettingsValidated = false;
             testMessage = '';
             isSaved = false;
-            addErrorMessage('Settings is not correct or was not validated.');
+            addErrorMessage('Settings are not correct, or validation could not be completed successfully.');
             return null;
         }
         settings.setCurrentMemberId(memberId);
@@ -141,10 +141,10 @@ public with sharing class SettingsController {
         try {
             settings.updateSettings();
             saveSeverity = 'info';
-            saveMessage = 'Settings has been saved.';
+            saveMessage = 'Settings have been saved.';
         } catch (Exception ex) {
             saveSeverity = 'error';
-            saveMessage = 'Settings has not been saved. Reason:' + ex.getMessage();
+            saveMessage = 'Settings have not been saved. Reason: ' + ex.getMessage();
         }
         return null;
     }
@@ -182,7 +182,7 @@ public with sharing class SettingsController {
     		currentMapping.productName = currentMapping.productId;
     		V1CaseCollector.addNewMapping(currentMapping);
     	} else {
-    		addErrorMessage('Mapping for this product already exist');
+    		addErrorMessage('Mapping for this product already exists');
     	}
     	resetMappingData();
 
@@ -270,7 +270,7 @@ public with sharing class SettingsController {
     			V1CaseCollector.updateMapping(mappingId, currentMapping);
     			resetMappingData();
     		} else {
-    			addErrorMessage('Mapping for this product already exist');
+    			addErrorMessage('Mapping for this product already exists');
     		}
     	}
 
