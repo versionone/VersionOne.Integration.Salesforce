@@ -22,11 +22,11 @@
             ele.disabled = false;
             ele.className = 'btn';
         }
-        function isMappingDataValide(mappingId) {
-        	var product = getSelectedProdcut();
+        function isMappingDataValid(mappingId) {
+        	var product = getSelectedProduct();
         	var result = true;
 
-			for (var index=0;index<SFUserProductList.length;index++) {
+			for (var index = 0;index < SFUserProductList.length;index++) {
 				var mappingData = SFUserProductList[index].split("|||");
        			if (mappingData[0] == product.value && mappingId != mappingData[1] && result) {
        				alert ('Product already used in mapping');
@@ -52,7 +52,7 @@
     <apex:actionStatus startText="Saving settings..." id="save_status" />
     <apex:actionStatus startText="Updating mapping..." id="update_mapping" />
     <apex:actionStatus startText="Deleting mapping..." id="remove_mapping" />
-    <apex:actionStatus startText="Additing mapping ..." id="addMapping" />
+    <apex:actionStatus startText="Adding mapping ..." id="addMapping" />
     <apex:form >
         <apex:pageBlock title="Connection settings" mode="edit">
             <apex:pageBlockSection columns="1">
@@ -85,7 +85,7 @@
             </apex:pageBlockSection>
             <apex:pageBlockButtons location="top">
                 <apex:commandButton value="Save settings" action="{!saveSettings}"
-                    disabled="{!isSettingsCorrect == false}" id="save_button1"
+                    disabled="{! not(isSettingsCorrect)}" id="save_button1"
                     onclick="disableAllButtons();" status="save_status"
                     rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
                     <script type="text/javascript">
@@ -144,7 +144,7 @@
                         <apex:selectOptions value="{!ProductList}"/>
 	                    <script type="text/javascript">
 		                    //<![CDATA[
-	                        function getSelectedProdcut() {
+	                        function getSelectedProduct() {
 								return document.getElementById('{!$Component.ProductId}');
 							}
 						    //]]>
@@ -160,7 +160,7 @@
 						&nbsp;&nbsp;&nbsp;
 						<apex:commandButton id="add_mapping_button" value="Add" action="{!addMapping}"
 							rerender="mappingTable,messages,JSMappingData,message_test,message_save" status="addMapping"
-							onClick="if (!isMappingDataValide('0')){return;}disableAddMappingButton();"
+							onClick="if (!isMappingDataValid('0')){return;}disableAddMappingButton();"
 							oncomplete="enableAddMappingButton()">
 		                    <script type="text/javascript">
 			                    //<![CDATA[
@@ -183,7 +183,7 @@
 			                	onclick="disableAddMappingButton();updateProject('{!HTMLENCODE(mapping.mappingId)}');"
 			                	rendered="{!not(mapping.isDeletable)}">Update VersionOne Project</apex:outputLink>
 			                <apex:outputLink value="javascript:void(0);"
-			                	onclick="if (isMappingDataValide('{!HTMLENCODE(mapping.mappingId)}')){disableAddMappingButton();updateProject('{!HTMLENCODE(mapping.mappingId)}');}"
+			                	onclick="if (isMappingDataValid('{!HTMLENCODE(mapping.mappingId)}')){disableAddMappingButton();updateProject('{!HTMLENCODE(mapping.mappingId)}');}"
 			                	rendered="{!mapping.isDeletable}">Update</apex:outputLink>
 	            		    &nbsp;&nbsp;
 			                <apex:outputLink value="javascript:void(0);" rendered="{!mapping.isDeletable}"
