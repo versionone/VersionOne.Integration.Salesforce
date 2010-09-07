@@ -7,7 +7,7 @@
 	}
 	</style>
     <script type="text/javascript">
-        ////<![CDATA[
+        //<![CDATA[
         function enableButton(buttonId) {
             var button = document.getElementById(buttonId);
             button.disabled = false;
@@ -53,13 +53,13 @@
 		        <apex:pageBlockSectionItem >
 		          <apex:outputPanel >
 		            <script type="text/javascript">
-		                <![CDATA[
+		                //<![CDATA[
                         function maybeRefreshWindow() {
                             if(<apex:outputText value="{!refreshWindow}"/>) {
                                 parent.location.href = "/<apex:outputText value="{!currentCase.Id}"/>";
                             }
                         }
-                        ]]>
+                        //]]>
                     </script>
                     <apex:outputPanel style="text-align: right;" rendered="{!paginator.hasData}">
 					    <br/>
