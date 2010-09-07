@@ -107,14 +107,14 @@
                       	</script>
 				</apex:commandButton>
 
-                <!-- Operations with assiged defect -->
-			    <apex:commandButton value="Unassign" id="unussignButton"
+                <!-- Operations with assigned defect -->
+			    <apex:commandButton value="Unassign" id="unassignButton"
 			        rendered="{!isDefectAssigned}" action="{!unassignDefect}" onclick="disableOperationOnAssigedDefect()"
 			        oncomplete="refreshWindowIfNoErrors()" status="unassigning"
 			        rerender="errorMessages, areThereErrorsBlock, CreateDefectSector">
 			        <script type="text/javascript">
 			            function disableUnassignButton() {
-			             disableElement(document.getElementById('{!$Component.unussignButton}'));
+			             disableElement(document.getElementById('{!$Component.unassignButton}'));
 			         }
 			    	</script>
 			    </apex:commandButton>
