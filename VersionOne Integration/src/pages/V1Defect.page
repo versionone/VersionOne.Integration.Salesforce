@@ -7,7 +7,7 @@
 	}
 	</style>
 	<script type="text/javascript">
-		////<![CDATA[
+		//<![CDATA[
         function disableElement(ele) {
             ele.disabled = true;
             ele.className = 'btnDisabled';
