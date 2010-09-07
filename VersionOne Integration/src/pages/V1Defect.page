@@ -27,7 +27,7 @@
 		}
 
 		function refreshWindow(){
-			parent.location.href='/<apex:outputText value="{!Case.Id}"/>';
+			parent.location.href="/{!HTMLENCODE(Case.Id)}";
 		}
 
 		function disableFormButtons() {
