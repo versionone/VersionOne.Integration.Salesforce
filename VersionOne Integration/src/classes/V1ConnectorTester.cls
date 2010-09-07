@@ -1050,6 +1050,7 @@ private class V1ConnectorTester {
         user.EmailEncodingKey = 'ISO-8859-1';
         user.ProfileId = [select id from Profile where Name='System Administrator'].Id;
         user.LanguageLocaleKey = 'en_US';
+        System.assertNotEquals(null, user);
         return user;
     }
 }
