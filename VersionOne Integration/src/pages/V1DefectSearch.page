@@ -56,7 +56,7 @@
 		                //<![CDATA[
                         function maybeRefreshWindow() {
                             if(<apex:outputText value="{!refreshWindow}"/>) {
-                                parent.location.href = "/<apex:outputText value="{!currentCase.Id}"/>";
+                                parent.location.href = '/<apex:outputText value="{!currentCase.Id}"/>';
                             }
                         }
                         //]]>
