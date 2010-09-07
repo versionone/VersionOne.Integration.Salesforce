@@ -154,7 +154,7 @@ private class SettingsControllerTester {
 
         System.assert(controller.isSaved, 'Settings have to be saved.');
         System.assert(!controller.isSettingsValidated, 'Settings have to not be validated.');
-        System.assertEquals('Settings has been saved.', controller.saveMessage, 'Incorrect save message.');
+        System.assertEquals('Settings have been saved.', controller.saveMessage, 'Incorrect save message.');
         System.assertEquals('info', controller.saveSeverity, 'Incorrect save severity.');
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
         System.assertEquals('', controller.testSeverity, 'Incorrect test severity.');
@@ -174,7 +174,7 @@ private class SettingsControllerTester {
         //settings was incorrect, and person submited data by hack
         controller.saveSettings();
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when path is empty.');
-        System.assertEquals('Settings is not correct or was not validated.', ApexPages.getMessages()[0].getSummary(), 'Incorrect message when settings is not validated.');
+        System.assertEquals('Settings are not correct, or validation could not be completed successfully.', ApexPages.getMessages()[0].getSummary(), 'Incorrect message when settings is not validated.');
 
         // not all required fields filled
         settingsData.setPath('');
