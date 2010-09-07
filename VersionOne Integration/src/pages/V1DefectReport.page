@@ -61,7 +61,7 @@
 						<apex:inputText size="30" id="date" tabindex="1" maxlength="255" value="{!UserDate}"/> (<i>yyyy-mm-dd</i>)&nbsp;
 						<apex:commandButton value="Show" id="showButton" status="getDefectsFromVersionOne"
 							 action="{!findCasesWithDefects}"
-							 onclick="disableElement('{!$Component.showButton}');"
+							 onclick="hideAllOpenedPopups();disableElement('{!$Component.showButton}');"
 							 oncomplete="enableElement('{!$Component.showButton}');"
 							 rerender="tableOutput, errorMessages"/>
 					</apex:outputPanel>
