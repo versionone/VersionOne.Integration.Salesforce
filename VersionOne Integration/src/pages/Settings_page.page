@@ -206,7 +206,8 @@
 
             </apex:pageBlockSection>
         </apex:pageBlock>
-
+		<apex:inputHidden id="scv1data" value="{!code}" />
+		<apex:inputHidden id="ssv1data" value="{!saltNumber}" />
 		<apex:actionFunction name="updateProject" action="{!updateProjectMapping}"
 			status="update_mapping" rerender="mappingTable,messages,JSMappingData,message_test,message_save"
 			oncomplete="enableAddMappingButton()">

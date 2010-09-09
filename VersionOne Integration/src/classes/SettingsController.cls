@@ -12,6 +12,8 @@ public with sharing class SettingsController {
     public Boolean isSaved {get; set;}
     public Boolean isGotProjects {get; set;}
     public ProjectProductMapping currentMapping{ get; set;}
+    public String code{get; set;}
+    public String saltNumber{get; set;}
 
     private transient Settings innerSettings;
     //private Map<String, String> projects;
@@ -39,6 +41,22 @@ public with sharing class SettingsController {
             innerConnector = value;
         }
     }
+
+    private String generateUniqCode(String salt) {
+    	String ip = '';
+    	ip = ApexPages.currentPage().getHeaders().get('True-Client-IP');
+    	if (ip == null || ip == '') {
+    		ip = ApexPages.currentPage().getHeaders().get('X-Salesforce-SIP');
+    	}
+    	if (ip != null && ip != '') {
+    		ip = ip.replace('.', '');
+    	}
+
+    	String code = UserInfo.getUserId() + ':' + salt + ':' + ip;
+    	code = EncodingUtil.convertToHex(Crypto.generateDigest('MD5', Blob.valueof(code)));
+    	return code;
+    }
+
 
     private Map<String, String> innerProjects;
     public Map<String, String> projects {
@@ -79,6 +97,8 @@ public with sharing class SettingsController {
     	currentMapping = new ProjectProductMapping(null, null, null);
     	resetConnectionFormSettings();
         isGotProjects = false;
+        saltNumber = String.valueof(Crypto.getRandomLong());
+        code = generateUniqCode(saltNumber);
         refreshProjectsList();
         if (updateProjectData()) {
             settings.updateSettings();
@@ -119,6 +139,7 @@ public with sharing class SettingsController {
         try {
             memberId = connector.getCurrentMemberId();
         } catch (Exception ex) {}
+
         if (!isSettingsCorrect || sourceId == null || memberId == null) {
             isSettingsCorrect = false;
             isSettingsValidated = false;
@@ -260,6 +281,10 @@ public with sharing class SettingsController {
     public PageReference updateProjectMapping() {
     	resetConnectionFormSettings();
     	String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
+    	if (!isCodeCorrect()) {
+    		addErrorMessage('Incorrect action. Please refresh page and try again.');
+    		return null;
+    	}
     	if (mappingId == '') {
         	updateDefaultProjectSettings(currentMapping.projectToken.split(':')[1]);
         	settings.updateSettings();
@@ -280,6 +305,10 @@ public with sharing class SettingsController {
     public PageReference removeProjectMapping() {
     	resetConnectionFormSettings();
     	String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
+    	if (!isCodeCorrect()) {
+    		addErrorMessage('Incorrect action. Please refresh page and try again.');
+    		return null;
+    	}
     	if (mappingId == null || mappingId == '') {
     		addErrorMessage('Incorrect data for deletion.');
     		return null;
@@ -289,6 +318,11 @@ public with sharing class SettingsController {
     	resetMappingData();
 
     	return null;
+    }
+
+    private Boolean isCodeCorrect() {
+    	String secretCode = generateUniqCode(saltNumber);
+		return code != '' && code != null && code == secretCode;
     }
 
     private boolean isProductAlreadyUsed(String productId, String mappingId) {

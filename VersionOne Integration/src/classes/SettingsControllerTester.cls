@@ -300,6 +300,7 @@ private class SettingsControllerTester {
     	insert mappingData1;
 
         SettingsController controller = new SettingsController();
+		controller.initSettings();
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
@@ -309,6 +310,41 @@ private class SettingsControllerTester {
         controller.currentMapping.productId = productId1;
         controller.updateProjectMapping();
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when product id already used.');
+    }
+
+    static testMethod void updateProjectMappingWithoutSecurityCodeTest() {
+		for (MappingV1ProjectsToSFProducts__c obj :
+		    [select Id from MappingV1ProjectsToSFProducts__c]) {
+		    delete obj;
+		}
+
+    	String projectName1 = 'CI';
+    	String productName1 = 'GDS';
+    	String projectToken1 = 'Scope:1081';
+    	String productId1 = 'GDS';
+    	MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
+    	mappingData1.SFProductId__c = productId1;
+    	mappingData1.SFProductName__c = productName1;
+    	mappingData1.V1ProjectToken__c = projectToken1;
+    	mappingData1.V1ProjectName__c = projectName1;
+    	insert mappingData1;
+
+        SettingsController controller = new SettingsController();
+		controller.initSettings();
+		controller.code = '123';//incorrect security code
+        Settings settingsData = Settings.getTestSettings();
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+        ApexPages.currentPage().getParameters().put('mappingId', mappingData1.Id);
+        controller.currentMapping = new ProjectProductMapping(projectName1 + 'up', true, productName1 + 'up');
+        controller.currentMapping.projectToken = projectToken1;
+        controller.currentMapping.productId = productId1+ 'up';
+        controller.updateProjectMapping();
+        MappingV1ProjectsToSFProducts__c resultMapping = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
+        System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors.');
+        System.assertEquals(projectName1, resultMapping.V1ProjectName__c, 'Incorrect project name for updated mapping with incorrect code.');
+        System.assertEquals(projectToken1, resultMapping.V1ProjectToken__c, 'Incorrect project token for updated mapping with incorrect code.');
+        System.assertEquals(productName1, resultMapping.SFProductName__c, 'Incorrect project token for updated mapping with incorrect code.');
     }
 
     static testMethod void updateProjectMappingWithSameMappingIdTest() {
@@ -329,6 +365,7 @@ private class SettingsControllerTester {
     	insert mappingData1;
 
         SettingsController controller = new SettingsController();
+		controller.initSettings();
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
@@ -372,6 +409,7 @@ private class SettingsControllerTester {
 
     	ApexPages.currentPage().getParameters().put('mappingId', mappingData1.id);
         SettingsController controller = new SettingsController();
+        controller.initSettings();
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
         controller.settings = settingsData;
@@ -381,5 +419,49 @@ private class SettingsControllerTester {
 		MappingV1ProjectsToSFProducts__c resultMapping2 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData2.Id];
 		System.assertEquals(0, resultMappings1.size(), 'This mapping should be deleted');
 		System.assertNotEquals(null, resultMapping2, 'This mapping should be not deleted');
+		System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of errors.');
+    }
+
+    static testMethod void removeProjectMappingWithoutSpecialCodeTest() {
+		for (MappingV1ProjectsToSFProducts__c obj :
+		    [select Id from MappingV1ProjectsToSFProducts__c]) {
+		    delete obj;
+		}
+
+    	String projectName1 = 'Project Name 1';
+    	String productName1 = 'Product Name 1';
+    	String projectToken1 = 'Scope:1234';
+    	String productId1 = 'GDS';
+    	MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
+    	mappingData1.SFProductId__c = productId1;
+    	mappingData1.SFProductName__c = productName1;
+    	mappingData1.V1ProjectToken__c = projectToken1;
+    	mappingData1.V1ProjectName__c = projectName1;
+    	String projectName2 = 'Project Name 2';
+    	String productName2 = 'Product Name 2';
+    	String projectToken2 = 'Scope:2345';
+    	String productId2 = 'GDS 2';
+    	MappingV1ProjectsToSFProducts__c mappingData2 = new MappingV1ProjectsToSFProducts__c();
+    	mappingData2.SFProductId__c = productId2;
+    	mappingData2.SFProductName__c = productName2;
+    	mappingData2.V1ProjectToken__c = projectToken2;
+    	mappingData2.V1ProjectName__c = projectName2;
+    	insert new MappingV1ProjectsToSFProducts__c[] {mappingData1, mappingData2};
+
+    	ApexPages.currentPage().getParameters().put('mappingId', mappingData1.id);
+    	ApexPages.currentPage().getHeaders().put('X-Salesforce-SIP', '127.0.0.1');
+        SettingsController controller = new SettingsController();
+        controller.initSettings();
+        controller.code = '123';//incorrect security code
+        Settings settingsData = Settings.getTestSettings();
+        controller.connector = new V1ConnectorMock();
+        controller.settings = settingsData;
+        controller.removeProjectMapping();
+
+		List<MappingV1ProjectsToSFProducts__c> resultMapping1 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
+		MappingV1ProjectsToSFProducts__c resultMapping2 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData2.Id];
+		System.assertNotEquals(null, resultMapping1, 'This mapping should be not deleted');
+		System.assertNotEquals(null, resultMapping2, 'This mapping should be not deleted');
+		System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors.');
     }
 }
