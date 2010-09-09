@@ -36,14 +36,19 @@
 			}
         	return result;
         }
-        var SFUserProductList = [];
     //]]>
     </script>
     <apex:outputPanel id="JSMappingData">
-	<apex:repeat value="{!mappings}" var="mapping">
-	  <!-- Pushing items into Javascript array -->
-	  <script>SFUserProductList.push('<apex:outputText escape="true" value="{!mapping.productId}" />|||<apex:outputText escape="true" value="{!mapping.mappingId}" />');</script>
-	</apex:repeat>
+    <script type="text/javascript">
+		var SFUserProductList = [];
+		function updateJSMapping() {
+			SFUserProductList = [];
+			<apex:repeat value="{!mappings}" var="mapping">
+				  SFUserProductList.push('<apex:outputText escape="true" value="{!mapping.productId}" />|||<apex:outputText escape="true" value="{!mapping.mappingId}" />');
+			</apex:repeat>
+		}
+		updateJSMapping();
+	</script>
 	</apex:outputPanel>
 
     <apex:sectionHeader title="Settings for VersionOne integration." />
@@ -210,12 +215,12 @@
 		<apex:inputHidden id="ssv1data" value="{!saltNumber}" />
 		<apex:actionFunction name="updateProject" action="{!updateProjectMapping}"
 			status="update_mapping" rerender="mappingTable,messages,JSMappingData,message_test,message_save"
-			oncomplete="enableAddMappingButton()">
+			oncomplete="enableAddMappingButton();updateJSMapping();">
 			<apex:param name="mappingId" value=""/>
 		</apex:actionFunction>
 		<apex:actionFunction name="removeMapping" action="{!removeProjectMapping}"
 			status="remove_mapping" rerender="mappingTable,messages,JSMappingData,message_test,message_save"
-			oncomplete="enableAddMappingButton()">
+			oncomplete="enableAddMappingButton();updateJSMapping();">
 			<apex:param name="mappingId" value=""/>
 		</apex:actionFunction>
 
