@@ -1,0 +1,242 @@
+<!-- Page -->
+<apex:page controller="SettingsController" action="{!initSettings}" title="VersionOne Integration Settings">
+    <script type="text/javascript">
+	//<![CDATA[
+        function disableAllButtons() {
+            disableSaveButtons();
+            disableTestButtons();
+        }
+        function disableSaveButtons() {
+            disableSaveButton1();
+            disableSaveButton2();
+        }
+        function disableTestButtons() {
+            disableTestButton1();
+            disableTestButton2();
+        }
+        function disableElement(ele) {
+            ele.disabled = true;
+            ele.className = 'btnDisabled';
+        }
+        function enableElement(ele) {
+            ele.disabled = false;
+            ele.className = 'btn';
+        }
+        function isMappingDataValid(mappingId) {
+        	var product = getSelectedProduct();
+        	var result = true;
+
+			for (var index = 0;index < SFUserProductList.length;index++) {
+				var mappingData = SFUserProductList[index].split("|||");
+       			if (mappingData[0] == product.value && mappingId != mappingData[1] && result) {
+       				alert ('Product already used in mapping');
+        			result = false;
+   	    			break;
+       			}
+			}
+        	return result;
+        }
+    //]]>
+    </script>
+    <apex:outputPanel id="JSMappingData">
+    <script type="text/javascript">
+		var SFUserProductList = [];
+		function updateJSMapping() {
+			SFUserProductList = [];
+			<apex:repeat value="{!mappings}" var="mapping">
+				  SFUserProductList.push('<apex:outputText escape="true" value="{!mapping.productId}" />|||<apex:outputText escape="true" value="{!mapping.mappingId}" />');
+			</apex:repeat>
+		}
+		updateJSMapping();
+	</script>
+	</apex:outputPanel>
+
+    <apex:sectionHeader title="Settings for VersionOne integration." />
+
+    <apex:actionStatus startText="Testing settings..." id="test_status" />
+    <apex:actionStatus startText="Saving settings..." id="save_status" />
+    <apex:actionStatus startText="Updating mapping..." id="update_mapping" />
+    <apex:actionStatus startText="Deleting mapping..." id="remove_mapping" />
+    <apex:actionStatus startText="Adding mapping ..." id="addMapping" />
+    <apex:form >
+        <apex:pageBlock title="Connection settings" mode="edit">
+            <apex:pageBlockSection columns="1">
+                <!-- title="Connection" -->
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!settings.pathTitle}" for="V1Path" />
+                    <c:inputRequiredText value="{!settings.path}" size="75" id="V1Path"
+                        tabindex="1" onkeydown="disableSaveButtons();" onchange="disableSaveButtons();" maxlength="255"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!settings.UserNameTitle}" for="UserName" />
+                    <c:inputRequiredText value="{!settings.UserName}" size="40"
+                        id="UserName" tabindex="2"
+                        onkeydown="disableSaveButtons();" onchange="disableSaveButtons();" maxlength="20"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!settings.PasswordTitle}" for="Password" />
+                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                        <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                        <apex:inputSecret value="{!settings.Password}" size="40" redisplay="true"
+                            id="Password" tabindex="3" onkeydown="disableSaveButtons();" onchange="disableSaveButtons();" maxlength="20"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!settings.SourceTitle}" for="Source" />
+                    <c:inputRequiredText value="{!settings.Source}" size="40"
+                        id="Source" tabindex="4"
+                        onkeydown="disableSaveButtons();" onchange="disableSaveButtons();" maxlength="30"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton value="Save settings" action="{!saveSettings}"
+                    disabled="{! not(isSettingsCorrect)}" id="save_button1"
+                    onclick="disableAllButtons();" status="save_status"
+                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
+                    <script type="text/javascript">
+	                    //<![CDATA[
+                        function disableSaveButton1() {
+	                        disableElement(document.getElementById('{!$Component.save_button1}'));
+    	                }
+					    //]]>
+                	</script>
+                </apex:commandButton>
+                <apex:commandButton value="Test settings" action="{!testSettings}"
+                    rerender="out_testing, out_saving, message_test, messge_save, save_button1, save_button2, test_button1, test_button2, messages"
+                    onclick="disableAllButtons()"
+                    status="test_status" id="test_button1">
+                    <script type="text/javascript">
+	                    //<![CDATA[
+                        function disableTestButton1() {
+                            disableElement(document.getElementById('{!$Component.test_button1}'));
+                        }
+					    //]]>
+                	</script>
+                </apex:commandButton>
+            </apex:pageBlockButtons>
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton value="Save settings" action="{!saveSettings}"
+                    disabled="{!isSettingsCorrect == false}" id="save_button2"
+                    onclick="disableAllButtons();" status="save_status"
+                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages, ProjectMapping">
+                    <script type="text/javascript">
+	                    //<![CDATA[
+	                    function disableSaveButton2() {
+    	                    disableElement(document.getElementById('{!$Component.save_button2}'));
+        	            }
+					    //]]>
+                	</script>
+                </apex:commandButton>
+                <apex:commandButton value="Test settings" action="{!testSettings}"
+                    rerender="out_testing, out_saving, message_test, message_save, save_button1, save_button2, test_button1, test_button2, messages"
+                    onclick="disableAllButtons()"
+                    status="test_status" id="test_button2">
+                    <script type="text/javascript">
+	                    //<![CDATA[
+                        function disableTestButton2() {
+							disableElement(document.getElementById('{!$Component.test_button2}'));
+						}
+					    //]]>
+                	</script>
+                </apex:commandButton>
+            </apex:pageBlockButtons>
+        </apex:pageBlock>
+        <apex:pageBlock title="VersionOne Project for Defect Creation" id="ProjectMapping">
+            <apex:pageBlockSection rendered="{!isGotProjects}" columns="1">
+                <apex:pageBlockSectionItem >
+	                <apex:outputLabel value="Salesforce product" for="ProductId" />
+                    <apex:selectList size="1" required="false" id="ProductId" value="{!currentMapping.productId}">
+                        <apex:selectOptions value="{!ProductList}"/>
+	                    <script type="text/javascript">
+		                    //<![CDATA[
+	                        function getSelectedProduct() {
+								return document.getElementById('{!$Component.ProductId}');
+							}
+						    //]]>
+	                	</script>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+	                <apex:outputLabel value="VersionOne project" for="ProjectToken" />
+					<apex:outputPanel layout="block">
+						<apex:selectList value="{!currentMapping.projectToken}" size="1" required="false" id="ProjectToken">
+						    <apex:selectOptions value="{!VersionOneProjectsList}"/>
+						</apex:selectList>
+						&nbsp;&nbsp;&nbsp;
+						<apex:commandButton id="add_mapping_button" value="Add" action="{!addMapping}"
+							rerender="mappingTable,messages,JSMappingData,message_test,message_save" status="addMapping"
+							onClick="if (!isMappingDataValid('0')){return;}disableAddMappingButton();"
+							oncomplete="enableAddMappingButton()">
+		                    <script type="text/javascript">
+			                    //<![CDATA[
+		                        function disableAddMappingButton() {
+									disableElement(document.getElementById('{!$Component.add_mapping_button}'));
+								}
+								function enableAddMappingButton() {
+									enableElement(document.getElementById('{!$Component.add_mapping_button}'))
+								}
+							    //]]>
+		                	</script>
+		                </apex:commandButton>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+			    <apex:pageBlockSectionItem >
+			        <apex:pageBlockTable value="{!mappings}" var="mapping" id="mappingTable">
+						<apex:column >
+							<apex:facet name="header">Actions</apex:facet>
+			                <apex:outputLink value="javascript:void(0);"
+			                	onclick="disableAddMappingButton();updateProject('{!HTMLENCODE(mapping.mappingId)}');"
+			                	rendered="{!not(mapping.isDeletable)}">Update VersionOne Project</apex:outputLink>
+			                <apex:outputLink value="javascript:void(0);"
+			                	onclick="if (isMappingDataValid('{!HTMLENCODE(mapping.mappingId)}')){disableAddMappingButton();updateProject('{!HTMLENCODE(mapping.mappingId)}');}"
+			                	rendered="{!mapping.isDeletable}">Update</apex:outputLink>
+	            		    &nbsp;&nbsp;
+			                <apex:outputLink value="javascript:void(0);" rendered="{!mapping.isDeletable}"
+			                	onclick="disableAddMappingButton();removeMapping('{!HTMLENCODE(mapping.mappingId)}');">Remove</apex:outputLink>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Salesforce Product</apex:facet>
+							<apex:outputText value="{!mapping.productName}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">VersionOne Project</apex:facet>
+							<apex:outputText value="{!mapping.projectName}"/>
+						</apex:column>
+						<apex:column >
+							<apex:facet name="header">Visible</apex:facet>
+							<apex:outputText value="{!IF((mapping.isVisible),'Yes','No')}"/>
+						</apex:column>
+ 			        </apex:pageBlockTable>
+			    </apex:pageBlockSectionItem>
+
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+		<apex:inputHidden id="scv1data" value="{!code}" />
+		<apex:inputHidden id="ssv1data" value="{!saltNumber}" />
+		<apex:actionFunction name="updateProject" action="{!updateProjectMapping}"
+			status="update_mapping" rerender="mappingTable,messages,JSMappingData,message_test,message_save"
+			oncomplete="enableAddMappingButton();updateJSMapping();">
+			<apex:param name="mappingId" value=""/>
+		</apex:actionFunction>
+		<apex:actionFunction name="removeMapping" action="{!removeProjectMapping}"
+			status="remove_mapping" rerender="mappingTable,messages,JSMappingData,message_test,message_save"
+			oncomplete="enableAddMappingButton();updateJSMapping();">
+			<apex:param name="mappingId" value=""/>
+		</apex:actionFunction>
+
+    </apex:form>
+
+    <apex:outputPanel id="out_testing">
+        <apex:pageMessage severity="{!testSeverity}" id="message_test"
+            title="Testing result" summary="{!testMessage}"
+            rendered="{!isSettingsValidated}" strength="1" />
+    </apex:outputPanel>
+
+    <apex:outputPanel id="out_saving">
+        <apex:pageMessage severity="{!saveSeverity}" id="message_save"
+            title="Saving result" summary="{!saveMessage}" rendered="{!isSaved}"
+            strength="1" />
+    </apex:outputPanel>
+
+    <apex:pageMessages id="messages" />
+</apex:page>
