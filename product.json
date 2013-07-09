@@ -1,8 +1,8 @@
 {
-    "id": "VersionOne.Integration.SalesForce",
+    "id": "VersionOne.Integration.CaseConnect",
     "titleSection": {
         "name": "CaseConnect",
-        "shortDescription": "short description of CaseConnect",
+        "shortDescription": "link VersionOne Defects with salesforce.com Cases",
         "pricing": "Free",
         "support": {
             "text": "VersionOne",
@@ -10,40 +10,56 @@
         }
     },
     "descriptionSection": {
-        "description": "Description of CaseConnect."
+        "description": "CaseConnect affords the ability to link VersionOne Defects with salesforce.com Cases. Using this integration your organization can leverage its investment in salesforce.com Cases Management as part of an integrated platform for Agile development.\n \n * Create VersionOne Defects from Cases in salesforce.com \n * Associate Cases in salesforce.com with Defects in VersionOne \n * Update salesforce.com Cases with Defect Status"
     },
     "linksSection": [
         {
+            "type": "hyperlink",
+            "title": "VersionOne CaseConnect on AppExchange",
+            "href": "https://appexchange.salesforce.com/listingDetail?listingId=a0N30000003IkE1EAK"
+        },
+        {
             "type": "documentation",
             "title": "Documentation",
-            "href": "http://versionone.github.io/VersionOne.Integration.SalesForce/index.html"
+            "href": "https://appexchange.salesforce.com/servlet/servlet.FileDownload?file=00P30000006BLYwEAO"
+        },
+        {
+            "type": "documentation",
+            "title": "bwin Interactive Customer Success Story",
+            "href": "http://www.versionone.com/pdf/bwin_Interactive_Customer_Success_Story.pdf"
         }
     ],
     "updatesSection": {
         "updates": [
             {
-                "date": "2013-07-09T16:59:17.151Z",
-                "description": "Launch",
-                "version": "0.0.1",
-                "releaseNotes": "Initial Release",
-                "qualityBand": "seed"
+                "date": "2010-12-01T00:00:00.000Z",
+                "description": "Fall 2010",
+                "version": "1.5.0",
+                "qualityBand": "mature"
             }
         ],
-        "qualityBands": [
+        "qualityBands": {
             "seed": {
-                "shortDescription": "The initial idea of a product. May not be stable code.",
-                "href": "https://github.com/versionone/VersionOne.Integration.SalesForce/blob/master/CONTRIBUTING.md#seed"
+                "shortDescription": "The initial idea of a product. No working code.",
+                "href": "https://github.com/versionone/VersionOne.Integration.CaseConnect/blob/master/CONTRIBUTING.md#seed"
             },
             "sapling": {
                 "shortDescription": "The product is undergoing rapid growth. The code works but expect major changes.",
-                "href": "https://github.com/versionone/VersionOne.Integration.SalesForce/blob/master/CONTRIBUTING.md#sapling"
+                "href": "https://github.com/versionone/VersionOne.Integration.CaseConnect/blob/master/CONTRIBUTING.md#sapling"
             },
             "mature": {
                 "shortDescription": "The product is stable. The code will continue to evolve with minimum breaking changes.",
-                "href": "https://github.com/versionone/VersionOne.Integration.SalesForce/blob/master/CONTRIBUTING.md#mature"
+                "href": "https://github.com/versionone/VersionOne.Integration.CaseConnect/blob/master/CONTRIBUTING.md#mature"
             }
-        ]
+        }
     },
     "mediaSection": [
+        {
+            "title": "Demonstration",
+            "caption": "link VersionOne Defects with salesforce.com Cases",
+            "mimetype": "video/x-flv",
+            "href": "http://www.versionone.tv.s3.amazonaws.com/CaseConnect/CaseConnect.flv",
+            "thumbhref": "http://community.versionone.com/attachments/imagefolder/gettingstarted/video.png"
+        }
     ]
 }

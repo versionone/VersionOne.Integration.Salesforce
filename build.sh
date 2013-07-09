@@ -160,42 +160,40 @@ done
 
 # ---- Clean solution ---------------------------------------------------------
 
-rm -rf $WORKSPACE/*.nupkg
-MSBuild.exe $SOLUTION_FILE -m \
-  -t:Clean \
-  -p:Configuration="$Configuration" \
-  -p:Platform="$Platform" \
-  -p:Verbosity=Diagnostic
+## Don't clean unless there's code.
+# rm -rf $WORKSPACE/*.nupkg
+# MSBuild.exe $SOLUTION_FILE -m \
+#  -t:Clean \
+#  -p:Configuration="$Configuration" \
+#  -p:Platform="$Platform" \
+#  -p:Verbosity=Diagnostic
 
 
 
 # ---- Update NuGet Packages --------------------------------------------------
 
-# Suspending update
+# Don't use NuGet unless there's code.
 # update_nuget_deps
-install_nuget_deps
+# install_nuget_deps
 
 
 # ---- Build solution using msbuild -------------------------------------------
 
-WIN_SIGNING_KEY="`winpath "$SIGNING_KEY"`"
-MSBuild.exe $SOLUTION_FILE \
-  -p:SignAssembly=$SIGN_ASSEMBLY \
-  -p:AssemblyOriginatorKeyFile=$WIN_SIGNING_KEY \
-  -p:RequireRestoreConsent=false \
-  -p:Configuration="$Configuration" \
-  -p:Platform="$Platform" \
-  -p:Verbosity=Diagnostic
+# Don't build unless there's code.
+# WIN_SIGNING_KEY="`winpath "$SIGNING_KEY"`"
+# MSBuild.exe $SOLUTION_FILE \
+#   -p:SignAssembly=$SIGN_ASSEMBLY \
+#   -p:AssemblyOriginatorKeyFile=$WIN_SIGNING_KEY \
+#   -p:RequireRestoreConsent=false \
+#   -p:Configuration="$Configuration" \
+#   -p:Platform="$Platform" \
+#   -p:Verbosity=Diagnostic
+echo Code coming soon.
 
 
 
-# ---- Produce NuGet .nupkg file ----------------------------------------------------------
+# ---- Produce .zip file ----------------------------------------------------------
 
-unset Platform
-cd $WORKSPACE/$MAIN_DIR
-NuGet.exe pack $MAIN_CSPROJ \
-  -Symbols \
-  -Properties Configuration="$Configuration"
-cd $WORKSPACE
+git archive -o ${MAIN_DIR}_${VERSION_NUMBER}.${BUILD_NUMBER}.zip HEAD
 
 
