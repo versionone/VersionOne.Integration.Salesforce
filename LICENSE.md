@@ -1,4 +1,4 @@
-# CaseConnect
+# VersionOne CaseConnect
 Copyright (c) 2013 VersionOne, Inc.
 All rights reserved.
 
