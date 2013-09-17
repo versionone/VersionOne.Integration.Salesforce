@@ -1,4 +1,3 @@
 # CaseConnect
 
-## Code Coming Soon!
-If you are interested in contributing to this project, please contact [Acey Bunch](mailto:acey.bunch@versionone.com).
+If you are interested in contributing to this project, please contact [Ian Buchanan](mailto:ian.buchanan@versionone.com).
