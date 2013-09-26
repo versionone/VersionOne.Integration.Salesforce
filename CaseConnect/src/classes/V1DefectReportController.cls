@@ -1,20 +1,20 @@
 public class V1DefectReportController {
-	private List<DefectWrapper> casesWithDefects = null;
+    private List<DefectWrapper> casesWithDefects = null;
 
-	//public String userDate { get; set; }
-	//public String ownerDefectList { get; set; }
-	public String ownerCaseList { get; set; }
-	public String caseStatusList { get; set; }
-	public String defectStatusList { get; set; }
-	private final Integer ITEMS_PER_PAGE = 20;
-	//private final String SHOW_MY_DEFECTS = '1';
-	//private final String SHOW_ALL_DEFECTS = '2';
-	private final String MY_CASE = '1';
-	private final String ALL_CASE = '2';
-	private final String OPEN = '1';
-	private final String CLOSED = '2';
+    //public String userDate { get; set; }
+    //public String ownerDefectList { get; set; }
+    public String ownerCaseList { get; set; }
+    public String caseStatusList { get; set; }
+    public String defectStatusList { get; set; }
+    private final Integer ITEMS_PER_PAGE = 20;
+    //private final String SHOW_MY_DEFECTS = '1';
+    //private final String SHOW_ALL_DEFECTS = '2';
+    private final String MY_CASE = '1';
+    private final String ALL_CASE = '2';
+    private final String OPEN = '1';
+    private final String CLOSED = '2';
 
-	public DefectTablePaginator paginator { get; private set; }
+    public DefectTablePaginator paginator { get; private set; }
 
     private transient Settings innerSettings;
     public Settings settings {
@@ -43,47 +43,47 @@ public class V1DefectReportController {
     }
 
     public boolean displayCasesWithDefectsTable {
-    	get {
-    		return casesWithDefects != null && casesWithDefects.size() > 0;
-    	}
+        get {
+            return casesWithDefects != null && casesWithDefects.size() > 0;
+        }
     }
 
     public V1DefectReportController() {
-		//ownerDefectList = SHOW_ALL_DEFECTS;
-		ownerCaseList = MY_CASE;
-		caseStatusList = OPEN;
-		defectStatusList = CLOSED;
+        //ownerDefectList = SHOW_ALL_DEFECTS;
+        ownerCaseList = MY_CASE;
+        caseStatusList = OPEN;
+        defectStatusList = CLOSED;
     }
 
-	public List<DefectWrapper> getCasesWithDefect() {
-		return casesWithDefects;
-	}
+    public List<DefectWrapper> getCasesWithDefect() {
+        return casesWithDefects;
+    }
 
 /*
-	public List<SelectOption> getOwnerDefectListOptions() {
+    public List<SelectOption> getOwnerDefectListOptions() {
         List<SelectOption> options = new List<SelectOption>();
         options.add(new SelectOption(SHOW_ALL_DEFECTS, 'Show all defects'));
         options.add(new SelectOption(SHOW_MY_DEFECTS, 'Show only my defects'));
-		return options;
-	}
+        return options;
+    }
 */
 
-	public List<SelectOption> getOwnerCaseListOptions() {
+    public List<SelectOption> getOwnerCaseListOptions() {
         List<SelectOption> options = new List<SelectOption>();
         options.add(new SelectOption(ALL_CASE, 'All'));
-		options.add(new SelectOption(MY_CASE, 'Mine'));
-		return options;
-	}
+        options.add(new SelectOption(MY_CASE, 'Mine'));
+        return options;
+    }
 
-	public List<SelectOption> getStatusListOptions() {
+    public List<SelectOption> getStatusListOptions() {
         List<SelectOption> options = new List<SelectOption>();
         options.add(new SelectOption(OPEN, 'Open'));
         options.add(new SelectOption(CLOSED, 'Closed'));
-		return options;
-	}
+        return options;
+    }
 
     public void goToPage() {
-    	String pageNumber = ApexPages.currentPage().getParameters().get('pageNumber');
+        String pageNumber = ApexPages.currentPage().getParameters().get('pageNumber');
         try {
             paginator.goToPage(Integer.valueof(pageNumber));
         } catch (Exception ex) {
@@ -91,7 +91,7 @@ public class V1DefectReportController {
         }
     }
 
-	public PageReference findCasesWithDefects() {
+    public PageReference findCasesWithDefects() {
         casesWithDefects = new List<DefectWrapper>();
         paginator = new DefectTablePaginator(ITEMS_PER_PAGE, new List<DefectWrapper>());
 
@@ -104,13 +104,13 @@ public class V1DefectReportController {
 
             paginator = new DefectTablePaginator(ITEMS_PER_PAGE, casesWithDefects);
         } catch (Exception ex) {
-        	casesWithDefects = new List<DefectWrapper>();
+            casesWithDefects = new List<DefectWrapper>();
             System.debug(ex.getMessage());
             addPageMessage(ApexPages.Severity.ERROR, ex.getMessage());
         }
 
-		return null;
-	}
+        return null;
+    }
 
     private void addPageMessage(ApexPages.Severity severity, String text) {
         ApexPages.addMessage(new ApexPages.Message(severity, text));

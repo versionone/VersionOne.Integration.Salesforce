@@ -190,7 +190,7 @@ private class DefectFacadeTester {
             defectFacade.unassignDefectFromCase(case1);
             System.assert(false, 'Error! IntegrationException must be thrown.');
         } catch(IntegrationException ex) {}
-        System.assertEquals(null, case1.V1DefectId__c, 'Assigned defect has to be empty.');
+        System.assertEquals('', case1.V1DefectId__c, 'Assigned defect has to be empty.');
         System.assertEquals(false, case1.V1Association__c, 'Case does not have association.');
     }
 
@@ -264,9 +264,9 @@ private class DefectFacadeTester {
     }
 
     static testMethod void getDateTimeTest() {
-    	String dateTime1 = '2009-10-21 08:57:50';
-    	String dateTime2 = '2009-10-21';
-    	String format = 'yyyy-MM-dd HH:mm:ss';
+        String dateTime1 = '2009-10-21 08:57:50';
+        String dateTime2 = '2009-10-21';
+        String format = 'yyyy-MM-dd HH:mm:ss';
         System.assertEquals(null, DefectFacade.getDateTime(null));
         System.assertEquals(dateTime1, DefectFacade.getDateTime(dateTime1).format(format));
         System.assertEquals(dateTime2+' 00:00:00', DefectFacade.getDateTime(dateTime2).format(format));
@@ -277,35 +277,35 @@ private class DefectFacadeTester {
         connector.setCreatedWorkitemToken(DEFECT_TOKEN);
         IDefectFacade defectFacade = new DefectFacade(connector, Settings.getTestSettings());
 
-    	User userData = createUser('testUser');
-    	List<Case> cases = new List<Case>();
-    	List<Defect> defects = new List<Defect>();
-    	Integer numberRecords = 100;
-		System.runAs(userData){
-	    	for (Integer i=0; i<numberRecords; i++) {
-		        Case caseValue = new Case(
-		            Subject = 'case'+i,
-		            Description = 'desc'+i,
-		            Product__c = PRODUCT_ID,
-		            V1Association__c = true,
-		            V1DefectId__c = 'Defect:'+i,
-		            OwnerId = Userinfo.getUserId()
-		        );
-	    	    cases.add(caseValue);
-	    	    Defect defectData = new Defect('case'+i, 'desc'+i);
-	    	    defectData.id = String.valueof(i);
-	    	    defects.add(defectData);
-	    	}
-	    	insert cases;
-	    	connector.AssignedDefects = defects;
+        User userData = createUser('testUser');
+        List<Case> cases = new List<Case>();
+        List<Defect> defects = new List<Defect>();
+        Integer numberRecords = 100;
+        System.runAs(userData){
+            for (Integer i=0; i<numberRecords; i++) {
+                Case caseValue = new Case(
+                    Subject = 'case'+i,
+                    Description = 'desc'+i,
+                    Product__c = PRODUCT_ID,
+                    V1Association__c = true,
+                    V1DefectId__c = 'Defect:'+i,
+                    OwnerId = Userinfo.getUserId()
+                );
+                cases.add(caseValue);
+                Defect defectData = new Defect('case'+i, 'desc'+i);
+                defectData.id = String.valueof(i);
+                defects.add(defectData);
+            }
+            insert cases;
+            connector.AssignedDefects = defects;
 
-    		List<DefectWrapper> wrappedDefects = defectFacade.getCasesWithDefects(true, false, true);
-    		System.assertEquals(numberRecords, wrappedDefects.size(), 'Incorrect numbers of defects.');
-    		for (Integer i=0; i<numberRecords; i++) {
-    			System.assertNotEquals(null, wrappedDefects.get(i).casePart, 'Case can\'t be null.');
-    			System.assertNotEquals(null, wrappedDefects.get(i).defectPart, 'Defect can\'t be null.');
-    		}
-		}
+            List<DefectWrapper> wrappedDefects = defectFacade.getCasesWithDefects(true, false, true);
+            System.assertEquals(numberRecords, wrappedDefects.size(), 'Incorrect numbers of defects.');
+            for (Integer i=0; i<numberRecords; i++) {
+                System.assertNotEquals(null, wrappedDefects.get(i).casePart, 'Case can\'t be null.');
+                System.assertNotEquals(null, wrappedDefects.get(i).defectPart, 'Defect can\'t be null.');
+            }
+        }
     }
 
     static testMethod void getCasesWithDefectsWithExceptionTest() {

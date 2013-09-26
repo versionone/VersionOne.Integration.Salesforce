@@ -38,8 +38,8 @@ private class V1ConnectorTester {
                             '<Attribute name="ChangeDateUTC">' + changeDateUTC + '</Attribute>' +
                             '<Attribute name="Reference">' + reference + '</Attribute>' +
                             '<Attribute name="Owners.Name">' +
-                            	'<Value>Administrator</Value>' +
-                            	'<Value>Testing</Value>' +
+                                '<Value>Administrator</Value>' +
+                                '<Value>Testing</Value>' +
                             '</Attribute>' +
                         '</Asset>' +
                       '</Assets>';
@@ -449,7 +449,7 @@ private class V1ConnectorTester {
     static testMethod void getDefectByIdTest() {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
-		insert new Case[] {case1, case2};
+        insert new Case[] {case1, case2};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
         String defectId = '2345';
@@ -494,7 +494,7 @@ private class V1ConnectorTester {
 
     static testMethod void removeLinkFromDefectTest() {
         Case case1 = new Case(Subject='TestCase1');
-		insert new Case[] {case1};
+        insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         String defectId = '2345';
         String linkId = '2346';
@@ -518,7 +518,7 @@ private class V1ConnectorTester {
     static testMethod void removeLinkFromDefectWithMultipleLinksTest() {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
-		insert new Case[] {case1, case2};
+        insert new Case[] {case1, case2};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
         String defectId = '2345';
@@ -549,7 +549,7 @@ private class V1ConnectorTester {
 
     static testMethod void removeLinkFromDefectWithMultipleLinksButRemoveOnlyOneTest() {
         Case case1 = new Case(Subject='TestCase1');
-		insert new Case[] {case1};
+        insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         String defectId = '2345';
         String linkId = '2346';
@@ -578,7 +578,7 @@ private class V1ConnectorTester {
 
     static testMethod void removeLinkFromDefectButNoLinkTest() {
         Case case1 = new Case(Subject='TestCase1');
-		insert new Case[] {case1};
+        insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         String defectId = '2345';
         String linkId = '2346';
@@ -631,7 +631,7 @@ private class V1ConnectorTester {
     static testMethod void updateReferenceForDefectWithAlreadyAssignedCasesTest() {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
-		insert new Case[] {case1, case2};
+        insert new Case[] {case1, case2};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
         String defectId = '2345';
@@ -702,7 +702,7 @@ private class V1ConnectorTester {
     static testMethod void deleteReferenceInDefectTest() {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
-		insert new Case[] {case1, case2};
+        insert new Case[] {case1, case2};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
         String defectId = '2345';
@@ -739,109 +739,109 @@ private class V1ConnectorTester {
     }
 
     static testMethod void searchDefectsTest() {
-    	String[] fields = new String[]{'Name', 'Number'};
-    	Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
-    	expectedDefect1.status = 'In Progress';
-    	expectedDefect1.id = '2469';
-    	expectedDefect1.token = 'Defect:2469';
-    	expectedDefect1.assetNumber = 'D-01470';
-    	expectedDefect1.isClosed = false;
-    	expectedDefect1.project = 'Salesforce test';
-    	expectedDefect1.priority = 'Low';
-    	expectedDefect1.resolution = '';
-		Defect expectedDefect2 = new Defect('testing new functionality', null);
-		expectedDefect2.id = '2473';
-		expectedDefect2.token = 'Defect:2473';
-		expectedDefect2.status = '';
-		expectedDefect2.assetNumber = 'D-01472';
-		expectedDefect2.isClosed = false;
-		expectedDefect2.project = 'Salesforce test';
-		expectedDefect2.priority = '';
-		expectedDefect2.resolution = 'Fixed';
-    	String searchPhrase = 'testing new functionality';
-    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&where=(Defect.AssetState!=\'Closed\')&sort=-CreateDateUTC' + createSearchQuery(searchPhrase) + '&findin=Name,Number';
-    	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
-						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
-							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
-							'<Attribute name="ResolutionReason.Name"/>' +
-							'<Attribute name="Name">' + expectedDefect1.title + '</Attribute>' +
-							'<Attribute name="Priority.Name">' + expectedDefect1.priority + '</Attribute>' +
-							'<Attribute name="AssetState">64</Attribute>' +
-							'<Attribute name="Scope.Name">' + expectedDefect1.project + '</Attribute>' +
-							'<Attribute name="Number">' + expectedDefect1.assetNumber + '</Attribute>' +
-						'</Asset>' +
-						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect2.id + '" id="Defect:' + expectedDefect2.id + '">' +
-							'<Attribute name="Status.Name"/>' +
-							'<Attribute name="ResolutionReason.Name">' + expectedDefect2.resolution + '</Attribute>' +
-							'<Attribute name="Name">' + expectedDefect2.title + '</Attribute>' +
-							'<Attribute name="Priority.Name"/>' +
-							'<Attribute name="AssetState">64</Attribute>' +
-							'<Attribute name="Scope.Name">' + expectedDefect2.project + '</Attribute>' +
-							'<Attribute name="Number">' + expectedDefect2.assetNumber + '</Attribute>' +
-						'</Asset>' +
-					  '</Assets>';
-		Settings testSettings = Settings.getTestSettings();
+        String[] fields = new String[]{'Name', 'Number'};
+        Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
+        expectedDefect1.status = 'In Progress';
+        expectedDefect1.id = '2469';
+        expectedDefect1.token = 'Defect:2469';
+        expectedDefect1.assetNumber = 'D-01470';
+        expectedDefect1.isClosed = false;
+        expectedDefect1.project = 'Salesforce test';
+        expectedDefect1.priority = 'Low';
+        expectedDefect1.resolution = '';
+        Defect expectedDefect2 = new Defect('testing new functionality', null);
+        expectedDefect2.id = '2473';
+        expectedDefect2.token = 'Defect:2473';
+        expectedDefect2.status = '';
+        expectedDefect2.assetNumber = 'D-01472';
+        expectedDefect2.isClosed = false;
+        expectedDefect2.project = 'Salesforce test';
+        expectedDefect2.priority = '';
+        expectedDefect2.resolution = 'Fixed';
+        String searchPhrase = 'testing new functionality';
+        String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&where=(Defect.AssetState!=\'Closed\')&sort=-CreateDateUTC' + createSearchQuery(searchPhrase) + '&findin=Name,Number';
+        String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
+                            '<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
+                            '<Attribute name="ResolutionReason.Name"/>' +
+                            '<Attribute name="Name">' + expectedDefect1.title + '</Attribute>' +
+                            '<Attribute name="Priority.Name">' + expectedDefect1.priority + '</Attribute>' +
+                            '<Attribute name="AssetState">64</Attribute>' +
+                            '<Attribute name="Scope.Name">' + expectedDefect1.project + '</Attribute>' +
+                            '<Attribute name="Number">' + expectedDefect1.assetNumber + '</Attribute>' +
+                        '</Asset>' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect2.id + '" id="Defect:' + expectedDefect2.id + '">' +
+                            '<Attribute name="Status.Name"/>' +
+                            '<Attribute name="ResolutionReason.Name">' + expectedDefect2.resolution + '</Attribute>' +
+                            '<Attribute name="Name">' + expectedDefect2.title + '</Attribute>' +
+                            '<Attribute name="Priority.Name"/>' +
+                            '<Attribute name="AssetState">64</Attribute>' +
+                            '<Attribute name="Scope.Name">' + expectedDefect2.project + '</Attribute>' +
+                            '<Attribute name="Number">' + expectedDefect2.assetNumber + '</Attribute>' +
+                        '</Asset>' +
+                      '</Assets>';
+        Settings testSettings = Settings.getTestSettings();
         RequestorMock testRequestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, testRequestor);
 
         List<Defect> defects = connector.searchDefects(searchPhrase, false, fields);
 
         System.assertEquals(2, defects.size());
-		System.assertEquals(expectedUrl, testRequestor.getSentUrl(0),'Incorrect request url.');
+        System.assertEquals(expectedUrl, testRequestor.getSentUrl(0),'Incorrect request url.');
         System.assert(defectEquals(expectedDefect1, defects.get(0)), 'Incorrect data for defect 1');
         System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
     }
 
     static testMethod void searchDefectsWithClosedDefectsTest() {
-    	String[] fields = new String[]{'Number', 'Name', 'Description', 'Reference'};
-    	Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
-    	expectedDefect1.status = 'In Progress';
-    	expectedDefect1.id = '2469';
-    	expectedDefect1.token = 'Defect:2469';
-    	expectedDefect1.assetNumber = 'D-01470';
-    	expectedDefect1.isClosed = true;
-    	expectedDefect1.project = 'Salesforce test';
-    	expectedDefect1.priority = 'Low';
-    	expectedDefect1.resolution = '';
-		Defect expectedDefect2 = new Defect('testing new functionality', null);
-		expectedDefect2.id = '2473';
-		expectedDefect2.token = 'Defect:2473';
-		expectedDefect2.status = '';
-		expectedDefect2.assetNumber = 'D-01472';
-		expectedDefect2.isClosed = false;
-		expectedDefect2.project = 'Salesforce test';
-		expectedDefect2.priority = '';
-		expectedDefect2.resolution = 'Fixed';
-    	String searchPhrase = 'testing new functionality';
-    	String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&sort=-CreateDateUTC' + createSearchQuery(searchPhrase) + '&findin=Number,Name,Description,Reference';
-    	String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
-						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
-							'<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
-							'<Attribute name="ResolutionReason.Name"/>' +
-							'<Attribute name="Name">' + expectedDefect1.title + '</Attribute>' +
-							'<Attribute name="Priority.Name">' + expectedDefect1.priority + '</Attribute>' +
-							'<Attribute name="AssetState">128</Attribute>' +
-							'<Attribute name="Scope.Name">' + expectedDefect1.project + '</Attribute>' +
-							'<Attribute name="Number">' + expectedDefect1.assetNumber + '</Attribute>' +
-						'</Asset>' +
-						'<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect2.id + '" id="Defect:' + expectedDefect2.id + '">' +
-							'<Attribute name="Status.Name"/>' +
-							'<Attribute name="ResolutionReason.Name">' + expectedDefect2.resolution + '</Attribute>' +
-							'<Attribute name="Name">' + expectedDefect2.title + '</Attribute>' +
-							'<Attribute name="Priority.Name"/>' +
-							'<Attribute name="AssetState">64</Attribute>' +
-							'<Attribute name="Scope.Name">' + expectedDefect2.project + '</Attribute>' +
-							'<Attribute name="Number">' + expectedDefect2.assetNumber + '</Attribute>' +
-						'</Asset>' +
-					  '</Assets>';
-		Settings testSettings = Settings.getTestSettings();
+        String[] fields = new String[]{'Number', 'Name', 'Description', 'Reference'};
+        Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
+        expectedDefect1.status = 'In Progress';
+        expectedDefect1.id = '2469';
+        expectedDefect1.token = 'Defect:2469';
+        expectedDefect1.assetNumber = 'D-01470';
+        expectedDefect1.isClosed = true;
+        expectedDefect1.project = 'Salesforce test';
+        expectedDefect1.priority = 'Low';
+        expectedDefect1.resolution = '';
+        Defect expectedDefect2 = new Defect('testing new functionality', null);
+        expectedDefect2.id = '2473';
+        expectedDefect2.token = 'Defect:2473';
+        expectedDefect2.status = '';
+        expectedDefect2.assetNumber = 'D-01472';
+        expectedDefect2.isClosed = false;
+        expectedDefect2.project = 'Salesforce test';
+        expectedDefect2.priority = '';
+        expectedDefect2.resolution = 'Fixed';
+        String searchPhrase = 'testing new functionality';
+        String expectedUrl = 'rest-1.v1/Data/Defect?sel=Status.Name,AssetState,Number,Name,ResolutionReason.Name,Priority.Name,Scope.Name&sort=-CreateDateUTC' + createSearchQuery(searchPhrase) + '&findin=Number,Name,Description,Reference';
+        String xml = '<Assets total="2" pageSize="2147483647" pageStart="0">' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect1.id + '" id="Defect:' + expectedDefect1.id + '">' +
+                            '<Attribute name="Status.Name">' + expectedDefect1.status + '</Attribute>' +
+                            '<Attribute name="ResolutionReason.Name"/>' +
+                            '<Attribute name="Name">' + expectedDefect1.title + '</Attribute>' +
+                            '<Attribute name="Priority.Name">' + expectedDefect1.priority + '</Attribute>' +
+                            '<Attribute name="AssetState">128</Attribute>' +
+                            '<Attribute name="Scope.Name">' + expectedDefect1.project + '</Attribute>' +
+                            '<Attribute name="Number">' + expectedDefect1.assetNumber + '</Attribute>' +
+                        '</Asset>' +
+                        '<Asset href="/VersionOne/rest-1.v1/Data/Defect/' + expectedDefect2.id + '" id="Defect:' + expectedDefect2.id + '">' +
+                            '<Attribute name="Status.Name"/>' +
+                            '<Attribute name="ResolutionReason.Name">' + expectedDefect2.resolution + '</Attribute>' +
+                            '<Attribute name="Name">' + expectedDefect2.title + '</Attribute>' +
+                            '<Attribute name="Priority.Name"/>' +
+                            '<Attribute name="AssetState">64</Attribute>' +
+                            '<Attribute name="Scope.Name">' + expectedDefect2.project + '</Attribute>' +
+                            '<Attribute name="Number">' + expectedDefect2.assetNumber + '</Attribute>' +
+                        '</Asset>' +
+                      '</Assets>';
+        Settings testSettings = Settings.getTestSettings();
         RequestorMock testRequestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, testRequestor);
 
         List<Defect> defects = connector.searchDefects(searchPhrase, true, fields);
 
         System.assertEquals(2, defects.size());
-		System.assertEquals(expectedUrl, testRequestor.getSentUrl(0),'Incorrect request url.');
+        System.assertEquals(expectedUrl, testRequestor.getSentUrl(0),'Incorrect request url.');
         System.assert(defectEquals(expectedDefect1, defects.get(0)), 'Incorrect data for defect 1');
         System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
     }
@@ -850,13 +850,13 @@ private class V1ConnectorTester {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
         Case case3 = new Case(Subject='TestCase3');
-		insert new Case[] {case1, case2, case3};
+        insert new Case[] {case1, case2, case3};
         case1 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case1.Id];
         case2 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case2.Id];
         case3 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case3.Id];
 
         Defect closedDefect1 = new Defect('testing defect 1', null);
-		closedDefect1.changeDate = '2009-10-21 08:57:50';
+        closedDefect1.changeDate = '2009-10-21 08:57:50';
         //closedDefect1.cases = new Case[]{case1,case2};
         closedDefect1.cases = null;
         closedDefect1.assetNumber = 'D-01032';
@@ -864,7 +864,7 @@ private class V1ConnectorTester {
         closedDefect1.id = '1077';
         closedDefect1.isClosed = true;
         Defect closedDefect2 = new Defect('testing defect 2', null);
-		closedDefect2.changeDate = '2009-10-21 08:57:52';
+        closedDefect2.changeDate = '2009-10-21 08:57:52';
         //closedDefect2.cases = new Case[]{case1,case3};
         closedDefect2.cases = null;
         closedDefect2.assetNumber = 'D-01033';
@@ -877,14 +877,14 @@ private class V1ConnectorTester {
                         '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect1.token + '">' +
                             '<Attribute name="Number">' + closedDefect1.assetNumber + '</Attribute>' +
                             '<Attribute name="ChangeDateUTC">2009-10-21T08:57:50.493</Attribute>' +
-							'<Attribute name="Name">' + closedDefect1.title + '</Attribute>' +
+                            '<Attribute name="Name">' + closedDefect1.title + '</Attribute>' +
                             '<Attribute name="Reference">' + case1.CaseNumber + ';' + case2.CaseNumber + '</Attribute>' +
                             '<Attribute name="AssetState">128</Attribute>' +
                         '</Asset>' +
                         '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect2.token + '">' +
                             '<Attribute name="Number">' + closedDefect2.assetNumber + '</Attribute>' +
                             '<Attribute name="ChangeDateUTC">2009-10-21T08:57:52.493</Attribute>' +
-							'<Attribute name="Name">' + closedDefect2.title + '</Attribute>' +
+                            '<Attribute name="Name">' + closedDefect2.title + '</Attribute>' +
                             '<Attribute name="Reference">' + case1.CaseNumber + ';' + case3.CaseNumber + '</Attribute>' +
                             '<Attribute name="AssetState">128</Attribute>' +
                         '</Asset>' +
@@ -909,12 +909,12 @@ private class V1ConnectorTester {
     static testMethod void getAssignedDefectsOnlyNotClosedDefectsTest() {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
-		insert new Case[] {case1, case2};
+        insert new Case[] {case1, case2};
         case1 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case1.Id];
         case2 = [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name, V1DefectId__c FROM Case WHERE Id = :case2.Id];
 
         Defect closedDefect1 = new Defect('testing defect 1', null);
-		closedDefect1.changeDate = '2009-10-21 08:57:50';
+        closedDefect1.changeDate = '2009-10-21 08:57:50';
         //closedDefect1.cases = new Case[]{case1,case2};
         closedDefect1.cases = null;
         closedDefect1.assetNumber = 'D-01032';
@@ -928,7 +928,7 @@ private class V1ConnectorTester {
                         '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="' + closedDefect1.token + '">' +
                             '<Attribute name="Number">' + closedDefect1.assetNumber + '</Attribute>' +
                             '<Attribute name="ChangeDateUTC">2009-10-21T08:57:50.493</Attribute>' +
-							'<Attribute name="Name">' + closedDefect1.title + '</Attribute>' +
+                            '<Attribute name="Name">' + closedDefect1.title + '</Attribute>' +
                             '<Attribute name="Reference">' + case1.CaseNumber + ';' + case2.CaseNumber + '</Attribute>' +
                             '<Attribute name="AssetState">128</Attribute>' +
                         '</Asset>' +
@@ -951,10 +951,10 @@ private class V1ConnectorTester {
     }
 
     static testMethod void getAssignedDefectsWithManyResultsTest() {
-    	User userData = createUser('testUser');
-    	List<Case> cases = new List<Case>();
-    	List<Defect> defects = new List<Defect>();
-    	Integer numberRecords = 250;
+        User userData = createUser('testUser');
+        List<Case> cases = new List<Case>();
+        List<Defect> defects = new List<Defect>();
+        Integer numberRecords = 250;
         String queueId = '12345667';
         String sourceId = '1010';
         String memberId = '12';
@@ -964,28 +964,28 @@ private class V1ConnectorTester {
         String xml = '';
         String xmlFinish = '</Assets>';
 
-    	for (Integer i=0; i<numberRecords; i++) {
-	        Case caseValue = new Case(
-	            Subject = 'case'+i,
-	            Description = 'desc'+i,
-	            V1Association__c = true,
-	            V1DefectId__c = 'Defect:'+i,
-	            OwnerId = Userinfo.getUserId()
-	        );
-    	    cases.add(caseValue);
-    	    xml = xml + '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="Defect:'+ i +'">' +
+        for (Integer i=0; i<numberRecords; i++) {
+            Case caseValue = new Case(
+                Subject = 'case'+i,
+                Description = 'desc'+i,
+                V1Association__c = true,
+                V1DefectId__c = 'Defect:'+i,
+                OwnerId = Userinfo.getUserId()
+            );
+            cases.add(caseValue);
+            xml = xml + '<Asset href="/VersionOne/rest-1.v1/Data/Defect/1077" id="Defect:'+ i +'">' +
                             '<Attribute name="Number">123</Attribute>' +
                             '<Attribute name="ChangeDateUTC">2009-10-21T08:57:50.493</Attribute>' +
-							'<Attribute name="Name">case ' + i + '</Attribute>' +
+                            '<Attribute name="Name">case ' + i + '</Attribute>' +
                             '<Attribute name="Reference">123</Attribute>' +
                             '<Attribute name="AssetState">128</Attribute>' +
                         '</Asset>';
-			if (i == 200) {
-				allResponce.add(xmlStart + xml + xmlFinish);
-				xml = '';
-			}
-    	}
-    	allResponce.add(xmlStart + xml + xmlFinish);
+            if (i == 200) {
+                allResponce.add(xmlStart + xml + xmlFinish);
+                xml = '';
+            }
+        }
+        allResponce.add(xmlStart + xml + xmlFinish);
 
         Settings testSettings = Settings.getTestSettings();
         RequestorMock testRequestor = new RequestorMock(allResponce, new List<Integer>{200, 200}, null);
@@ -998,34 +998,34 @@ private class V1ConnectorTester {
     }
 
     private static String createSearchQuery(string searchPhrase) {
-    	List<String> parts = searchPhrase.trim().split(' ');
-    	String query = '';
+        List<String> parts = searchPhrase.trim().split(' ');
+        String query = '';
 
-    	for(String part : parts) {
-    		query += '&find=' + part;
-    	}
-		System.assertNotEquals(null, query, 'Incorrect query state.');
-    	return query;
+        for(String part : parts) {
+            query += '&find=' + part;
+        }
+        System.assertNotEquals(null, query, 'Incorrect query state.');
+        return query;
     }
 
 
     private static Boolean defectEquals(Defect defect1, Defect defect2) {
-    	Boolean result = true;
-    	result = defect1.title == defect2.title;
-    	result = result && defect1.description == defect2.description;
-    	result = result && defect1.token == defect2.token;
-    	result = result && defect1.id == defect2.id;
-    	result = result && defect1.assetNumber == defect2.assetNumber;
-    	result = result && defect1.project == defect2.project;
-    	result = result && defect1.priority == defect2.priority;
-    	result = result && defect1.status == defect2.status;
-    	result = result && defect1.resolution == defect2.resolution;
-    	result = result && defect1.isClosed == defect2.isClosed;
-    	result = result && defect1.isClosed == defect2.isClosed;
-    	result = result && defect1.cases == defect2.cases;
-    	result = result && defect1.changeDate == defect2.changeDate;
-		System.assertNotEquals(null, result, 'Incorrect result state.');
-    	return result;
+        Boolean result = true;
+        result = defect1.title == defect2.title;
+        result = result && defect1.description == defect2.description;
+        result = result && defect1.token == defect2.token;
+        result = result && defect1.id == defect2.id;
+        result = result && defect1.assetNumber == defect2.assetNumber;
+        result = result && defect1.project == defect2.project;
+        result = result && defect1.priority == defect2.priority;
+        result = result && defect1.status == defect2.status;
+        result = result && defect1.resolution == defect2.resolution;
+        result = result && defect1.isClosed == defect2.isClosed;
+        result = result && defect1.isClosed == defect2.isClosed;
+        result = result && defect1.cases == defect2.cases;
+        result = result && defect1.changeDate == defect2.changeDate;
+        System.assertNotEquals(null, result, 'Incorrect result state.');
+        return result;
     }
 
     static void assertContains(Defect expect, List<Defect> actuals, String msg) {

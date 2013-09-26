@@ -1,12 +1,14 @@
 @isTest
-private class DefectControllerTester {
+private class DefectControllerTester 
+{
     private static final String CASE_SUBJECT = 'TestCase1';
     private static final String CASE_DESCRIPTION = 'Description 123';
     private static final String PROJECT_NAME = 'project name';
     private static final String DEFECT_TOKEN = DefectFacadeMock.CreatedDefectToken;
     private static final String SF_PRODUCT_ID = 'GC1020';
 
-    static testMethod void mainTest() {
+    static @isTest void mainTest() 
+    {
         DefectController controller = getControllerWithoutAssignedDefect();
 
         Defect defect = controller.getCreatingDefect();
@@ -21,8 +23,16 @@ private class DefectControllerTester {
         System.assertEquals(false, controller.areThereErrors);
         System.assertEquals(false, controller.isEditForm);
     }
+    
+    static @isTest void createDefectWithNoSettingsTest()
+    {
+    	DefectController controller = getControllerWithoutSettings();
+    	Settings settings = controller.settings;
+    	System.assertEquals(null, settings.getCurrentMemberId());
+    }
 
-    static testMethod void createDefectTest() {
+    static @isTest void createDefectTest() 
+    {
         DefectController controller = getControllerWithoutAssignedDefect();
         controller.createDefect();
         Defect defect = controller.getCreatingDefect();
@@ -32,7 +42,8 @@ private class DefectControllerTester {
         System.assertEquals(DEFECT_TOKEN, defect.token);
     }
 
-    static testMethod void createDefectWithExceptionTest() {
+    static @isTest void createDefectWithExceptionTest() 
+    {
         DefectController controller = getControllerWithoutAssignedDefect();
         DefectFacadeMock facade = (DefectFacadeMock)controller.defectFacade;
         facade.addException(DefectFacadeMock.CREATE_DEFECT_IN_V1_EXCEPTION, new IntegrationException('test exception'));
@@ -43,7 +54,8 @@ private class DefectControllerTester {
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors after failed defect creation.');
     }
 
-    static testMethod void getAssignedDefectTest() {
+    static @isTest void getAssignedDefectTest() 
+    {
         DefectController controller = getControllerWithAssignedDefect();
 
         Defect defectData = controller.getAssignedDefect();
@@ -52,7 +64,8 @@ private class DefectControllerTester {
         System.assertEquals(DefectFacadeMock.CreatedDefectToken, defectData.token);
     }
 
-    static testMethod void getAssignedDefectWithExceptionTest() {
+    static @isTest void getAssignedDefectWithExceptionTest() 
+    {
         DefectController controller = getControllerWithAssignedDefect();
         DefectFacadeMock facade = (DefectFacadeMock)controller.defectFacade;
         facade.addException(DefectFacadeMock.DEFECT_BY_ID_EXCEPTION, new IntegrationException('test exception'));
@@ -64,7 +77,8 @@ private class DefectControllerTester {
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors after failed defect creation.');
     }
 
-    static testMethod void getAssignedDefectWithoutRequestToV1Test() {
+    static @isTest void getAssignedDefectWithoutRequestToV1Test() 
+    {
         DefectController controller = getControllerWithAssignedDefect();
         controller.createDefect();
         controller.defectFacade = null;
@@ -75,7 +89,8 @@ private class DefectControllerTester {
         System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
     }
 
-    static testMethod void getAssignedDefectWhenDefectIsNotAssignedTest() {
+    static @isTest void getAssignedDefectWhenDefectIsNotAssignedTest() 
+    {
         DefectController controller = getControllerWithoutAssignedDefect();
 
         Defect defectData = controller.getAssignedDefect();
@@ -84,7 +99,8 @@ private class DefectControllerTester {
         System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
     }
 
-    static testMethod void unassignDefectTest() {
+    static @isTest void unassignDefectTest() 
+    {
         DefectController controller = getControllerWithAssignedDefect();
 
         controller.unassignDefect();
@@ -92,7 +108,8 @@ private class DefectControllerTester {
         System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
     }
 
-    static testMethod void unassignDefectWithExeptionTest() {
+    static @isTest void unassignDefectWithExeptionTest() 
+    {
         DefectController controller = getControllerWithAssignedDefect();
         DefectFacadeMock facade = (DefectFacadeMock)controller.defectFacade;
         facade.addException(DefectFacadeMock.UNASSIGN_DEFECT_FROM_CASE_EXCEPTION, new IntegrationException('test exception'));
@@ -103,7 +120,8 @@ private class DefectControllerTester {
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
     }
 
-    static testMethod void publishStatusTest() {
+    static @isTest void publishStatusTest() 
+    {
         DefectController controller = getControllerWithAssignedDefect();
 
         controller.publishStatus();
@@ -111,7 +129,8 @@ private class DefectControllerTester {
         System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
     }
 
-    static testMethod void publishStatusWithExceptionTest() {
+    static @isTest void publishStatusWithExceptionTest() 
+    {
         DefectController controller = getControllerWithAssignedDefect();
         DefectFacadeMock facade = (DefectFacadeMock)controller.defectFacade;
         facade.addException(DefectFacadeMock.PUBLISH_STATUS_EXCEPTION, new IntegrationException('test exception'));
@@ -122,7 +141,8 @@ private class DefectControllerTester {
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of warnings after failed defect creation.');
     }
 
-    static testMethod void cancelFormTest() {
+    static @isTest void cancelFormTest() 
+    {
         String newTitle = 'new title';
         String newDescription = 'new description';
         DefectController controller = getControllerWithoutAssignedDefect();
@@ -143,7 +163,8 @@ private class DefectControllerTester {
         System.assertEquals(false, controller.isEditForm, 'Incorrect description');
     }
 
-    private static DefectController getControllerWithoutAssignedDefect() {
+    private static DefectController getControllerWithoutAssignedDefect() 
+    {
         Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, Product__c = SF_PRODUCT_ID);
         insert new Case[] {caseData};
 
@@ -152,7 +173,8 @@ private class DefectControllerTester {
         return getController(caseData);
     }
 
-    private static DefectController getControllerWithAssignedDefect() {
+    private static DefectController getControllerWithAssignedDefect() 
+    {
         Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, V1Association__c = true, V1DefectId__c = DEFECT_TOKEN, Product__c = SF_PRODUCT_ID);
         insert new Case[] {caseData};
 
@@ -160,8 +182,21 @@ private class DefectControllerTester {
         System.assertEquals(true, caseData.V1Association__c, 'Incorrect case state.');
         return getController(caseData);
     }
+    
+    private static DefectController getControllerWithoutSettings() 
+    {
+        Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, V1Association__c = true, V1DefectId__c = DEFECT_TOKEN, Product__c = SF_PRODUCT_ID);
+        insert new Case[] {caseData};
+        caseData = [SELECT V1Association__c FROM Case WHERE Id = :caseData.Id];
+        
+        DefectFacadeMock facade = new DefectFacadeMock();
+        DefectController controller = new DefectController(caseData);
+        controller.defectFacade = facade;
+        return controller;        
+    }
 
-    private static DefectController getController(Case caseData) {
+    private static DefectController getController(Case caseData) 
+    {
         DefectFacadeMock facade = new DefectFacadeMock();
         Settings settingsData = Settings.getTestSettings();
         settingsData.setProjectName(PROJECT_NAME);

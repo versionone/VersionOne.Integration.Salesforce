@@ -30,48 +30,48 @@ public class V1CaseCollector {
     /* Query cases with specified owner and status.
      * ownerId - ID of an owner, null - owner doesn't matter.
      * isClosed - is case closed.
-     *			true  - gather only not closed cases
-     *			false - gather only closed cases
+     *          true  - gather only not closed cases
+     *          false - gather only closed cases
      * Return: Array of cases.
      */
     public static Case[] getCases(String ownerId, Boolean isClosed) {
         Case[] cases;
 
         if (ownerId != null) {
-        	cases = getCasesByOwnerId(ownerId, isClosed);
-		} else {
-        	cases = getCasesByStatus(isClosed);
-		}
+            cases = getCasesByOwnerId(ownerId, isClosed);
+        } else {
+            cases = getCasesByStatus(isClosed);
+        }
 
         System.debug('==> getCasesByOwnerId() found: ' + cases.size());
         return cases;
     }
 
     private static Case[] getCasesByOwnerId(String ownerId, Boolean isClosed) {
-		if (isClosed) {
-        	return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-            	          FROM Case WHERE OwnerId = :ownerId and Status = 'Closed' and V1Association__c = true ];
-		} else {
-        	return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-            	          FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed' and V1Association__c = true ];
-		}
-	}
+        if (isClosed) {
+            return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+                          FROM Case WHERE OwnerId = :ownerId and Status = 'Closed' and V1Association__c = true ];
+        } else {
+            return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+                          FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed' and V1Association__c = true ];
+        }
+    }
 
     private static Case[] getCasesByStatus(Boolean isClosed) {
-		if (isClosed) {
-        	return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-                	          FROM Case WHERE Status = 'Closed' and V1Association__c = true LIMIT 5000];
-		} else {
-        	return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-                	          FROM Case WHERE Status <> 'Closed' and V1Association__c = true LIMIT 5000];
-		}
-	}
+        if (isClosed) {
+            return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+                              FROM Case WHERE Status = 'Closed' and V1Association__c = true LIMIT 5000];
+        } else {
+            return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
+                              FROM Case WHERE Status <> 'Closed' and V1Association__c = true LIMIT 5000];
+        }
+    }
 
     /**
      * Update case.
-     * caseData 	- case which need to be updated.
-     * defectId 	- id of defect which was assigned for this case.
-     * assicuation	- was defect from VersionOne associated.
+     * caseData     - case which need to be updated.
+     * defectId     - id of defect which was assigned for this case.
+     * assicuation  - was defect from VersionOne associated.
      **/
     public static void updateCase(Case caseData, String defectId, Boolean association, String devStatus) {
         caseData.V1DefectId__c = defectId;
@@ -82,8 +82,8 @@ public class V1CaseCollector {
 
     /**
      * Update developer status.
-     * caseData 	- case which need to be updated.
-     * status		- developer status.
+     * caseData     - case which need to be updated.
+     * status       - developer status.
      **/
     public static void updateDeveloperStatus(Case caseData, String status) {
         caseData.V1DevelopmentStatus__c = status;
@@ -101,10 +101,10 @@ public class V1CaseCollector {
      * Get mapping for the Case
      */
     public static MappingV1ProjectsToSFProducts__c getProductToProjectMappingForCase(Case caseValue) {
-    	List<MappingV1ProjectsToSFProducts__c> mappings = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c,
-    	                                                   V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c
-    	                                                   WHERE SFProductId__c = :caseValue.Product__c];
-    	return mappings.size() > 0 ? mappings[0] : null;
+        List<MappingV1ProjectsToSFProducts__c> mappings = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c,
+                                                           V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c
+                                                           WHERE SFProductId__c = :caseValue.Product__c];
+        return mappings.size() > 0 ? mappings[0] : null;
     }
 
     /**
@@ -131,8 +131,8 @@ public class V1CaseCollector {
 
     /**
      * Updates mapping data.
-     * mappingId 	- mapping id which need to update.
-     * mapping 		- data about mapping for updating
+     * mappingId    - mapping id which need to update.
+     * mapping      - data about mapping for updating
      **/
     public static void updateMapping(String mappingId, ProjectProductMapping mapping) {
         MappingV1ProjectsToSFProducts__c mappingData = [select Id from MappingV1ProjectsToSFProducts__c where id=:mappingId];

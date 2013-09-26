@@ -84,8 +84,8 @@ private class XMLDomTest {
 
         keys = d.root.getElementsByTagName('Key');
         for(XMLdom.Element e2: keys ) {
-        	system.debug( 'Key is ' + e2.nodeValue );
-         	e2.dump();
+            system.debug( 'Key is ' + e2.nodeValue );
+            e2.dump();
          }
         count= keys.size();
         system.assert(count>1);
@@ -101,10 +101,10 @@ private class XMLDomTest {
 
         // uses namespaces
          string testACLResponse =
-	     '<?xml version="1.0" encoding="UTF-8"?>'+
-	     '<AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Owner><ID>owner_id</ID><DisplayName>foobar</DisplayName></Owner>'+
-	     '<AccessControlList><Grant><Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="CanonicalUser" foo="bar" ><ID>owner_id</ID>'+
-	     '<DisplayName>foobar</DisplayName></Grantee><Permission>FULL_CONTROL</Permission></Grant></AccessControlList></AccessControlPolicy>';
+         '<?xml version="1.0" encoding="UTF-8"?>'+
+         '<AccessControlPolicy xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Owner><ID>owner_id</ID><DisplayName>foobar</DisplayName></Owner>'+
+         '<AccessControlList><Grant><Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="CanonicalUser" foo="bar" ><ID>owner_id</ID>'+
+         '<DisplayName>foobar</DisplayName></Grantee><Permission>FULL_CONTROL</Permission></Grant></AccessControlList></AccessControlPolicy>';
         d = new xmldom(testACLResponse);
         //d.dumpAll();
         system.assert( d.root.hasChildNodes() );
@@ -124,19 +124,19 @@ private class XMLDomTest {
     }
 
     public static testmethod void test4() {
-    	String xml = '<RetrieveItem_Request_1 xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/Quotes_1"><ItemRequest Scope="All"><QoS xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon"><TimelinessInfo Timeliness="DELAYED" /><RateInfo Rate="UNSPECIFIED" /></QoS><Fields xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon" /><RequestKey xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon" Name="MSFT.O" Service="" NameType="RIC" /></ItemRequest></RetrieveItem_Request_1>';
-    	String expectedXml = '<#document >\n'+
-								'<RetrieveItem_Request_1 xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/Quotes_1\' >\n'+
-									'<ItemRequest Scope=\'All\' >\n'+
-										'<QoS xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon\' >\n'+
-											'<TimelinessInfo Timeliness=\'DELAYED\'  />\n'+
-											'<RateInfo Rate=\'UNSPECIFIED\'  />\n'+
-										'</QoS>\n'+
-										'<Fields xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon\'  />\n'+
-										'<RequestKey Name=\'MSFT.O\' Service=\'\' NameType=\'RIC\' xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon\'  />\n'+
-									'</ItemRequest>\n'+
-								'</RetrieveItem_Request_1>\n'+
-							'</#document>\n';
+        String xml = '<RetrieveItem_Request_1 xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/Quotes_1"><ItemRequest Scope="All"><QoS xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon"><TimelinessInfo Timeliness="DELAYED" /><RateInfo Rate="UNSPECIFIED" /></QoS><Fields xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon" /><RequestKey xmlns="http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon" Name="MSFT.O" Service="" NameType="RIC" /></ItemRequest></RetrieveItem_Request_1>';
+        String expectedXml = '<#document >\n'+
+                                '<RetrieveItem_Request_1 xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/Quotes_1\' >\n'+
+                                    '<ItemRequest Scope=\'All\' >\n'+
+                                        '<QoS xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon\' >\n'+
+                                            '<TimelinessInfo Timeliness=\'DELAYED\'  />\n'+
+                                            '<RateInfo Rate=\'UNSPECIFIED\'  />\n'+
+                                        '</QoS>\n'+
+                                        '<Fields xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon\'  />\n'+
+                                        '<RequestKey Name=\'MSFT.O\' Service=\'\' NameType=\'RIC\' xmlns=\'http://www.reuters.com/ns/2006/05/01/webservices/rkd/QuotesCommon\'  />\n'+
+                                    '</ItemRequest>\n'+
+                                '</RetrieveItem_Request_1>\n'+
+                            '</#document>\n';
         xmldom f = new xmldom( xml);
         system.debug( f.toXmlString() );
         system.assertEquals(expectedXml, f.toXmlString());
@@ -147,13 +147,13 @@ private class XMLDomTest {
          '<?xml version="1.0" encoding="UTF-8"?>' +
             '<bookstore><book><title lang="eng">Harry Potter</title><price>29.99</price>' +
             '</book><book><title lang="eng">Learning '; // truncated
-		xmldom f = new xmldom( testNotification );
-		// should cause an exception which is caught , returning a truncated dom
-		for ( xmldom.element e : f.getElementsByTagName('title') ) {
-			e.dump();
-		}
-		system.assert( f.getElementsByTagName('title')[0].nodeValue == 'Harry Potter' );
-		system.assert( f.getElementsByTagName('title')[1].nodeValue == '' );
+        xmldom f = new xmldom( testNotification );
+        // should cause an exception which is caught , returning a truncated dom
+        for ( xmldom.element e : f.getElementsByTagName('title') ) {
+            e.dump();
+        }
+        system.assert( f.getElementsByTagName('title')[0].nodeValue == 'Harry Potter' );
+        system.assert( f.getElementsByTagName('title')[1].nodeValue == '' );
 
     }
 

@@ -147,11 +147,11 @@ global with sharing class Settings {
     }
 
     public String getCurrentMemberId() {
-    	return memberId;
+        return memberId;
     }
 
     public void setCurrentMemberId(String memberId) {
-    	this.memberId = memberId;
+        this.memberId = memberId;
     }
 
     public void updateSettings() {

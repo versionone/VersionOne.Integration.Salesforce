@@ -27,16 +27,16 @@ public class RequestorMock implements IRequestor {
     }
 
     public String getBody() {
-    	if (numberRequest > responceBody.size()) {
-    		responceBody.get(0);
-    	}
+        if (numberRequest > responceBody.size()) {
+            responceBody.get(0);
+        }
         return responceBody.get(numberRequest-1);
     }
 
     public Integer getStatusCode() {
-    	if (numberRequest > statusCode.size()) {
-    		return statusCode.get(0);
-    	}
+        if (numberRequest > statusCode.size()) {
+            return statusCode.get(0);
+        }
         return statusCode.get(numberRequest-1);
     }
 
