@@ -56,9 +56,9 @@ public class V1Connector implements IV1Connector {
         }
 
         if (defectData.cases != null && defectData.cases.size() > 0) {
-        	for(Case caseData : defectData.cases) {
-        		referenceValue = caseData.CaseNumber + ';' + referenceValue;
-        	}
+            for(Case caseData : defectData.cases) {
+                referenceValue = caseData.CaseNumber + ';' + referenceValue;
+            }
         }
 
         updateReference(referenceValue, defectId, relationNode('Source', 'StorySource:' + settings.getSourceId()));
@@ -69,16 +69,16 @@ public class V1Connector implements IV1Connector {
         if (defectData.isClosed) {
             return;
         }
-		String reference = '';
+        String reference = '';
         if (defectData.cases != null) {
-        	for(Case caseData : defectData.cases) {
-        		if (caseData.CaseNumber != caseNumberToDelete) {
-        			if (reference != '') {
-        				reference = reference + ';';
-        			}
-        			reference = reference + caseData.CaseNumber;
-        		}
-        	}
+            for(Case caseData : defectData.cases) {
+                if (caseData.CaseNumber != caseNumberToDelete) {
+                    if (reference != '') {
+                        reference = reference + ';';
+                    }
+                    reference = reference + caseData.CaseNumber;
+                }
+            }
         }
 
         updateReference(reference, defectId, '');
@@ -102,24 +102,24 @@ public class V1Connector implements IV1Connector {
         XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element asset = xmlParser.getElementByTagName('Asset');
-		Defect defectData = getDefect(asset);
+        Defect defectData = getDefect(asset);
 
         return defectData;
     }
 
     public List<Defect> searchDefects(String query, Boolean isLookingInClosed, String[] fieldsForSearch) {
-    	List<Defect> defects = new List<Defect>();
+        List<Defect> defects = new List<Defect>();
 
-    	String closedItemsFilter = isLookingInClosed ? '' : SEARCH_PART_FOR_CLOSED_DEFECT_URL;
-    	String lookupQuery = '';
-    	List<String> queryParts = query.trim().split(' ');
-    	for(String queryPart : queryParts) {
-    		lookupQuery += String.format(SEARCH_WORD_TEMPLATE, new String[] { queryPart });
-    	}
+        String closedItemsFilter = isLookingInClosed ? '' : SEARCH_PART_FOR_CLOSED_DEFECT_URL;
+        String lookupQuery = '';
+        List<String> queryParts = query.trim().split(' ');
+        for(String queryPart : queryParts) {
+            lookupQuery += String.format(SEARCH_WORD_TEMPLATE, new String[] { queryPart });
+        }
 
-    	lookupQuery += getFieldsForSearch(fieldsForSearch);
+        lookupQuery += getFieldsForSearch(fieldsForSearch);
 
-    	String url = String.format(SEARCH_DEFECT_URL, new String[] { closedItemsFilter, lookupQuery });
+        String url = String.format(SEARCH_DEFECT_URL, new String[] { closedItemsFilter, lookupQuery });
 
         requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
@@ -127,32 +127,32 @@ public class V1Connector implements IV1Connector {
         xmlParser.parseFromString(requestor.getBody());
         List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
         for (XMLDom.Element assetTag : assetTags) {
-        	defects.add(getDefect(assetTag));
+            defects.add(getDefect(assetTag));
         }
         return defects;
     }
 
     private String getFieldsForSearch(String[] fieldsForSearch) {
-    	String fieldsForUrl = '';
-    	if (fieldsForSearch != null && !fieldsForSearch.isEmpty()) {
-    		String fields = '';
-    		for(Integer i=0; i<fieldsForSearch.size(); i++) {
-    			if (i > 0) {
-    				fields += ',';
-    			}
-    			fields += fieldsForSearch[i];
-    		}
-			fieldsForUrl = String.format(FIELDS_LIST_FOR_SEARCH_TEMPLATE, new String[] { fields });
-    	}
-    	return fieldsForUrl;
+        String fieldsForUrl = '';
+        if (fieldsForSearch != null && !fieldsForSearch.isEmpty()) {
+            String fields = '';
+            for(Integer i=0; i<fieldsForSearch.size(); i++) {
+                if (i > 0) {
+                    fields += ',';
+                }
+                fields += fieldsForSearch[i];
+            }
+            fieldsForUrl = String.format(FIELDS_LIST_FOR_SEARCH_TEMPLATE, new String[] { fields });
+        }
+        return fieldsForUrl;
     }
 
     private Defect getDefect(XMLDom.Element asset) {
-    	return getDefect(asset, true);
+        return getDefect(asset, true);
     }
 
     private Defect getDefect(XMLDom.Element asset, Boolean isReferenceProcess) {
-    	Defect defectData = new Defect(getValue('Name', asset.childNodes), getValue('Description', asset.childNodes));
+        Defect defectData = new Defect(getValue('Name', asset.childNodes), getValue('Description', asset.childNodes));
         defectData.resolution = getValue('ResolutionReason.Name', asset.childNodes);
         defectData.project = getValue('Scope.Name', asset.childNodes);
         defectData.assetNumber = getValue('Number', asset.childNodes);
@@ -164,16 +164,16 @@ public class V1Connector implements IV1Connector {
         defectData.owners = getValues('Owners.Name', asset.childNodes);
         DateTime changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes));
         if (changeDate != null) {
-			defectData.changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes)).format('yyyy-MM-dd hh:mm:ss');
+            defectData.changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes)).format('yyyy-MM-dd hh:mm:ss');
         }
         String reference = getValue('Reference', asset.childNodes);
 
         if (reference != null && isReferenceProcess) {
-        	defectData.cases = V1CaseCollector.getCasesByCasesNumber(reference.split(';'));
-        	//defectData.casesNumber = reference.split(';');
+            defectData.cases = V1CaseCollector.getCasesByCasesNumber(reference.split(';'));
+            //defectData.casesNumber = reference.split(';');
         }
 
-    	return defectData;
+        return defectData;
     }
 
     public String getSourceId() {
@@ -197,7 +197,7 @@ public class V1Connector implements IV1Connector {
     }
 
     public String getCurrentMemberId() {
-    	XMLDom xmlParser = new XMLDom();
+        XMLDom xmlParser = new XMLDom();
 
         HttpRequest req = requestor.createRequest('', MEMBER_URL, 'GET');
         requestor.request(req);
@@ -207,7 +207,7 @@ public class V1Connector implements IV1Connector {
         if (assetTag != null) {
             return assetTag.getAttribute('id').split(':')[1];
         }
-    	return null;
+        return null;
     }
 
     /**
@@ -249,13 +249,13 @@ public class V1Connector implements IV1Connector {
     * String attributeValue - value of name attribute for looking for.
     **/
     public String[] getValues(String attributeValue, List<XMLDom.Element> assetsData) {
-    	List<String> data = new List<String>();
+        List<String> data = new List<String>();
         for (XMLDom.Element element : assetsData) {
             String attibuteValue = element.getAttribute('name');
             if (attibuteValue != null && attibuteValue.equals(attributeValue)) {
                 List<XMLDom.Element> elements = element.getElementsByTagName('Value');
                 for (XMLDom.Element ele : elements) {
-                	data.add(ele.nodeValue);
+                    data.add(ele.nodeValue);
                 }
             }
         }
@@ -263,20 +263,18 @@ public class V1Connector implements IV1Connector {
         return data;
     }
 
-
-
     /**
     * Converts string with yyyy-MM-ddTHH:mm:ss.MMM or yyyy-MM-dd HH:mm:ss.MMM format to DateTime object
     * If millisecond more then 0 - convert to yyyy-MM-ddTHH:mm:ss
     * if millisecond equals 0 - convert to yyyy-MM-ddTHH:mm:ss-1
     **/
     public static DateTime convertToDateTime(String utcDate) {
-    	if (utcDate == null) {
-    		return null;
-    	}
+        if (utcDate == null) {
+            return null;
+        }
         String[] dateTimeData = utcDate.split('T');
         if (dateTimeData.size() == 1 ) {
-        	dateTimeData  = utcDate.split(' ');
+            dateTimeData  = utcDate.split(' ');
         }
         String[] dateData = dateTimeData[0].split('-');
         String[] timeData = dateTimeData[1].split(':');
@@ -290,11 +288,10 @@ public class V1Connector implements IV1Connector {
         if (secondAndMillisecond.intValue() == secondAndMillisecond ) {
             second = secondAndMillisecond.intValue();
         } else {
-        	second = Math.round(secondAndMillisecond);
+            second = Math.round(secondAndMillisecond);
         }
         return DateTime.newInstance(year, month, day, hour, minutes, second);
     }
-
 
     /**
     * Gathers all project from the VersionOne, and assign default project
@@ -375,7 +372,7 @@ public class V1Connector implements IV1Connector {
     * Creates link to the corresponding case in the Salesforce
     **/
     public void createLinkV1ToSF(String workitemId, Case caseData) {
-    	//throw new V1RequestException('Problem to create link to case');
+        //throw new V1RequestException('Problem to create link to case');
         if (workitemId == null) {
             return;
         }
@@ -396,7 +393,7 @@ public class V1Connector implements IV1Connector {
     /**
      * Creates defect or story in the VersionOne and assign link to it.
      *
-     * returns: 	id of the created workitem
+     * returns:     id of the created workitem
      * throws:  V1RequestException, Exception
      */
     public String createWorkitemInV1(Case caseData, Defect defectData, String projectId) {
@@ -450,56 +447,56 @@ public class V1Connector implements IV1Connector {
     public List<Defect> getAssignedDefects(Case[] cases, Boolean isClosedDefects) {
         List<Defect> assignedDefects = new List<Defect>();
         if (cases.size() == 0) {
-        	return assignedDefects;
+            return assignedDefects;
         }
 
         String defectStatus = '';
         if (isClosedDefects) {
-        	defectStatus = ';AssetState=\'Closed\'';
+            defectStatus = ';AssetState=\'Closed\'';
         } else {
-        	defectStatus = ';AssetState!=\'Closed\'';
+            defectStatus = ';AssetState!=\'Closed\'';
         }
         Integer start = 0;
         Integer numbersToProcess = 200;
         while (start < cases.size() && canMakeCallouts(1)) {
-	        String defectsIds = getDefectIdsURL(cases, start, numbersToProcess);
-	        String url = String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), defectStatus, defectsIds});
+            String defectsIds = getDefectIdsURL(cases, start, numbersToProcess);
+            String url = String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), defectStatus, defectsIds});
 
-			//Send the request, and get a response
-	        requestor.request(requestor.createRequest('', url, 'GET'));
-	        validateResponse();
-	        XMLDom xmlParser = new XMLDom();
-	        xmlParser.parseFromString(requestor.getBody());
-	        XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
-	        for (XMLDom.Element asset : assetTags) {
-	        	Defect defectData = getDefect(asset, false);
-	            assignedDefects.add(defectData);
-	        }
-	        start = start + numbersToProcess;
+            //Send the request, and get a response
+            requestor.request(requestor.createRequest('', url, 'GET'));
+            validateResponse();
+            XMLDom xmlParser = new XMLDom();
+            xmlParser.parseFromString(requestor.getBody());
+            XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
+            for (XMLDom.Element asset : assetTags) {
+                Defect defectData = getDefect(asset, false);
+                assignedDefects.add(defectData);
+            }
+            start = start + numbersToProcess;
         }
         return assignedDefects;
     }
 
     private String getDefectIdsURL(Case[] cases, Integer start, Integer numbers) {
-    	if(cases.size() == 0 || cases.size() < start) {
-    		return '';
-    	}
-    	if (cases.size() < start + numbers) {
-    		numbers = cases.size() - start;
-    	}
-    	String defectIds = ';(';
-    	Boolean addSeparator = false;
-    	for (Integer i=start; i<start+numbers; i++) {
-    		Case caseData = cases.get(i);
-    		if (addSeparator) {
-    			defectIds = defectIds + '|';
-    		} else {
-    			addSeparator = true;
-    		}
-    		defectIds = defectIds + 'Defect.ID=' + '\'' + caseData.V1DefectId__c + '\'';
-    	}
-    	defectIds = defectIds + ')';
-    	return defectIds;
+        if(cases.size() == 0 || cases.size() < start) {
+            return '';
+        }
+        if (cases.size() < start + numbers) {
+            numbers = cases.size() - start;
+        }
+        String defectIds = ';(';
+        Boolean addSeparator = false;
+        for (Integer i=start; i<start+numbers; i++) {
+            Case caseData = cases.get(i);
+            if (addSeparator) {
+                defectIds = defectIds + '|';
+            } else {
+                addSeparator = true;
+            }
+            defectIds = defectIds + 'Defect.ID=' + '\'' + caseData.V1DefectId__c + '\'';
+        }
+        defectIds = defectIds + ')';
+        return defectIds;
     }
 
     private Boolean canMakeCallouts(Integer count) {

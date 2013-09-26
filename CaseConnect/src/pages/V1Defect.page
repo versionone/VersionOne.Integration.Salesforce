@@ -1,13 +1,13 @@
 <apex:page extensions="DefectController" standardController="Case" tabStyle="Case">
-	<style>
-	body {
+    <style>
+    body {
 
-	   background-color: #F3F3EC;
+       background-color: #F3F3EC;
 
-	}
-	</style>
-	<script type="text/javascript">
-		//<![CDATA[
+    }
+    </style>
+    <script type="text/javascript">
+        //<![CDATA[
         function disableElement(ele) {
             ele.disabled = true;
             ele.className = 'btnDisabled';
@@ -19,228 +19,228 @@
         }
 
         function refreshWindowIfNoErrors() {
-        	if (!areThereAnyErrors()) {
-				refreshWindow();
-			} else {
-				enableCreateDefectButton();
-			}
-		}
+            if (!areThereAnyErrors()) {
+                refreshWindow();
+            } else {
+                enableCreateDefectButton();
+            }
+        }
 
-		function refreshWindow(){
-			parent.location.href="/{!HTMLENCODE(Case.Id)}";
-		}
+        function refreshWindow(){
+            parent.location.href="/{!HTMLENCODE(Case.Id)}";
+        }
 
-		function disableFormButtons() {
-			if (window.disableCreateDefectButton) {
-				disableCreateDefectButton();
-			}
-			if (window.disableCancelButton) {
-				disableCancelButton();
-			}
-		}
+        function disableFormButtons() {
+            if (window.disableCreateDefectButton) {
+                disableCreateDefectButton();
+            }
+            if (window.disableCancelButton) {
+                disableCancelButton();
+            }
+        }
 
-		function disableOperationOnAssigedDefect() {
-			if (window.disablePublishStatusButton) {
-				disablePublishStatusButton();
-			}
+        function disableOperationOnAssigedDefect() {
+            if (window.disablePublishStatusButton) {
+                disablePublishStatusButton();
+            }
 
-			if (window.disableUnassignButton) {
-				disableUnassignButton();
-			}
-		}
-		//]]>
+            if (window.disableUnassignButton) {
+                disableUnassignButton();
+            }
+        }
+        //]]>
     </script>
     <apex:actionStatus startText="" id="empty" />
     <apex:actionStatus startText="Generating form..." id="createForm" />
     <apex:actionStatus startText="Creating defect in the VersionOne..." id="defectCreate"/>
-	<apex:actionStatus startText="Un-assigning defect from the case..." id="unassigning"/>
-	<apex:actionStatus startText="Publishing status..." id="publishing_status"/>
+    <apex:actionStatus startText="Un-assigning defect from the case..." id="unassigning"/>
+    <apex:actionStatus startText="Publishing status..." id="publishing_status"/>
 
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
-        	<!-- Buttons secton -->
-			<apex:pageBlockButtons location="top" id="buttons">
-				<!-- Create Defect button -->
-				<apex:commandButton value="Create" id="createFormDefectButton"
-					rerender="CreateDefectSector" status="createForm"
-					action="{!showForm}" onClick="disableCreateFormDefectButton()"
-					rendered="{!not(isEditForm) && not(isDefectAssigned) && not(areThereErrors)}">
-                      	<script type="text/javascript">
-	                        function disableCreateFormDefectButton() {
-	                            disableElement(document.getElementById('{!$Component.createFormDefectButton}'));
-	                        }
-                       	</script>
+            <!-- Buttons secton -->
+            <apex:pageBlockButtons location="top" id="buttons">
+                <!-- Create Defect button -->
+                <apex:commandButton value="Create" id="createFormDefectButton"
+                    rerender="CreateDefectSector" status="createForm"
+                    action="{!showForm}" onClick="disableCreateFormDefectButton()"
+                    rendered="{!not(isEditForm) && not(isDefectAssigned) && not(areThereErrors)}">
+                        <script type="text/javascript">
+                            function disableCreateFormDefectButton() {
+                                disableElement(document.getElementById('{!$Component.createFormDefectButton}'));
+                            }
+                        </script>
                 </apex:commandButton>
 
                 <!-- Operations during defect creation -->
-				<apex:commandButton value="Create Defect" id="CreateDefectButton"
-					rerender="errorMessages, areThereErrorsBlock, CreateDefectSector"  status="defectCreate"
-					action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableFormButtons();" oncomplete="refreshWindowIfNoErrors()"
-					rendered="{!isEditForm && not(areThereErrors)}">
-                     	<script type="text/javascript">
+                <apex:commandButton value="Create Defect" id="CreateDefectButton"
+                    rerender="errorMessages, areThereErrorsBlock, CreateDefectSector"  status="defectCreate"
+                    action="{!createDefect}" onClick="if (!verifyForm()) {return;}disableFormButtons();" oncomplete="refreshWindowIfNoErrors()"
+                    rendered="{!isEditForm && not(areThereErrors)}">
+                        <script type="text/javascript">
                         function disableCreateDefectButton() {
                             disableElement(document.getElementById('{!$Component.CreateDefectButton}'));
                         }
 
-						function enableCreateDefectButton() {
+                        function enableCreateDefectButton() {
                             enableElement(document.getElementById('{!$Component.CreateDefectButton}'));
                         }
-                      	</script>
-				</apex:commandButton>
-				<apex:commandButton value="Cancel" id="CancelButton"
-					rerender="CreateDefectSector" status="empty"
-					action="{!cancelForm}" onClick="disableFormButtons();"
-					rendered="{!isEditForm && not(areThereErrors)}">
-                     	<script type="text/javascript">
+                        </script>
+                </apex:commandButton>
+                <apex:commandButton value="Cancel" id="CancelButton"
+                    rerender="CreateDefectSector" status="empty"
+                    action="{!cancelForm}" onClick="disableFormButtons();"
+                    rendered="{!isEditForm && not(areThereErrors)}">
+                        <script type="text/javascript">
                         function disableCancelButton() {
                             disableElement(document.getElementById('{!$Component.CancelButton}'));
                         }
-                      	</script>
-				</apex:commandButton>
-				<apex:commandButton value="Refresh Window" id="RefreshButton" status="empty"
-					action="{!refreshWidow}" onClick="disableCancelButton();"
-					oncomplete="refreshWindow();" rendered="{!areThereErrors}">
-                     	<script type="text/javascript">
+                        </script>
+                </apex:commandButton>
+                <apex:commandButton value="Refresh Window" id="RefreshButton" status="empty"
+                    action="{!refreshWidow}" onClick="disableCancelButton();"
+                    oncomplete="refreshWindow();" rendered="{!areThereErrors}">
+                        <script type="text/javascript">
                         function disableCancelButton() {
                             disableElement(document.getElementById('{!$Component.RefreshButton}'));
                         }
-                      	</script>
-				</apex:commandButton>
+                        </script>
+                </apex:commandButton>
 
                 <!-- Operations with assigned defect -->
-			    <apex:commandButton value="Unassign" id="unassignButton"
-			        rendered="{!isDefectAssigned}" action="{!unassignDefect}" onclick="disableOperationOnAssigedDefect()"
-			        oncomplete="refreshWindowIfNoErrors()" status="unassigning"
-			        rerender="errorMessages, areThereErrorsBlock, CreateDefectSector">
-			        <script type="text/javascript">
-			            function disableUnassignButton() {
-			             disableElement(document.getElementById('{!$Component.unassignButton}'));
-			         }
-			    	</script>
-			    </apex:commandButton>
-			    <apex:commandButton value="Publish Status" id="updateStatusButton"
-			        rendered="{!isDefectAssigned}" action="{!publishStatus}" onclick="disableOperationOnAssigedDefect()"
-					oncomplete="refreshWindowIfNoErrors()" status="publishing_status"
-			        rerender="errorMessages, areThereErrorsBlock">
-			        <script type="text/javascript">
-			            function disablePublishStatusButton() {
-			                disableElement(document.getElementById('{!$Component.updateStatusButton}'));
-			            }
-			    	</script>
-			    </apex:commandButton>
-			</apex:pageBlockButtons>
-			<!--  Defect creation form -->
-			<script type="text/javascript">
-          		////<![CDATA[
-				function verifyForm() {
-					var result = true;
-					var message = "";
-					var fields = {Tltle: getTitle(), Desciption: getDesciption()};
+                <apex:commandButton value="Unassign" id="unassignButton"
+                    rendered="{!isDefectAssigned}" action="{!unassignDefect}" onclick="disableOperationOnAssigedDefect()"
+                    oncomplete="refreshWindowIfNoErrors()" status="unassigning"
+                    rerender="errorMessages, areThereErrorsBlock, CreateDefectSector">
+                    <script type="text/javascript">
+                        function disableUnassignButton() {
+                         disableElement(document.getElementById('{!$Component.unassignButton}'));
+                     }
+                    </script>
+                </apex:commandButton>
+                <apex:commandButton value="Publish Status" id="updateStatusButton"
+                    rendered="{!isDefectAssigned}" action="{!publishStatus}" onclick="disableOperationOnAssigedDefect()"
+                    oncomplete="refreshWindowIfNoErrors()" status="publishing_status"
+                    rerender="errorMessages, areThereErrorsBlock">
+                    <script type="text/javascript">
+                        function disablePublishStatusButton() {
+                            disableElement(document.getElementById('{!$Component.updateStatusButton}'));
+                        }
+                    </script>
+                </apex:commandButton>
+            </apex:pageBlockButtons>
+            <!--  Defect creation form -->
+            <script type="text/javascript">
+                ////<![CDATA[
+                function verifyForm() {
+                    var result = true;
+                    var message = "";
+                    var fields = {Tltle: getTitle(), Desciption: getDesciption()};
 
-					for (var name in fields) {
-						if (fields[name] == "") {
-							result = false;
-							if (message != "") {
-								message += ", ";
-							}
-							message += name;
-						}
-					}
+                    for (var name in fields) {
+                        if (fields[name] == "") {
+                            result = false;
+                            if (message != "") {
+                                message += ", ";
+                            }
+                            message += name;
+                        }
+                    }
 
-					if (message != "") {
-						alert (message + " required.");
-					}
-					return result;
-				}
+                    if (message != "") {
+                        alert (message + " required.");
+                    }
+                    return result;
+                }
                   //]]>
-			</script>
+            </script>
             <apex:pageBlockSection columns="2" rendered="{!isEditForm && not(areThereErrors)}" id="createDefectForm">
                 <apex:pageBlockSectionItem >
-	                <apex:outputLabel value="Title" for="DefectTitle" />
-				    <apex:outputPanel layout="block" styleClass="requiredInput">
-				    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
-				    <apex:inputText value="{!CreatingDefect.title}" size="40" id="DefectTitle"
+                    <apex:outputLabel value="Title" for="DefectTitle" />
+                    <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                    <apex:inputText value="{!CreatingDefect.title}" size="40" id="DefectTitle"
                         tabindex="1" maxlength="255">
-                       	<script type="text/javascript">
-	                        function getTitle() {
-	                            return document.getElementById('{!$Component.DefectTitle}').value;
-	                        }
-                       	</script>
-					</apex:inputText>
-					</apex:outputPanel>
+                        <script type="text/javascript">
+                            function getTitle() {
+                                return document.getElementById('{!$Component.DefectTitle}').value;
+                            }
+                        </script>
+                    </apex:inputText>
+                    </apex:outputPanel>
                 </apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
-	                <apex:outputLabel value="Description" for="DefectDescription" />
-				    <apex:outputPanel layout="block" styleClass="requiredInput">
-				    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
-						<apex:inputTextarea id="DefectDescription" value="{!creatingDefect.description}" rows="2" cols="35">
-                       	<script type="text/javascript">
-	                        function getDesciption() {
-	                            return document.getElementById('{!$Component.DefectDescription}').value;
-	                        }
-                       	</script>
-						</apex:inputTextarea>
-					</apex:outputPanel>
+                    <apex:outputLabel value="Description" for="DefectDescription" />
+                    <apex:outputPanel layout="block" styleClass="requiredInput">
+                    <apex:outputPanel layout="block" styleClass="requiredBlock"/>
+                        <apex:inputTextarea id="DefectDescription" value="{!creatingDefect.description}" rows="2" cols="35">
+                        <script type="text/javascript">
+                            function getDesciption() {
+                                return document.getElementById('{!$Component.DefectDescription}').value;
+                            }
+                        </script>
+                        </apex:inputTextarea>
+                    </apex:outputPanel>
                 </apex:pageBlockSectionItem>
 
             </apex:pageBlockSection>
 
             <!-- Detail defect information  -->
             <apex:pageBlockSection rendered="{!isDefectAssigned}" id="assignedDefect" columns="1">
-				<apex:pageBlockSectionItem >
-					<apex:pageBlockTable value="{!AssignedDefect}" var="d" rendered="{!isDefectAssigned}">
-						<apex:column >
-							<apex:facet name="header">ID</apex:facet>
-							<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!d.token}" target="_blank" ><apex:outputText value="{!d.assetNumber}"/></apex:outputLink>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Title</apex:facet>
-							<apex:outputText value="{!d.title}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Project</apex:facet>
-							<apex:outputText value="{!d.project}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Priority</apex:facet>
-							<apex:outputText value="{!d.priority}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Status</apex:facet>
-							<apex:outputText value="{!d.status}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Resolution</apex:facet>
-							<apex:outputText value="{!d.resolution}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Is Closed</apex:facet>
-							<apex:image value="/img/checkbox_checked.gif" alt="closed" rendered="{!d.isClosed}"/>
-							<apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(d.isClosed)}"/>
-						</apex:column>
-					</apex:pageBlockTable>
-				</apex:pageBlockSectionItem>
                 <apex:pageBlockSectionItem >
-	                <apex:outputText value="Description:" style="text-align:left"/>
-	                <apex:outputPanel layout="block" style="background-color:white;border-style:solid;border-width:1px;">
-						<apex:outputText value="{!AssignedDefect.description}"/>
-					</apex:outputPanel>
-				</apex:pageBlockSectionItem>
+                    <apex:pageBlockTable value="{!AssignedDefect}" var="d" rendered="{!isDefectAssigned}">
+                        <apex:column >
+                            <apex:facet name="header">ID</apex:facet>
+                            <apex:outputLink value="{!settings.path}assetdetail.v1?oid={!d.token}" target="_blank" ><apex:outputText value="{!d.assetNumber}"/></apex:outputLink>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Title</apex:facet>
+                            <apex:outputText value="{!d.title}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Project</apex:facet>
+                            <apex:outputText value="{!d.project}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Priority</apex:facet>
+                            <apex:outputText value="{!d.priority}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Status</apex:facet>
+                            <apex:outputText value="{!d.status}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Resolution</apex:facet>
+                            <apex:outputText value="{!d.resolution}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Is Closed</apex:facet>
+                            <apex:image value="/img/checkbox_checked.gif" alt="closed" rendered="{!d.isClosed}"/>
+                            <apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(d.isClosed)}"/>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="Description:" style="text-align:left"/>
+                    <apex:outputPanel layout="block" style="background-color:white;border-style:solid;border-width:1px;">
+                        <apex:outputText value="{!AssignedDefect.description}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
 
-			</apex:pageBlockSection>
+            </apex:pageBlockSection>
 
-		    <apex:pageMessages id="errorMessages"/>
+            <apex:pageMessages id="errorMessages"/>
 
-		    <apex:outputPanel id="areThereErrorsBlock">
-			<apex:inputHidden value="{!areThereErrors}" id="areThereErrors">
-				<script type="text/javascript">
-					function areThereAnyErrors() {
-					    return document.getElementById('{!$Component.areThereErrors}').value == "true";
-					}
-				</script>
-			</apex:inputHidden>
-			</apex:outputPanel>
+            <apex:outputPanel id="areThereErrorsBlock">
+            <apex:inputHidden value="{!areThereErrors}" id="areThereErrors">
+                <script type="text/javascript">
+                    function areThereAnyErrors() {
+                        return document.getElementById('{!$Component.areThereErrors}').value == "true";
+                    }
+                </script>
+            </apex:inputHidden>
+            </apex:outputPanel>
         </apex:pageBlock>
-	</apex:form>
+    </apex:form>
 
 </apex:page>

@@ -16,7 +16,7 @@ private class V1CaseCollectorTestSuite {
         Case case2 = new Case(Subject='TestCase2');
         Case case3 = new Case(Subject='TestCase3');
         Case case4 = new Case(Subject='TestCase4');
-		insert new Case[] {case1, case2, case3, case4};
+        insert new Case[] {case1, case2, case3, case4};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
         case2 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case2.Id];
         case3 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case3.Id];
@@ -107,11 +107,11 @@ private class V1CaseCollectorTestSuite {
             if (isMappingEquals(actual, expected)) {
                 result = true;
                 break;
-			}
-		}
+            }
+        }
 
         System.assert(result, errorMessage);
-	}
+    }
 
     private static void assertMappingContain(ProjectProductMapping expected, List<MappingV1ProjectsToSFProducts__c> actuals, String errorMessage){
         boolean result = false;
@@ -133,7 +133,7 @@ private class V1CaseCollectorTestSuite {
         result = mapping1.V1ProjectName__c == mapping2.V1ProjectName__c;
         System.assertNotEquals(null, result, 'Result state is not correct.');
         return result;
-	}
+    }
 
     private static boolean isMappingEquals(MappingV1ProjectsToSFProducts__c mapping1, ProjectProductMapping mapping2) {
         Boolean result = true;
@@ -143,7 +143,7 @@ private class V1CaseCollectorTestSuite {
         result = mapping2.projectName == mapping1.V1ProjectName__c;
         System.assertNotEquals(null, result, 'Result state is not correct.');
         return result;
-	}
+    }
 
     static testMethod void addNewMappingTest() {
         String projectName = 'Project Name';
@@ -249,11 +249,11 @@ private class V1CaseCollectorTestSuite {
         }
 
         System.runAs(createUser('test4356')){
-	        String queueName = 'TestQueue1';
-	        Group queue = new Group(Type='Queue', Name=queueName);
-	        insert queue;
-	        QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
-	        insert sobj;
+            String queueName = 'TestQueue1';
+            Group queue = new Group(Type='Queue', Name=queueName);
+            insert queue;
+            QueueSobject sobj = new QueueSobject(QueueId = queue.Id, SobjectType = 'Case');
+            insert sobj;
             Case case1 = new Case(Subject='TestCase1', OwnerId = queue.Id, V1Association__c = true);
             Case case2 = new Case(Subject='TestCase2', OwnerId = queue.Id, V1Association__c = true);
             Case case3 = new Case(Subject='TestCase3', OwnerId = queue.Id, V1Association__c = true);

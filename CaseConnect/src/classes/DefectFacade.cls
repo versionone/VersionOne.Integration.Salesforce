@@ -155,50 +155,50 @@ public class DefectFacade implements IDefectFacade {
     }
 
     public List<DefectWrapper> getCasesWithDefects(Boolean isShowAllCase, Boolean isClosedCases, Boolean isClosedDefects) {
-    	String userId = null;
-    	if (!isShowAllCase) {
-    		userId = Userinfo.getUserId();
-    	}
-		Case[] cases = V1CaseCollector.getCases(userId, isClosedCases);
-    	try {
-    		List<Defect> defects = connector.getAssignedDefects(cases, isClosedDefects);
-    		List<DefectWrapper> defectsWithCases = new List<DefectWrapper>();
-    		if (defects == null) {
-    			return defectsWithCases;
-    		}
-    		for (Defect defectData : defects) {
-    			Case caseData = findCase(defectData.id, cases);
-    			defectsWithCases.add(new DefectWrapper(caseData, defectData));
-    		}
-    		return defectsWithCases;
-    	} catch(Exception ex) {
+        String userId = null;
+        if (!isShowAllCase) {
+            userId = Userinfo.getUserId();
+        }
+        Case[] cases = V1CaseCollector.getCases(userId, isClosedCases);
+        try {
+            List<Defect> defects = connector.getAssignedDefects(cases, isClosedDefects);
+            List<DefectWrapper> defectsWithCases = new List<DefectWrapper>();
+            if (defects == null) {
+                return defectsWithCases;
+            }
+            for (Defect defectData : defects) {
+                Case caseData = findCase(defectData.id, cases);
+                defectsWithCases.add(new DefectWrapper(caseData, defectData));
+            }
+            return defectsWithCases;
+        } catch(Exception ex) {
             throw new IntegrationException('Failed to get closed defects.');
         }
     }
 
     private Case findCase(String defectId, Case[] cases) {
-    	for (Case caseData : cases) {
-    		if (caseData.V1DefectId__c == 'Defect:' + defectId) {
-    			return caseData;
-    		}
-    	}
-    	return null;
+        for (Case caseData : cases) {
+            if (caseData.V1DefectId__c == 'Defect:' + defectId) {
+                return caseData;
+            }
+        }
+        return null;
     }
 
     public static DateTime getDateTime(String dateString) {
-    	if (dateString == null || dateString == '') {
-    		return null;
-    	}
-    	String[] dateTimeDate = dateString.split(' ');
-    	if (dateTimeDate.size() == 1) {
-    		dateString += ' 00:00:00';
-    	}
+        if (dateString == null || dateString == '') {
+            return null;
+        }
+        String[] dateTimeDate = dateString.split(' ');
+        if (dateTimeDate.size() == 1) {
+            dateString += ' 00:00:00';
+        }
 
-    	return datetime.valueOf(dateString);
+        return datetime.valueOf(dateString);
     }
 
     private String removeInfoAboutAssociationFromDefect(Case caseData) {
-    	String Id = getDefectFromToken(caseData.V1DefectId__c);
+        String Id = getDefectFromToken(caseData.V1DefectId__c);
         String notRemovedData = '';
 
         try {

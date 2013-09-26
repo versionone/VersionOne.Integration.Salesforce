@@ -73,16 +73,16 @@ public class DefectFacadeMock implements IDefectFacade {
         return defectData;
     }
 
-	public List<DefectWrapper> getCasesWithDefects(Boolean isShowAllCase, Boolean isClosedCases, Boolean isClosedDefects) {
+    public List<DefectWrapper> getCasesWithDefects(Boolean isShowAllCase, Boolean isClosedCases, Boolean isClosedDefects) {
         if(exceptions.get(GETTING_CASES_WITH_DEFECT_EXCEPTION) != null) {
             throw exceptions.get(GETTING_CASES_WITH_DEFECT_EXCEPTION);
         }
-		return casesWithDefects;
-	}
+        return casesWithDefects;
+    }
 
-	public void addException(String name, Exception ex) {
-		exceptions.put(name, ex);
-	}
+    public void addException(String name, Exception ex) {
+        exceptions.put(name, ex);
+    }
 
     public class AssignDefectPassedData {
         public Case caseValue { get; private set; }

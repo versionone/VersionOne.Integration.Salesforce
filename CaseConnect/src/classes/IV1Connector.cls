@@ -8,9 +8,9 @@ public interface IV1Connector {
 
     /**
     * Searches defects in the VersionOne by specify string.
-    * find 					- string for searching.
-    * isLookingInClosed 	- need to include closed defects in result.
-    * fieldsForSearch		- field list where need to search specified text.
+    * find                  - string for searching.
+    * isLookingInClosed     - need to include closed defects in result.
+    * fieldsForSearch       - field list where need to search specified text.
     **/
     List<Defect> searchDefects(String query, Boolean isLookingInClosed, String[] fieldsForSearch);
 
@@ -19,21 +19,21 @@ public interface IV1Connector {
     * defectId  - defect id in the VersionOne.
     * caseData  - link to this case need to delete.
     **/
-	void removeLinkFromDefect(String defectId, Case caseData);
+    void removeLinkFromDefect(String defectId, Case caseData);
 
-	/**
-	* Updates reference for the defect.
-	* defectId 			- defect id for updating.
-	* referenceValue	- add this reference to defect reference.
-	**/
-	void updateReferenceForDefect(String defectId, String referenceValue);
+    /**
+    * Updates reference for the defect.
+    * defectId          - defect id for updating.
+    * referenceValue    - add this reference to defect reference.
+    **/
+    void updateReferenceForDefect(String defectId, String referenceValue);
 
-	/**
-	* Defect reference from the defect.
-	* defectId 			 - defect id for updating.
-	* caseNumberToDelete - remove this case number from the reference.
-	**/
-	void deleteReferenceInDefect(String defectId, String caseNumberToDelete);
+    /**
+    * Defect reference from the defect.
+    * defectId           - defect id for updating.
+    * caseNumberToDelete - remove this case number from the reference.
+    **/
+    void deleteReferenceInDefect(String defectId, String caseNumberToDelete);
 
     /**
     * Returns: find and return id of current source(from Settings).
@@ -59,7 +59,7 @@ public interface IV1Connector {
     /**
     * Creates link to Salesforce web page with information about case.
     * defectId  - defect id in the VersionOne.
-    * caseData	- case to create link to.
+    * caseData  - case to create link to.
     **/
     void createLinkV1ToSF(String workitemId, Case caseData);
 
@@ -79,8 +79,8 @@ public interface IV1Connector {
 
     /**
     * Request information about assigned defects,
-    * cases 			- collect all defects which was assigned this these cases.
-    * isClosedDefects	- true - collect only closed defect, false only with open status.
+    * cases             - collect all defects which was assigned this these cases.
+    * isClosedDefects   - true - collect only closed defect, false only with open status.
     * Return: defects which were assiged to specific cases.
     **/
     List<Defect> getAssignedDefects(Case[] cases, Boolean isClosedDefects);
