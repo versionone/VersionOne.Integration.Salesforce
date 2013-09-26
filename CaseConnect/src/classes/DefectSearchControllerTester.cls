@@ -1,6 +1,6 @@
 @isTest
 private class DefectSearchControllerTester {
-	private static final String caseSubject = 'TestCase1';
+    private static final String caseSubject = 'TestCase1';
     private static final String caseDescription = 'Case description';
     private static final String projectName = 'Call Center';
     private static final String defectStatus = 'In Progress';
@@ -11,158 +11,158 @@ private class DefectSearchControllerTester {
     private static Case caseData;
 
     static testMethod void emptyCriteriaSearchTest() {
-    	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	System.assertEquals(controller.defectFacade, defectFacadeMockValue);
-    	System.assertEquals(controller.Settings, settingsValue);
+        DefectSearchController controller = getControllerWithoutAssignedDefect();
+        System.assertEquals(controller.defectFacade, defectFacadeMockValue);
+        System.assertEquals(controller.Settings, settingsValue);
 
-    	controller.searchForDefects();
+        controller.searchForDefects();
 
-    	System.assertEquals(controller.getDefects(), null);
-    	System.assertEquals(controller.displayDefectTable, false);
-    	pageMessageAssert(ApexPages.Severity.ERROR);
+        System.assertEquals(controller.getDefects(), null);
+        System.assertEquals(controller.displayDefectTable, false);
+        pageMessageAssert(ApexPages.Severity.ERROR);
     }
 
     static testMethod void emptyResultSearchTest() {
-    	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	defectFacadeMockValue.foundDefects = new List<Defect>();
+        DefectSearchController controller = getControllerWithoutAssignedDefect();
+        defectFacadeMockValue.foundDefects = new List<Defect>();
 
-    	controller.getSearchCriteria().queryString = 'test';
-    	controller.getSearchCriteria().includeClosedDefects = false;
-    	controller.getSearchCriteria().searchIn = 'fieldsList';
-    	controller.searchForDefects();
+        controller.getSearchCriteria().queryString = 'test';
+        controller.getSearchCriteria().includeClosedDefects = false;
+        controller.getSearchCriteria().searchIn = 'fieldsList';
+        controller.searchForDefects();
 
-    	System.assertNotEquals(controller.getDefects(), null);
-    	System.assertEquals(controller.getDefects().size(), 0);
-    	System.assertEquals(controller.displayDefectTable, false);
-    	System.assertEquals(controller.paginator.getRecordCount(), 0);
-    	pageMessageAssert(ApexPages.Severity.INFO);
+        System.assertNotEquals(controller.getDefects(), null);
+        System.assertEquals(controller.getDefects().size(), 0);
+        System.assertEquals(controller.displayDefectTable, false);
+        System.assertEquals(controller.paginator.getRecordCount(), 0);
+        pageMessageAssert(ApexPages.Severity.INFO);
     }
 
     static testMethod void searchFailureTest() {
-    	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	defectFacadeMockValue.addException(DefectFacadeMock.SEARCH_EXCEPTION, new IntegrationException());
+        DefectSearchController controller = getControllerWithoutAssignedDefect();
+        defectFacadeMockValue.addException(DefectFacadeMock.SEARCH_EXCEPTION, new IntegrationException());
 
 
-    	controller.getSearchCriteria().queryString = 'test';
-    	controller.getSearchCriteria().includeClosedDefects = false;
-    	controller.getSearchCriteria().searchIn = 'fieldsList';
-    	controller.searchForDefects();
+        controller.getSearchCriteria().queryString = 'test';
+        controller.getSearchCriteria().includeClosedDefects = false;
+        controller.getSearchCriteria().searchIn = 'fieldsList';
+        controller.searchForDefects();
 
-    	System.assertEquals(controller.getDefects(), null);
-    	System.assertEquals(controller.displayDefectTable, false);
-    	System.assertEquals(controller.paginator.getRecordCount(), 0);
-    	pageMessageAssert(ApexPages.Severity.ERROR);
+        System.assertEquals(controller.getDefects(), null);
+        System.assertEquals(controller.displayDefectTable, false);
+        System.assertEquals(controller.paginator.getRecordCount(), 0);
+        pageMessageAssert(ApexPages.Severity.ERROR);
     }
 
     static testMethod void nonEmptyResultSearchTest() {
-    	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	setupFoundDefect();
+        DefectSearchController controller = getControllerWithoutAssignedDefect();
+        setupFoundDefect();
 
-    	controller.getSearchCriteria().queryString = caseSubject;
-    	controller.getSearchCriteria().includeClosedDefects = false;
-    	controller.getSearchCriteria().searchIn = 'fieldsList';
-    	controller.searchForDefects();
+        controller.getSearchCriteria().queryString = caseSubject;
+        controller.getSearchCriteria().includeClosedDefects = false;
+        controller.getSearchCriteria().searchIn = 'fieldsList';
+        controller.searchForDefects();
 
-    	System.assertNotEquals(controller.getDefects(), null);
-    	System.assertEquals(controller.getDefects().size(), 1);
-    	System.assertEquals(controller.getDefects().get(0).isAssignedToCurrentCase, false);
-    	System.assertEquals(controller.displayDefectTable, true);
-    	System.assertEquals(controller.paginator.getRecordCount(), 1);
-    	System.assertEquals(ApexPages.getMessages().size(), 0);
+        System.assertNotEquals(controller.getDefects(), null);
+        System.assertEquals(controller.getDefects().size(), 1);
+        System.assertEquals(controller.getDefects().get(0).isAssignedToCurrentCase, false);
+        System.assertEquals(controller.displayDefectTable, true);
+        System.assertEquals(controller.paginator.getRecordCount(), 1);
+        System.assertEquals(ApexPages.getMessages().size(), 0);
     }
 
     static testMethod void assignDefectFailureTest() {
-    	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	defectFacadeMockValue.addException(DefectFacadeMock.ASSIGN_DEFECT_TO_CASE_EXCEPTION, new IntegrationException());
-    	controller.assignedDefectToken = assignedDefectToken;
-    	setupFoundDefect();
+        DefectSearchController controller = getControllerWithoutAssignedDefect();
+        defectFacadeMockValue.addException(DefectFacadeMock.ASSIGN_DEFECT_TO_CASE_EXCEPTION, new IntegrationException());
+        controller.assignedDefectToken = assignedDefectToken;
+        setupFoundDefect();
 
-    	controller.getSearchCriteria().queryString = caseSubject;
-    	controller.getSearchCriteria().includeClosedDefects = false;
-    	controller.getSearchCriteria().searchIn = 'fieldsList';
-    	controller.searchForDefects();
-    	controller.assignDefectToCase();
+        controller.getSearchCriteria().queryString = caseSubject;
+        controller.getSearchCriteria().includeClosedDefects = false;
+        controller.getSearchCriteria().searchIn = 'fieldsList';
+        controller.searchForDefects();
+        controller.assignDefectToCase();
 
-    	pageMessageAssert(ApexPages.Severity.ERROR);
+        pageMessageAssert(ApexPages.Severity.ERROR);
     }
 
     static testMethod void assignDefectWarningTest() {
-    	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	//defectFacadeMockValue.setAssignDefectToCaseException(new IntegrationException('', Severity.WARNING));
-    	defectFacadeMockValue.addException(DefectFacadeMock.ASSIGN_DEFECT_TO_CASE_EXCEPTION, new IntegrationException('', Severity.WARNING));
-    	controller.assignedDefectToken = assignedDefectToken;
-    	setupFoundDefect();
+        DefectSearchController controller = getControllerWithoutAssignedDefect();
+        //defectFacadeMockValue.setAssignDefectToCaseException(new IntegrationException('', Severity.WARNING));
+        defectFacadeMockValue.addException(DefectFacadeMock.ASSIGN_DEFECT_TO_CASE_EXCEPTION, new IntegrationException('', Severity.WARNING));
+        controller.assignedDefectToken = assignedDefectToken;
+        setupFoundDefect();
 
-    	controller.getSearchCriteria().queryString = caseSubject;
-    	controller.getSearchCriteria().includeClosedDefects = false;
-    	controller.getSearchCriteria().searchIn = 'fieldsList';
-    	controller.searchForDefects();
-    	controller.assignDefectToCase();
+        controller.getSearchCriteria().queryString = caseSubject;
+        controller.getSearchCriteria().includeClosedDefects = false;
+        controller.getSearchCriteria().searchIn = 'fieldsList';
+        controller.searchForDefects();
+        controller.assignDefectToCase();
 
-    	pageMessageAssert(ApexPages.Severity.WARNING);
+        pageMessageAssert(ApexPages.Severity.WARNING);
     }
 
     static testmethod void assignDefectTest() {
-    	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	controller.assignedDefectToken = assignedDefectToken;
-    	setupFoundDefect();
+        DefectSearchController controller = getControllerWithoutAssignedDefect();
+        controller.assignedDefectToken = assignedDefectToken;
+        setupFoundDefect();
 
-    	controller.getSearchCriteria().queryString = caseSubject;
-    	controller.getSearchCriteria().includeClosedDefects = false;
-    	controller.getSearchCriteria().searchIn = 'fieldsList';
-    	controller.searchForDefects();
-    	controller.assignDefectToCase();
+        controller.getSearchCriteria().queryString = caseSubject;
+        controller.getSearchCriteria().includeClosedDefects = false;
+        controller.getSearchCriteria().searchIn = 'fieldsList';
+        controller.searchForDefects();
+        controller.assignDefectToCase();
 
-    	System.assertEquals(ApexPages.getMessages().size(), 0);
-    	System.assertEquals(caseData.Id, defectFacadeMockValue.assignDefectResultValue.caseValue.Id);
-    	System.assertEquals(assignedDefectToken, defectFacadeMockValue.assignDefectResultValue.defectValue.token);
-    	System.assertEquals(defectStatus, defectFacadeMockValue.assignDefectResultValue.defectValue.status);
+        System.assertEquals(ApexPages.getMessages().size(), 0);
+        System.assertEquals(caseData.Id, defectFacadeMockValue.assignDefectResultValue.caseValue.Id);
+        System.assertEquals(assignedDefectToken, defectFacadeMockValue.assignDefectResultValue.defectValue.token);
+        System.assertEquals(defectStatus, defectFacadeMockValue.assignDefectResultValue.defectValue.status);
     }
 
     static testMethod void unassignDefectFailureTest() {
-    	DefectSearchController controller = getControllerWithAssignedDefect();
-    	//defectFacadeMockValue.setUnassignDefectFromCaseException(new IntegrationException());
-    	defectFacadeMockValue.addException(DefectFacadeMock.UNASSIGN_DEFECT_FROM_CASE_EXCEPTION, new IntegrationException());
+        DefectSearchController controller = getControllerWithAssignedDefect();
+        //defectFacadeMockValue.setUnassignDefectFromCaseException(new IntegrationException());
+        defectFacadeMockValue.addException(DefectFacadeMock.UNASSIGN_DEFECT_FROM_CASE_EXCEPTION, new IntegrationException());
 
-    	controller.unassignDefectFromCase();
+        controller.unassignDefectFromCase();
 
-    	pageMessageAssert(ApexPages.Severity.ERROR);
+        pageMessageAssert(ApexPages.Severity.ERROR);
     }
 
     static testMethod void unassignDefectTest() {
-    	DefectSearchController controller = getControllerWithAssignedDefect();
+        DefectSearchController controller = getControllerWithAssignedDefect();
 
-    	controller.unassignDefectFromCase();
+        controller.unassignDefectFromCase();
 
         System.assertEquals(caseData.Id, defectFacadeMockValue.assignDefectResultValue.caseValue.Id);
-    	System.assertEquals(null, defectFacadeMockValue.assignDefectResultValue.defectValue);
-    	System.assertEquals(ApexPages.getMessages().size(), 0);
+        System.assertEquals(null, defectFacadeMockValue.assignDefectResultValue.defectValue);
+        System.assertEquals(ApexPages.getMessages().size(), 0);
     }
 
     static testMethod void getFieldsListTest() {
-    	DefectSearchController controller = getControllerWithoutAssignedDefect();
-    	IDefectFacade facade = new DefectFacade(new V1ConnectorMock(), settingsValue);
-    	controller.defectFacade = facade;
-    	List<Selectoption> options = controller.getFieldsList();
+        DefectSearchController controller = getControllerWithoutAssignedDefect();
+        IDefectFacade facade = new DefectFacade(new V1ConnectorMock(), settingsValue);
+        controller.defectFacade = facade;
+        List<Selectoption> options = controller.getFieldsList();
 
-    	System.assertEquals(facade.getFieldsData().size(), options.size(), 'Incorrect amount of field options.');
-	}
+        System.assertEquals(facade.getFieldsData().size(), options.size(), 'Incorrect amount of field options.');
+    }
 
     private static void setupFoundDefect() {
-    	defectFacadeMockValue.foundDefects = new List<Defect>();
-    	Defect foundDefect = new Defect(caseSubject, caseDescription);
-    	foundDefect.token = assignedDefectToken;
-    	foundDefect.status = defectStatus;
-    	defectFacadeMockValue.foundDefects.clear();
-    	defectFacadeMockValue.foundDefects.add(foundDefect);
+        defectFacadeMockValue.foundDefects = new List<Defect>();
+        Defect foundDefect = new Defect(caseSubject, caseDescription);
+        foundDefect.token = assignedDefectToken;
+        foundDefect.status = defectStatus;
+        defectFacadeMockValue.foundDefects.clear();
+        defectFacadeMockValue.foundDefects.add(foundDefect);
 
-    	System.assertEquals(1, defectFacadeMockValue.foundDefects.size());
+        System.assertEquals(1, defectFacadeMockValue.foundDefects.size());
     }
 
     private static void pageMessageAssert(ApexPages.Severity severity) {
-    	System.assertEquals(ApexPages.getMessages().size(), 1);
-    	ApexPages.Message message = ApexPages.getMessages().get(0);
-    	System.assertEquals(message.getSeverity(), severity);
+        System.assertEquals(ApexPages.getMessages().size(), 1);
+        ApexPages.Message message = ApexPages.getMessages().get(0);
+        System.assertEquals(message.getSeverity(), severity);
     }
 
     private static DefectSearchController getControllerWithoutAssignedDefect() {

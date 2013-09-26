@@ -9,7 +9,10 @@
         <name>ApexComponent</name>
     </types>
     <types>
-        <members>*</members>
+        <members>Settings_page</members>
+        <members>V1Defect</members>
+        <members>V1DefectReport</members>
+        <members>V1DefectSearch</members>
         <name>ApexPage</name>
     </types>
     <types>
@@ -17,8 +20,31 @@
         <name>ApexTrigger</name>
     </types>
     <types>
+        <members>Case.V1Association__c</members>
+        <members>Case.V1DefectId__c</members>
+        <members>Case.V1Description__c</members>
+        <members>Case.V1DevelopmentStatus__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>Case-Case %28VersionOne%29 Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>VersionOne</members>
+        <name>RemoteSiteSetting</name>
+    </types>
+    <types>
         <members>*</members>
         <name>StaticResource</name>
     </types>
-    <version>16.0</version>
+    <version>27.0</version>
 </Package>

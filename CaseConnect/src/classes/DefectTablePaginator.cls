@@ -40,15 +40,15 @@ public class DefectTablePaginator {
     }
 
     public Integer pageSize {
-    	get {
-    		return pageSizeValue;
-    	}
-    	private set {
-    		if(value < 1) {
-    			throw new IntegrationException('Page size must be positive number, at least 1');
-    		}
-    		pageSizeValue = value;
-    	}
+        get {
+            return pageSizeValue;
+        }
+        private set {
+            if(value < 1) {
+                throw new IntegrationException('Page size must be positive number, at least 1');
+            }
+            pageSizeValue = value;
+        }
     }
 
     public Boolean hasData {get; set;}

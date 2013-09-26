@@ -1,11 +1,11 @@
 <apex:page extensions="DefectSearchController" standardController="Case" tabStyle="Case">
-	<style>
-	body {
+    <style>
+    body {
 
-	   background-color: #F3F3EC;
+       background-color: #F3F3EC;
 
-	}
-	</style>
+    }
+    </style>
     <script type="text/javascript">
         //<![CDATA[
         function enableButton(buttonId) {
@@ -23,37 +23,37 @@
     </script>
 
     <apex:actionStatus startText="Searching for VersionOne defects..." id="searchForDefects"/>
-	<apex:actionStatus startText="Assigning defect to the case..." id="assigningDefect"/>
-	<apex:actionStatus startText="Unassigning defect from the case..." id="unassigningDefect"/>
-	<apex:actionStatus startText="Updating found Defects table..." id="updatingDefectsTable" />
+    <apex:actionStatus startText="Assigning defect to the case..." id="assigningDefect"/>
+    <apex:actionStatus startText="Unassigning defect from the case..." id="unassigningDefect"/>
+    <apex:actionStatus startText="Updating found Defects table..." id="updatingDefectsTable" />
 
     <apex:form >
         <apex:pageBlock >
             <apex:pageBlockSection columns="1" id="searchForm">
                 <apex:pageBlockSectionItem >
                     <apex:outputPanel >
-			            <apex:outputLabel value="Find" for="queryText" />&nbsp;
-			            <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255"
-			             value="{!SearchCriteria.queryString}"/>&nbsp;in&nbsp;
-						<apex:selectList value="{!SearchCriteria.searchIn}" size="1" required="false" id="ProjectToken">
-						    <apex:selectOptions value="{!FieldsList}"/>
-						</apex:selectList>&nbsp;
-			            <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2"
-			             value="{!SearchCriteria.includeClosedDefects}" />
-			            <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>&nbsp;
-			            <apex:commandButton value="Search" id="searchButton" status="searchForDefects"
-						 rerender="searchResults, errorMessages" action="{!searchForDefects}"
-						 onclick="disableButton('{!$Component.searchButton}');"
-						 oncomplete="enableButton('{!$Component.searchButton}');" />
-				    </apex:outputPanel>
-				</apex:pageBlockSectionItem>
-		    </apex:pageBlockSection>
-		    <br/>
-		    <apex:pageBlockSection columns="1" id="searchResults">
-		        <apex:pageBlockSectionItem >
-		          <apex:outputPanel >
-		            <script type="text/javascript">
-		                //<![CDATA[
+                        <apex:outputLabel value="Find" for="queryText" />&nbsp;
+                        <apex:inputText size="75" id="queryText" tabindex="1" maxlength="255"
+                         value="{!SearchCriteria.queryString}"/>&nbsp;in&nbsp;
+                        <apex:selectList value="{!SearchCriteria.searchIn}" size="1" required="false" id="ProjectToken">
+                            <apex:selectOptions value="{!FieldsList}"/>
+                        </apex:selectList>&nbsp;
+                        <apex:inputCheckbox id="includeClosedCheckBox" tabindex="2"
+                         value="{!SearchCriteria.includeClosedDefects}" />
+                        <apex:outputLabel value="Include closed Defects" for="includeClosedCheckBox"/>&nbsp;
+                        <apex:commandButton value="Search" id="searchButton" status="searchForDefects"
+                         rerender="searchResults, errorMessages" action="{!searchForDefects}"
+                         onclick="disableButton('{!$Component.searchButton}');"
+                         oncomplete="enableButton('{!$Component.searchButton}');" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <br/>
+            <apex:pageBlockSection columns="1" id="searchResults">
+                <apex:pageBlockSectionItem >
+                  <apex:outputPanel >
+                    <script type="text/javascript">
+                        //<![CDATA[
                         function maybeRefreshWindow() {
                             if({!refreshWindow}) {
                                 parent.location.href = "/{!HTMLENCODE(currentCase.Id)}";
@@ -62,76 +62,76 @@
                         //]]>
                     </script>
                     <apex:outputPanel style="text-align: right;" rendered="{!paginator.hasData}">
-					    <br/>
-					    <apex:repeat value="{!paginator.pagesList}" var="pageNumber"  rendered="{!paginator.totalPageNumber > 1}">
-	                        <apex:outputPanel rendered="{!(pageNumber + 1) != paginator.pageNumber}">
-	                            <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
-	                             value="javascript:return false;"><apex:outputText value="{!pageNumber + 1}"/> </apex:outputLink>
-	                        </apex:outputPanel>
-	                        <apex:outputPanel rendered="{!(pageNumber + 1) == paginator.pageNumber}">
-	                            <apex:outputText value="{!pageNumber + 1}"/>
-	                        </apex:outputPanel>
-	                        &nbsp;&nbsp;
-	                    </apex:repeat>
+                        <br/>
+                        <apex:repeat value="{!paginator.pagesList}" var="pageNumber"  rendered="{!paginator.totalPageNumber > 1}">
+                            <apex:outputPanel rendered="{!(pageNumber + 1) != paginator.pageNumber}">
+                                <apex:outputLink onclick="javascript: goToPage({!pageNumber + 1});"
+                                 value="javascript:return false;"><apex:outputText value="{!pageNumber + 1}"/> </apex:outputLink>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!(pageNumber + 1) == paginator.pageNumber}">
+                                <apex:outputText value="{!pageNumber + 1}"/>
+                            </apex:outputPanel>
+                            &nbsp;&nbsp;
+                        </apex:repeat>
                         <apex:actionFunction name="goToPage" action="{!goToPage}" rerender="searchResults" status="updatingDefectsTable">
                             <apex:param name="pageNumber" value="" assignTo="{!pageNumber}" />
                         </apex:actionFunction>
-			            <span style="font-size: x-small;">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
-			             out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/>
-			             in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/>&nbsp;results &nbsp;&nbsp;</span>
-			            <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}"
-			             disabled="{!paginator.previousButtonDisabled}" rerender="searchResults" status="updatingDefectsTable"/>
-			            <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" rerender="searchResults"
-			             disabled="{!paginator.nextButtonDisabled}" status="updatingDefectsTable" />
-					</apex:outputPanel>
-				    <apex:pageBlockTable value="{!paginator.defects}" var="item" rendered="{!displayDefectTable}" id="defectTable">
-				        <apex:column >
-				        	<apex:facet name="header">Action</apex:facet>
-				            <apex:commandButton value="Assign" id="assignButton"
-				    		 rerender="searchResults, errorMessages" status="assigningDefect"
-							 action="{!assignDefectToCase}" rendered="{!not(item.isAssignedToCurrentCase)}"
-							 oncomplete="maybeRefreshWindow()">
-							    <apex:param id="assignParam" value="{!item.defectPart.token}" name="defectToAssign" assignTo="{!assignedDefectToken}" />
-						    </apex:commandButton>
-						    <apex:commandButton value="Unassign" id="unassignButton"
-				    		 rerender="searchResults, errorMessages" status="unassigningDefect"
-							 action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}"
-							 oncomplete="maybeRefreshWindow()" style="color: #000000" />
-				        </apex:column>
-					    <apex:column >
-						    <apex:facet name="header">ID</apex:facet>
-							<apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank"><apex:outputText value="{!item.defectPart.assetNumber}"/></apex:outputLink>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Title</apex:facet>
-							<apex:outputText value="{!item.defectPart.title}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Project</apex:facet>
-							<apex:outputText value="{!item.defectPart.project}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Priority</apex:facet>
-							<apex:outputText value="{!item.defectPart.priority}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Status</apex:facet>
-							<apex:outputText value="{!item.defectPart.status}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Resolution</apex:facet>
-							<apex:outputText value="{!item.defectPart.resolution}"/>
-						</apex:column>
-						<apex:column >
-							<apex:facet name="header">Is Closed</apex:facet>
-							<apex:image value="/img/checkbox_checked.gif" alt="closed" rendered="{!item.defectPart.isClosed}"/>
-							<apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(item.defectPart.isClosed)}"/>
-						</apex:column>
-					</apex:pageBlockTable>
-				  </apex:outputPanel>
-				</apex:pageBlockSectionItem>
-		    </apex:pageBlockSection>
+                        <span style="font-size: x-small;">Page #:&nbsp;<apex:outputLabel value="{!paginator.pageNumber}"/>
+                         out of&nbsp;<apex:outputLabel value="{!paginator.totalPageNumber}"/>
+                         in&nbsp;<apex:outputLabel value="{!paginator.recordCount}"/>&nbsp;results &nbsp;&nbsp;</span>
+                        <apex:commandButton value="Previous" action="{!paginator.previousBtnClick}"
+                         disabled="{!paginator.previousButtonDisabled}" rerender="searchResults" status="updatingDefectsTable"/>
+                        <apex:commandButton value="Next" action="{!paginator.nextBtnClick}" rerender="searchResults"
+                         disabled="{!paginator.nextButtonDisabled}" status="updatingDefectsTable" />
+                    </apex:outputPanel>
+                    <apex:pageBlockTable value="{!paginator.defects}" var="item" rendered="{!displayDefectTable}" id="defectTable">
+                        <apex:column >
+                            <apex:facet name="header">Action</apex:facet>
+                            <apex:commandButton value="Assign" id="assignButton"
+                             rerender="searchResults, errorMessages" status="assigningDefect"
+                             action="{!assignDefectToCase}" rendered="{!not(item.isAssignedToCurrentCase)}"
+                             oncomplete="maybeRefreshWindow()">
+                                <apex:param id="assignParam" value="{!item.defectPart.token}" name="defectToAssign" assignTo="{!assignedDefectToken}" />
+                            </apex:commandButton>
+                            <apex:commandButton value="Unassign" id="unassignButton"
+                             rerender="searchResults, errorMessages" status="unassigningDefect"
+                             action="{!unassignDefectFromCase}" rendered="{!item.isAssignedToCurrentCase}"
+                             oncomplete="maybeRefreshWindow()" style="color: #000000" />
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">ID</apex:facet>
+                            <apex:outputLink value="{!settings.path}assetdetail.v1?oid={!item.defectPart.token}" target="_blank"><apex:outputText value="{!item.defectPart.assetNumber}"/></apex:outputLink>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Title</apex:facet>
+                            <apex:outputText value="{!item.defectPart.title}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Project</apex:facet>
+                            <apex:outputText value="{!item.defectPart.project}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Priority</apex:facet>
+                            <apex:outputText value="{!item.defectPart.priority}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Status</apex:facet>
+                            <apex:outputText value="{!item.defectPart.status}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Resolution</apex:facet>
+                            <apex:outputText value="{!item.defectPart.resolution}"/>
+                        </apex:column>
+                        <apex:column >
+                            <apex:facet name="header">Is Closed</apex:facet>
+                            <apex:image value="/img/checkbox_checked.gif" alt="closed" rendered="{!item.defectPart.isClosed}"/>
+                            <apex:image value="/img/checkbox_unchecked.gif" alt="not closed" rendered="{!not(item.defectPart.isClosed)}"/>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                  </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
         </apex:pageBlock>
         <apex:pageMessages id="errorMessages"/>
-	</apex:form>
+    </apex:form>
 </apex:page>

@@ -6,18 +6,18 @@ public class Requestor implements IRequestor {
         this.settings = settings;
     }
 
-	/**
-	* Returns responce body
-	*
-	**/
+    /**
+    * Returns responce body
+    *
+    **/
     public String getBody() {
         return responce != null ? responce.getBody() : null;
     }
 
-	/**
-	* Returns status code of responce
-	*
-	**/
+    /**
+    * Returns status code of responce
+    *
+    **/
     public Integer getStatusCode() {
         return responce != null ? responce.getStatusCode() : null;
     }
@@ -33,9 +33,9 @@ public class Requestor implements IRequestor {
 
     /**
     * Creates request
-    * body 			- body of request
-    * additionUrl	- additional path to main URL from settings
-    * requestType	- request type (GET or POST)
+    * body          - body of request
+    * additionUrl   - additional path to main URL from settings
+    * requestType   - request type (GET or POST)
     **/
     public HttpRequest createRequest(String body, String additionUrl, String requestType) {
         HttpRequest req = new HttpRequest();
