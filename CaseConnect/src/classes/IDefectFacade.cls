@@ -1,21 +1,21 @@
 public interface IDefectFacade {
 
-	/**
-	* Return information about fields for defect searching.
-	**/
-	List<V1FieldData> getFieldsData();
+    /**
+    * Return information about fields for defect searching.
+    **/
+    List<V1FieldData> getFieldsData();
 
     /**
     * Create defect in the VersionOne and assign it to a case in the Salesforce
-    * caseData 		- case for assign
-    * defectData 	- information about new defect
+    * caseData      - case for assign
+    * defectData    - information about new defect
     * Returns id of created defect
     **/
     String createDefectInVersionOne(Case caseData, Defect defectData);
 
     /**
     * Assign defect in the VersionOne to case in the Salesforce
-    * caseData 		- case for assignment
+    * caseData      - case for assignment
     * defectData    - defect to assign
     **/
     void assignDefectToCase(Case caseData, Defect defectData);
@@ -29,13 +29,13 @@ public interface IDefectFacade {
 
     /**
     * Get status from the assigned defect and put it to the case
-    * caseData 		- case for processing
+    * caseData      - case for processing
     **/
     void publishStatus(Case caseData);
 
     /**
     * Get defect from the VersionOne by defect id
-    * defectToken 	- defect token (for example Defect:1234)
+    * defectToken   - defect token (for example Defect:1234)
     **/
     Defect getDefectByToken(String defectToken);
 
@@ -48,10 +48,10 @@ public interface IDefectFacade {
 
     /**
     * Lookup closed VersionOne defects.
-    * dateString 		- date since will lookup closed defects.
-    * isShowAllCase		- true - show all cases, false only assigned to current user.
-    * isClosedCases		- true - show only closed cases, false only open cases.
-    * isClosedDefects	- true - show only closed defects, false only open defect.
+    * dateString        - date since will lookup closed defects.
+    * isShowAllCase     - true - show all cases, false only assigned to current user.
+    * isClosedCases     - true - show only closed cases, false only open cases.
+    * isClosedDefects   - true - show only closed defects, false only open defect.
     **/
     List<DefectWrapper> getCasesWithDefects(Boolean isShowAllCase, Boolean isClosedCases, Boolean isClosedDefects);
 }

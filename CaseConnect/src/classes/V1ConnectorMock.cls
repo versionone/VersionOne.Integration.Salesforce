@@ -30,23 +30,23 @@ public class V1ConnectorMock implements IV1Connector {
         return defectData;
     }
 
-	public List<Defect> searchDefects(String query, Boolean isLookingInClosed, String[] fieldsForSearch) {
-		defectSearchCriteria = new DefectSearchCriteria();
-		defectSearchCriteria.queryString = query;
-		defectSearchCriteria.includeClosedDefects = isLookingInClosed;
-		this.fieldsForSearch = fieldsForSearch;
-		//defectSearchCriteria.searchIn = fieldsForSearch;
+    public List<Defect> searchDefects(String query, Boolean isLookingInClosed, String[] fieldsForSearch) {
+        defectSearchCriteria = new DefectSearchCriteria();
+        defectSearchCriteria.queryString = query;
+        defectSearchCriteria.includeClosedDefects = isLookingInClosed;
+        this.fieldsForSearch = fieldsForSearch;
+        //defectSearchCriteria.searchIn = fieldsForSearch;
 
-		if(exceptions.get(SEARCHING_FOR_DEFECTS_EXCEPTION) != null) {
-			throw exceptions.get(SEARCHING_FOR_DEFECTS_EXCEPTION);
-		}
+        if(exceptions.get(SEARCHING_FOR_DEFECTS_EXCEPTION) != null) {
+            throw exceptions.get(SEARCHING_FOR_DEFECTS_EXCEPTION);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public String[] getFieldsForSearch() {
-		return fieldsForSearch;
-	}
+    public String[] getFieldsForSearch() {
+        return fieldsForSearch;
+    }
 
     public void removeLinkFromDefect(String defectId, Case caseData) {
         throwException();
@@ -79,9 +79,9 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     public String getCurrentMemberId() {
-    	throwException();
+        throwException();
 
-    	return MEMBER_ID;
+        return MEMBER_ID;
     }
 
     public Map<String, String> findAllProjects() {
@@ -135,7 +135,7 @@ public class V1ConnectorMock implements IV1Connector {
     }
 
     public void addException(String name, Exception ex) {
-    	exceptions.put(name, ex);
+        exceptions.put(name, ex);
     }
 
     private void throwException() {

@@ -43,18 +43,18 @@ public with sharing class SettingsController {
     }
 
     private String generateUniqCode(String salt) {
-    	String ip = '';
-    	ip = ApexPages.currentPage().getHeaders().get('True-Client-IP');
-    	if (ip == null || ip == '') {
-    		ip = ApexPages.currentPage().getHeaders().get('X-Salesforce-SIP');
-    	}
-    	if (ip != null && ip != '') {
-    		ip = ip.replace('.', '');
-    	}
+        String ip = '';
+        ip = ApexPages.currentPage().getHeaders().get('True-Client-IP');
+        if (ip == null || ip == '') {
+            ip = ApexPages.currentPage().getHeaders().get('X-Salesforce-SIP');
+        }
+        if (ip != null && ip != '') {
+            ip = ip.replace('.', '');
+        }
 
-    	String code = UserInfo.getUserId() + ':' + salt + ':' + ip;
-    	code = EncodingUtil.convertToHex(Crypto.generateDigest('MD5', Blob.valueof(code)));
-    	return code;
+        String code = UserInfo.getUserId() + ':' + salt + ':' + ip;
+        code = EncodingUtil.convertToHex(Crypto.generateDigest('MD5', Blob.valueof(code)));
+        return code;
     }
 
 
@@ -82,20 +82,20 @@ public with sharing class SettingsController {
 
     private List<MappingV1ProjectsToSFProducts__c> baseMappingData;
     private void resetMappingData() {
-    	baseMappingData = null;
+        baseMappingData = null;
     }
 
     private List<MappingV1ProjectsToSFProducts__c> getMappingData() {
-    	if (baseMappingData == null) {
-    		baseMappingData = V1CaseCollector.getMappingList();
-    	}
-    	return baseMappingData;
+        if (baseMappingData == null) {
+            baseMappingData = V1CaseCollector.getMappingList();
+        }
+        return baseMappingData;
     }
 
     /** Must be called before usage of any other method. */
     public void initSettings() {
-    	currentMapping = new ProjectProductMapping(null, null, null);
-    	resetConnectionFormSettings();
+        currentMapping = new ProjectProductMapping(null, null, null);
+        resetConnectionFormSettings();
         isGotProjects = false;
         saltNumber = String.valueof(Crypto.getRandomLong());
         code = generateUniqCode(saltNumber);
@@ -113,10 +113,10 @@ public with sharing class SettingsController {
         isSaved = false;
     }
 
-	/*
-	* Is there is no settings for default mapping sets it.
-	* Return: true - if settings was updated, false - if setting wasn't updated
-	*/
+    /*
+    * Is there is no settings for default mapping sets it.
+    * Return: true - if settings was updated, false - if setting wasn't updated
+    */
     public boolean updateProjectData() {
         boolean isUpdated = false;
 
@@ -198,24 +198,24 @@ public with sharing class SettingsController {
     }
 
     public PageReference addMapping() {
-    	if (!isProductAlreadyUsed(currentMapping.productId, '0')) {
-    		currentMapping.projectName = projects.get(currentMapping.projectToken);
-    		currentMapping.productName = currentMapping.productId;
-    		V1CaseCollector.addNewMapping(currentMapping);
-    	} else {
-    		addErrorMessage('Mapping for this product already exists');
-    	}
-    	resetMappingData();
+        if (!isProductAlreadyUsed(currentMapping.productId, '0')) {
+            currentMapping.projectName = projects.get(currentMapping.projectToken);
+            currentMapping.productName = currentMapping.productId;
+            V1CaseCollector.addNewMapping(currentMapping);
+        } else {
+            addErrorMessage('Mapping for this product already exists');
+        }
+        resetMappingData();
 
-    	return null;
+        return null;
     }
 
     /**
      * Validates settings and adds errors messages on page if any.
      *
      * settings - settings to validate.
-     * Returns 	true  - if all requred fields are filled.
-     *			false - if any of requred fields are not filled.
+     * Returns  true  - if all requred fields are filled.
+     *          false - if any of requred fields are not filled.
      */
     public Boolean validateSettings() {
         String[] errors = settings.validate();
@@ -267,11 +267,11 @@ public with sharing class SettingsController {
         mappings.add(mapping);
         List<MappingV1ProjectsToSFProducts__c> baseMappingData = getMappingData();
         for (MappingV1ProjectsToSFProducts__c mapData : baseMappingData) {
-	        mapping = new ProjectProductMapping(mapData.V1ProjectName__c, projects.containsKey(mapData.V1ProjectToken__c), mapData.SFProductName__c);
-        	mapping.productId = mapData.SFProductId__c;
-        	mapping.isDeletable = true;
-        	mapping.mappingId = mapData.id;
-        	mappings.add(mapping);
+            mapping = new ProjectProductMapping(mapData.V1ProjectName__c, projects.containsKey(mapData.V1ProjectToken__c), mapData.SFProductName__c);
+            mapping.productId = mapData.SFProductId__c;
+            mapping.isDeletable = true;
+            mapping.mappingId = mapData.id;
+            mappings.add(mapping);
         }
 
         return mappings;
@@ -279,58 +279,58 @@ public with sharing class SettingsController {
 
 
     public PageReference updateProjectMapping() {
-    	resetConnectionFormSettings();
-    	String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
-    	if (!isCodeCorrect()) {
-    		addErrorMessage('Incorrect action. Please refresh page and try again.');
-    		return null;
-    	}
-    	if (mappingId == '') {
-        	updateDefaultProjectSettings(currentMapping.projectToken.split(':')[1]);
-        	settings.updateSettings();
-    	} else {
-    		if (!isProductAlreadyUsed(currentMapping.productId, mappingId)) {
-	    		currentMapping.projectName = projects.get(currentMapping.projectToken);
-	    		currentMapping.productName = currentMapping.productId;
-    			V1CaseCollector.updateMapping(mappingId, currentMapping);
-    			resetMappingData();
-    		} else {
-    			addErrorMessage('Mapping for this product already exists');
-    		}
-    	}
+        resetConnectionFormSettings();
+        String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
+        if (!isCodeCorrect()) {
+            addErrorMessage('Incorrect action. Please refresh page and try again.');
+            return null;
+        }
+        if (mappingId == '') {
+            updateDefaultProjectSettings(currentMapping.projectToken.split(':')[1]);
+            settings.updateSettings();
+        } else {
+            if (!isProductAlreadyUsed(currentMapping.productId, mappingId)) {
+                currentMapping.projectName = projects.get(currentMapping.projectToken);
+                currentMapping.productName = currentMapping.productId;
+                V1CaseCollector.updateMapping(mappingId, currentMapping);
+                resetMappingData();
+            } else {
+                addErrorMessage('Mapping for this product already exists');
+            }
+        }
 
-    	return null;
+        return null;
     }
 
     public PageReference removeProjectMapping() {
-    	resetConnectionFormSettings();
-    	String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
-    	if (!isCodeCorrect()) {
-    		addErrorMessage('Incorrect action. Please refresh page and try again.');
-    		return null;
-    	}
-    	if (mappingId == null || mappingId == '') {
-    		addErrorMessage('Incorrect data for deletion.');
-    		return null;
-    	}
+        resetConnectionFormSettings();
+        String mappingId = ApexPages.currentPage().getParameters().get('mappingId');
+        if (!isCodeCorrect()) {
+            addErrorMessage('Incorrect action. Please refresh page and try again.');
+            return null;
+        }
+        if (mappingId == null || mappingId == '') {
+            addErrorMessage('Incorrect data for deletion.');
+            return null;
+        }
 
-    	V1CaseCollector.deleteMapping(mappingId);
-    	resetMappingData();
+        V1CaseCollector.deleteMapping(mappingId);
+        resetMappingData();
 
-    	return null;
+        return null;
     }
 
     private Boolean isCodeCorrect() {
-    	String secretCode = generateUniqCode(saltNumber);
-		return code != '' && code != null && code == secretCode;
+        String secretCode = generateUniqCode(saltNumber);
+        return code != '' && code != null && code == secretCode;
     }
 
     private boolean isProductAlreadyUsed(String productId, String mappingId) {
         List<MappingV1ProjectsToSFProducts__c> baseMappingData = getMappingData();
         for (MappingV1ProjectsToSFProducts__c mapData : baseMappingData) {
-        	if (mapData.SFProductId__c == productId && mapData.id != mappingId) {
-        		return true;
-        	}
+            if (mapData.SFProductId__c == productId && mapData.id != mappingId) {
+                return true;
+            }
         }
 
         return false;
