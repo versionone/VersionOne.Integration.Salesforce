@@ -9,4 +9,5 @@ public interface IRequestor {
     void request(HttpRequest request);
 
     HttpRequest createRequest(String body, String additionUrl, String requestType);
+    
 }
