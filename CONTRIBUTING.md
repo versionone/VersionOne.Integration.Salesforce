@@ -1,4 +1,4 @@
-# Contributing to CaseConnect
+# Contributing to VersionOne Integration for Salesforce
 
  1. [Getting Involved](#getting-involved)
  2. [Reporting Bugs](#reporting-bugs)
@@ -7,7 +7,7 @@
 
 ## Getting Involved
 
-We need your help to make CaseConnect a useful integration. While third-party patches are absolutely essential, they are not the only way to get involved. You can help the project by discovering and [reporting bugs](#reporting-bugs) and helping others on the [versionone-dev group](http://groups.google.com/group/versionone-dev/) and [GitHub issues][issues].
+We need your help to make VersionOne Integration for Salesforce a useful integration. While third-party patches are absolutely essential, they are not the only way to get involved. You can help the project by discovering and [reporting bugs](#reporting-bugs) and helping others on the [versionone-dev group](http://groups.google.com/group/versionone-dev/) and [GitHub issues][issues].
 
 ## Reporting Bugs
 

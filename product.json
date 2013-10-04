@@ -1,7 +1,7 @@
 {
     "id": "VersionOne.Integration.CaseConnect",
     "titleSection": {
-        "name": "CaseConnect",
+        "name": "VersionOne Integration for Salesforce",
         "shortDescription": "Link VersionOne Defects with salesforce.com Cases",
         "pricing": "Free",
         "support": {
