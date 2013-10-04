@@ -11,7 +11,6 @@ private class SettingsTestSuite {
         System.assertEquals('http://localhost/', s.getPath(), 'Wrong Path.');
     }
 
-
     static testMethod void updateSettingsTest() {
         delete [SELECT Id FROM V1Settings__c];
         Settings s = new Settings();

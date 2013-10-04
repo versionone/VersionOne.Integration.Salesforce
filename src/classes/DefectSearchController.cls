@@ -1,11 +1,9 @@
 public with sharing class DefectSearchController {
+    
     private final Integer ITEMS_PER_PAGE = 10;
-
     private Case currentCaseValue;
-
     private transient Settings innerSettings;
     private transient IDefectFacade innerDefectFacade;
-
     private DefectSearchCriteria searchCriteria = new DefectSearchCriteria();
     private List<DefectWrapper> foundDefects;
 
