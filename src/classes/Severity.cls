@@ -1,4 +1,5 @@
-public enum Severity {
+public enum Severity 
+{
     INFO,
     WARNING,
     ERROR
