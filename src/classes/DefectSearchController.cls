@@ -1,5 +1,5 @@
-public with sharing class DefectSearchController {
-    
+public with sharing class DefectSearchController 
+{
     private final Integer ITEMS_PER_PAGE = 10;
     private Case currentCaseValue;
     private transient Settings innerSettings;
@@ -9,96 +9,124 @@ public with sharing class DefectSearchController {
 
     public DefectTablePaginator paginator { get; private set; }
 
-    public Case currentCase {
+    public Case currentCase 
+    {
         get { return currentCaseValue; }
         private set { currentCaseValue = value; }
     }
 
-    public Settings Settings {
-        get {
-            if (innerSettings == null) {
+    public Settings Settings 
+    {
+        get 
+        {
+            if (innerSettings == null) 
+            {
                 innerSettings = new Settings();
             }
             return innerSettings;
         }
-        set { innerSettings = value; }
+        set 
+        { 
+        	innerSettings = value; 
+        }
     }
 
-    public IDefectFacade defectFacade {
-        get {
-            if (innerDefectFacade == null) {
+    public IDefectFacade defectFacade 
+    {
+        get 
+        {
+            if (innerDefectFacade == null) 
+            {
                 innerDefectFacade = new DefectFacade(new V1Connector(settings, new Requestor(settings)), settings);
             }
             return innerDefectFacade;
         }
-        set { innerDefectFacade = value; }
+        set 
+        { 
+        	innerDefectFacade = value; 
+        }
     }
 
-    public Boolean displayDefectTable {
-         get {
+    public Boolean displayDefectTable 
+    {
+         get 
+         {
              return foundDefects != null && foundDefects.size() > 0;
          }
     }
 
     public Boolean refreshWindow { get; private set; }
-
     public String assignedDefectToken { get; set; }
-
     public Integer pageNumber { get; set; }
 
-    public DefectSearchController(Case caseEntity) {
+    public DefectSearchController(Case caseEntity) 
+    {
         this(caseEntity.ID);
         searchCriteria = new DefectSearchCriteria();
     }
 
-    public DefectSearchController(ApexPages.StandardController controller) {
+    public DefectSearchController(ApexPages.StandardController controller) 
+    {
         this(controller.getRecord().ID);
     }
 
-    private DefectSearchController(String id) {
+    private DefectSearchController(String id) 
+    {
         currentCase = V1CaseCollector.getCaseByCaseId(id);
     }
 
-    public DefectSearchCriteria getSearchCriteria() {
+    public DefectSearchCriteria getSearchCriteria() 
+    {
         return searchCriteria;
     }
 
-    public List<DefectWrapper> getDefects() {
+    public List<DefectWrapper> getDefects() 
+    {
         return foundDefects;
     }
 
-    public List<Selectoption> getFieldsList() {
+    public List<Selectoption> getFieldsList() 
+    {
         List<SelectOption> options = new List<SelectOption>();
         List<V1FieldData> fieldData = defectFacade.getFieldsData();
-        for(V1FieldData field : fieldData) {
+        
+        for(V1FieldData field : fieldData) 
+        {
             options.add(new SelectOption(field.id, field.title));
         }
         return options;
     }
 
-    public PageReference searchForDefects() {
+    public PageReference searchForDefects() 
+    {
         foundDefects = null;
         paginator = new DefectTablePaginator(ITEMS_PER_PAGE, new List<DefectWrapper>());
 
-        if(searchCriteria == null || searchCriteria.isEmpty()) {
+        if(searchCriteria == null || searchCriteria.isEmpty()) 
+        {
             addPageMessage(ApexPages.Severity.ERROR, 'Please provide non-empty search criteria');
             return null;
         }
 
-        try {
+        try 
+        {
             List<Defect> defects = defectFacade.searchForDefects(searchCriteria);
             foundDefects = new List<DefectWrapper>();
 
-            for(Defect defect : defects) {
+            for(Defect defect : defects) 
+            {
                 foundDefects.add(new DefectWrapper(currentCase, defect));
             }
 
-            if(foundDefects.size() == 0) {
+            if(foundDefects.size() == 0) 
+            {
                 addPageMessage(ApexPages.Severity.INFO, 'VersionOne search returned no matching defects');
             }
 
             paginator = new DefectTablePaginator(ITEMS_PER_PAGE, foundDefects);
-        } catch(IntegrationException ex) {
+        } 
+        catch(IntegrationException ex) 
+        {
             System.debug(ex.getMessage());
             addPageMessage(ApexPages.Severity.ERROR, ex.getMessage());
         }
@@ -106,21 +134,29 @@ public with sharing class DefectSearchController {
         return null;
     }
 
-    public void goToPage() {
+    public void goToPage() 
+    {
         paginator.goToPage(pageNumber);
     }
 
-    public PageReference assignDefectToCase() {
-        try {
+    public PageReference assignDefectToCase() 
+    {
+        try 
+        {
             refreshWindow = true;
             Defect matchingDefect = findDefectByToken(assignedDefectToken);
             defectFacade.assignDefectToCase(currentCase, matchingDefect);
-        } catch(IntegrationException ex) {
+        } 
+        catch(IntegrationException ex) 
+        {
             refreshWindow = false;
 
-            if(ex.getSeverity() == Severity.WARNING) {
+            if(ex.getSeverity() == Severity.WARNING) 
+            {
                 addPageMessage(ApexPages.Severity.WARNING, ex.getMessage());
-            } else {
+            } 
+            else 
+            {
                 addPageMessage(ApexPages.Severity.ERROR, 'Failed to associate current Case and selected VersionOne defect: ' + ex.getMessage());
             }
         }
@@ -128,11 +164,15 @@ public with sharing class DefectSearchController {
         return null;
     }
 
-    public PageReference unassignDefectFromCase() {
-        try {
+    public PageReference unassignDefectFromCase() 
+    {
+        try 
+        {
             refreshWindow = true;
             defectFacade.unassignDefectFromCase(currentCase);
-        } catch(IntegrationException ex) {
+        } 
+        catch(IntegrationException ex) 
+        {
             refreshWindow = false;
             addPageMessage(ApexPages.Severity.ERROR, 'Failed to detach selected VersionOne defect from current Case: ' + ex.getMessage());
         }
@@ -140,13 +180,17 @@ public with sharing class DefectSearchController {
         return null;
     }
 
-    private Defect findDefectByToken(String token) {
-        if(foundDefects == null) {
+    private Defect findDefectByToken(String token) 
+    {
+        if(foundDefects == null) 
+        {
             return null;
         }
 
-        for(DefectWrapper item : foundDefects) {
-            if(item.defectPart.token.equals(token)) {
+        for(DefectWrapper item : foundDefects) 
+        {
+            if(item.defectPart.token.equals(token)) 
+            {
                 return item.defectPart;
             }
         }
@@ -154,7 +198,8 @@ public with sharing class DefectSearchController {
         return null;
     }
 
-    private void addPageMessage(ApexPages.Severity severity, String text) {
+    private void addPageMessage(ApexPages.Severity severity, String text) 
+    {
         ApexPages.addMessage(new ApexPages.Message(severity, text));
     }
 }

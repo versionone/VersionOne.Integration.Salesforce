@@ -1,7 +1,8 @@
 @isTest
-private class V1ConnectorTester {
-
-    static testMethod void getValueTest() {
+private class V1ConnectorTester 
+{
+    static testMethod void getValueTest() 
+    {
         String numberData = 'D-01032';
         String changeDateUTC = '2009-10-21T08:57:50.493';
         String reference = '33';
@@ -26,7 +27,8 @@ private class V1ConnectorTester {
         System.assertEquals(null, synch.getValue('test', attibuteTags), 'Incorrect test value.');
     }
 
-    static testMethod void getValuesTest() {
+    static testMethod void getValuesTest() 
+    {
         String numberData = 'D-01032';
         String changeDateUTC = '2009-10-21T08:57:50.493';
         String reference = '33';
@@ -55,7 +57,8 @@ private class V1ConnectorTester {
         System.assertEquals(value2, owners.get(1), 'Value \'' + value2 + '\' not found.');
     }
 
-    static testMethod void convertToDateTimeTest() {
+    static testMethod void convertToDateTimeTest() 
+    {
         String changeDateUTC = '2009-10-21T08:57:50.493';
         String expectedDateTime = '2009-10-21 08:57:50';
 
@@ -63,7 +66,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');
     }
 
-    static testMethod void convertToDateTimeTest2() {
+    static testMethod void convertToDateTimeTest2() 
+    {
         String changeDateUTC = '2009-10-21T08:57:50.000';
         String expectedDateTime = '2009-10-21 08:57:50';
 
@@ -71,7 +75,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');
     }
 
-    static testMethod void convertToDateTimeTest3() {
+    static testMethod void convertToDateTimeTest3() 
+    {
         String changeDateUTC = '2009-10-21 08:57:50.000';
         String expectedDateTime = '2009-10-21 08:57:50';
 
@@ -79,7 +84,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');
     }
 
-    static testMethod void convertToDateTimeTest4() {
+    static testMethod void convertToDateTimeTest4() 
+    {
         String changeDateUTC = '2009-10-21 08:57:50.501';
         String expectedDateTime = '2009-10-21 08:57:51';
 
@@ -87,7 +93,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectedDateTime, test.format('yyyy-MM-dd HH:mm:ss'), 'Incorrect time.');
     }
 
-    static testMethod void correctGetSourceIdTester() {
+    static testMethod void correctGetSourceIdTester() 
+    {
         String sourceName = 'TestSource';
         String sourceIdExpected = '1010';
         Settings testSettings = Settings.getTestSettings();
@@ -100,7 +107,8 @@ private class V1ConnectorTester {
         System.assertEquals(sourceIdExpected, sourceId, 'Incorrect id of source');
     }
 
-    static testMethod void incorrectGetSourceIdTester() {
+    static testMethod void incorrectGetSourceIdTester() 
+    {
         Settings testSettings = Settings.getTestSettings();
         testSettings.setSource('TestSource');
         String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="0" pageSize="0" pageStart="0"></Assets>';
@@ -111,7 +119,8 @@ private class V1ConnectorTester {
         System.assertEquals(null, sourceId, 'sourceId must not be returned.');
     }
 
-    static testMethod void exceptionsGetSourceIdTester() {
+    static testMethod void exceptionsGetSourceIdTester() 
+    {
         String sourceName = 'TestSource';
         String sourceIdExpected = null;
         Settings testSettings = Settings.getTestSettings();
@@ -120,16 +129,19 @@ private class V1ConnectorTester {
         IRequestor requestor = new RequestorMock(body, 401);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        try {
+        try 
+        {
             String sourceId = connector.getSourceId();
             System.assert(false, 'This cannot be reached.');
-        } catch (V1RequestException ex) {}
+        } 
+        catch (V1RequestException ex) {}
 
         //another exception
         requestor = new RequestorMock(body, 500);
         connector = new V1Connector(testSettings, requestor);
 
-        try {
+        try 
+        {
             String sourceId = connector.getSourceId();
             System.assert(false, 'This cannot be reached.');
         } catch (V1RequestException ex) {}
@@ -138,7 +150,8 @@ private class V1ConnectorTester {
         requestor = new RequestorMock(body, 404);
         connector = new V1Connector(testSettings, requestor);
 
-        try {
+        try 
+        {
             String sourceId = connector.getSourceId();
             System.assert(false, 'This cannot be reached.');
         } catch (V1RequestException ex) {}
@@ -147,13 +160,15 @@ private class V1ConnectorTester {
         requestor = new RequestorMock(body, 111);
         connector = new V1Connector(testSettings, requestor);
 
-        try {
+        try 
+        {
             String sourceId = connector.getSourceId();
             System.assert(false, 'This cannot be reached.');
         } catch (V1RequestException ex) {}
     }
 
-    static testMethod void correctGetMemberIdTester() {
+    static testMethod void correctGetMemberIdTester() 
+    {
         String expectedMemberId = '20';
         Settings testSettings = Settings.getTestSettings();
         String body = '<Assets total="1" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/Member/20" id="Member:' + expectedMemberId + '"/></Assets>';
@@ -164,7 +179,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectedMemberId, memberId, 'Incorrect id of current member');
     }
 
-    static testMethod void correctProjectsListTest() {
+    static testMethod void correctProjectsListTest() 
+    {
         // correct responce
         String body = '<?xml version="1.0" encoding="UTF-8"?><Assets total="21" pageSize="2147483647" pageStart="0"><Asset href="/VersionOne/rest-1.v1/Data/Scope/1081" id="Scope:1081"><Attribute name="Name">CI</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1367" id="Scope:1367"><Attribute name="Name">Misha\'s project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1099" id="Scope:1099"><Attribute name="Name">Manual Hudson testing</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/0" id="Scope:1"><Attribute name="Name">System (All Projects)</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1675" id="Scope:1675"><Attribute name="Name">DefectTester</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1676" id="Scope:1676"><Attribute name="Name">DefectTester</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1082" id="Scope:1082"><Attribute name="Name">HudsonPlugin</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1202" id="Scope:1202"><Attribute name="Name">StoryTester</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1204" id="Scope:1204"><Attribute name="Name">StoryTester</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1443" id="Scope:1443"><Attribute name="Name">testAlina</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1349" id="Scope:1349"><Attribute name="Name">stanf</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1002" id="Scope:1002"><Attribute name="Name">DIR project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1457" id="Scope:1457"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1462" id="Scope:1462"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1467" id="Scope:1467"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1472" id="Scope:1472"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1477" id="Scope:1477"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1492" id="Scope:1492"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1542" id="Scope:1542"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1562" id="Scope:1562"><Attribute name="Name">Integrational tests project</Attribute></Asset><Asset href="/VersionOne/rest-1.v1/Data/Scope/1008" id="Scope:1008"><Attribute name="Name">_Bugzilla test</Attribute></Asset></Assets>';
         IRequestor requestor = new RequestorMock(body, 200);
@@ -177,24 +193,31 @@ private class V1ConnectorTester {
         System.assertEquals('Integrational tests project', projects.get('Scope:1457'), 'Incorrect id for \'Integrational tests project.');
     }
 
-    static testMethod void incorrectProjectsListTest() {
+    static testMethod void incorrectProjectsListTest() 
+    {
         //incorrect responce
         Settings testSettings = Settings.getTestSettings();
         IRequestor requestor = new RequestorMock('', 400);
         V1Connector connector = new V1Connector(testSettings, requestor);
         Map<String, String> projects;
-        try{
+        
+        try
+        {
             projects = connector.findAllProjects();
             System.assert(false, 'This place cannot be reached.');
-        }catch(V1RequestException e){
+        }
+        catch(V1RequestException e)
+        {
             //Catch code
         }
+        
         System.assertEquals(null, projects, 'Error! Incorrect amount of projects.');
         //System.assertEquals(V1Publisher.getDefaultProjectId(), String.valueof(0), 'Error! Incorrect default project');
         //System.assertEquals(V1Publisher.findProjectId('Integrational tests project'), '0', 'Incorrect id for \'Integrational tests project\'.');
     }
 
-    static testMethod void correctGetReferencedWorkitemsTest() {
+    static testMethod void correctGetReferencedWorkitemsTest() 
+    {
         //prepare data
         Case case1 = new Case(Subject = 'case1');
         Case case2 = new Case(Subject = 'case2');
@@ -225,7 +248,8 @@ private class V1ConnectorTester {
         delete new Case[]{case1, case2, case3};
     }
 
-    static testMethod void incorrectGetAlreadyExistedDefectsTest() {
+    static testMethod void incorrectGetAlreadyExistedDefectsTest() 
+    {
         //prepare data
         Case case1 = new Case(Subject = 'case1');
         Case case2 = new Case(Subject = 'case2');
@@ -245,15 +269,18 @@ private class V1ConnectorTester {
         IRequestor requestor = new RequestorMock(body, 400);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        try {
+        try 
+        {
             Map<String, Boolean> alreadyPorted =  connector.getReferencedWorkitems(new Case[]{case1, case2, case3});
             System.assert(false, 'This place cannot be reached.');
-        }catch(V1RequestException e){
+        }catch(V1RequestException e)
+        {
             //Catch code
         }
     }
 
-    static testMethod void correctCreatingLinkToSalesforceCaseTest() {
+    static testMethod void correctCreatingLinkToSalesforceCaseTest() 
+    {
         Case case1 = new Case(Subject = 'case1');
         insert case1;
         case1 = [SELECT CaseNumber, OwnerId FROM Case WHERE Id = :case1.Id];
@@ -278,7 +305,8 @@ private class V1ConnectorTester {
         System.assertEquals(body, requestor.getSentBody(0), 'Incorrect created body for POST.');
     }
 
-    static testMethod void incorrectCreatingLinkToSalesforceCaseTest() {
+    static testMethod void incorrectCreatingLinkToSalesforceCaseTest() 
+    {
         Case case1 = new Case(Subject = 'case1');
         insert case1;
         case1 = [SELECT CaseNumber, OwnerId FROM Case WHERE Id = :case1.Id];
@@ -288,10 +316,13 @@ private class V1ConnectorTester {
         Settings testSettings = Settings.getTestSettings();
         String defectId = 'Defect:123';
         V1Connector connector = new V1Connector(testSettings, requestor);
-        try {
+        
+        try 
+        {
             connector.createLinkV1ToSF(defectId, case1);
             System.assert(false, 'This place cannot be reached.');
-        }catch(V1RequestException e){ }
+        } catch(V1RequestException e){ }
+        
         String body = '<Asset>' +
                         '<Attribute act="set" name="OnMenu">true</Attribute>' +
                         '<Attribute act="set" name="URL">https://na7.salesforce.com/' + case1.Id + '</Attribute>' +
@@ -304,7 +335,8 @@ private class V1ConnectorTester {
         System.assertEquals(body, requestor.getSentBody(0), 'Incorrect created body for POST.');
     }
 
-    static testMethod void correctCreateDefectInVersionOne() {
+    static testMethod void correctCreateDefectInVersionOne() 
+    {
         //data preparation
         String caseName = '<Test case>';
         String caseDescription = 'Case for testing';
@@ -369,7 +401,8 @@ private class V1ConnectorTester {
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
     }
 
-    static testMethod void incorrectCreateDefectInVersionOne() {
+    static testMethod void incorrectCreateDefectInVersionOne() 
+    {
         String caseName = 'Test case';
         String sourceId = '1010';
         String productId = '123';
@@ -383,7 +416,8 @@ private class V1ConnectorTester {
         cfg.setSourceId(sourceId);
         V1Connector connector = new V1Connector(cfg, requestor);
 
-        try {
+        try 
+        {
             Test.startTest();
             String id = connector.createWorkitemInV1(caseData, defectData, cfg.getProjectId());
             Test.stopTest();
@@ -391,7 +425,8 @@ private class V1ConnectorTester {
         } catch (V1RequestException ex) {}
     }
 
-    static testMethod void exceptionsCreateDefectInVersionOne() {
+    static testMethod void exceptionsCreateDefectInVersionOne() 
+    {
         System.debug('exceptionsCreateDefectInVersionOne: 1');
         // incorrect responce from the VersionOne on any request during creation defect
         String caseName = 'Test case';
@@ -406,7 +441,8 @@ private class V1ConnectorTester {
         RequestorMock requestor = new RequestorMock(body, 200, new Exception[]{new V1RequestException('test error')});
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        try {
+        try 
+        {
             String id = connector.createWorkitemInV1(caseData, defectData, testSettings.getProjectId());
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (V1RequestException ex) {}
@@ -416,7 +452,8 @@ private class V1ConnectorTester {
         requestor = new RequestorMock(body, 200, new Exception[]{new NullPointerException()});
         connector = new V1Connector(testSettings, requestor);
 
-        try {
+        try 
+        {
             String Id = connector.createWorkitemInV1(caseData, defectData, testSettings.getProjectId());
             System.assert(false, 'Error! V1RequestException must be thrown.');
         } catch (NullPointerException ex) {}
@@ -438,7 +475,8 @@ private class V1ConnectorTester {
         System.assertEquals('Defect:1699', workitemId, 'Error! Incorrect defect id');
     }
 
-    static testMethod void getSettingsTest() {
+    static testMethod void getSettingsTest() 
+    {
         Settings testSettings = Settings.getTestSettings();
         IRequestor requestor = new RequestorMock('', 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
@@ -446,7 +484,8 @@ private class V1ConnectorTester {
         System.assertEquals(testSettings, connector.getSettings(), 'Incorrect settings.');
     }
 
-    static testMethod void getDefectByIdTest() {
+    static testMethod void getDefectByIdTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
         insert new Case[] {case1, case2};
@@ -492,7 +531,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectedUrl, ((RequestorMock)requestor).getSentUrl(0), 'Incorrect requested URL.');
     }
 
-    static testMethod void removeLinkFromDefectTest() {
+    static testMethod void removeLinkFromDefectTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
@@ -515,7 +555,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectedUrl2, requestor.getSentUrl(1), 'Incorrect requested URL for deleting link.');
     }
 
-    static testMethod void removeLinkFromDefectWithMultipleLinksTest() {
+    static testMethod void removeLinkFromDefectWithMultipleLinksTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
         insert new Case[] {case1, case2};
@@ -541,13 +582,16 @@ private class V1ConnectorTester {
         connector.removeLinkFromDefect(defectId, case1);
         System.assertEquals(expectedUrl1, requestor.getSentUrl(0), 'Incorrect requested URL for link.');
         System.assertEquals(expectedUrl2, requestor.getSentUrl(1), 'Incorrect requested URL for link.');
-        try {
+        
+        try 
+        {
             System.assertEquals(null, requestor.getSentUrl(2));
             System.assert(false, 'This cannot be reached. Have to be only 2 requests');
         } catch (Exception ex){}
     }
 
-    static testMethod void removeLinkFromDefectWithMultipleLinksButRemoveOnlyOneTest() {
+    static testMethod void removeLinkFromDefectWithMultipleLinksButRemoveOnlyOneTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
@@ -570,13 +614,16 @@ private class V1ConnectorTester {
         connector.removeLinkFromDefect(defectId, case1);
         System.assertEquals(expectedUrl1, requestor.getSentUrl(0), 'Incorrect requested URL for link.');
         System.assertEquals(expectedUrl2, requestor.getSentUrl(1), 'Incorrect requested URL for link.');
-        try {
+        
+        try 
+        {
             System.assertEquals(null, requestor.getSentUrl(2));
             System.assert(false, 'This cannot be reached. Have to be only 2 requests');
         } catch (Exception ex){}
     }
 
-    static testMethod void removeLinkFromDefectButNoLinkTest() {
+    static testMethod void removeLinkFromDefectButNoLinkTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
@@ -589,13 +636,15 @@ private class V1ConnectorTester {
         RequestorMock requestor = new RequestorMock(xml, 200);
         V1Connector connector = new V1Connector(testSettings, requestor);
 
-        try {
+        try 
+        {
             connector.removeLinkFromDefect(defectId, case1);
             System.assert(false, 'This cannot be reached.');
         } catch (V1RequestException ex){}
     }
 
-    static testMethod void updateReferenceForDefectTest() {
+    static testMethod void updateReferenceForDefectTest() 
+    {
         String defectId = '2345';
         String resolution = 'Duplicate';
         String project = 'Salesforce test';
@@ -628,7 +677,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectionUrl, requestor.getSentUrl(1));
     }
 
-    static testMethod void updateReferenceForDefectWithAlreadyAssignedCasesTest() {
+    static testMethod void updateReferenceForDefectWithAlreadyAssignedCasesTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
         insert new Case[] {case1, case2};
@@ -668,7 +718,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectionUrl, requestor.getSentUrl(1));
     }
 
-    static testMethod void updateReferenceForDefectButWithoutUpdateTest() {
+    static testMethod void updateReferenceForDefectButWithoutUpdateTest() 
+    {
         String defectId = '2345';
         String resolution = 'Duplicate';
         String project = 'Salesforce test';
@@ -693,13 +744,16 @@ private class V1ConnectorTester {
         V1Connector connector = new V1Connector(testSettings, requestor);
 
         connector.updateReferenceForDefect(defectId, '');
-        try {
+        
+        try 
+        {
             System.assertEquals(null, requestor.getSentUrl(1));
             System.assert(false, 'This cannot be reached. Have to be only 1 request');
         } catch (Exception ex){}
     }
 
-    static testMethod void deleteReferenceInDefectTest() {
+    static testMethod void deleteReferenceInDefectTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
         insert new Case[] {case1, case2};
@@ -738,7 +792,8 @@ private class V1ConnectorTester {
         System.assertEquals(expectionUrl, requestor.getSentUrl(1));
     }
 
-    static testMethod void searchDefectsTest() {
+    static testMethod void searchDefectsTest() 
+    {
         String[] fields = new String[]{'Name', 'Number'};
         Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
         expectedDefect1.status = 'In Progress';
@@ -792,7 +847,8 @@ private class V1ConnectorTester {
         System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
     }
 
-    static testMethod void searchDefectsWithClosedDefectsTest() {
+    static testMethod void searchDefectsWithClosedDefectsTest() 
+    {
         String[] fields = new String[]{'Number', 'Name', 'Description', 'Reference'};
         Defect expectedDefect1 = new Defect('testing new functionality (updated)', null);
         expectedDefect1.status = 'In Progress';
@@ -846,7 +902,8 @@ private class V1ConnectorTester {
         System.assert(defectEquals(expectedDefect2, defects.get(1)), 'Incorrect data for defect 2');
     }
 
-    static testMethod void getAssignedDefectsOnlyClosedDefectsTest() {
+    static testMethod void getAssignedDefectsOnlyClosedDefectsTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
         Case case3 = new Case(Subject='TestCase3');
@@ -906,7 +963,8 @@ private class V1ConnectorTester {
         System.assert(testRequestor.getSentUrl(0).contains(';AssetState=\'Closed\''), 'Incorrect request url.');
     }
 
-    static testMethod void getAssignedDefectsOnlyNotClosedDefectsTest() {
+    static testMethod void getAssignedDefectsOnlyNotClosedDefectsTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
         insert new Case[] {case1, case2};
@@ -950,7 +1008,8 @@ private class V1ConnectorTester {
         System.assert(testRequestor.getSentUrl(0).contains(';AssetState!=\'Closed\''), 'Incorrect request url.');
     }
 
-    static testMethod void getAssignedDefectsWithManyResultsTest() {
+    static testMethod void getAssignedDefectsWithManyResultsTest() 
+    {
         User userData = createUser('testUser');
         List<Case> cases = new List<Case>();
         List<Defect> defects = new List<Defect>();
@@ -964,7 +1023,8 @@ private class V1ConnectorTester {
         String xml = '';
         String xmlFinish = '</Assets>';
 
-        for (Integer i=0; i<numberRecords; i++) {
+        for (Integer i=0; i<numberRecords; i++) 
+        {
             Case caseValue = new Case(
                 Subject = 'case'+i,
                 Description = 'desc'+i,
@@ -980,7 +1040,8 @@ private class V1ConnectorTester {
                             '<Attribute name="Reference">123</Attribute>' +
                             '<Attribute name="AssetState">128</Attribute>' +
                         '</Asset>';
-            if (i == 200) {
+            if (i == 200) 
+            {
                 allResponce.add(xmlStart + xml + xmlFinish);
                 xml = '';
             }
@@ -997,19 +1058,23 @@ private class V1ConnectorTester {
         System.assertEquals(numberRecords, closedDefects.size(), 'Wrong number of results.');
     }
 
-    private static String createSearchQuery(string searchPhrase) {
+    private static String createSearchQuery(string searchPhrase) 
+    {
         List<String> parts = searchPhrase.trim().split(' ');
         String query = '';
 
-        for(String part : parts) {
+        for(String part : parts) 
+        {
             query += '&find=' + part;
         }
+        
         System.assertNotEquals(null, query, 'Incorrect query state.');
         return query;
     }
 
 
-    private static Boolean defectEquals(Defect defect1, Defect defect2) {
+    private static Boolean defectEquals(Defect defect1, Defect defect2) 
+    {
         Boolean result = true;
         result = defect1.title == defect2.title;
         result = result && defect1.description == defect2.description;
@@ -1028,10 +1093,13 @@ private class V1ConnectorTester {
         return result;
     }
 
-    static void assertContains(Defect expect, List<Defect> actuals, String msg) {
+    static void assertContains(Defect expect, List<Defect> actuals, String msg) 
+    {
         Boolean contains = false;
-        for (Defect actual : actuals) {
-            if (defectEquals(expect, actual)) {
+        for (Defect actual : actuals) 
+        {
+            if (defectEquals(expect, actual)) 
+            {
                 contains = true;
                 break;
             }
@@ -1039,7 +1107,8 @@ private class V1ConnectorTester {
         System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
     }
 
-    private static User createUser(String alias) {
+    private static User createUser(String alias) 
+    {
         User user = new User();
         user.Username = alias + '@not-a-mail.com';
         user.LastName = alias;

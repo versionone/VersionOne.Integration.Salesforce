@@ -1,5 +1,5 @@
-public class V1Connector implements IV1Connector {
-
+public class V1Connector implements IV1Connector 
+{
     public static final String DATA_URL = 'rest-1.v1/Data/';
     public static final String CLOSED_DEFECTS_URL = 'rest-1.v1/Data/Defect?sel=AssetState,Name,Number,ChangeDateUTC,Reference,Owners.Name&where=(Source=\'\'StorySource:{0}\'\'{1}{2})';
     public static final String SOURCE_URL = 'rest-1.v1/Data/StorySource?sel=&where=Name=\'\'{0}\'\'';
@@ -23,25 +23,33 @@ public class V1Connector implements IV1Connector {
 
     private String defaultProjectId;
 
-    public V1Connector(Settings settings, IRequestor requestor) {
+    public V1Connector(Settings settings, IRequestor requestor) 
+    {
         this.settings = settings;
         this.requestor = requestor;
     }
 
-    public void removeLinkFromDefect(String defectId, Case caseData) {
+    public void removeLinkFromDefect(String defectId, Case caseData) 
+    {
         String url = String.format(LINK_BY_DEFECT_ID_URL, new String[]{defectId});
         requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
         XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element[] assets = xmlParser.getElementsByTagName('Asset');
-        if (assets == null || assets.size() == 0) {
+        
+        if (assets == null || assets.size() == 0) 
+        {
             throw new V1RequestException('There is no link for this defect.');
         }
-        for (XMLDom.Element asset : assets) {
+        
+        for (XMLDom.Element asset : assets) 
+        {
             String name = getValue('Name', asset.childNodes);
             String linkId = asset.getAttribute('id').split(':')[1];
-            if (linkId != '' && name == LINK_NAME_TO_CASE + ' #' + caseData.CaseNumber) {
+            
+            if (linkId != '' && name == LINK_NAME_TO_CASE + ' #' + caseData.CaseNumber) 
+            {
                 url = String.format(DELETE_LINK_URL, new String[]{linkId});
                 requestor.request(requestor.createRequest('', url, 'POST'));
                 validateResponse();
@@ -49,14 +57,19 @@ public class V1Connector implements IV1Connector {
         }
     }
 
-    public void updateReferenceForDefect(String defectId, String referenceValue) {
+    public void updateReferenceForDefect(String defectId, String referenceValue) 
+    {
         Defect defectData = getDefectById(defectId);
-        if (defectData.isClosed) {
+        
+        if (defectData.isClosed) 
+        {
             return;
         }
 
-        if (defectData.cases != null && defectData.cases.size() > 0) {
-            for(Case caseData : defectData.cases) {
+        if (defectData.cases != null && defectData.cases.size() > 0) 
+        {
+            for(Case caseData : defectData.cases) 
+            {
                 referenceValue = caseData.CaseNumber + ';' + referenceValue;
             }
         }
@@ -64,16 +77,24 @@ public class V1Connector implements IV1Connector {
         updateReference(referenceValue, defectId, relationNode('Source', 'StorySource:' + settings.getSourceId()));
     }
 
-    public void deleteReferenceInDefect(String defectId, String caseNumberToDelete) {
+    public void deleteReferenceInDefect(String defectId, String caseNumberToDelete) 
+    {
         Defect defectData = getDefectById(defectId);
-        if (defectData.isClosed) {
+        
+        if (defectData.isClosed) 
+        {
             return;
         }
         String reference = '';
-        if (defectData.cases != null) {
-            for(Case caseData : defectData.cases) {
-                if (caseData.CaseNumber != caseNumberToDelete) {
-                    if (reference != '') {
+        
+        if (defectData.cases != null) 
+        {
+            for(Case caseData : defectData.cases) 
+            {
+                if (caseData.CaseNumber != caseNumberToDelete) 
+                {
+                    if (reference != '') 
+                    {
                         reference = reference + ';';
                     }
                     reference = reference + caseData.CaseNumber;
@@ -84,7 +105,8 @@ public class V1Connector implements IV1Connector {
         updateReference(reference, defectId, '');
     }
 
-    private void updateReference(String referenceValue, String defectId, String sourceNode) {
+    private void updateReference(String referenceValue, String defectId, String sourceNode) 
+    {
         String url = String.format(UPDATE_REFERENCE_URL, new String[]{defectId});
 
         String body = '<Asset id="Defect:' + defectId + '">' +
@@ -95,7 +117,8 @@ public class V1Connector implements IV1Connector {
         validateResponse();
     }
 
-    public Defect getDefectById(String defectId) {
+    public Defect getDefectById(String defectId) 
+    {
         String url = String.format(DEFECT_REQUEST_URL, new String[]{defectId});
         requestor.request(requestor.createRequest('', url, 'GET'));
         validateResponse();
@@ -107,13 +130,16 @@ public class V1Connector implements IV1Connector {
         return defectData;
     }
 
-    public List<Defect> searchDefects(String query, Boolean isLookingInClosed, String[] fieldsForSearch) {
+    public List<Defect> searchDefects(String query, Boolean isLookingInClosed, String[] fieldsForSearch) 
+    {
         List<Defect> defects = new List<Defect>();
 
         String closedItemsFilter = isLookingInClosed ? '' : SEARCH_PART_FOR_CLOSED_DEFECT_URL;
         String lookupQuery = '';
         List<String> queryParts = query.trim().split(' ');
-        for(String queryPart : queryParts) {
+        
+        for(String queryPart : queryParts) 
+        {
             lookupQuery += String.format(SEARCH_WORD_TEMPLATE, new String[] { queryPart });
         }
 
@@ -126,18 +152,25 @@ public class V1Connector implements IV1Connector {
         XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
-        for (XMLDom.Element assetTag : assetTags) {
+        
+        for (XMLDom.Element assetTag : assetTags) 
+        {
             defects.add(getDefect(assetTag));
         }
         return defects;
     }
 
-    private String getFieldsForSearch(String[] fieldsForSearch) {
+    private String getFieldsForSearch(String[] fieldsForSearch) 
+    {
         String fieldsForUrl = '';
-        if (fieldsForSearch != null && !fieldsForSearch.isEmpty()) {
+        
+        if (fieldsForSearch != null && !fieldsForSearch.isEmpty()) 
+        {
             String fields = '';
-            for(Integer i=0; i<fieldsForSearch.size(); i++) {
-                if (i > 0) {
+            for(Integer i=0; i<fieldsForSearch.size(); i++) 
+            {
+                if (i > 0) 
+                {
                     fields += ',';
                 }
                 fields += fieldsForSearch[i];
@@ -147,11 +180,13 @@ public class V1Connector implements IV1Connector {
         return fieldsForUrl;
     }
 
-    private Defect getDefect(XMLDom.Element asset) {
+    private Defect getDefect(XMLDom.Element asset) 
+    {
         return getDefect(asset, true);
     }
 
-    private Defect getDefect(XMLDom.Element asset, Boolean isReferenceProcess) {
+    private Defect getDefect(XMLDom.Element asset, Boolean isReferenceProcess) 
+    {
         Defect defectData = new Defect(getValue('Name', asset.childNodes), getValue('Description', asset.childNodes));
         defectData.resolution = getValue('ResolutionReason.Name', asset.childNodes);
         defectData.project = getValue('Scope.Name', asset.childNodes);
@@ -163,12 +198,15 @@ public class V1Connector implements IV1Connector {
         defectData.status = getValue('Status.Name', asset.childNodes);
         defectData.owners = getValues('Owners.Name', asset.childNodes);
         DateTime changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes));
-        if (changeDate != null) {
+        
+        if (changeDate != null) 
+        {
             defectData.changeDate = convertToDateTime(getValue('ChangeDateUTC', asset.childNodes)).format('yyyy-MM-dd hh:mm:ss');
         }
         String reference = getValue('Reference', asset.childNodes);
 
-        if (reference != null && isReferenceProcess) {
+        if (reference != null && isReferenceProcess) 
+        {
             defectData.cases = V1CaseCollector.getCasesByCasesNumber(reference.split(';'));
             //defectData.casesNumber = reference.split(';');
         }
@@ -176,9 +214,12 @@ public class V1Connector implements IV1Connector {
         return defectData;
     }
 
-    public String getSourceId() {
+    public String getSourceId() 
+    {
         String source = settings.getSource();
-        if (source == null) {
+        
+        if (source == null) 
+        {
             return null;
         }
         XMLDom xmlParser = new XMLDom();
@@ -190,13 +231,16 @@ public class V1Connector implements IV1Connector {
         validateResponse();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
-        if (assetTag != null) {
+        
+        if (assetTag != null) 
+        {
             return assetTag.getAttribute('id').split(':')[1];
         }
         return null;
     }
 
-    public String getCurrentMemberId() {
+    public String getCurrentMemberId() 
+    {
         XMLDom xmlParser = new XMLDom();
 
         HttpRequest req = requestor.createRequest('', MEMBER_URL, 'GET');
@@ -204,7 +248,9 @@ public class V1Connector implements IV1Connector {
         validateResponse();
         xmlParser.parseFromString(requestor.getBody());
         XMLDom.Element assetTag = xmlParser.getElementByTagName('Asset');
-        if (assetTag != null) {
+        
+        if (assetTag != null) 
+        {
             return assetTag.getAttribute('id').split(':')[1];
         }
         return null;
@@ -215,13 +261,20 @@ public class V1Connector implements IV1Connector {
      *
      * thorws: V1RequestException if responce is not correct.
      */
-    public void validateResponse() {
+    public void validateResponse() 
+    {
         Integer status = requestor.getStatusCode();
-        if (status == 200) {
+        
+        if (status == 200) 
+        {
             return;
-        } else if (status == 401){
+        } 
+        else if (status == 401)
+        {
             throw new V1RequestException('Credentials are not correct.');
-        } else if (status == 500 || status == 404){
+        } 
+        else if (status == 500 || status == 404)
+        {
             throw new V1RequestException('Error during request to the VersionOne. Possible reason: URL is not correct, VersionOne server has some problems at the moment or requested item does not exist.');
         }
         throw new V1RequestException('Problem with getting data from the VersionOne.', requestor);
@@ -232,10 +285,13 @@ public class V1Connector implements IV1Connector {
     *
     * String attributeValue - value of name attribute for looking for.
     **/
-    public String getValue(String attributeValue, List<XMLDom.Element> assetsData) {
-        for (XMLDom.Element element : assetsData) {
+    public String getValue(String attributeValue, List<XMLDom.Element> assetsData) 
+    {
+        for (XMLDom.Element element : assetsData) 
+        {
             String attibuteValue = element.getAttribute('name');
-            if (attibuteValue != null && attibuteValue.equals(attributeValue)) {
+            if (attibuteValue != null && attibuteValue.equals(attributeValue)) 
+            {
                 return element.nodeValue;
             }
         }
@@ -248,13 +304,18 @@ public class V1Connector implements IV1Connector {
     *
     * String attributeValue - value of name attribute for looking for.
     **/
-    public String[] getValues(String attributeValue, List<XMLDom.Element> assetsData) {
+    public String[] getValues(String attributeValue, List<XMLDom.Element> assetsData) 
+    {
         List<String> data = new List<String>();
-        for (XMLDom.Element element : assetsData) {
+        
+        for (XMLDom.Element element : assetsData) 
+        {
             String attibuteValue = element.getAttribute('name');
-            if (attibuteValue != null && attibuteValue.equals(attributeValue)) {
+            if (attibuteValue != null && attibuteValue.equals(attributeValue)) 
+            {
                 List<XMLDom.Element> elements = element.getElementsByTagName('Value');
-                for (XMLDom.Element ele : elements) {
+                for (XMLDom.Element ele : elements) 
+                {
                     data.add(ele.nodeValue);
                 }
             }
@@ -268,14 +329,19 @@ public class V1Connector implements IV1Connector {
     * If millisecond more then 0 - convert to yyyy-MM-ddTHH:mm:ss
     * if millisecond equals 0 - convert to yyyy-MM-ddTHH:mm:ss-1
     **/
-    public static DateTime convertToDateTime(String utcDate) {
-        if (utcDate == null) {
+    public static DateTime convertToDateTime(String utcDate) 
+    {
+        if (utcDate == null) 
+        {
             return null;
         }
+        
         String[] dateTimeData = utcDate.split('T');
-        if (dateTimeData.size() == 1 ) {
+        if (dateTimeData.size() == 1 ) 
+        {
             dateTimeData  = utcDate.split(' ');
         }
+        
         String[] dateData = dateTimeData[0].split('-');
         String[] timeData = dateTimeData[1].split(':');
         Integer year = Integer.valueOf(dateData[0]);
@@ -285,9 +351,13 @@ public class V1Connector implements IV1Connector {
         Integer minutes = Integer.valueOf(timeData[1]);
         Decimal secondAndMillisecond = Decimal.valueOf(timeData[2]);
         Integer second;
-        if (secondAndMillisecond.intValue() == secondAndMillisecond ) {
+        
+        if (secondAndMillisecond.intValue() == secondAndMillisecond ) 
+        {
             second = secondAndMillisecond.intValue();
-        } else {
+        } 
+        else 
+        {
             second = Math.round(secondAndMillisecond);
         }
         return DateTime.newInstance(year, month, day, hour, minutes, second);
@@ -296,26 +366,31 @@ public class V1Connector implements IV1Connector {
     /**
     * Gathers all project from the VersionOne, and assign default project
     **/
-    public Map<String, String> findAllProjects() {
+    public Map<String, String> findAllProjects() 
+    {
         XMLDom xmlParser = new XMLDom();
         Map<String, String> projects = new Map<String, String>();
 
         //Send the request, and get a response
         requestor.request(requestor.createRequest('', SCOPE_URL, 'GET'));
-        if (requestor.getStatusCode() != 200) {
+        if (requestor.getStatusCode() != 200) 
+        {
             throw new V1RequestException('Problem with getting projects from the VersionOne.', requestor);
         }
         xmlParser.parseFromString(requestor.getBody());
         List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
 
         Integer testId = 999999999;
-        for (XMLDom.Element assetTag : assetTags) {
+        for (XMLDom.Element assetTag : assetTags)
+         {
             String id = assetTag.getAttribute('id').split(':')[1];
-            if (testId > Integer.valueOf(id)) {
+            if (testId > Integer.valueOf(id)) 
+            {
                 testId = Integer.valueOf(id);
             }
             String projectName = assetTag.getValue('Attribute');
-            if (!projects.containsKey(id)) {
+            if (!projects.containsKey(id)) 
+            {
                 projects.put('Scope:' + id, projectName);
             }
         }
@@ -327,8 +402,10 @@ public class V1Connector implements IV1Connector {
     /**
     * Returns default project. It we will use if user doesn't assign case to project
     **/
-    public String getDefaultProjectId() {
-        if (defaultProjectId == null) {
+    public String getDefaultProjectId() 
+    {
+        if (defaultProjectId == null) 
+        {
             findAllProjects();
         }
         return defaultProjectId;
@@ -339,11 +416,13 @@ public class V1Connector implements IV1Connector {
      *
      * Returns - List<Integer> Already ported cases
      */
-    public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) {
+    public Map<String, Boolean> getReferencedWorkitems(List<Case> cases) 
+    {
         XMLDom xmlParser = new XMLDom();
 
         String reference = '';
-        for (Case caseData : cases) {
+        for (Case caseData : cases) 
+        {
             reference += 'Reference=\''+ caseData.CaseNumber + '\'|';
         }
         reference = reference.substring(0, reference.length() - 1);
@@ -352,14 +431,17 @@ public class V1Connector implements IV1Connector {
         String source = EncodingUtil.urlEncode(settings.getSource(), 'UTF-8');
         requestor.request(requestor.createRequest('',
             String.format(WORKITEM_REFERENCE_SEARCH_URL, new String[]{reference, source}), 'GET'));
-        if (requestor.getStatusCode() != 200) {
+        if (requestor.getStatusCode() != 200) 
+        {
             throw new V1RequestException('Problem with getting data from the VersionOne', requestor);
         }
         xmlParser.parseFromString(requestor.getBody());
 
         List<XMLDom.Element> assetTags = xmlParser.getElementsByTagName('Asset');
         Map<String, Boolean> defectsInfo = new Map<String, Boolean>();
-        for (XMLDom.Element assetTag : assetTags) {
+        
+        for (XMLDom.Element assetTag : assetTags) 
+        {
             defectsInfo.put(assetTag.getValue('Attribute'), true);
         }
         return defectsInfo;
@@ -371,11 +453,14 @@ public class V1Connector implements IV1Connector {
     /**
     * Creates link to the corresponding case in the Salesforce
     **/
-    public void createLinkV1ToSF(String workitemId, Case caseData) {
+    public void createLinkV1ToSF(String workitemId, Case caseData) 
+    {
         //throw new V1RequestException('Problem to create link to case');
-        if (workitemId == null) {
+        if (workitemId == null) 
+        {
             return;
         }
+        
         String body = '<Asset>' +
                         attributeNode('OnMenu', 'true') +
                         attributeNode('URL', 'https://na7.salesforce.com/' + caseData.Id) +
@@ -385,7 +470,9 @@ public class V1Connector implements IV1Connector {
 
         //Send the request, and get a response
         requestor.request(requestor.createRequest(body, DATA_URL + 'Link', 'POST'));
-        if (requestor.getStatusCode() != 200) {
+        
+        if (requestor.getStatusCode() != 200) 
+        {
             throw new V1RequestException('Problem to create link to case', requestor);
         }
     }
@@ -396,7 +483,8 @@ public class V1Connector implements IV1Connector {
      * returns:     id of the created workitem
      * throws:  V1RequestException, Exception
      */
-    public String createWorkitemInV1(Case caseData, Defect defectData, String projectId) {
+    public String createWorkitemInV1(Case caseData, Defect defectData, String projectId) 
+    {
         String body = '<Asset>'
             + relationNode('Scope', 'Scope:' + projectId)
             + attributeNode('Name', (defectData.title != null ? defectData.title : DEFAULT_DEFECT_NAME))
@@ -408,9 +496,11 @@ public class V1Connector implements IV1Connector {
         System.debug('XML for creating ' + workitemType + ': ' + body);
         requestor.request(requestor.createRequest(body, DATA_URL + workitemType, 'POST'));
 
-        if (requestor.getStatusCode() != 200) {
+        if (requestor.getStatusCode() != 200) 
+        {
             throw new V1RequestException('Problem with creating new defect in the VersionOne', requestor);
         }
+        
         XMLDom xmlParser = new XMLDom();
         xmlParser.parseFromString(requestor.getBody());
         String[] id = xmlParser.getElementByTagName('Asset').getAttribute('id').split(':');
@@ -420,7 +510,8 @@ public class V1Connector implements IV1Connector {
     /**
     * Creates Relation node for request
     **/
-    public static String relationNode(String name, String value) {
+    public static String relationNode(String name, String value)
+    {
         return '<Relation act="set" name="' + name + '">' +
                 '<Asset idref="' + value + '"/>' +
                '</Relation>';
@@ -429,8 +520,10 @@ public class V1Connector implements IV1Connector {
     /**
     * Creates Attribute node for request
     **/
-    public static String attributeNode(String name, String value) {
-        if (value != null) {
+    public static String attributeNode(String name, String value) 
+    {
+        if (value != null) 
+        {
             value = value.replace('&', '&amp;');
             value = value.replace('<', '&lt;').replace('>', '&gt;');
         }
@@ -440,25 +533,34 @@ public class V1Connector implements IV1Connector {
     /**
     * Returns current used settings
     **/
-    public Settings getSettings() {
+    public Settings getSettings() 
+    {
         return settings;
     }
 
-    public List<Defect> getAssignedDefects(Case[] cases, Boolean isClosedDefects) {
+    public List<Defect> getAssignedDefects(Case[] cases, Boolean isClosedDefects) 
+    {
         List<Defect> assignedDefects = new List<Defect>();
-        if (cases.size() == 0) {
+        if (cases.size() == 0) 
+        {
             return assignedDefects;
         }
 
         String defectStatus = '';
-        if (isClosedDefects) {
+        if (isClosedDefects) 
+        {
             defectStatus = ';AssetState=\'Closed\'';
-        } else {
+        } 
+        else 
+        {
             defectStatus = ';AssetState!=\'Closed\'';
         }
+        
         Integer start = 0;
         Integer numbersToProcess = 200;
-        while (start < cases.size() && canMakeCallouts(1)) {
+        
+        while (start < cases.size() && canMakeCallouts(1)) 
+        {
             String defectsIds = getDefectIdsURL(cases, start, numbersToProcess);
             String url = String.format(CLOSED_DEFECTS_URL, new String[]{settings.getSourceId(), defectStatus, defectsIds});
 
@@ -468,7 +570,9 @@ public class V1Connector implements IV1Connector {
             XMLDom xmlParser = new XMLDom();
             xmlParser.parseFromString(requestor.getBody());
             XMLDom.Element[] assetTags = xmlParser.getElementsByTagName('Asset');
-            for (XMLDom.Element asset : assetTags) {
+            
+            for (XMLDom.Element asset : assetTags) 
+            {
                 Defect defectData = getDefect(asset, false);
                 assignedDefects.add(defectData);
             }
@@ -477,20 +581,30 @@ public class V1Connector implements IV1Connector {
         return assignedDefects;
     }
 
-    private String getDefectIdsURL(Case[] cases, Integer start, Integer numbers) {
-        if(cases.size() == 0 || cases.size() < start) {
+    private String getDefectIdsURL(Case[] cases, Integer start, Integer numbers) 
+    {
+        if(cases.size() == 0 || cases.size() < start) 
+        {
             return '';
         }
-        if (cases.size() < start + numbers) {
+        
+        if (cases.size() < start + numbers) 
+        {
             numbers = cases.size() - start;
         }
+        
         String defectIds = ';(';
         Boolean addSeparator = false;
-        for (Integer i=start; i<start+numbers; i++) {
+        
+        for (Integer i=start; i<start+numbers; i++)
+         {
             Case caseData = cases.get(i);
-            if (addSeparator) {
+            if (addSeparator) 
+            {
                 defectIds = defectIds + '|';
-            } else {
+            } 
+            else 
+            {
                 addSeparator = true;
             }
             defectIds = defectIds + 'Defect.ID=' + '\'' + caseData.V1DefectId__c + '\'';
@@ -499,7 +613,8 @@ public class V1Connector implements IV1Connector {
         return defectIds;
     }
 
-    private Boolean canMakeCallouts(Integer count) {
+    private Boolean canMakeCallouts(Integer count) 
+    {
         return Limits.getCallouts() + count <= Limits.getLimitCallouts();
     }
 }
