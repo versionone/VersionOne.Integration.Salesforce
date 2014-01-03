@@ -52,6 +52,10 @@
         <name>ApexPage</name>
     </types>
     <types>
+        <members>*</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
         <members>VersionOne_Defect_Report</members>
         <members>VersionOne_Settings</members>
         <name>CustomTab</name>
@@ -59,6 +63,14 @@
     <types>
         <members>Case-Case %28VersionOne%29 Layout</members>
         <name>Layout</name>
+    </types>
+    <types>
+        <members>VersionOne</members>
+        <name>RemoteSiteSetting</name>
+    </types>
+    <types>
+        <members>V1Settings__c</members>
+        <name>Workflow</name>
     </types>
     <version>29.0</version>
 </Package>
