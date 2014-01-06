@@ -64,13 +64,5 @@
         <members>Case-Case %28VersionOne%29 Layout</members>
         <name>Layout</name>
     </types>
-    <types>
-        <members>VersionOne</members>
-        <name>RemoteSiteSetting</name>
-    </types>
-    <types>
-        <members>V1Settings__c</members>
-        <name>Workflow</name>
-    </types>
     <version>29.0</version>
 </Package>

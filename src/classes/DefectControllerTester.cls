@@ -26,9 +26,9 @@ private class DefectControllerTester
     
     static @isTest void createDefectWithNoSettingsTest()
     {
-    	DefectController controller = getControllerWithoutSettings();
-    	Settings settings = controller.settings;
-    	System.assertEquals(null, settings.getCurrentMemberId());
+        DefectController controller = getControllerWithoutSettings();
+        Settings settings = controller.settings;
+        System.assertEquals(null, settings.getCurrentMemberId());
     }
 
     static @isTest void createDefectTest() 

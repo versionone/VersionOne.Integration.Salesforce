@@ -1,5 +1,5 @@
 public class ProjectProductMapping {
-	
+    
     public String productName {get; set;}
     public String productId {get; set;}
     public String projectName {get; set;}

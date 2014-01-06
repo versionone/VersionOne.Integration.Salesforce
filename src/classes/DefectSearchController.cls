@@ -27,7 +27,7 @@ public with sharing class DefectSearchController
         }
         set 
         { 
-        	innerSettings = value; 
+            innerSettings = value; 
         }
     }
 
@@ -43,7 +43,7 @@ public with sharing class DefectSearchController
         }
         set 
         { 
-        	innerDefectFacade = value; 
+            innerDefectFacade = value; 
         }
     }
 

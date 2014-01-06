@@ -1,6 +1,6 @@
 @isTest
 private class DefectTablePaginatorTester {
-	
+    
     static testMethod void paginatorTest() {
         Integer numberOfDefects = 45;
         List<DefectWrapper> defects = new List<DefectWrapper>();
