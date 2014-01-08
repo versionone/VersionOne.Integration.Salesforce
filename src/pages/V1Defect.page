@@ -55,7 +55,7 @@
     <apex:actionStatus startText="Generating form..." id="createForm" />
     <apex:actionStatus startText="Creating defect in the VersionOne..." id="defectCreate"/>
     <apex:actionStatus startText="Un-assigning defect from the case..." id="unassigning"/>
-    <apex:actionStatus startText="Publishing status..." id="publishing_status"/>
+    <apex:actionStatus startText="Refreshing status..." id="publishing_status"/>
 
     <apex:form >
         <apex:pageBlock id="CreateDefectSector">
@@ -119,7 +119,7 @@
                      }
                     </script>
                 </apex:commandButton>
-                <apex:commandButton value="Publish Status" id="updateStatusButton"
+                <apex:commandButton value="Refresh Status" id="updateStatusButton"
                     rendered="{!isDefectAssigned}" action="{!publishStatus}" onclick="disableOperationOnAssigedDefect()"
                     oncomplete="refreshWindowIfNoErrors()" status="publishing_status"
                     rerender="errorMessages, areThereErrorsBlock">
