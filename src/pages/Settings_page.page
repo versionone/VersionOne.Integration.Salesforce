@@ -51,17 +51,17 @@
     </script>
     </apex:outputPanel>
 
-    <apex:sectionHeader title="Settings for VersionOne integration." />
+    <apex:sectionHeader title="VersionOne Integration Settings" />
 
     <apex:actionStatus startText="Testing settings..." id="test_status" />
     <apex:actionStatus startText="Saving settings..." id="save_status" />
     <apex:actionStatus startText="Updating mapping..." id="update_mapping" />
     <apex:actionStatus startText="Deleting mapping..." id="remove_mapping" />
     <apex:actionStatus startText="Adding mapping ..." id="addMapping" />
+    
     <apex:form >
-        <apex:pageBlock title="Connection settings" mode="edit">
+        <apex:pageBlock title="Connection Settings" mode="edit">
             <apex:pageBlockSection columns="1">
-                <!-- title="Connection" -->
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="{!settings.pathTitle}" for="V1Path" />
                     <c:inputRequiredText value="{!settings.path}" size="75" id="V1Path"
@@ -141,7 +141,7 @@
                 </apex:commandButton>
             </apex:pageBlockButtons>
         </apex:pageBlock>
-        <apex:pageBlock title="VersionOne Project for Defect Creation" id="ProjectMapping">
+        <apex:pageBlock title="Project Mapping Settings" id="ProjectMapping">
             <apex:pageBlockSection rendered="{!isGotProjects}" columns="1">
                 <apex:pageBlockSectionItem >
                     <apex:outputLabel value="Salesforce product" for="ProductId" />

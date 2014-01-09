@@ -1,7 +1,8 @@
 @isTest
-private class SettingsTestSuite {
-
-    static testMethod void pathTest() {
+private class SettingsTestSuite 
+{
+    static testMethod void pathTest() 
+    {
         Settings s = new Settings();
         s.setPath('');
         System.assertEquals(null, s.getPath(), 'Wrong Path.');
@@ -11,14 +12,15 @@ private class SettingsTestSuite {
         System.assertEquals('http://localhost/', s.getPath(), 'Wrong Path.');
     }
 
-    static testMethod void updateSettingsTest() {
+    static testMethod void updateSettingsTest() 
+    {
         delete [SELECT Id FROM V1Settings__c];
+        
         Settings s = new Settings();
         String path = 'http://localhost/';
         String userName = 'UserName';
         String password = 'password';
         String source = 'Source';
-
 
         s.setPath(path);
         s.setUserName(userName);
@@ -34,7 +36,8 @@ private class SettingsTestSuite {
         System.assertEquals(source, s1.getSource(), 'Wrong Source.');
     }
 
-    static testMethod void validateTest() {
+    static testMethod void validateTest() 
+    {
         Settings settingsData = Settings.getTestSettings();
         String[] res;
 

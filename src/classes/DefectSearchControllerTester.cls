@@ -1,5 +1,6 @@
 @isTest
-private class DefectSearchControllerTester {
+private class DefectSearchControllerTester 
+{
     private static final String caseSubject = 'TestCase1';
     private static final String caseDescription = 'Case description';
     private static final String projectName = 'Call Center';
@@ -10,7 +11,8 @@ private class DefectSearchControllerTester {
     private static Settings settingsValue;
     private static Case caseData;
 
-    static testMethod void emptyCriteriaSearchTest() {
+    static testMethod void emptyCriteriaSearchTest() 
+    {
         DefectSearchController controller = getControllerWithoutAssignedDefect();
         System.assertEquals(controller.defectFacade, defectFacadeMockValue);
         System.assertEquals(controller.Settings, settingsValue);
@@ -22,7 +24,8 @@ private class DefectSearchControllerTester {
         pageMessageAssert(ApexPages.Severity.ERROR);
     }
 
-    static testMethod void emptyResultSearchTest() {
+    static testMethod void emptyResultSearchTest() 
+    {
         DefectSearchController controller = getControllerWithoutAssignedDefect();
         defectFacadeMockValue.foundDefects = new List<Defect>();
 
@@ -38,7 +41,8 @@ private class DefectSearchControllerTester {
         pageMessageAssert(ApexPages.Severity.INFO);
     }
 
-    static testMethod void searchFailureTest() {
+    static testMethod void searchFailureTest() 
+    {
         DefectSearchController controller = getControllerWithoutAssignedDefect();
         defectFacadeMockValue.addException(DefectFacadeMock.SEARCH_EXCEPTION, new IntegrationException());
 
@@ -54,7 +58,8 @@ private class DefectSearchControllerTester {
         pageMessageAssert(ApexPages.Severity.ERROR);
     }
 
-    static testMethod void nonEmptyResultSearchTest() {
+    static testMethod void nonEmptyResultSearchTest() 
+    {
         DefectSearchController controller = getControllerWithoutAssignedDefect();
         setupFoundDefect();
 
@@ -71,7 +76,8 @@ private class DefectSearchControllerTester {
         System.assertEquals(ApexPages.getMessages().size(), 0);
     }
 
-    static testMethod void assignDefectFailureTest() {
+    static testMethod void assignDefectFailureTest() 
+    {
         DefectSearchController controller = getControllerWithoutAssignedDefect();
         defectFacadeMockValue.addException(DefectFacadeMock.ASSIGN_DEFECT_TO_CASE_EXCEPTION, new IntegrationException());
         controller.assignedDefectToken = assignedDefectToken;
@@ -86,7 +92,8 @@ private class DefectSearchControllerTester {
         pageMessageAssert(ApexPages.Severity.ERROR);
     }
 
-    static testMethod void assignDefectWarningTest() {
+    static testMethod void assignDefectWarningTest() 
+    {
         DefectSearchController controller = getControllerWithoutAssignedDefect();
         //defectFacadeMockValue.setAssignDefectToCaseException(new IntegrationException('', Severity.WARNING));
         defectFacadeMockValue.addException(DefectFacadeMock.ASSIGN_DEFECT_TO_CASE_EXCEPTION, new IntegrationException('', Severity.WARNING));
@@ -102,7 +109,8 @@ private class DefectSearchControllerTester {
         pageMessageAssert(ApexPages.Severity.WARNING);
     }
 
-    static testmethod void assignDefectTest() {
+    static testmethod void assignDefectTest() 
+    {
         DefectSearchController controller = getControllerWithoutAssignedDefect();
         controller.assignedDefectToken = assignedDefectToken;
         setupFoundDefect();
@@ -119,7 +127,8 @@ private class DefectSearchControllerTester {
         System.assertEquals(defectStatus, defectFacadeMockValue.assignDefectResultValue.defectValue.status);
     }
 
-    static testMethod void unassignDefectFailureTest() {
+    static testMethod void unassignDefectFailureTest() 
+    {
         DefectSearchController controller = getControllerWithAssignedDefect();
         //defectFacadeMockValue.setUnassignDefectFromCaseException(new IntegrationException());
         defectFacadeMockValue.addException(DefectFacadeMock.UNASSIGN_DEFECT_FROM_CASE_EXCEPTION, new IntegrationException());
@@ -129,7 +138,8 @@ private class DefectSearchControllerTester {
         pageMessageAssert(ApexPages.Severity.ERROR);
     }
 
-    static testMethod void unassignDefectTest() {
+    static testMethod void unassignDefectTest() 
+    {
         DefectSearchController controller = getControllerWithAssignedDefect();
 
         controller.unassignDefectFromCase();
@@ -139,7 +149,8 @@ private class DefectSearchControllerTester {
         System.assertEquals(ApexPages.getMessages().size(), 0);
     }
 
-    static testMethod void getFieldsListTest() {
+    static testMethod void getFieldsListTest() 
+    {
         DefectSearchController controller = getControllerWithoutAssignedDefect();
         IDefectFacade facade = new DefectFacade(new V1ConnectorMock(), settingsValue);
         controller.defectFacade = facade;
@@ -148,7 +159,8 @@ private class DefectSearchControllerTester {
         System.assertEquals(facade.getFieldsData().size(), options.size(), 'Incorrect amount of field options.');
     }
 
-    private static void setupFoundDefect() {
+    private static void setupFoundDefect() 
+    {
         defectFacadeMockValue.foundDefects = new List<Defect>();
         Defect foundDefect = new Defect(caseSubject, caseDescription);
         foundDefect.token = assignedDefectToken;
@@ -159,13 +171,15 @@ private class DefectSearchControllerTester {
         System.assertEquals(1, defectFacadeMockValue.foundDefects.size());
     }
 
-    private static void pageMessageAssert(ApexPages.Severity severity) {
+    private static void pageMessageAssert(ApexPages.Severity severity) 
+    {
         System.assertEquals(ApexPages.getMessages().size(), 1);
         ApexPages.Message message = ApexPages.getMessages().get(0);
         System.assertEquals(message.getSeverity(), severity);
     }
 
-    private static DefectSearchController getControllerWithoutAssignedDefect() {
+    private static DefectSearchController getControllerWithoutAssignedDefect() 
+    {
         caseData = new Case(Subject = caseSubject, Description = caseDescription);
         insert new Case[] {caseData};
 
@@ -174,7 +188,8 @@ private class DefectSearchControllerTester {
         return getController();
     }
 
-    private static DefectSearchController getControllerWithAssignedDefect() {
+    private static DefectSearchController getControllerWithAssignedDefect() 
+    {
         caseData = new Case(Subject = caseSubject, Description = caseDescription, V1Association__c = true, V1DefectId__c = assignedDefectToken);
         insert new Case[] { caseData };
 
@@ -183,7 +198,8 @@ private class DefectSearchControllerTester {
         return getController();
     }
 
-    private static DefectSearchController getController() {
+    private static DefectSearchController getController() 
+    {
         defectFacadeMockValue = new DefectFacadeMock();
         settingsValue = Settings.getTestSettings();
         settingsValue.setProjectName(projectName);

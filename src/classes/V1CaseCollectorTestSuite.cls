@@ -1,7 +1,9 @@
 @isTest
-private class V1CaseCollectorTestSuite {
+private class V1CaseCollectorTestSuite 
+{
 
-    static testMethod void getCaseByCaseNumberTest() {
+    static testMethod void getCaseByCaseNumberTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
@@ -11,7 +13,8 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
     }
 
-    static testMethod void getCasesByCasesNumberTest() {
+    static testMethod void getCasesByCasesNumberTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         Case case2 = new Case(Subject='TestCase2');
         Case case3 = new Case(Subject='TestCase3');
@@ -25,7 +28,8 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals(3, newCase.size(), 'Incorrect number of cases.');
     }
 
-    static testMethod void getCaseByCaseIdTest() {
+    static testMethod void getCaseByCaseIdTest() 
+    {
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};
         case1 = [SELECT CaseNumber, Subject FROM Case WHERE Id = :case1.Id];
@@ -35,7 +39,8 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals(case1.Subject, newCase.Subject, 'Incorrect subject.');
     }
 
-    static testMethod void updateCaseTest() {
+    static testMethod void updateCaseTest() 
+    {
         String defectId = '123';
         String devStatus = 'In Progress';
         Case case1 = new Case(Subject='TestCase1');
@@ -51,7 +56,8 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals(defectId, newCase.V1DefectId__c, 'Incorrect associated defect id from VersionOne.');
     }
 
-    static testMethod void updateDeveloperStatusTest() {
+    static testMethod void updateDeveloperStatusTest() 
+    {
         String status = 'In Progress';
         Case case1 = new Case(Subject='TestCase1');
         insert new Case[] {case1};
@@ -62,11 +68,13 @@ private class V1CaseCollectorTestSuite {
         System.assertEquals(status, case1.V1DevelopmentStatus__c, 'Incorrect case numbers.');
     }
 
-    static testMethod void getMappingListTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void getMappingListTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
+        
         String projectName1 = 'Project Name';
         String productName1 = 'Product Name';
         String projectToken1 = 'Scope:1234';
@@ -74,7 +82,7 @@ private class V1CaseCollectorTestSuite {
         MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
         mappingData1.SFProductId__c = productId1;
         mappingData1.SFProductName__c = productName1;
-        mappingData1.V1ProjectToken__c = projectToken1;
+        mappingData1.V1ProjectId__c = projectToken1;
         mappingData1.V1ProjectName__c = projectName1;
         String projectName2 = 'Project Name 2';
         String productName2 = 'Product Name 2';
@@ -83,7 +91,7 @@ private class V1CaseCollectorTestSuite {
         MappingV1ProjectsToSFProducts__c mappingData2 = new MappingV1ProjectsToSFProducts__c();
         mappingData2.SFProductId__c = productId2;
         mappingData2.SFProductName__c = productName2;
-        mappingData2.V1ProjectToken__c = projectToken2;
+        mappingData2.V1ProjectId__c = projectToken2;
         mappingData2.V1ProjectName__c = projectName2;
         insert new MappingV1ProjectsToSFProducts__c[]{mappingData1, mappingData2};
 
@@ -101,10 +109,13 @@ private class V1CaseCollectorTestSuite {
         //System.assertEquals(projectName2, mappings.get(1).V1ProjectName__c, 'Incorrect project name for second mapping.');
     }
 
-    private static void assertMappingContain(MappingV1ProjectsToSFProducts__c expected, List<MappingV1ProjectsToSFProducts__c> actuals, String errorMessage){
+    private static void assertMappingContain(MappingV1ProjectsToSFProducts__c expected, List<MappingV1ProjectsToSFProducts__c> actuals, String errorMessage)
+    {
         boolean result = false;
-        for (MappingV1ProjectsToSFProducts__c actual : actuals) {
-            if (isMappingEquals(actual, expected)) {
+        for (MappingV1ProjectsToSFProducts__c actual : actuals) 
+        {
+            if (isMappingEquals(actual, expected)) 
+            {
                 result = true;
                 break;
             }
@@ -113,39 +124,44 @@ private class V1CaseCollectorTestSuite {
         System.assert(result, errorMessage);
     }
 
-    private static void assertMappingContain(ProjectProductMapping expected, List<MappingV1ProjectsToSFProducts__c> actuals, String errorMessage){
+    private static void assertMappingContain(ProjectProductMapping expected, List<MappingV1ProjectsToSFProducts__c> actuals, String errorMessage)
+    {
         boolean result = false;
-        for (MappingV1ProjectsToSFProducts__c actual : actuals) {
-            if (isMappingEquals(actual, expected)) {
+        for (MappingV1ProjectsToSFProducts__c actual : actuals) 
+        {
+            if (isMappingEquals(actual, expected)) 
+            {
                 result = true;
                 break;
             }
         }
-
         System.assert(result, errorMessage);
     }
 
-    private static boolean isMappingEquals(MappingV1ProjectsToSFProducts__c mapping1, MappingV1ProjectsToSFProducts__c mapping2) {
+    private static boolean isMappingEquals(MappingV1ProjectsToSFProducts__c mapping1, MappingV1ProjectsToSFProducts__c mapping2) 
+    {
         Boolean result = true;
         result = mapping1.SFProductId__c == mapping2.SFProductId__c;
         result = mapping1.SFProductName__c == mapping2.SFProductName__c;
-        result = mapping1.V1ProjectToken__c == mapping2.V1ProjectToken__c;
+        result = mapping1.V1ProjectId__c == mapping2.V1ProjectId__c;
         result = mapping1.V1ProjectName__c == mapping2.V1ProjectName__c;
         System.assertNotEquals(null, result, 'Result state is not correct.');
         return result;
     }
 
-    private static boolean isMappingEquals(MappingV1ProjectsToSFProducts__c mapping1, ProjectProductMapping mapping2) {
+    private static boolean isMappingEquals(MappingV1ProjectsToSFProducts__c mapping1, ProjectProductMapping mapping2) 
+    {
         Boolean result = true;
         result = mapping2.productId == mapping1.SFProductId__c;
         result = mapping2.productName == mapping1.SFProductName__c;
-        result = mapping2.projectToken == mapping1.V1ProjectToken__c;
+        result = mapping2.projectToken == mapping1.V1ProjectId__c;
         result = mapping2.projectName == mapping1.V1ProjectName__c;
         System.assertNotEquals(null, result, 'Result state is not correct.');
         return result;
     }
 
-    static testMethod void addNewMappingTest() {
+    static testMethod void addNewMappingTest() 
+    {
         String projectName = 'Project Name';
         String productName = 'Product Name';
         String projectToken = 'Scope:1234';
@@ -155,16 +171,18 @@ private class V1CaseCollectorTestSuite {
         mapping.productId = productId;
         V1CaseCollector.addNewMapping(mapping);
 
-        MappingV1ProjectsToSFProducts__c newMapping = [SELECT ID FROM MappingV1ProjectsToSFProducts__c WHERE SFProductId__c =: productId and SFProductName__c =: productName and V1ProjectToken__c =: projectToken and V1ProjectName__c =: projectName];
+        MappingV1ProjectsToSFProducts__c newMapping = [SELECT ID FROM MappingV1ProjectsToSFProducts__c WHERE SFProductId__c =: productId and SFProductName__c =: productName and V1ProjectId__c =: projectToken and V1ProjectName__c =: projectName];
         System.assertNotEquals(null, newMapping, 'Incorrect mapping data from the base.');
     }
 
 
-    static testMethod void deleteMappingTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void deleteMappingTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
+        
         String projectName1 = 'Project Name';
         String productName1 = 'Product Name';
         String projectToken1 = 'Scope:1234';
@@ -172,7 +190,7 @@ private class V1CaseCollectorTestSuite {
         MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
         mappingData1.SFProductId__c = productId1;
         mappingData1.SFProductName__c = productName1;
-        mappingData1.V1ProjectToken__c = projectToken1;
+        mappingData1.V1ProjectId__c = projectToken1;
         mappingData1.V1ProjectName__c = projectName1;
         String projectName2 = 'Project Name 2';
         String productName2 = 'Product Name 2';
@@ -181,21 +199,22 @@ private class V1CaseCollectorTestSuite {
         MappingV1ProjectsToSFProducts__c mappingData2 = new MappingV1ProjectsToSFProducts__c();
         mappingData2.SFProductId__c = productId2;
         mappingData2.SFProductName__c = productName2;
-        mappingData2.V1ProjectToken__c = projectToken2;
+        mappingData2.V1ProjectId__c = projectToken2;
         mappingData2.V1ProjectName__c = projectName2;
         insert new MappingV1ProjectsToSFProducts__c[]{mappingData1, mappingData2};
 
         V1CaseCollector.deleteMapping(mappingData1.id);
-        List<MappingV1ProjectsToSFProducts__c> mappings = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
+        List<MappingV1ProjectsToSFProducts__c> mappings = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
         System.assertEquals(1, mappings.size(), 'Incorect about of mapping after deleting.');
         //System.assertEquals(productName2, mappings.get(0).SFProductName__c, 'Incorect product name in mapping which was not deleted.');
         assertMappingContain(mappingData2, mappings, 'Incorect product data in mapping which was not deleted.');
     }
 
     //this test just verify that if there is no record with specify id, will not exception happens
-    static testMethod void deleteMappingWhenNothingToDeleteTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void deleteMappingWhenNothingToDeleteTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
         V1CaseCollector.deleteMapping('112312313123');
@@ -203,11 +222,13 @@ private class V1CaseCollectorTestSuite {
         System.assert(true);
     }
 
-    static testMethod void updateMappingTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void updateMappingTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
+        
         String projectName1 = 'Project Name';
         String productName1 = 'Product Name';
         String projectToken1 = 'Scope:1234';
@@ -215,7 +236,7 @@ private class V1CaseCollectorTestSuite {
         MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
         mappingData1.SFProductId__c = productId1;
         mappingData1.SFProductName__c = productName1;
-        mappingData1.V1ProjectToken__c = projectToken1;
+        mappingData1.V1ProjectId__c = projectToken1;
         mappingData1.V1ProjectName__c = projectName1;
         String projectName2 = 'Project Name 2';
         String productName2 = 'Product Name 2';
@@ -224,7 +245,7 @@ private class V1CaseCollectorTestSuite {
         MappingV1ProjectsToSFProducts__c mappingData2 = new MappingV1ProjectsToSFProducts__c();
         mappingData2.SFProductId__c = productId2;
         mappingData2.SFProductName__c = productName2;
-        mappingData2.V1ProjectToken__c = projectToken2;
+        mappingData2.V1ProjectId__c = projectToken2;
         mappingData2.V1ProjectName__c = projectName2;
         insert new MappingV1ProjectsToSFProducts__c[]{mappingData1, mappingData2};
         String newProjectName = 'new project name';
@@ -237,18 +258,21 @@ private class V1CaseCollectorTestSuite {
         updateForMapping.productId = newProductId;
 
         V1CaseCollector.updateMapping(mappingData2.id, updateForMapping);
-        List<MappingV1ProjectsToSFProducts__c> mappings = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
+        List<MappingV1ProjectsToSFProducts__c> mappings = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c];
         System.assertEquals(2, mappings.size(), 'Incorect about of mapping after deleting.');
         assertMappingContain(mappingData1, mappings, 'Incorect product data in mapping which was not updated.');
         assertMappingContain(updateForMapping, mappings, 'Incorect product data in mapping which was not updated.');
     }
 
-    static testMethod void getCasesTest() {
-        for (Case obj : [select Id from Case]) {
+    static testMethod void getCasesTest() 
+    {
+        for (Case obj : [select Id from Case]) 
+        {
             delete obj;
         }
 
-        System.runAs(createUser('test4356')){
+        System.runAs(createUser('test4356'))
+        {
             String queueName = 'TestQueue1';
             Group queue = new Group(Type='Queue', Name=queueName);
             insert queue;
@@ -277,10 +301,13 @@ private class V1CaseCollectorTestSuite {
         }
     }
 
-    static void assertContains (SObject expect, SObject[] actuals, String msg) {
+    static void assertContains (SObject expect, SObject[] actuals, String msg) 
+    {
         Boolean contains = false;
-        for (SObject o : actuals) {
-            if (o.Id == expect.Id) {
+        for (SObject o : actuals) 
+        {
+            if (o.Id == expect.Id) 
+            {
                 contains = true;
                 break;
             }
@@ -288,7 +315,8 @@ private class V1CaseCollectorTestSuite {
         System.assert(contains, msg + '\n  ' + expect + ' not found in ' + actuals);
     }
 
-    static User createUser(String alias) {
+    static User createUser(String alias) 
+    {
         User user = new User();
         user.Username = alias + '@not-a-mail.com';
         user.LastName = alias;

@@ -54,7 +54,7 @@
     <apex:actionStatus startText="Updating closed Defects report..." id="updatingDefectsTable"/>
 
     <apex:form >
-        <apex:pageBlock title="Closed Defects Report" mode="edit">
+        <apex:pageBlock title="VersionOne Defect Report" mode="edit">
             <apex:pageBlockSection columns="1" id="dateInput">
                 <!--
                 <apex:pageBlockSectionItem >

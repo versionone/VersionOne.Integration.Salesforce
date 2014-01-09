@@ -1,10 +1,15 @@
 @isTest
-private class SettingsControllerTester {
+private class SettingsControllerTester 
+{
 
-    static void assertContainsOption(String name, List<SelectOption> actuals, String msg) {
+    static void assertContainsOption(String name, List<SelectOption> actuals, String msg) 
+    {
         Boolean contains = false;
-        for (SelectOption o : actuals) {
-            if (o.getLabel() == name) {
+        
+        for (SelectOption o : actuals) 
+        {
+            if (o.getLabel() == name) 
+            {
                 contains = true;
                 break;
             }
@@ -12,7 +17,8 @@ private class SettingsControllerTester {
         System.assert(contains, msg + '\n  ' + name + ' not found in ' + actuals);
     }
 
-    static testMethod void validateSettingsTest() {
+    static testMethod void validateSettingsTest() 
+    {
         SettingsController controller = new SettingsController();
         Test.setCurrentPage(new PageReference('apex/Settings_page'));
         Settings settingsData = Settings.getTestSettings();
@@ -36,7 +42,8 @@ private class SettingsControllerTester {
         settingsData.setPath('http://localhost');
     }
 
-    static testMethod void validateConnectionAndSourceTest() {
+    static testMethod void validateConnectionAndSourceTest() 
+    {
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
         String sourceName = 'TestSource';
@@ -51,20 +58,25 @@ private class SettingsControllerTester {
 
         //thorw exception
         connector.enableException(new V1RequestException('Just test exception.'));
-        try {
+        try 
+        {
             controller.validateConnectionAndSource();
             System.assert(false, 'This place cannot be reached.');
-        }catch(V1RequestException e){}
+        }
+        catch(V1RequestException e){}
 
         //source was not found
         connector.setTestSourceId(null);
-        try {
+        try 
+        {
             controller.validateConnectionAndSource();
             System.assert(false, 'This place cannot be reached.');
-        }catch(V1RequestException e){}
+        }
+        catch(V1RequestException e){}
     }
 
-    static testMethod void testSettingsTest() {
+    static testMethod void testSettingsTest() 
+    {
         // not fully filled settings
         String sourceName = 'TestSource';
         String sourceIdExpected = '1010';
@@ -127,7 +139,8 @@ private class SettingsControllerTester {
         System.assert(!controller.isSaved, 'Settings has to be not saved.');
     }
 
-    static testMethod void saveSettingsTest() {
+    static testMethod void saveSettingsTest() 
+    {
         // normal way
         String userName = 'UserName';
         String source = 'Source';
@@ -185,7 +198,8 @@ private class SettingsControllerTester {
         System.assertEquals('', controller.testMessage, 'Incorrect test message.');
     }
 
-    static testMethod void updateProjectDataTest() {
+    static testMethod void updateProjectDataTest() 
+    {
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
@@ -208,9 +222,10 @@ private class SettingsControllerTester {
         System.assertEquals('Main project', settingsData.getProjectName());
     }
 
-    static testMethod void getMappingsTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void getMappingsTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
 
@@ -221,7 +236,7 @@ private class SettingsControllerTester {
         MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
         mappingData1.SFProductId__c = productId1;
         mappingData1.SFProductName__c = productName1;
-        mappingData1.V1ProjectToken__c = projectToken1;
+        mappingData1.V1ProjectId__c = projectToken1;
         mappingData1.V1ProjectName__c = projectName1;
         insert mappingData1;
         System.debug('----mappingData1.id' + mappingData1.id);
@@ -241,9 +256,10 @@ private class SettingsControllerTester {
         System.assert(!mappings.get(1).IsVisible, 'Incorrect "visible" status');
     }
 
-    static testMethod void getMappingsWithOnlyDefaultTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void getMappingsWithOnlyDefaultTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
 
@@ -260,7 +276,8 @@ private class SettingsControllerTester {
         System.assert(mappings.get(0).IsVisible, 'Incorrect "visible" status');
     }
 
-    static testMethod void getProductListTest() {
+    static testMethod void getProductListTest() 
+    {
         Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.Product__c;
         List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
 
@@ -272,7 +289,8 @@ private class SettingsControllerTester {
         System.assertEquals(ple.size(), options.size(), 'Incorrect amount of products options');
     }
 
-    static testMethod void getVersionOneProjectsListTest() {
+    static testMethod void getVersionOneProjectsListTest() 
+    {
         SettingsController controller = new SettingsController();
         Settings settingsData = Settings.getTestSettings();
         controller.connector = new V1ConnectorMock();
@@ -282,9 +300,10 @@ private class SettingsControllerTester {
         assertContainsOption('CI', options, 'Wrong option');
     }
 
-    static testMethod void updateProjectMappingWithErrorTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void updateProjectMappingWithErrorTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
 
@@ -295,7 +314,7 @@ private class SettingsControllerTester {
         MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
         mappingData1.SFProductId__c = productId1;
         mappingData1.SFProductName__c = productName1;
-        mappingData1.V1ProjectToken__c = projectToken1;
+        mappingData1.V1ProjectId__c = projectToken1;
         mappingData1.V1ProjectName__c = projectName1;
         insert mappingData1;
 
@@ -312,9 +331,10 @@ private class SettingsControllerTester {
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors when product id already used.');
     }
 
-    static testMethod void updateProjectMappingWithoutSecurityCodeTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void updateProjectMappingWithoutSecurityCodeTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
 
@@ -325,7 +345,7 @@ private class SettingsControllerTester {
         MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
         mappingData1.SFProductId__c = productId1;
         mappingData1.SFProductName__c = productName1;
-        mappingData1.V1ProjectToken__c = projectToken1;
+        mappingData1.V1ProjectId__c = projectToken1;
         mappingData1.V1ProjectName__c = projectName1;
         insert mappingData1;
 
@@ -340,16 +360,17 @@ private class SettingsControllerTester {
         controller.currentMapping.projectToken = projectToken1;
         controller.currentMapping.productId = productId1+ 'up';
         controller.updateProjectMapping();
-        MappingV1ProjectsToSFProducts__c resultMapping = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
+        MappingV1ProjectsToSFProducts__c resultMapping = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors.');
         System.assertEquals(projectName1, resultMapping.V1ProjectName__c, 'Incorrect project name for updated mapping with incorrect code.');
-        System.assertEquals(projectToken1, resultMapping.V1ProjectToken__c, 'Incorrect project token for updated mapping with incorrect code.');
+        System.assertEquals(projectToken1, resultMapping.V1ProjectId__c, 'Incorrect project token for updated mapping with incorrect code.');
         System.assertEquals(productName1, resultMapping.SFProductName__c, 'Incorrect project token for updated mapping with incorrect code.');
     }
 
-    static testMethod void updateProjectMappingWithSameMappingIdTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void updateProjectMappingWithSameMappingIdTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
 
@@ -360,7 +381,7 @@ private class SettingsControllerTester {
         MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
         mappingData1.SFProductId__c = productId1;
         mappingData1.SFProductName__c = productName1;
-        mappingData1.V1ProjectToken__c = projectToken1;
+        mappingData1.V1ProjectId__c = projectToken1;
         mappingData1.V1ProjectName__c = projectName1;
         insert mappingData1;
 
@@ -374,16 +395,17 @@ private class SettingsControllerTester {
         controller.currentMapping.projectToken = projectToken1;
         controller.currentMapping.productId = productId1+ 'up';
         controller.updateProjectMapping();
-        MappingV1ProjectsToSFProducts__c resultMapping = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
+        MappingV1ProjectsToSFProducts__c resultMapping = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
         System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of errors when product id already used.');
         System.assertEquals(projectName1, resultMapping.V1ProjectName__c, 'Incorrect project name for updated mapping.');
-        System.assertEquals(projectToken1, resultMapping.V1ProjectToken__c, 'Incorrect project token for updated mapping.');
+        System.assertEquals(projectToken1, resultMapping.V1ProjectId__c, 'Incorrect project token for updated mapping.');
         System.assertEquals(productName1 + 'up', resultMapping.SFProductName__c, 'Incorrect project token for updated mapping.');
     }
 
-    static testMethod void removeProjectMappingTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void removeProjectMappingTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
 
@@ -394,7 +416,7 @@ private class SettingsControllerTester {
         MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
         mappingData1.SFProductId__c = productId1;
         mappingData1.SFProductName__c = productName1;
-        mappingData1.V1ProjectToken__c = projectToken1;
+        mappingData1.V1ProjectId__c = projectToken1;
         mappingData1.V1ProjectName__c = projectName1;
         String projectName2 = 'Project Name 2';
         String productName2 = 'Product Name 2';
@@ -403,7 +425,7 @@ private class SettingsControllerTester {
         MappingV1ProjectsToSFProducts__c mappingData2 = new MappingV1ProjectsToSFProducts__c();
         mappingData2.SFProductId__c = productId2;
         mappingData2.SFProductName__c = productName2;
-        mappingData2.V1ProjectToken__c = projectToken2;
+        mappingData2.V1ProjectId__c = projectToken2;
         mappingData2.V1ProjectName__c = projectName2;
         insert new MappingV1ProjectsToSFProducts__c[] {mappingData1, mappingData2};
 
@@ -415,16 +437,17 @@ private class SettingsControllerTester {
         controller.settings = settingsData;
         controller.removeProjectMapping();
 
-        List<MappingV1ProjectsToSFProducts__c> resultMappings1 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
-        MappingV1ProjectsToSFProducts__c resultMapping2 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData2.Id];
+        List<MappingV1ProjectsToSFProducts__c> resultMappings1 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
+        MappingV1ProjectsToSFProducts__c resultMapping2 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData2.Id];
         System.assertEquals(0, resultMappings1.size(), 'This mapping should be deleted');
         System.assertNotEquals(null, resultMapping2, 'This mapping should be not deleted');
         System.assertEquals(0, ApexPages.getMessages().size(), 'Incorrect number of errors.');
     }
 
-    static testMethod void removeProjectMappingWithoutSpecialCodeTest() {
-        for (MappingV1ProjectsToSFProducts__c obj :
-            [select Id from MappingV1ProjectsToSFProducts__c]) {
+    static testMethod void removeProjectMappingWithoutSpecialCodeTest() 
+    {
+        for (MappingV1ProjectsToSFProducts__c obj : [select Id from MappingV1ProjectsToSFProducts__c]) 
+        {
             delete obj;
         }
 
@@ -435,7 +458,7 @@ private class SettingsControllerTester {
         MappingV1ProjectsToSFProducts__c mappingData1 = new MappingV1ProjectsToSFProducts__c();
         mappingData1.SFProductId__c = productId1;
         mappingData1.SFProductName__c = productName1;
-        mappingData1.V1ProjectToken__c = projectToken1;
+        mappingData1.V1ProjectId__c = projectToken1;
         mappingData1.V1ProjectName__c = projectName1;
         String projectName2 = 'Project Name 2';
         String productName2 = 'Product Name 2';
@@ -444,7 +467,7 @@ private class SettingsControllerTester {
         MappingV1ProjectsToSFProducts__c mappingData2 = new MappingV1ProjectsToSFProducts__c();
         mappingData2.SFProductId__c = productId2;
         mappingData2.SFProductName__c = productName2;
-        mappingData2.V1ProjectToken__c = projectToken2;
+        mappingData2.V1ProjectId__c = projectToken2;
         mappingData2.V1ProjectName__c = projectName2;
         insert new MappingV1ProjectsToSFProducts__c[] {mappingData1, mappingData2};
 
@@ -458,8 +481,8 @@ private class SettingsControllerTester {
         controller.settings = settingsData;
         controller.removeProjectMapping();
 
-        List<MappingV1ProjectsToSFProducts__c> resultMapping1 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
-        MappingV1ProjectsToSFProducts__c resultMapping2 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectToken__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData2.Id];
+        List<MappingV1ProjectsToSFProducts__c> resultMapping1 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData1.Id];
+        MappingV1ProjectsToSFProducts__c resultMapping2 = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c where id=:mappingData2.Id];
         System.assertNotEquals(null, resultMapping1, 'This mapping should be not deleted');
         System.assertNotEquals(null, resultMapping2, 'This mapping should be not deleted');
         System.assertEquals(1, ApexPages.getMessages().size(), 'Incorrect number of errors.');
