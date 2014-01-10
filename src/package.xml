@@ -52,6 +52,7 @@
         <name>ApexPage</name>
     </types>
     <types>
+        <members>Case.Product__c</members>
         <members>Case.V1Association__c</members>
         <members>Case.V1DefectId__c</members>
         <members>Case.V1Description__c</members>
