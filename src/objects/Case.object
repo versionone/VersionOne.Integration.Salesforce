@@ -1,6 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <fields>
+        <fullName>EngineeringReqNumber__c</fullName>
+        <externalId>false</externalId>
+        <label>Engineering Req Number</label>
+        <length>12</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>PotentialLiability__c</fullName>
+        <externalId>false</externalId>
+        <label>Potential Liability</label>
+        <picklist>
+            <picklistValues>
+                <fullName>No</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Yes</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
         <fullName>Product__c</fullName>
         <externalId>false</externalId>
         <label>Product</label>
@@ -39,6 +69,25 @@
             </picklistValues>
             <picklistValues>
                 <fullName>GC1020</fullName>
+                <default>false</default>
+            </picklistValues>
+            <sorted>false</sorted>
+        </picklist>
+        <trackFeedHistory>false</trackFeedHistory>
+        <trackHistory>false</trackHistory>
+        <type>Picklist</type>
+    </fields>
+    <fields>
+        <fullName>SLAViolation__c</fullName>
+        <externalId>false</externalId>
+        <label>SLA Violation</label>
+        <picklist>
+            <picklistValues>
+                <fullName>No</fullName>
+                <default>false</default>
+            </picklistValues>
+            <picklistValues>
+                <fullName>Yes</fullName>
                 <default>false</default>
             </picklistValues>
             <sorted>false</sorted>

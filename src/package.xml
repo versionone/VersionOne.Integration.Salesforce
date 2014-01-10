@@ -52,7 +52,10 @@
         <name>ApexPage</name>
     </types>
     <types>
+        <members>Case.EngineeringReqNumber__c</members>
+        <members>Case.PotentialLiability__c</members>
         <members>Case.Product__c</members>
+        <members>Case.SLAViolation__c</members>
         <members>Case.V1Association__c</members>
         <members>Case.V1DefectId__c</members>
         <members>Case.V1Description__c</members>
