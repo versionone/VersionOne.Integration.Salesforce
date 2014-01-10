@@ -75,5 +75,9 @@
         <members>Case-Case %28VersionOne%29 Layout</members>
         <name>Layout</name>
     </types>
+    <types>
+        <members>Case.UpsellCrosssellOpportunity</members>
+        <name>WebLink</name>
+    </types>
     <version>29.0</version>
 </Package>
