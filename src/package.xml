@@ -52,6 +52,13 @@
         <name>ApexPage</name>
     </types>
     <types>
+        <members>Case.V1Association__c</members>
+        <members>Case.V1DefectId__c</members>
+        <members>Case.V1Description__c</members>
+        <members>Case.V1DevelopmentStatus__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
         <members>*</members>
         <name>CustomObject</name>
     </types>
