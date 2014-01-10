@@ -1,3 +1,14 @@
 # VersionOne Integration for Salesforce
 
-If you are interested in contributing to this project, please contact [Ian Buchanan](mailto:ian.buchanan@versionone.com).
+## Build Prerequisites
+
+### Step 1: Create Force.com Environment
+
+Also known as an organization.
+
+### Step 2: Download and Install Force.com Migration Tool
+
+You must [login](https://login.salesforce.com/) to the Force.com environment (from step 1) to download this tool.
+
+[Install Force.com Migration Tool](http://wiki.developerforce.com/page/Force.com_Migration_Tool).
+
