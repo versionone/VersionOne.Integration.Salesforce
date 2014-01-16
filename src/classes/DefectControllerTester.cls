@@ -165,7 +165,7 @@ private class DefectControllerTester
 
     private static DefectController getControllerWithoutAssignedDefect() 
     {
-        Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, Product__c = SF_PRODUCT_ID);
+        Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, V1Product__c = SF_PRODUCT_ID);
         insert new Case[] {caseData};
 
         caseData = [SELECT V1Association__c FROM Case WHERE Id = :caseData.Id];
@@ -175,7 +175,7 @@ private class DefectControllerTester
 
     private static DefectController getControllerWithAssignedDefect() 
     {
-        Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, V1Association__c = true, V1DefectId__c = DEFECT_TOKEN, Product__c = SF_PRODUCT_ID);
+        Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, V1Association__c = true, V1DefectId__c = DEFECT_TOKEN, V1Product__c = SF_PRODUCT_ID);
         insert new Case[] {caseData};
 
         caseData = [SELECT V1Association__c FROM Case WHERE Id = :caseData.Id];
@@ -185,7 +185,7 @@ private class DefectControllerTester
     
     private static DefectController getControllerWithoutSettings() 
     {
-        Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, V1Association__c = true, V1DefectId__c = DEFECT_TOKEN, Product__c = SF_PRODUCT_ID);
+        Case caseData = new Case(Subject = CASE_SUBJECT, Description = CASE_DESCRIPTION, V1Association__c = true, V1DefectId__c = DEFECT_TOKEN, V1Product__c = SF_PRODUCT_ID);
         insert new Case[] {caseData};
         caseData = [SELECT V1Association__c FROM Case WHERE Id = :caseData.Id];
         

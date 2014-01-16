@@ -311,8 +311,7 @@ public with sharing class SettingsController
     public List<Selectoption> getProductList() 
     {
         List<SelectOption> options = new List<SelectOption>();
-        //options.add(new SelectOption(DEFAULT_PRODUCT_ID, DEFAULT_PRODUCT));
-        Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.Product__c;
+        Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.V1Product__c;
         List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
         for(Schema.PicklistEntry f : ple) 
         {

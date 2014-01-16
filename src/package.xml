@@ -52,14 +52,10 @@
         <name>ApexPage</name>
     </types>
     <types>
-        <members>Case.EngineeringReqNumber__c</members>
-        <members>Case.PotentialLiability__c</members>
-        <members>Case.Product__c</members>
-        <members>Case.SLAViolation__c</members>
         <members>Case.V1Association__c</members>
         <members>Case.V1DefectId__c</members>
-        <members>Case.V1Description__c</members>
         <members>Case.V1DevelopmentStatus__c</members>
+        <members>Case.V1Product__c</members>
         <name>CustomField</name>
     </types>
     <types>
@@ -70,14 +66,6 @@
         <members>VersionOne_Defect_Report</members>
         <members>VersionOne_Settings</members>
         <name>CustomTab</name>
-    </types>
-    <types>
-        <members>Case-Case %28VersionOne%29 Layout</members>
-        <name>Layout</name>
-    </types>
-    <types>
-        <members>Case.UpsellCrosssellOpportunity</members>
-        <name>WebLink</name>
     </types>
     <version>29.0</version>
 </Package>

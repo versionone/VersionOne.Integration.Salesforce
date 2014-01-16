@@ -278,7 +278,7 @@ private class SettingsControllerTester
 
     static testMethod void getProductListTest() 
     {
-        Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.Product__c;
+        Schema.DescribeFieldResult fieldResult = Schema.sObjectType.Case.fields.V1Product__c;
         List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
 
         SettingsController controller = new SettingsController();

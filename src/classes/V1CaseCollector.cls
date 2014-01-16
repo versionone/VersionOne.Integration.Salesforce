@@ -1,14 +1,13 @@
 public class V1CaseCollector 
 {
-
     /* Query case with specified case number.
      * caseNumbers - case number.
      * Return: found case.
      */
     public static Case getCaseByCaseNumber(String caseNumber) 
     {
-        return [SELECT id, CaseNumber, Description, Subject, Product__c
-                          FROM Case WHERE CaseNumber = :caseNumber];
+        return [SELECT id, CaseNumber, Description, Subject, V1Product__c 
+        		FROM Case WHERE CaseNumber = :caseNumber];
     }
 
     /* Query case with specified case ID.
@@ -17,8 +16,8 @@ public class V1CaseCollector
      */
     public static Case getCaseByCaseId(String caseID) 
     {
-        return [SELECT id, CaseNumber, Description, Subject, Product__c, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c
-                          FROM Case WHERE id = :caseID];
+        return [SELECT id, CaseNumber, Description, Subject, V1Product__c, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c 
+        		FROM Case WHERE id = :caseID];
     }
 
     /* Query cases with specified case IDs.
@@ -27,7 +26,8 @@ public class V1CaseCollector
      */
     public static Case[] getCasesByCasesNumber(String[] casesNumber) 
     {
-        return [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name FROM Case WHERE CaseNumber in :casesNumber];
+        return [SELECT id, CaseNumber, Subject, Status, CreatedDate, Owner.Name 
+        		FROM Case WHERE CaseNumber in :casesNumber];
     }
 
 
@@ -45,11 +45,12 @@ public class V1CaseCollector
         if (ownerId != null) 
         {
             cases = getCasesByOwnerId(ownerId, isClosed);
-        } else {
+        } 
+        else 
+        {
             cases = getCasesByStatus(isClosed);
         }
 
-        System.debug('==> getCasesByOwnerId() found: ' + cases.size());
         return cases;
     }
 
@@ -58,12 +59,12 @@ public class V1CaseCollector
         if (isClosed) 
         {
             return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-                          FROM Case WHERE OwnerId = :ownerId and Status = 'Closed' and V1Association__c = true ];
+            		FROM Case WHERE OwnerId = :ownerId and Status = 'Closed' and V1Association__c = true ];
         } 
         else 
         {
             return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-                          FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed' and V1Association__c = true ];
+            		FROM Case WHERE OwnerId = :ownerId and Status <> 'Closed' and V1Association__c = true ];
         }
     }
 
@@ -72,12 +73,12 @@ public class V1CaseCollector
         if (isClosed) 
         {
             return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-                              FROM Case WHERE Status = 'Closed' and V1Association__c = true LIMIT 5000];
+            		FROM Case WHERE Status = 'Closed' and V1Association__c = true LIMIT 5000];
         } 
         else 
         {
             return [SELECT id, CaseNumber, V1DefectId__c, Subject, Status, CreatedDate, Owner.Name
-                              FROM Case WHERE Status <> 'Closed' and V1Association__c = true LIMIT 5000];
+            		FROM Case WHERE Status <> 'Closed' and V1Association__c = true LIMIT 5000];
         }
     }
 
@@ -111,7 +112,8 @@ public class V1CaseCollector
      **/
     public static List<MappingV1ProjectsToSFProducts__c> getMappingList() 
     {
-        return [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c LIMIT 5000];
+        return [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c, V1ProjectName__c 
+        		FROM MappingV1ProjectsToSFProducts__c LIMIT 5000];
     }
 
     /**
@@ -121,7 +123,7 @@ public class V1CaseCollector
     {
         List<MappingV1ProjectsToSFProducts__c> mappings = [SELECT Id, SFProductId__c, SFProductName__c, V1ProjectId__c,
                                                            V1ProjectName__c FROM MappingV1ProjectsToSFProducts__c
-                                                           WHERE SFProductId__c = :caseValue.Product__c];
+                                                           WHERE SFProductId__c = :caseValue.V1Product__c];
         return mappings.size() > 0 ? mappings[0] : null;
     }
 
@@ -145,7 +147,7 @@ public class V1CaseCollector
      **/
     public static void deleteMapping(String mappingId) 
     {
-        List<MappingV1ProjectsToSFProducts__c> mappings = [select Id from MappingV1ProjectsToSFProducts__c where id=:mappingId];
+        List<MappingV1ProjectsToSFProducts__c> mappings = [SELECT Id FROM MappingV1ProjectsToSFProducts__c WHERE id=:mappingId];
         delete mappings;
     }
 
@@ -156,7 +158,7 @@ public class V1CaseCollector
      **/
     public static void updateMapping(String mappingId, ProjectProductMapping mapping) 
     {
-        MappingV1ProjectsToSFProducts__c mappingData = [select Id from MappingV1ProjectsToSFProducts__c where id=:mappingId];
+        MappingV1ProjectsToSFProducts__c mappingData = [SELECT Id FROM MappingV1ProjectsToSFProducts__c WHERE id=:mappingId];
         mappingData.SFProductId__c = mapping.productId;
         mappingData.SFProductName__c = mapping.productName;
         mappingData.V1ProjectId__c = mapping.projectToken;

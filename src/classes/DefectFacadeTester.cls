@@ -80,7 +80,7 @@ private class DefectFacadeTester
         connector.addException(V1ConnectorMock.CREATION_LINK_EXCEPTION, new IntegrationException());
         case1 = new Case(Subject = 'case1', Description = 'desc');
         insert case1;
-        case1 = [SELECT Subject, Id, Description, Product__c, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
+        case1 = [SELECT Subject, Id, Description, V1Product__c, V1Association__c, V1DefectId__c FROM Case WHERE Id = :case1.Id];
 
         createdDefectToken = null;
         try 
@@ -334,7 +334,7 @@ private class DefectFacadeTester
                 Case caseValue = new Case(
                     Subject = 'case'+i,
                     Description = 'desc'+i,
-                    Product__c = PRODUCT_ID,
+                    V1Product__c = PRODUCT_ID,
                     V1Association__c = true,
                     V1DefectId__c = 'Defect:'+i,
                     OwnerId = Userinfo.getUserId()
@@ -377,12 +377,12 @@ private class DefectFacadeTester
         Case caseValue = new Case(
             Subject = 'case1',
             Description = 'desc',
-            Product__c = PRODUCT_ID,
+            V1Product__c = PRODUCT_ID,
             V1Association__c = isAssigned,
             V1DefectId__c = isAssigned ? DEFECT_TOKEN : null
         );
         insert caseValue;
-        caseValue = [SELECT Subject, Id, Description, Product__c, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c, CaseNumber FROM Case WHERE Id = :caseValue.Id];
+        caseValue = [SELECT Subject, Id, Description, V1Product__c, V1Association__c, V1DefectId__c, V1DevelopmentStatus__c, CaseNumber FROM Case WHERE Id = :caseValue.Id];
         System.assertNotEquals(null, caseValue);
         return caseValue;
     }
