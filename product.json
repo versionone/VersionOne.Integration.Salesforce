@@ -1,5 +1,5 @@
 {
-    "id": "VersionOne.Integration.CaseConnect",
+    "id": "VersionOne.Integration.Salesforce",
     "titleSection": {
         "name": "VersionOne Integration for Salesforce",
         "shortDescription": "Link VersionOne Defects with salesforce.com Cases",
@@ -10,7 +10,7 @@
         }
     },
     "descriptionSection": {
-        "description": "CaseConnect affords the ability to link VersionOne Defects with salesforce.com Cases. Using this integration your organization can leverage its investment in salesforce.com Cases Management as part of an integrated platform for Agile development.\n \n * Create VersionOne Defects from Cases in salesforce.com \n * Associate Cases in salesforce.com with Defects in VersionOne \n * Update salesforce.com Cases with Defect Status"
+        "description": "VersionOne Integration for Salesforce affords the ability to link VersionOne Defects with salesforce.com Cases. Using this integration your organization can leverage its investment in salesforce.com Cases Management as part of an integrated platform for Agile development.\n \n * Create VersionOne Defects from Cases in salesforce.com \n * Associate Cases in salesforce.com with Defects in VersionOne \n * Update salesforce.com Cases with Defect Status"
     },
     "linksSection": [
         {
@@ -27,29 +27,50 @@
             "type": "documentation",
             "title": "bwin Interactive Customer Success Story",
             "href": "http://www.versionone.com/pdf/bwin_Interactive_Customer_Success_Story.pdf"
-        }
+        },
+        {
+            "type": "documentation",
+            "title": "README for developers",
+            "href": "https://github.com/versionone/VersionOne.Integration.Salesforce/blob/master/README.md"
+        },
+        {
+            "type": "source",
+            "title": "GitHub Project for Source Code and Issues",
+            "href": "https://github.com/versionone/VersionOne.Integration.Salesforce"
+        },
+        {
+            "type": "license",
+            "title": "Modified BSD (3 clause) License",
+            "href": "https://github.com/versionone/VersionOne.Integration.Salesforce/blob/master/LICENSE.md"
+        }        
     ],
     "updatesSection": {
         "updates": [
             {
+                "date": "2014-01-17T00:00:00.000Z",
+                "description": "Winter 2014",
+                "version": "2.0.0",
+                "qualityBand": "sapling"
+            },
+            {
                 "date": "2010-12-01T00:00:00.000Z",
                 "description": "Fall 2010",
                 "version": "1.5.0",
-                "qualityBand": "mature"
+                "qualityBand": "seed"
             }
         ],
         "qualityBands": {
             "seed": {
-                "shortDescription": "The initial idea of a product. No working code.",
-                "href": "https://github.com/versionone/VersionOne.Integration.CaseConnect/blob/master/CONTRIBUTING.md#seed"
+                "shortDescription": "Early access build. Use with caution.",
+                "href": "https://github.com/versionone/VersionOne.Integration.Salesforce/blob/master/CONTRIBUTING.md#seed"
             },
             "sapling": {
                 "shortDescription": "The product is undergoing rapid growth. The code works but expect major changes.",
-                "href": "https://github.com/versionone/VersionOne.Integration.CaseConnect/blob/master/CONTRIBUTING.md#sapling"
+                "href": "https://github.com/versionone/VersionOne.Integration.Salesforce/blob/master/CONTRIBUTING.md#sapling"
             },
             "mature": {
                 "shortDescription": "The product is stable. The code will continue to evolve with minimum breaking changes.",
-                "href": "https://github.com/versionone/VersionOne.Integration.CaseConnect/blob/master/CONTRIBUTING.md#mature"
+                "href": "https://github.com/versionone/VersionOne.Integration.Salesforce/blob/master/CONTRIBUTING.md#mature"
             }
         }
     },
