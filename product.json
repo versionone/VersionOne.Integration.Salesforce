@@ -50,6 +50,7 @@
                 "date": "2014-01-17T00:00:00.000Z",
                 "description": "Winter 2014",
                 "version": "2.0.0",
+                "releaseNotes": "* Added: Now available as a managed package, compatible with Professional Edition.\n* Renamed: CaseConnect is now VersionOne Integration for Salesforce.\n* Removed: Case (VersionOne) Layout has been removed.",
                 "qualityBand": "sapling"
             },
             {
