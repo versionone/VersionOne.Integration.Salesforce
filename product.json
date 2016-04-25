@@ -5,12 +5,12 @@
         "shortDescription": "Link VersionOne Defects with salesforce.com Cases",
         "pricing": "Free",
         "support": {
-            "text": "VersionOne",
-            "href": "http://support.versionone.com/home"
+            "text": "Open Source Community",
+            "href": "http://stackoverflow.com/questions"
         }
     },
     "descriptionSection": {
-        "description": "VersionOne Integration for Salesforce affords the ability to link VersionOne Defects with salesforce.com Cases. Using this integration your organization can leverage its investment in salesforce.com Cases Management as part of an integrated platform for Agile development.\n \n * Create VersionOne Defects from Cases in salesforce.com \n * Associate Cases in salesforce.com with Defects in VersionOne \n * Update salesforce.com Cases with Defect Status"
+        "description": "As of Spring 2016 this integration was set to sunset status, the source is available below for extending this integration.** \n For support please submit a question to Stack Overflow using the tag versionone-caseconnect \n VersionOne Integration for Salesforce affords the ability to link VersionOne Defects with salesforce.com Cases. Using this integration your organization can leverage its investment in salesforce.com Cases Management as part of an integrated platform for Agile development.\n \n * Create VersionOne Defects from Cases in salesforce.com \n * Associate Cases in salesforce.com with Defects in VersionOne \n * Update salesforce.com Cases with Defect Status"
     },
     "linksSection": [
         {
@@ -46,6 +46,11 @@
     ],
     "updatesSection": {
         "updates": [
+            {
+                "date": "2016-04-25T12:00:00.000Z",
+                "description": "Spring 2016",
+                "version": "Sunset"
+            },
             {
                 "date": "2014-01-17T00:00:00.000Z",
                 "description": "Winter 2014",
